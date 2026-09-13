@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-base: #0B0D10;
+  --surface-1: #111418;
+  --surface-2: #171B20;
+  --border-default: #232830;
+  --border-subtle: #1C2026;
+  --text-primary: #E6E9EE;
+  --text-secondary: #8A93A0;
+  --text-tertiary: #5B6370;
+}
+
+.light {
+  --bg-base: #F6F7F9;
+  --surface-1: #FFFFFF;
+  --surface-2: #EFF1F5;
+  --border-default: #DCE0E7;
+  --border-subtle: #E6E9EE;
+  --text-primary: #14171C;
+  --text-secondary: #5A6270;
+  --text-tertiary: #8A93A0;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+.font-tabular {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Restrained scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #232830;
+  border-radius: 9999px;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: #DCE0E7;
+}
+
+/* Subtle focus indicators */
+*:focus-visible {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+}
