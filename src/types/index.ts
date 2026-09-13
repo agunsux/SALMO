@@ -21,6 +21,7 @@ export type LifecycleStage =
   | 'VALIDATED'
   | 'OOS_PASS'
   | 'WALK_FORWARD_PASS'
+  | 'UNVERIFIED'
   | 'LIVE_SHADOW'
   | 'LIVE_SETTLED'
   | 'HISTORICAL'

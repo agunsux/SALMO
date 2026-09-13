@@ -2,7 +2,7 @@
 // Full quarter-line split resolution without binary reduction.
 // Strictly supports: WIN, HALF_WIN, PUSH, HALF_LOSS, LOSS, VOID
 
-import { SettlementOutcome } from '../../types';
+import { SettlementOutcome } from '../../types/index';
 
 export class QuarterLineSettler {
   public static isQuarterLine(line: number): boolean {

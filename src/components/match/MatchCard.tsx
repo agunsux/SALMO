@@ -82,7 +82,6 @@ export const MatchCard: React.FC<MatchCardProps> = ({
     return (
       <span className={`text-[11px] font-tabular ${color}`}>
         {market.confidence === 'HIGH' ? t.confidence.high : market.confidence === 'MEDIUM' ? t.confidence.medium : t.confidence.low}
-        <span className="text-[10px] text-[#5B6370] ml-1">({market.confidenceScore}%)</span>
       </span>
     );
   };

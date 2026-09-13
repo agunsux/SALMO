@@ -28,7 +28,13 @@ export const InlineWhy: React.FC<{ market: MarketView }> = ({ market }) => {
         <span className="font-semibold uppercase tracking-wider text-[#E6E9EE] dark:text-[#E6E9EE] light:text-[#14171C]">
           {t.why.title} — {market.marketType.replace('_', ' ')}
         </span>
-        <span className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-400">
+        <span className={`flex items-center gap-1.5 text-[11px] font-medium ${
+          market.validationStage === 'WALK_FORWARD_PASS'
+            ? 'text-emerald-400'
+            : market.validationStage === 'UNVERIFIED'
+            ? 'text-amber-400/90'
+            : 'text-[#8A93A0]'
+        }`}>
           <ShieldCheck className="h-3.5 w-3.5" />
           {market.validationStage}
         </span>

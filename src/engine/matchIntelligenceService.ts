@@ -6,7 +6,7 @@ import { HandicapLabClient } from '../contracts/handicapLabClient';
 import { QuarterLineSettler } from './ah/quarterLineSettler';
 import { DevigEngine } from './ah/devig';
 import { DecisionPolicy } from './decision/decisionPolicy';
-import { MatchIntelligence, MarketView, DecisionProvenance } from '../types';
+import { MatchIntelligence, MarketView, DecisionProvenance } from '../types/index';
 
 export class MatchIntelligenceService {
   /**
@@ -88,7 +88,7 @@ export class MatchIntelligenceService {
     }
 
     const evaluated = sampleSize - pushes;
-    const coverRatePct = evaluated > 0 ? Number((((wins + 0.5 * halfWins) / evaluated) * 100).toFixed(1)) : 50.0;
+    const coverRatePct = evaluated > 0 ? Number((((wins + 0.5 * halfWins) / evaluated) * 100).toFixed(1)) : null;
 
     const devig = DevigEngine.devigTwoWay(odds, oppOdds);
     const impliedProbPct = Number((devig.impliedProbA * 100).toFixed(1));
@@ -100,7 +100,7 @@ export class MatchIntelligenceService {
       impliedProbPct,
       sampleSize,
       dataQuality: 'PASS',
-      validationStage: 'WALK_FORWARD_PASS',
+      validationStage: 'UNVERIFIED',
     });
 
     const provenance: DecisionProvenance = {
@@ -112,7 +112,7 @@ export class MatchIntelligenceService {
       line: `${record.homeTeam} ${lineLabel}`,
       sampleSize,
       settlementMethodology: 'Quarter-Line Split Settlement v1.0',
-      validationStatus: 'WALK_FORWARD_PASS',
+      validationStatus: 'UNVERIFIED',
       lastUpdate: summary.lastUpdate,
       checksum: summary.checksum,
     };
@@ -137,7 +137,7 @@ export class MatchIntelligenceService {
       expectedValuePct: decision.expectedValuePct,
       sampleSize,
       dataQuality: 'PASS',
-      validationStage: 'WALK_FORWARD_PASS',
+      validationStage: 'UNVERIFIED',
       settlementDistribution: {
         winPct: sampleSize > 0 ? Number(((wins / sampleSize) * 100).toFixed(1)) : 0,
         halfWinPct: sampleSize > 0 ? Number(((halfWins / sampleSize) * 100).toFixed(1)) : 0,
@@ -176,7 +176,7 @@ export class MatchIntelligenceService {
       impliedProbPct,
       sampleSize,
       dataQuality: 'PASS',
-      validationStage: 'WALK_FORWARD_PASS',
+      validationStage: 'UNVERIFIED',
     });
 
     const provenance: DecisionProvenance = {
@@ -188,7 +188,7 @@ export class MatchIntelligenceService {
       line: 'YES',
       sampleSize,
       settlementMethodology: 'Binary Settlement (Goals >= 1 Both)',
-      validationStatus: 'WALK_FORWARD_PASS',
+      validationStatus: 'UNVERIFIED',
       lastUpdate: summary.lastUpdate,
       checksum: summary.checksum,
     };
@@ -212,7 +212,7 @@ export class MatchIntelligenceService {
       expectedValuePct: decision.expectedValuePct,
       sampleSize,
       dataQuality: 'PASS',
-      validationStage: 'WALK_FORWARD_PASS',
+      validationStage: 'UNVERIFIED',
       reason: decision.reason,
       provenance,
     };
@@ -244,7 +244,7 @@ export class MatchIntelligenceService {
       impliedProbPct,
       sampleSize,
       dataQuality: 'PASS',
-      validationStage: 'WALK_FORWARD_PASS',
+      validationStage: 'UNVERIFIED',
     });
 
     const provenance: DecisionProvenance = {
@@ -256,7 +256,7 @@ export class MatchIntelligenceService {
       line: 'OVER 2.5',
       sampleSize,
       settlementMethodology: 'Single Half-Line Goal Settlement (2.5 Goals)',
-      validationStatus: 'WALK_FORWARD_PASS',
+      validationStatus: 'UNVERIFIED',
       lastUpdate: summary.lastUpdate,
       checksum: summary.checksum,
     };
@@ -281,7 +281,7 @@ export class MatchIntelligenceService {
       expectedValuePct: decision.expectedValuePct,
       sampleSize,
       dataQuality: 'PASS',
-      validationStage: 'WALK_FORWARD_PASS',
+      validationStage: 'UNVERIFIED',
       reason: decision.reason,
       provenance,
     };

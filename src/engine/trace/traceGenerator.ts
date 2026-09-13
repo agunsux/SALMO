@@ -1,7 +1,7 @@
 // SALMO.DEV — Calculation Trace Generator
 // Transparent mathematical derivation with zero unexplained magic numbers.
 
-import { CalculationTrace, MarketView } from '../../types';
+import { CalculationTrace, MarketView } from '../../types/index';
 
 export class TraceGenerator {
   public static generateTrace(market: MarketView): CalculationTrace {

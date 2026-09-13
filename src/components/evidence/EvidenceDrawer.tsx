@@ -127,7 +127,7 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({
             <div>Source: <span className="text-[#E6E9EE]">{market.provenance.source}</span></div>
             <div>Version: <span className="text-[#E6E9EE]">{market.provenance.datasetVersion}</span></div>
             <div>Coverage: <span className="text-[#E6E9EE]">{market.provenance.dateRange}</span></div>
-            <div>Validation: <span className="text-emerald-400 font-medium">{market.provenance.validationStatus}</span></div>
+            <div>Validation: <span className={`font-medium ${market.provenance.validationStatus === 'WALK_FORWARD_PASS' ? 'text-emerald-400' : market.provenance.validationStatus === 'UNVERIFIED' ? 'text-amber-400' : 'text-[#8A93A0]'}`}>{market.provenance.validationStatus}</span></div>
           </div>
         </div>
 

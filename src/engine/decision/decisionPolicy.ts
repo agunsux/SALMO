@@ -2,7 +2,7 @@
 // Strictly enforces separation of Probability, Value, and Decision.
 // Never uses default 50% probabilities or synthetic confidence.
 
-import { DecisionBadge, DecisionStatus, ConfidenceTier } from '../../types';
+import { DecisionBadge, DecisionStatus, ConfidenceTier } from '../../types/index';
 
 export interface DecisionEvaluationInput {
   odds: number | null | undefined;
@@ -72,8 +72,8 @@ export class DecisionPolicy {
         badge: 'GREY',
         status: 'INSUFFICIENT_DATA',
         statusLabel: 'INSUFFICIENT EVIDENCE',
-        confidence: 'LOW',
-        confidenceScore: Math.min(sampleSize * 2, 40),
+        confidence: 'NONE',
+        confidenceScore: 0,
         edgePercentagePoints: null,
         expectedValuePct: null,
         reason: `Historical sample (${sampleSize} matches) is below minimum statistical threshold (20).`,
@@ -83,29 +83,34 @@ export class DecisionPolicy {
     const implied = impliedProbPct ?? Number(((1 / odds) * 100).toFixed(1));
     const edge = Number((modelProbPct - implied).toFixed(1));
 
-    // Expected value calculation
+    // Expected value calculation: EV = (model_prob * odds) - 1
     const ev = Number((((modelProbPct / 100) * odds - 1) * 100).toFixed(1));
 
-    // Compute independent confidence score (0 - 100)
-    let confScore = 40;
-    if (sampleSize >= 150) confScore += 30;
-    else if (sampleSize >= 75) confScore += 20;
-    else if (sampleSize >= 40) confScore += 10;
+    // Strict categorical confidence tiers grounded in sample size & data provenance:
+    // HIGH: Sample size >= 75, verified closing odds, clean data quality (Standard error <= 5.7%)
+    // MEDIUM: Sample size 40-74, clean data quality (Standard error <= 7.9%)
+    // LOW: Sample size 20-39 (Standard error <= 11.2%)
+    // NONE: Sample size < 20 or data unavailable
+    let confidenceTier: ConfidenceTier = 'LOW';
+    let confScore = 30;
 
-    if (dataQuality === 'PASS') confScore += 15;
-    if (odds >= 1.70 && odds <= 2.20) confScore += 15; // standard liquid band
-
-    confScore = Math.min(Math.max(confScore, 0), 95);
-
-    let confidenceTier: ConfidenceTier = 'MEDIUM';
-    if (confScore >= 75) confidenceTier = 'HIGH';
-    else if (confScore >= 50) confidenceTier = 'MEDIUM';
-    else if (confScore >= 25) confidenceTier = 'LOW';
-    else confidenceTier = 'NONE';
+    if (sampleSize >= 75 && dataQuality === 'PASS') {
+      confidenceTier = 'HIGH';
+      confScore = 85;
+    } else if (sampleSize >= 40 && dataQuality === 'PASS') {
+      confidenceTier = 'MEDIUM';
+      confScore = 65;
+    } else if (sampleSize >= 20) {
+      confidenceTier = 'LOW';
+      confScore = 40;
+    } else {
+      confidenceTier = 'NONE';
+      confScore = 0;
+    }
 
     // Decision gating
-    // GREEN: Edge >= +3.0 pp AND sampleSize >= 40 AND odds available
-    if (edge >= 3.0 && sampleSize >= 40 && confScore >= 70) {
+    // GREEN: Edge >= +3.0 pp AND sampleSize >= 40 AND confidenceTier at least MEDIUM
+    if (edge >= 3.0 && sampleSize >= 40 && (confidenceTier === 'HIGH' || confidenceTier === 'MEDIUM')) {
       return {
         badge: 'GREEN',
         status: 'VALUE',

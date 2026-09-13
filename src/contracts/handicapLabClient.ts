@@ -4,7 +4,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { MatchObservation, SettlementOutcome } from '../types';
+import { MatchObservation, SettlementOutcome } from '../types/index';
 
 export interface RawMatchRecord {
   id: string;
