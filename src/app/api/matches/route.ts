@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
 import { MatchIntelligenceService } from '@/engine/matchIntelligenceService';
-import { HandicapLabClient } from '@/contracts/handicapLabClient';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const matches = MatchIntelligenceService.getTodaysMatches();
-    const summary = HandicapLabClient.getDatasetSummary();
+    const { HandicapLabAdapterFactory } = await import('@/contracts/handicapLabAdapter');
+    const adapter = HandicapLabAdapterFactory.getAdapter();
+    const matches = await MatchIntelligenceService.getTodaysMatches();
+    const summary = await adapter.getDatasetSummary();
 
     return NextResponse.json({
       success: true,
@@ -27,4 +28,3 @@ export async function GET() {
     );
   }
 }
-

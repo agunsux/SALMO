@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { HandicapLabClient } from '@/contracts/handicapLabClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,12 +9,14 @@ export async function GET(request: NextRequest) {
     const teamParam = searchParams.get('team') || undefined;
 
     const line = lineParam !== null ? parseFloat(lineParam) : undefined;
-    const observations = HandicapLabClient.getHistoricalObservations({
+    const { HandicapLabAdapterFactory } = await import('@/contracts/handicapLabAdapter');
+    const adapter = HandicapLabAdapterFactory.getAdapter();
+    const observations = await adapter.getHistoricalObservations({
       line,
       team: teamParam,
     });
 
-    const summary = HandicapLabClient.getDatasetSummary();
+    const summary = await adapter.getDatasetSummary();
 
     return NextResponse.json({
       success: true,
@@ -36,4 +37,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

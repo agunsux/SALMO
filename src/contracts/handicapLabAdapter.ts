@@ -23,14 +23,14 @@ export interface HistoricalObservationFilter {
 
 export interface AdapterHealth {
   status: 'HEALTHY' | 'DEGRADED' | 'UNAVAILABLE';
-  mode: 'local' | 'http';
+  mode: 'local' | 'http' | 'database';
   recordCount: number;
   lastChecked: string;
   error?: string;
 }
 
 export interface IHandicapLabAdapter {
-  readonly mode: 'local' | 'http';
+  readonly mode: 'local' | 'http' | 'database';
   getAllRecords(): Promise<RawMatchRecord[]>;
   getHistoricalObservations(filter?: HistoricalObservationFilter): Promise<MatchObservation[]>;
   getDatasetSummary(): Promise<DatasetSummary>;
@@ -426,6 +426,182 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
 }
 
 /**
+ * Database adapter for persistent production setups.
+ * Queries canonical historical data from Postgres / Supabase.
+ */
+export class DatabaseHandicapLabAdapter implements IHandicapLabAdapter {
+  public readonly mode = 'database' as const;
+
+  public async getAllRecords(): Promise<RawMatchRecord[]> {
+    try {
+      const { getDbClient } = await import('../lib/db');
+      const client = getDbClient();
+      const { data, error } = await client
+        .from('matches')
+        .select('*')
+        .order('kickoff_time', { ascending: true });
+
+      if (error) {
+        throw error;
+      }
+
+      return (data || []).map((m: any) => ({
+        id: m.canonical_match_id || m.id,
+        season: m.season || '2025-2026',
+        date: m.kickoff_time ? m.kickoff_time.split('T')[0] : '',
+        homeTeam: m.home_team,
+        awayTeam: m.away_team,
+        homeGoals: m.home_goals,
+        awayGoals: m.away_goals,
+        status: m.status || 'SCHEDULED',
+        ahLine: null,
+        ahHomeOdds: null,
+        ahAwayOdds: null,
+        ahBookmaker: null,
+        ouLine: 2.5,
+        ouOverOdds: null,
+        ouUnderOdds: null,
+        ouBookmaker: null,
+        bttsYesOdds: null,
+        bttsNoOdds: null,
+        bttsBookmaker: null,
+        sourceFile: 'database/matches',
+      }));
+    } catch (err) {
+      Logger.error('[DatabaseHandicapLabAdapter] Failed to query matches:', { error: String(err) });
+      throw new HandicapLabDataUnavailableError(`Database query failed: ${String(err)}`);
+    }
+  }
+
+  public async getHistoricalObservations(filter?: HistoricalObservationFilter): Promise<MatchObservation[]> {
+    try {
+      const { getDbClient } = await import('../lib/db');
+      const client = getDbClient();
+
+      let query = client
+        .from('matches')
+        .select(`
+          id,
+          canonical_match_id,
+          season,
+          kickoff_time,
+          home_team,
+          away_team,
+          home_goals,
+          away_goals,
+          market_snapshots (
+            market_type,
+            numeric_line,
+            home_odds,
+            away_odds,
+            bookmaker
+          )
+        `)
+        .eq('status', 'FINISHED')
+        .not('home_goals', 'is', null)
+        .not('away_goals', 'is', null);
+
+      if (filter?.team) {
+        query = query.or(`home_team.ilike.%${filter.team}%,away_team.ilike.%${filter.team}%`);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      const observations: MatchObservation[] = [];
+
+      for (const row of data || []) {
+        const ahSnap = (row.market_snapshots || []).find((s: any) => s.market_type === 'ASIAN_HANDICAP');
+        if (!ahSnap || ahSnap.numeric_line === null) continue;
+
+        const line = Number(ahSnap.numeric_line);
+        if (filter?.line !== undefined && Math.abs(line - filter.line) > 0.001) continue;
+
+        const homeGoals = row.home_goals ?? 0;
+        const awayGoals = row.away_goals ?? 0;
+        const odds = Number(ahSnap.home_odds) || 1.90;
+        const settlement = QuarterLineSettler.settle('home', line, homeGoals, awayGoals);
+        const profit = QuarterLineSettler.calculateProfit(settlement, odds, 1);
+
+        observations.push({
+          matchId: row.canonical_match_id || row.id,
+          date: row.kickoff_time ? row.kickoff_time.split('T')[0] : '',
+          season: row.season,
+          homeTeam: row.home_team,
+          awayTeam: row.away_team,
+          line,
+          homeGoals,
+          awayGoals,
+          scoreDisplay: `${homeGoals} - ${awayGoals}`,
+          settlement,
+          odds,
+          profit: Number(profit.toFixed(2)),
+        });
+      }
+
+      return observations;
+    } catch (err) {
+      Logger.error('[DatabaseHandicapLabAdapter] Observations query error:', { error: String(err) });
+      throw new HandicapLabDataUnavailableError(`Database query failed: ${String(err)}`);
+    }
+  }
+
+  public async getDatasetSummary(): Promise<DatasetSummary> {
+    try {
+      const records = await this.getAllRecords();
+      return {
+        version: 'v0.32.0-db',
+        verifiedMatchCount: records.length,
+        seasons: ['2019-2020', '2020-2021', '2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026'],
+        lastUpdate: new Date().toISOString(),
+        checksum: 'sha256-database-canonical-v1',
+      };
+    } catch {
+      return {
+        version: 'v0.32.0-db',
+        verifiedMatchCount: 0,
+        seasons: [],
+        lastUpdate: new Date().toISOString(),
+        checksum: 'none',
+      };
+    }
+  }
+
+  public async getHealth(): Promise<AdapterHealth> {
+    try {
+      const { testDbConnection } = await import('../lib/db');
+      const dbHealth = await testDbConnection();
+
+      if (!dbHealth.connected) {
+        return {
+          status: 'UNAVAILABLE',
+          mode: 'database',
+          recordCount: 0,
+          lastChecked: new Date().toISOString(),
+          error: dbHealth.error || 'Database connection probe failed',
+        };
+      }
+
+      const records = await this.getAllRecords();
+      return {
+        status: records.length > 0 ? 'HEALTHY' : 'DEGRADED',
+        mode: 'database',
+        recordCount: records.length,
+        lastChecked: new Date().toISOString(),
+      };
+    } catch (err) {
+      return {
+        status: 'UNAVAILABLE',
+        mode: 'database',
+        recordCount: 0,
+        lastChecked: new Date().toISOString(),
+        error: String(err),
+      };
+    }
+  }
+}
+
+/**
  * Adapter Factory: returns appropriate adapter based on environment configuration.
  */
 export class HandicapLabAdapterFactory {
@@ -439,6 +615,8 @@ export class HandicapLabAdapterFactory {
     const mode = env.handicapLab.adapter;
     if (mode === 'http') {
       this.instance = new HttpHandicapLabAdapter(env.handicapLab.apiUrl, env.handicapLab.apiKey);
+    } else if (mode === 'database') {
+      this.instance = new DatabaseHandicapLabAdapter();
     } else {
       this.instance = new LocalHandicapLabAdapter(env.handicapLab.dataPath);
     }

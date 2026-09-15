@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const adapter = HandicapLabAdapterFactory.getAdapter();
-    const matches = MatchIntelligenceService.getTodaysMatches();
+    const matches = await MatchIntelligenceService.getTodaysMatches();
     const summary = await adapter.getDatasetSummary();
 
     const v1Matches: MatchIntelligenceV1DTO[] = matches.map(m => {

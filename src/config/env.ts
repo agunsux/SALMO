@@ -6,7 +6,7 @@ export interface EnvironmentConfig {
   appUrl: string;
   salmoApiUrl: string;
   handicapLab: {
-    adapter: 'local' | 'http';
+    adapter: 'local' | 'http' | 'database';
     dataPath: string;
     apiUrl?: string;
     apiKey?: string;
@@ -48,8 +48,15 @@ class EnvironmentValidator {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const salmoApiUrl = process.env.SALMO_API_URL || `${appUrl}/api`;
 
-    const handicapLabAdapter = (process.env.HANDICAPLAB_ADAPTER as 'local' | 'http') || 
-      (nodeEnv === 'production' && process.env.HANDICAPLAB_API_URL ? 'http' : 'local');
+    // In production, default to 'http' or 'database' (if configured), never 'local'
+    let handicapLabAdapter = process.env.HANDICAPLAB_ADAPTER as 'local' | 'http' | 'database';
+    if (!handicapLabAdapter) {
+      if (nodeEnv === 'production') {
+        handicapLabAdapter = (process.env.SUPABASE_URL || process.env.DATABASE_URL) ? 'database' : 'http';
+      } else {
+        handicapLabAdapter = 'local';
+      }
+    }
 
     const handicapLabDataPath = process.env.HANDICAPLAB_DATA_PATH || '../HandicapLab/data/bronze/football_data';
     const handicapLabApiUrl = process.env.HANDICAPLAB_API_URL;

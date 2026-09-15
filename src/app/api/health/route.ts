@@ -1,9 +1,11 @@
 // SALMO.DEV — GET /api/health
-// Real introspection of system health and external dependencies.
+// Active operational introspection of system health and external dependencies.
 // Zero fabrication: dependencies report exact, truthful operational status.
+// Strictly exposes NO secrets.
 
 import { NextResponse } from 'next/server';
 import { HandicapLabAdapterFactory } from '@/contracts/handicapLabAdapter';
+import { testDbConnection } from '@/lib/db';
 import { env } from '@/config/env';
 
 export const dynamic = 'force-dynamic';
@@ -11,25 +13,37 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const start = Date.now();
 
-  // 1. HandicapLab contract health check
+  // 1. HandicapLab adapter & canonical data health
   const adapter = HandicapLabAdapterFactory.getAdapter();
   const hlHealth = await adapter.getHealth();
 
-  // 2. Database health check
-  const dbStatus = env.database.configured ? 'configured_unmigrated' : 'not_configured';
+  // 2. Database active connection probe
+  const dbHealth = await testDbConnection();
+  let dbStatus: 'connected' | 'configured_unreachable' | 'not_configured' = 'not_configured';
+  if (dbHealth.connected) {
+    dbStatus = 'connected';
+  } else if (dbHealth.configured) {
+    dbStatus = 'configured_unreachable';
+  }
 
-  // 3. Provider status checks
-  const apiFootballStatus = env.providers.apiFootball.configured ? 'ready' : 'unconfigured';
-  const oddsPapiStatus = env.providers.oddsPapi.configured ? 'ready' : 'unconfigured';
+  // 3. Providers operational checks
+  const apiFootballStatus = env.providers.apiFootball.configured ? 'configured' : 'unconfigured';
+  const oddsPapiStatus = env.providers.oddsPapi.configured ? 'configured' : 'unconfigured';
 
   // System status determination:
-  // In dev: OK if HandicapLab is healthy.
-  // In prod: degraded if database is not configured.
-  let overallStatus: 'ok' | 'degraded' | 'unavailable' = 'ok';
+  // HEALTHY: Adapter healthy, DB connected, Providers configured
+  // DEGRADED: Any optional dependency unconfigured/unreachable, but core service alive
+  // UNAVAILABLE: Core prediction dependencies completely unavailable
+  let overallStatus: 'healthy' | 'degraded' | 'unavailable' = 'healthy';
 
   if (hlHealth.status === 'UNAVAILABLE') {
     overallStatus = 'unavailable';
-  } else if (!env.database.configured || !env.providers.oddsPapi.configured) {
+  } else if (
+    hlHealth.status === 'DEGRADED' ||
+    !dbHealth.connected ||
+    !env.providers.apiFootball.configured ||
+    !env.providers.oddsPapi.configured
+  ) {
     overallStatus = 'degraded';
   }
 
@@ -50,13 +64,23 @@ export async function GET() {
         verifiedMatches: hlHealth.recordCount,
         error: hlHealth.error,
       },
-      database: dbStatus,
-      apiFootball: apiFootballStatus,
-      oddsPapi: oddsPapiStatus,
+      database: {
+        status: dbStatus,
+        latencyMs: dbHealth.latencyMs,
+        error: dbHealth.error,
+      },
+      apiFootball: {
+        status: apiFootballStatus,
+        provider: 'API-Football',
+      },
+      oddsPapi: {
+        status: oddsPapiStatus,
+        provider: 'OddsPapi',
+        supportedMarkets: ['ASIAN_HANDICAP', 'OVER_UNDER', 'BTTS'],
+      },
     },
   };
 
   const httpStatus = overallStatus === 'unavailable' ? 503 : 200;
   return NextResponse.json(payload, { status: httpStatus });
 }
-

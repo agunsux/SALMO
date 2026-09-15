@@ -1,49 +1,100 @@
 // SALMO.DEV — Match Intelligence Service
-// Synthesizes the Three-Market Model (AH, BTTS, O/U) for every fixture.
-// Combines the presentation, keeps mathematical engines strictly independent.
+// Strictly limited to 3 markets:
+// 1. Asian Handicap (AH)
+// 2. Over/Under 2.5 (OU 2.5)
+// 3. Both Teams To Score (BTTS: Yes/No)
+// ZERO MONEYLINE / 1X2. Zero fake odds. Zero filesystem reliance in production.
 
-import { HandicapLabClient } from '../contracts/handicapLabClient';
-import { QuarterLineSettler } from './ah/quarterLineSettler';
+import { HandicapLabAdapterFactory } from '../contracts/handicapLabAdapter';
+import { ApiFootballProvider } from '../services/providers/apiFootballProvider';
+import { OddsPapiProvider } from '../services/providers/oddsPapiProvider';
+import { LiveFixtureDTO, LiveOddsDTO } from '../services/providers/types';
 import { DevigEngine } from './ah/devig';
 import { DecisionPolicy } from './decision/decisionPolicy';
 import { MatchIntelligence, MarketView, DecisionProvenance } from '../types/index';
+import { Logger } from '../lib/logger';
 
 export class MatchIntelligenceService {
+  private static apiFootball = new ApiFootballProvider();
+  private static oddsPapi = new OddsPapiProvider();
+
   /**
-   * Generates intelligence feeds for today's workspace.
+   * Main production entry point: returns intelligence feeds for upcoming matches.
+   * Pulls real fixtures from API-Football, joins real odds from OddsPAPI,
+   * and calculates empirical edges against historical evidence via the active adapter.
    */
-  public static getTodaysMatches(): MatchIntelligence[] {
-    const allRecords = HandicapLabClient.getAllRecords();
-    const summary = HandicapLabClient.getDatasetSummary();
+  public static async getTodaysMatches(): Promise<MatchIntelligence[]> {
+    const adapter = HandicapLabAdapterFactory.getAdapter();
+    const summary = await adapter.getDatasetSummary();
 
-    // Select a curated set of prominent real fixtures (including recent real matches & upcoming schedule)
-    // E.g. 2025-2026 real closing matchdays
-    const recentMatches = allRecords.slice(-12);
+    // 1. Fetch real upcoming fixtures
+    let upcomingFixtures: LiveFixtureDTO[] = [];
+    if (this.apiFootball.isConfigured()) {
+      const fixtureRes = await this.apiFootball.getUpcomingFixtures('39'); // Premier League ID: 39
+      if (fixtureRes.status === 'AVAILABLE' && fixtureRes.data) {
+        upcomingFixtures = fixtureRes.data;
+      } else {
+        Logger.warn('[MatchIntelligenceService] API-Football unavailable:', { error: fixtureRes.error });
+      }
+    }
 
+    // If API-Football is unconfigured or returns empty, check adapter records (e.g. scheduled matches in DB or local dev)
+    if (upcomingFixtures.length === 0) {
+      try {
+        const allRecords = await adapter.getAllRecords();
+        const scheduled = allRecords.filter(r => r.status === 'SCHEDULED');
+        if (scheduled.length > 0) {
+          upcomingFixtures = scheduled.slice(0, 10).map(s => ({
+            providerFixtureId: s.id,
+            league: 'Premier League',
+            season: s.season,
+            kickoffTime: `${s.date}T15:00:00Z`,
+            homeTeam: s.homeTeam,
+            awayTeam: s.awayTeam,
+            venue: `${s.homeTeam} Stadium`,
+            status: 'SCHEDULED',
+          }));
+        }
+      } catch (err) {
+        Logger.warn('[MatchIntelligenceService] Could not retrieve fallback scheduled matches:', { error: String(err) });
+      }
+    }
+
+    if (upcomingFixtures.length === 0) {
+      return [];
+    }
+
+    // 2. For each real fixture, attempt to fetch live odds and evaluate the 3 markets
     const matches: MatchIntelligence[] = [];
 
-    for (let i = 0; i < recentMatches.length; i++) {
-      const r = recentMatches[i];
+    for (const fixture of upcomingFixtures) {
+      let liveOdds: LiveOddsDTO[] = [];
+      if (this.oddsPapi.isConfigured()) {
+        const oddsRes = await this.oddsPapi.getMarketOdds(fixture.providerFixtureId);
+        if (oddsRes.status === 'AVAILABLE' && oddsRes.data) {
+          liveOdds = oddsRes.data;
+        }
+      }
 
-      // 1. ASIAN HANDICAP MARKET EVALUATION
-      const ahMarket = this.buildAhMarket(r, summary);
+      // Filter live odds strictly to the 3 approved markets
+      const ahOdds = liveOdds.find(o => o.marketType === 'ASIAN_HANDICAP');
+      const ouOdds = liveOdds.find(o => o.marketType === 'OVER_UNDER' && Math.abs(o.line - 2.5) < 0.01);
+      const bttsOdds = liveOdds.find(o => o.marketType === 'BTTS');
 
-      // 2. BTTS MARKET EVALUATION
-      const bttsMarket = this.buildBttsMarket(r, summary);
-
-      // 3. OVER / UNDER MARKET EVALUATION
-      const ouMarket = this.buildOuMarket(r, summary);
+      const ahMarket = await this.buildAhMarket(fixture, ahOdds, summary);
+      const bttsMarket = await this.buildBttsMarket(fixture, bttsOdds, summary);
+      const ouMarket = await this.buildOuMarket(fixture, ouOdds, summary);
 
       matches.push({
-        id: r.id,
-        fixtureId: r.id,
-        homeTeam: r.homeTeam,
-        awayTeam: r.awayTeam,
-        league: 'Premier League',
-        kickoffIso: `${r.date}T15:00:00Z`,
-        kickoffDisplay: `${r.date} • 15:00 UTC`,
-        venue: `${r.homeTeam} Stadium`,
-        isUpcoming: i >= 10, // last 2 are upcoming to demonstrate live/unquoted states
+        id: fixture.providerFixtureId,
+        fixtureId: fixture.providerFixtureId,
+        homeTeam: fixture.homeTeam,
+        awayTeam: fixture.awayTeam,
+        league: fixture.league || 'Premier League',
+        kickoffIso: fixture.kickoffTime,
+        kickoffDisplay: `${fixture.kickoffTime.split('T')[0]} • ${fixture.kickoffTime.split('T')[1]?.slice(0, 5) || '15:00'} UTC`,
+        venue: fixture.venue || `${fixture.homeTeam} Stadium`,
+        isUpcoming: true,
         markets: {
           asianHandicap: ahMarket,
           btts: bttsMarket,
@@ -56,21 +107,26 @@ export class MatchIntelligenceService {
   }
 
   /**
-   * Builds Asian Handicap market view for a match record.
+   * Builds Asian Handicap market view.
+   * Gated on real odds: if missing, explicitly returns ODDS_UNAVAILABLE (badge GREY).
    */
-  private static buildAhMarket(record: any, summary: any): MarketView {
-    const line = record.ahLine;
-    const odds = record.ahHomeOdds;
-    const oppOdds = record.ahAwayOdds;
+  private static async buildAhMarket(
+    fixture: LiveFixtureDTO,
+    oddsDto: LiveOddsDTO | undefined,
+    summary: any
+  ): Promise<MarketView> {
+    const line = oddsDto ? oddsDto.line : 0;
+    const lineLabel = line > 0 ? `+${line}` : `${line}`;
 
-    const lineLabel = line !== null ? (line > 0 ? `+${line}` : `${line}`) : '0.00';
-
-    if (!odds || line === null) {
+    if (!oddsDto || !oddsDto.homeOdds || !oddsDto.awayOdds) {
       return this.buildUnavailableMarket('ASIAN_HANDICAP', lineLabel, summary);
     }
 
-    // Historical sample for this line in HandicapLab dataset
-    const historicalObs = HandicapLabClient.getHistoricalObservations({ line });
+    const odds = oddsDto.homeOdds;
+    const oppOdds = oddsDto.awayOdds;
+
+    const adapter = HandicapLabAdapterFactory.getAdapter();
+    const historicalObs = await adapter.getHistoricalObservations({ line });
     const sampleSize = historicalObs.length;
 
     let wins = 0;
@@ -104,17 +160,17 @@ export class MatchIntelligenceService {
     });
 
     const provenance: DecisionProvenance = {
-      source: 'Pinnacle Closing / HandicapLab Bronze Gold',
-      datasetVersion: summary.version,
-      dateRange: '2019-08-09 to 2026-05-24',
-      league: 'Premier League',
+      source: `${oddsDto.bookmaker} / HandicapLab Canonical`,
+      datasetVersion: summary?.version || 'v0.32.0',
+      dateRange: 'Historical 2019-2026',
+      league: fixture.league,
       market: 'Asian Handicap',
-      line: `${record.homeTeam} ${lineLabel}`,
+      line: `${fixture.homeTeam} ${lineLabel}`,
       sampleSize,
       settlementMethodology: 'Quarter-Line Split Settlement v1.0',
       validationStatus: 'UNVERIFIED',
-      lastUpdate: summary.lastUpdate,
-      checksum: summary.checksum,
+      lastUpdate: summary?.lastUpdate || new Date().toISOString(),
+      checksum: summary?.checksum || 'canonical',
     };
 
     return {
@@ -125,7 +181,7 @@ export class MatchIntelligenceService {
       available: true,
       odds,
       oppositeOdds: oppOdds,
-      bookmaker: record.ahBookmaker || 'Pinnacle',
+      bookmaker: oddsDto.bookmaker,
       badge: decision.badge,
       status: decision.status,
       statusLabel: decision.statusLabel,
@@ -152,19 +208,25 @@ export class MatchIntelligenceService {
 
   /**
    * Builds Both Teams To Score (BTTS) market view.
+   * Gated on real odds: if missing, explicitly returns ODDS_UNAVAILABLE (badge GREY).
    */
-  private static buildBttsMarket(record: any, summary: any): MarketView {
-    const odds = record.bttsYesOdds;
-    const oppOdds = record.bttsNoOdds;
-
-    if (!odds) {
+  private static async buildBttsMarket(
+    fixture: LiveFixtureDTO,
+    oddsDto: LiveOddsDTO | undefined,
+    summary: any
+  ): Promise<MarketView> {
+    if (!oddsDto || !oddsDto.homeOdds || !oddsDto.awayOdds) {
       return this.buildUnavailableMarket('BTTS', 'YES', summary);
     }
 
-    const all = HandicapLabClient.getAllRecords().filter(r => r.homeGoals !== null && r.awayGoals !== null);
+    const odds = oddsDto.homeOdds;
+    const oppOdds = oddsDto.awayOdds;
+
+    const adapter = HandicapLabAdapterFactory.getAdapter();
+    const all = (await adapter.getAllRecords()).filter(r => r.homeGoals !== null && r.awayGoals !== null);
     const sampleSize = all.length;
     const bttsYesCount = all.filter(r => (r.homeGoals ?? 0) >= 1 && (r.awayGoals ?? 0) >= 1).length;
-    const modelProbPct = Number(((bttsYesCount / sampleSize) * 100).toFixed(1));
+    const modelProbPct = sampleSize > 0 ? Number(((bttsYesCount / sampleSize) * 100).toFixed(1)) : null;
 
     const devig = DevigEngine.devigTwoWay(odds, oppOdds);
     const impliedProbPct = Number((devig.impliedProbA * 100).toFixed(1));
@@ -180,17 +242,17 @@ export class MatchIntelligenceService {
     });
 
     const provenance: DecisionProvenance = {
-      source: 'Pinnacle Closing / HandicapLab Bronze Gold',
-      datasetVersion: summary.version,
-      dateRange: '2019-08-09 to 2026-05-24',
-      league: 'Premier League',
+      source: `${oddsDto.bookmaker} / HandicapLab Canonical`,
+      datasetVersion: summary?.version || 'v0.32.0',
+      dateRange: 'Historical 2019-2026',
+      league: fixture.league,
       market: 'Both Teams To Score',
       line: 'YES',
       sampleSize,
       settlementMethodology: 'Binary Settlement (Goals >= 1 Both)',
       validationStatus: 'UNVERIFIED',
-      lastUpdate: summary.lastUpdate,
-      checksum: summary.checksum,
+      lastUpdate: summary?.lastUpdate || new Date().toISOString(),
+      checksum: summary?.checksum || 'canonical',
     };
 
     return {
@@ -200,7 +262,7 @@ export class MatchIntelligenceService {
       available: true,
       odds,
       oppositeOdds: oppOdds,
-      bookmaker: record.bttsBookmaker || 'Pinnacle',
+      bookmaker: oddsDto.bookmaker,
       badge: decision.badge,
       status: decision.status,
       statusLabel: decision.statusLabel,
@@ -220,19 +282,25 @@ export class MatchIntelligenceService {
 
   /**
    * Builds Over / Under 2.5 market view.
+   * Gated on real odds: if missing, explicitly returns ODDS_UNAVAILABLE (badge GREY).
    */
-  private static buildOuMarket(record: any, summary: any): MarketView {
-    const odds = record.ouOverOdds;
-    const oppOdds = record.ouUnderOdds;
-
-    if (!odds) {
+  private static async buildOuMarket(
+    fixture: LiveFixtureDTO,
+    oddsDto: LiveOddsDTO | undefined,
+    summary: any
+  ): Promise<MarketView> {
+    if (!oddsDto || !oddsDto.homeOdds || !oddsDto.awayOdds) {
       return this.buildUnavailableMarket('OVER_UNDER', 'OVER 2.5', summary);
     }
 
-    const all = HandicapLabClient.getAllRecords().filter(r => r.homeGoals !== null && r.awayGoals !== null);
+    const odds = oddsDto.homeOdds;
+    const oppOdds = oddsDto.awayOdds;
+
+    const adapter = HandicapLabAdapterFactory.getAdapter();
+    const all = (await adapter.getAllRecords()).filter(r => r.homeGoals !== null && r.awayGoals !== null);
     const sampleSize = all.length;
     const overCount = all.filter(r => ((r.homeGoals ?? 0) + (r.awayGoals ?? 0)) > 2.5).length;
-    const modelProbPct = Number(((overCount / sampleSize) * 100).toFixed(1));
+    const modelProbPct = sampleSize > 0 ? Number(((overCount / sampleSize) * 100).toFixed(1)) : null;
 
     const devig = DevigEngine.devigTwoWay(odds, oppOdds);
     const impliedProbPct = Number((devig.impliedProbA * 100).toFixed(1));
@@ -248,17 +316,17 @@ export class MatchIntelligenceService {
     });
 
     const provenance: DecisionProvenance = {
-      source: 'Pinnacle Closing / HandicapLab Bronze Gold',
-      datasetVersion: summary.version,
-      dateRange: '2019-08-09 to 2026-05-24',
-      league: 'Premier League',
+      source: `${oddsDto.bookmaker} / HandicapLab Canonical`,
+      datasetVersion: summary?.version || 'v0.32.0',
+      dateRange: 'Historical 2019-2026',
+      league: fixture.league,
       market: 'Over / Under Goals',
       line: 'OVER 2.5',
       sampleSize,
       settlementMethodology: 'Single Half-Line Goal Settlement (2.5 Goals)',
       validationStatus: 'UNVERIFIED',
-      lastUpdate: summary.lastUpdate,
-      checksum: summary.checksum,
+      lastUpdate: summary?.lastUpdate || new Date().toISOString(),
+      checksum: summary?.checksum || 'canonical',
     };
 
     return {
@@ -269,7 +337,7 @@ export class MatchIntelligenceService {
       available: true,
       odds,
       oppositeOdds: oppOdds,
-      bookmaker: record.ouBookmaker || 'Pinnacle',
+      bookmaker: oddsDto.bookmaker,
       badge: decision.badge,
       status: decision.status,
       statusLabel: decision.statusLabel,

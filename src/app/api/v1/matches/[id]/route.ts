@@ -54,7 +54,7 @@ export async function GET(
   const { id } = await context.params;
 
   try {
-    const matches = MatchIntelligenceService.getTodaysMatches();
+    const matches = await MatchIntelligenceService.getTodaysMatches();
     const match = matches.find(m => m.id === id);
 
     if (!match) {
