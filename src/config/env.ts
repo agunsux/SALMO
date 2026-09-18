@@ -28,6 +28,11 @@ export interface EnvironmentConfig {
       apiKey?: string;
       baseUrl: string;
     };
+    footyStats: {
+      configured: boolean;
+      apiKey?: string;
+      baseUrl: string;
+    };
   };
   security: {
     authSecretConfigured: boolean;
@@ -72,11 +77,14 @@ class EnvironmentValidator {
     const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
     const dbConfigured = Boolean(databaseUrl || (supabaseUrl && supabaseAnonKey));
 
-    const apiFootballKey = process.env.API_FOOTBALL_KEY;
+    const apiFootballKey = process.env.API_FOOTBALL_KEY || process.env.APIFOOTBALL_KEY;
     const apiFootballBaseUrl = process.env.API_FOOTBALL_BASE_URL || 'https://v3.football.api-sports.io';
 
-    const oddsPapiKey = process.env.ODDS_PAPI_KEY;
-    const oddsPapiBaseUrl = process.env.ODDS_PAPI_BASE_URL || 'https://api.oddspapi.com/v1';
+    const oddsPapiKey = process.env.ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY;
+    const oddsPapiBaseUrl = process.env.ODDS_PAPI_BASE_URL || 'https://api.oddspapi.io/v4';
+
+    const footyStatsKey = process.env.FOOTYSTATS_API_KEY || process.env.FOOTYSTATS_KEY;
+    const footyStatsBaseUrl = process.env.FOOTYSTATS_BASE_URL || 'https://api.football-data-api.com';
 
     const authSecret = process.env.AUTH_SECRET;
     const cronSecret = process.env.CRON_SECRET;
@@ -109,6 +117,11 @@ class EnvironmentValidator {
           configured: Boolean(oddsPapiKey && oddsPapiKey.trim().length > 0),
           apiKey: oddsPapiKey,
           baseUrl: oddsPapiBaseUrl,
+        },
+        footyStats: {
+          configured: Boolean(footyStatsKey && footyStatsKey.trim().length > 0),
+          apiKey: footyStatsKey,
+          baseUrl: footyStatsBaseUrl,
         },
       },
       security: {

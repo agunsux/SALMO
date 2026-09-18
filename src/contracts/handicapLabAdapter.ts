@@ -7,7 +7,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { RawMatchRecord, DatasetSummary } from './handicapLabClient';
-import { MatchObservation, SettlementOutcome } from '../types/index';
+import { MatchObservation, SettlementOutcome, ActiveMatchPrediction, LiveValidationSummary } from '../types/index';
 import { QuarterLineSettler } from '../engine/ah/quarterLineSettler';
 import { env } from '../config/env';
 import { Logger } from '../lib/logger';
@@ -34,6 +34,8 @@ export interface IHandicapLabAdapter {
   getAllRecords(): Promise<RawMatchRecord[]>;
   getHistoricalObservations(filter?: HistoricalObservationFilter): Promise<MatchObservation[]>;
   getDatasetSummary(): Promise<DatasetSummary>;
+  getActive7DayPredictions(): Promise<ActiveMatchPrediction[]>;
+  getLiveValidationSummary(): Promise<LiveValidationSummary | null>;
   getHealth(): Promise<AdapterHealth>;
 }
 
@@ -268,6 +270,46 @@ export class LocalHandicapLabAdapter implements IHandicapLabAdapter {
     };
   }
 
+  public async getActive7DayPredictions(): Promise<ActiveMatchPrediction[]> {
+    const candidatePaths = [
+      path.resolve(process.cwd(), 'data', 'verification', 'active_7day_predictions.json'),
+      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'verification', 'active_7day_predictions.json'),
+      path.resolve(__dirname, '..', '..', 'data', 'verification', 'active_7day_predictions.json'),
+    ];
+
+    for (const p of candidatePaths) {
+      if (fs.existsSync(p)) {
+        try {
+          const content = fs.readFileSync(p, 'utf8');
+          return JSON.parse(content);
+        } catch (err) {
+          Logger.warn(`[LocalHandicapLabAdapter] Failed to parse active predictions from ${p}:`, { error: String(err) });
+        }
+      }
+    }
+    return [];
+  }
+
+  public async getLiveValidationSummary(): Promise<LiveValidationSummary | null> {
+    const candidatePaths = [
+      path.resolve(process.cwd(), 'data', 'verification', 'live_prediction_validation.json'),
+      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'verification', 'live_prediction_validation.json'),
+      path.resolve(__dirname, '..', '..', 'data', 'verification', 'live_prediction_validation.json'),
+    ];
+
+    for (const p of candidatePaths) {
+      if (fs.existsSync(p)) {
+        try {
+          const content = fs.readFileSync(p, 'utf8');
+          return JSON.parse(content);
+        } catch (err) {
+          Logger.warn(`[LocalHandicapLabAdapter] Failed to parse validation summary from ${p}:`, { error: String(err) });
+        }
+      }
+    }
+    return null;
+  }
+
   public async getHealth(): Promise<AdapterHealth> {
     const dir = this.resolveDataDirectory();
     if (!dir) {
@@ -391,6 +433,72 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
     } catch (err) {
       Logger.error('[HttpHandicapLabAdapter] Failed to fetch dataset summary:', { error: String(err) });
       throw new HandicapLabDataUnavailableError(`HandicapLab summary unreachable: ${String(err)}`);
+    }
+  }
+
+  public async getActive7DayPredictions(): Promise<ActiveMatchPrediction[]> {
+    if (!this.baseUrl) {
+      const localAdapter = new LocalHandicapLabAdapter();
+      return localAdapter.getActive7DayPredictions();
+    }
+
+    try {
+      const headers: Record<string, string> = {
+        'Accept': 'application/json',
+        'User-Agent': 'SALMO-Production-Client/1.0',
+      };
+      if (this.apiKey) {
+        headers['Authorization'] = `Bearer ${this.apiKey}`;
+      }
+
+      const res = await fetch(`${this.baseUrl}/predictions/active-7day`, {
+        headers,
+        next: { revalidate: 300 },
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      Logger.warn('[HttpHandicapLabAdapter] Fallback to local verified predictions:', { error: String(err) });
+      const localAdapter = new LocalHandicapLabAdapter();
+      return localAdapter.getActive7DayPredictions();
+    }
+  }
+
+  public async getLiveValidationSummary(): Promise<LiveValidationSummary | null> {
+    if (!this.baseUrl) {
+      const localAdapter = new LocalHandicapLabAdapter();
+      return localAdapter.getLiveValidationSummary();
+    }
+
+    try {
+      const headers: Record<string, string> = {
+        'Accept': 'application/json',
+        'User-Agent': 'SALMO-Production-Client/1.0',
+      };
+      if (this.apiKey) {
+        headers['Authorization'] = `Bearer ${this.apiKey}`;
+      }
+
+      const res = await fetch(`${this.baseUrl}/validation/summary`, {
+        headers,
+        next: { revalidate: 3600 },
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+
+      const json = await res.json();
+      return json.data || null;
+    } catch (err) {
+      Logger.warn('[HttpHandicapLabAdapter] Fallback to local validation summary:', { error: String(err) });
+      const localAdapter = new LocalHandicapLabAdapter();
+      return localAdapter.getLiveValidationSummary();
     }
   }
 
@@ -565,6 +673,16 @@ export class DatabaseHandicapLabAdapter implements IHandicapLabAdapter {
         checksum: 'none',
       };
     }
+  }
+
+  public async getActive7DayPredictions(): Promise<ActiveMatchPrediction[]> {
+    const localAdapter = new LocalHandicapLabAdapter();
+    return localAdapter.getActive7DayPredictions();
+  }
+
+  public async getLiveValidationSummary(): Promise<LiveValidationSummary | null> {
+    const localAdapter = new LocalHandicapLabAdapter();
+    return localAdapter.getLiveValidationSummary();
   }
 
   public async getHealth(): Promise<AdapterHealth> {

@@ -1,0 +1,351 @@
+{
+  "auditTimestamp": "2026-09-18T00:10:50.300Z",
+  "auditScope": "OddsPapi Historical Ingestion & Point-in-Time Reconstruction (Phase 1)",
+  "datasetSummary": {
+    "provider": "oddspapi",
+    "historicalEndpoint": "/v4/historical-odds (Unmetered, data >= 2026-01)",
+    "analyzedDumps": 4,
+    "totalRawObservations": 106620,
+    "preMatchObservations": 31860,
+    "inPlayObservationsRejected": 74760,
+    "inPlayRejectionPct": 70.12,
+    "duplicateTimestampsFound": 0,
+    "reconciliationRatePct": 100,
+    "closingLineAvailabilityPct": 100
+  },
+  "marketLineCoverage": {
+    "asianHandicap": {
+      "distinctLinesCount": 14,
+      "lines": [
+        -2.5,
+        -2.25,
+        -2,
+        -1.75,
+        -1.5,
+        -1.25,
+        -1,
+        -0.75,
+        -0.5,
+        -0.25,
+        0,
+        0.25,
+        0.5,
+        0.75
+      ],
+      "stepGrid": "0.25 discrete grid confirmed"
+    },
+    "overUnder": {
+      "distinctLinesCount": 37,
+      "lines": [
+        0.5,
+        0.75,
+        1,
+        1.25,
+        1.5,
+        1.75,
+        2,
+        2.25,
+        2.5,
+        2.75,
+        3,
+        3.25,
+        3.5,
+        3.75,
+        4,
+        4.25,
+        4.5,
+        4.75,
+        5,
+        5.25,
+        5.5,
+        5.75,
+        6,
+        6.5,
+        7,
+        7.5,
+        8,
+        8.5,
+        9,
+        9.5,
+        10,
+        10.5,
+        11,
+        11.5,
+        12,
+        12.5,
+        13
+      ],
+      "stepGrid": "0.25 / 0.5 discrete grid confirmed"
+    },
+    "bothTeamsToScore": {
+      "covered": true,
+      "selections": [
+        "yes",
+        "no"
+      ]
+    },
+    "moneyline": {
+      "covered": true,
+      "selections": [
+        "1",
+        "X",
+        "2"
+      ]
+    }
+  },
+  "multiHorizonSnapshotDensity": {
+    "T_7D": "3/4",
+    "T_72H": "4/4",
+    "T_24H": "4/4",
+    "T_6H": "4/4",
+    "T_1H": "4/4",
+    "T_15M_Closing": "4/4"
+  },
+  "bookmakerAvailability": {
+    "primarySharpGroundTruth": "Pinnacle (Status 200 - Active full tick series)",
+    "secondarySBOBET": "Available on live feed; historical endpoint returns 404 in current sub",
+    "softBookmakers": "404 on unmetered archive (Bet365 / Circa / Singbet)",
+    "verdict": "CLV ground truth is 100% Pinnacle-based, adhering strictly to Bookmaker Hierarchy rules."
+  },
+  "apiFootballAudit": {
+    "plan": "Pro",
+    "costPerMonthUsd": 39,
+    "hardLimitDaily": 7500,
+    "softLimitDaily": 6000,
+    "currentUsageStatus": "Active & Verified",
+    "breakdown": [
+      {
+        "action": "Daily fixture & results sync (8 leagues)",
+        "requestsPerDay": 8,
+        "notes": "1 call per league per day"
+      },
+      {
+        "action": "Starting lineups & injuries (top matches)",
+        "requestsPerDay": 20,
+        "notes": "Pre-match lineups ~1h before kickoff"
+      },
+      {
+        "action": "Match facts & final stats settlement",
+        "requestsPerDay": 15,
+        "notes": "Post-match verification"
+      },
+      {
+        "action": "Total Routine Operational Consumption",
+        "requestsPerDay": 43,
+        "notes": "Only 0.57% of daily quota"
+      }
+    ],
+    "headroomRatio": "99.4% unused daily capacity",
+    "upgradeRecommendation": "NONE. API-Football Pro quota is more than 150x current operational requirements."
+  },
+  "matchDetails": [
+    {
+      "fixtureId": "id1000001761300977",
+      "canonicalId": "ENG-PL|2025-2026|2026-02-01|aston-villa|brentford",
+      "mappingStatus": "MAPPED",
+      "kickoff": "2026-02-01T14:00:00.000Z",
+      "homeTeam": "Aston Villa",
+      "awayTeam": "Brentford FC",
+      "totalTicks": 25805,
+      "inPlayTicks": 20732,
+      "preMatchTicks": 5073,
+      "marketsCovered": {
+        "ah": 34,
+        "ou": 96,
+        "btts": 4,
+        "ml": 6
+      },
+      "horizonCoverage": {
+        "T_7D": {
+          "present": false,
+          "count": 0,
+          "closestDeltaMin": -1
+        },
+        "T_72H": {
+          "present": true,
+          "count": 74,
+          "closestDeltaMin": 402
+        },
+        "T_24H": {
+          "present": true,
+          "count": 94,
+          "closestDeltaMin": 302
+        },
+        "T_6H": {
+          "present": true,
+          "count": 7,
+          "closestDeltaMin": 66
+        },
+        "T_1H": {
+          "present": true,
+          "count": 94,
+          "closestDeltaMin": 24
+        },
+        "T_15M": {
+          "present": true,
+          "count": 96,
+          "closestDeltaMin": 15
+        }
+      }
+    },
+    {
+      "fixtureId": "id1000001761301063",
+      "canonicalId": "ENG-PL|2025-2026|2026-03-01|brighton|nott-m-forest",
+      "mappingStatus": "MAPPED",
+      "kickoff": "2026-03-01T14:00:00.000Z",
+      "homeTeam": "Brighton & Hove Albion",
+      "awayTeam": "Nottingham Forest",
+      "totalTicks": 21902,
+      "inPlayTicks": 15171,
+      "preMatchTicks": 6731,
+      "marketsCovered": {
+        "ah": 32,
+        "ou": 136,
+        "btts": 4,
+        "ml": 6
+      },
+      "horizonCoverage": {
+        "T_7D": {
+          "present": true,
+          "count": 70,
+          "closestDeltaMin": 385
+        },
+        "T_72H": {
+          "present": true,
+          "count": 74,
+          "closestDeltaMin": 608
+        },
+        "T_24H": {
+          "present": true,
+          "count": 94,
+          "closestDeltaMin": 267
+        },
+        "T_6H": {
+          "present": true,
+          "count": 96,
+          "closestDeltaMin": 53
+        },
+        "T_1H": {
+          "present": true,
+          "count": 92,
+          "closestDeltaMin": 14
+        },
+        "T_15M": {
+          "present": true,
+          "count": 100,
+          "closestDeltaMin": 14
+        }
+      }
+    },
+    {
+      "fixtureId": "id1000001761301159",
+      "canonicalId": "ENG-PL|2025-2026|2026-04-10|west-ham|wolves",
+      "mappingStatus": "MAPPED",
+      "kickoff": "2026-04-10T19:00:00.000Z",
+      "homeTeam": "West Ham United",
+      "awayTeam": "Wolverhampton Wanderers",
+      "totalTicks": 24168,
+      "inPlayTicks": 17607,
+      "preMatchTicks": 6561,
+      "marketsCovered": {
+        "ah": 30,
+        "ou": 118,
+        "btts": 4,
+        "ml": 6
+      },
+      "horizonCoverage": {
+        "T_7D": {
+          "present": true,
+          "count": 76,
+          "closestDeltaMin": 139
+        },
+        "T_72H": {
+          "present": true,
+          "count": 80,
+          "closestDeltaMin": 613
+        },
+        "T_24H": {
+          "present": true,
+          "count": 96,
+          "closestDeltaMin": 2
+        },
+        "T_6H": {
+          "present": true,
+          "count": 98,
+          "closestDeltaMin": 48
+        },
+        "T_1H": {
+          "present": true,
+          "count": 96,
+          "closestDeltaMin": 8
+        },
+        "T_15M": {
+          "present": true,
+          "count": 104,
+          "closestDeltaMin": 15
+        }
+      }
+    },
+    {
+      "fixtureId": "id1000001761301213",
+      "canonicalId": "ENG-PL|2025-2026|2026-05-01|leeds|burnley",
+      "mappingStatus": "MAPPED",
+      "kickoff": "2026-05-01T19:00:00.000Z",
+      "homeTeam": "Leeds United",
+      "awayTeam": "Burnley FC",
+      "totalTicks": 34745,
+      "inPlayTicks": 21250,
+      "preMatchTicks": 13495,
+      "marketsCovered": {
+        "ah": 36,
+        "ou": 126,
+        "btts": 4,
+        "ml": 6
+      },
+      "horizonCoverage": {
+        "T_7D": {
+          "present": true,
+          "count": 68,
+          "closestDeltaMin": 4
+        },
+        "T_72H": {
+          "present": true,
+          "count": 88,
+          "closestDeltaMin": 301
+        },
+        "T_24H": {
+          "present": true,
+          "count": 94,
+          "closestDeltaMin": 4
+        },
+        "T_6H": {
+          "present": true,
+          "count": 104,
+          "closestDeltaMin": 61
+        },
+        "T_1H": {
+          "present": true,
+          "count": 96,
+          "closestDeltaMin": 3
+        },
+        "T_15M": {
+          "present": true,
+          "count": 106,
+          "closestDeltaMin": 15
+        }
+      }
+    }
+  ],
+  "goNoGoVerdict": {
+    "status": "GO",
+    "rationales": [
+      "Reconciliation rate is 100.0% (Threshold >= 95%)",
+      "Closing line capture is 100.0% (Threshold >= 95%)",
+      "Extracted 31.860 valid pre-match ticks with exact timestamp lineage",
+      "Rejected 74.760 in-play ticks (strict zero-leakage invariant enforced)",
+      "AH spans 14 distinct lines on a strict 0.25 step grid",
+      "OU spans 37 distinct lines",
+      "Pinnacle tick series provides granular price movement across multiple pre-match horizons"
+    ]
+  }
+}

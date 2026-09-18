@@ -1,0 +1,1146 @@
+{
+  "timestamp": "2026-09-18T11:34:00.729Z",
+  "totalHistoricalMatches": 2280,
+  "totalOosMatches": 1140,
+  "foldsCount": 3,
+  "models": {
+    "model_0_baseline": {
+      "modelId": "model_0_baseline",
+      "modelName": "Model 0: Existing 3-Cluster Baseline",
+      "dataFamilies": [
+        "Family 1 (Fundamentals)",
+        "Family 2 (Strength)",
+        "Family 3 (Market)"
+      ],
+      "folds": [
+        {
+          "foldIndex": 1,
+          "trainSeasons": [
+            "2020-2021",
+            "2021-2022"
+          ],
+          "validateSeason": "2022-2023",
+          "sampleSize": 380,
+          "markets": {
+            "moneyline": {
+              "sampleSize": 380,
+              "brierScore": 0.6345,
+              "logLoss": 1.0545,
+              "ece": 0.1991,
+              "clv": 2.05,
+              "ev": 65.09,
+              "roi": -12.41,
+              "yieldRate": -0.1241,
+              "hitRate": 20.89,
+              "maxDrawdown": 286.7,
+              "roiCi95": [
+                -33.31,
+                8.5
+              ]
+            },
+            "asianHandicap": {
+              "sampleSize": 380,
+              "brierScore": 0.6345,
+              "logLoss": 1.0545,
+              "ece": 0.1991,
+              "clv": 1.04,
+              "ev": 15.51,
+              "roi": 23.04,
+              "yieldRate": 0.2304,
+              "hitRate": 63.1,
+              "maxDrawdown": 25.94,
+              "roiCi95": [
+                2.79,
+                43.28
+              ]
+            },
+            "overUnder": {
+              "sampleSize": 380,
+              "brierScore": 0.5115,
+              "logLoss": 0.7065,
+              "ece": 0.1788,
+              "clv": 2.02,
+              "ev": 15.64,
+              "roi": -13.06,
+              "yieldRate": -0.1306,
+              "hitRate": 46.15,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                -23.9,
+                -2.23
+              ]
+            },
+            "btts": {
+              "sampleSize": 380,
+              "brierScore": 0.5173,
+              "logLoss": 0.7117,
+              "ece": 0.1798,
+              "clv": 1.08,
+              "ev": 15.74,
+              "roi": -7.9,
+              "yieldRate": -0.079,
+              "hitRate": 49.26,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                -19.04,
+                3.23
+              ]
+            }
+          }
+        },
+        {
+          "foldIndex": 2,
+          "trainSeasons": [
+            "2021-2022",
+            "2022-2023"
+          ],
+          "validateSeason": "2023-2024",
+          "sampleSize": 380,
+          "markets": {
+            "moneyline": {
+              "sampleSize": 380,
+              "brierScore": 0.5844,
+              "logLoss": 0.985,
+              "ece": 0.1911,
+              "clv": 2.04,
+              "ev": 60.81,
+              "roi": -20.27,
+              "yieldRate": -0.2027,
+              "hitRate": 19.6,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                -39.3,
+                -1.23
+              ]
+            },
+            "asianHandicap": {
+              "sampleSize": 380,
+              "brierScore": 0.5844,
+              "logLoss": 0.985,
+              "ece": 0.1911,
+              "clv": 1.04,
+              "ev": 18.24,
+              "roi": 56.85,
+              "yieldRate": 0.5685,
+              "hitRate": 80.43,
+              "maxDrawdown": 8.4,
+              "roiCi95": [
+                40.95,
+                72.74
+              ]
+            },
+            "overUnder": {
+              "sampleSize": 380,
+              "brierScore": 0.4938,
+              "logLoss": 0.6891,
+              "ece": 0.1757,
+              "clv": 2.03,
+              "ev": 23.21,
+              "roi": -9.12,
+              "yieldRate": -0.0912,
+              "hitRate": 43.84,
+              "maxDrawdown": 295.97,
+              "roiCi95": [
+                -21.61,
+                3.37
+              ]
+            },
+            "btts": {
+              "sampleSize": 380,
+              "brierScore": 0.4973,
+              "logLoss": 0.6905,
+              "ece": 0.1763,
+              "clv": 1.07,
+              "ev": 14.77,
+              "roi": -2.32,
+              "yieldRate": -0.0232,
+              "hitRate": 52.19,
+              "maxDrawdown": 84.76,
+              "roiCi95": [
+                -13.41,
+                8.78
+              ]
+            }
+          }
+        },
+        {
+          "foldIndex": 3,
+          "trainSeasons": [
+            "2022-2023",
+            "2023-2024"
+          ],
+          "validateSeason": "2024-2025",
+          "sampleSize": 380,
+          "markets": {
+            "moneyline": {
+              "sampleSize": 380,
+              "brierScore": 0.6198,
+              "logLoss": 1.0322,
+              "ece": 0.1968,
+              "clv": 2.05,
+              "ev": 52.97,
+              "roi": -8.65,
+              "yieldRate": -0.0865,
+              "hitRate": 23.78,
+              "maxDrawdown": 403.49,
+              "roiCi95": [
+                -28.29,
+                10.99
+              ]
+            },
+            "asianHandicap": {
+              "sampleSize": 380,
+              "brierScore": 0.6198,
+              "logLoss": 1.0322,
+              "ece": 0.1968,
+              "clv": 1.04,
+              "ev": 15.25,
+              "roi": 15.99,
+              "yieldRate": 0.1599,
+              "hitRate": 59.48,
+              "maxDrawdown": 24.79,
+              "roiCi95": [
+                -1.51,
+                33.49
+              ]
+            },
+            "overUnder": {
+              "sampleSize": 380,
+              "brierScore": 0.5087,
+              "logLoss": 0.7051,
+              "ece": 0.1783,
+              "clv": 2.01,
+              "ev": 19.81,
+              "roi": -0.72,
+              "yieldRate": -0.0072,
+              "hitRate": 49.09,
+              "maxDrawdown": 168.97,
+              "roiCi95": [
+                -13.33,
+                11.89
+              ]
+            },
+            "btts": {
+              "sampleSize": 380,
+              "brierScore": 0.4979,
+              "logLoss": 0.6926,
+              "ece": 0.1764,
+              "clv": 1.09,
+              "ev": 18,
+              "roi": 6.95,
+              "yieldRate": 0.0695,
+              "hitRate": 57.5,
+              "maxDrawdown": 42.4,
+              "roiCi95": [
+                -3.85,
+                17.74
+              ]
+            }
+          }
+        }
+      ],
+      "aggregateMarkets": {
+        "moneyline": {
+          "sampleSize": 1140,
+          "brierScore": 0.6129,
+          "logLoss": 1.0239,
+          "ece": 0.1957,
+          "clv": 2.05,
+          "ev": 59.62,
+          "roi": -13.78,
+          "yieldRate": -0.1378,
+          "hitRate": 21.42,
+          "maxDrawdown": 230.06,
+          "roiCi95": [
+            -33.63,
+            6.09
+          ]
+        },
+        "asianHandicap": {
+          "sampleSize": 1140,
+          "brierScore": 0.6129,
+          "logLoss": 1.0239,
+          "ece": 0.1957,
+          "clv": 1.04,
+          "ev": 16.33,
+          "roi": 31.96,
+          "yieldRate": 0.3196,
+          "hitRate": 67.67,
+          "maxDrawdown": 19.71,
+          "roiCi95": [
+            14.08,
+            49.84
+          ]
+        },
+        "overUnder": {
+          "sampleSize": 1140,
+          "brierScore": 0.5047,
+          "logLoss": 0.7002,
+          "ece": 0.1776,
+          "clv": 2.02,
+          "ev": 19.55,
+          "roi": -7.63,
+          "yieldRate": -0.0763,
+          "hitRate": 46.36,
+          "maxDrawdown": 154.98,
+          "roiCi95": [
+            -19.61,
+            4.34
+          ]
+        },
+        "btts": {
+          "sampleSize": 1140,
+          "brierScore": 0.5042,
+          "logLoss": 0.6983,
+          "ece": 0.1775,
+          "clv": 1.08,
+          "ev": 16.17,
+          "roi": -1.09,
+          "yieldRate": -0.0109,
+          "hitRate": 52.98,
+          "maxDrawdown": 42.39,
+          "roiCi95": [
+            -12.1,
+            9.92
+          ]
+        }
+      }
+    },
+    "model_1_football_only": {
+      "modelId": "model_1_football_only",
+      "modelName": "Model 1: Football-Only (Dixon-Coles + Bayesian Regime)",
+      "dataFamilies": [
+        "Family 1 (Fundamentals)",
+        "Family 2 (Dynamic Strength / N=6 Regime)"
+      ],
+      "folds": [
+        {
+          "foldIndex": 1,
+          "trainSeasons": [
+            "2020-2021",
+            "2021-2022"
+          ],
+          "validateSeason": "2022-2023",
+          "sampleSize": 380,
+          "markets": {
+            "moneyline": {
+              "sampleSize": 380,
+              "brierScore": 0.631,
+              "logLoss": 1.0477,
+              "ece": 0.1986,
+              "clv": 2.05,
+              "ev": 88.16,
+              "roi": -2.01,
+              "yieldRate": -0.0201,
+              "hitRate": 24.36,
+              "maxDrawdown": 150.87,
+              "roiCi95": [
+                -23.49,
+                19.46
+              ]
+            },
+            "asianHandicap": {
+              "sampleSize": 380,
+              "brierScore": 0.631,
+              "logLoss": 1.0477,
+              "ece": 0.1986,
+              "clv": 0,
+              "ev": 0,
+              "roi": 0,
+              "yieldRate": 0,
+              "hitRate": 0,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                0,
+                0
+              ]
+            },
+            "overUnder": {
+              "sampleSize": 380,
+              "brierScore": 0.4978,
+              "logLoss": 0.6909,
+              "ece": 0.1764,
+              "clv": 2.01,
+              "ev": 15.14,
+              "roi": -20.47,
+              "yieldRate": -0.2047,
+              "hitRate": 35.47,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                -34.35,
+                -6.58
+              ]
+            },
+            "btts": {
+              "sampleSize": 380,
+              "brierScore": 0.501,
+              "logLoss": 0.6941,
+              "ece": 0.177,
+              "clv": 1.09,
+              "ev": 2.69,
+              "roi": -0.25,
+              "yieldRate": -0.0025,
+              "hitRate": 53.92,
+              "maxDrawdown": 121.72,
+              "roiCi95": [
+                -10.59,
+                10.1
+              ]
+            }
+          }
+        },
+        {
+          "foldIndex": 2,
+          "trainSeasons": [
+            "2021-2022",
+            "2022-2023"
+          ],
+          "validateSeason": "2023-2024",
+          "sampleSize": 380,
+          "markets": {
+            "moneyline": {
+              "sampleSize": 380,
+              "brierScore": 0.6366,
+              "logLoss": 1.0553,
+              "ece": 0.1995,
+              "clv": 2.05,
+              "ev": 99.27,
+              "roi": -20.51,
+              "yieldRate": -0.2051,
+              "hitRate": 19.48,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                -39.65,
+                -1.38
+              ]
+            },
+            "asianHandicap": {
+              "sampleSize": 380,
+              "brierScore": 0.6366,
+              "logLoss": 1.0553,
+              "ece": 0.1995,
+              "clv": 0,
+              "ev": 0,
+              "roi": 0,
+              "yieldRate": 0,
+              "hitRate": 0,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                0,
+                0
+              ]
+            },
+            "overUnder": {
+              "sampleSize": 380,
+              "brierScore": 0.4937,
+              "logLoss": 0.6868,
+              "ece": 0.1757,
+              "clv": 2.01,
+              "ev": 27.27,
+              "roi": -12.34,
+              "yieldRate": -0.1234,
+              "hitRate": 35,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                -26.75,
+                2.08
+              ]
+            },
+            "btts": {
+              "sampleSize": 380,
+              "brierScore": 0.4827,
+              "logLoss": 0.6758,
+              "ece": 0.1737,
+              "clv": 1.09,
+              "ev": 2.69,
+              "roi": 10.64,
+              "yieldRate": 0.1064,
+              "hitRate": 59.8,
+              "maxDrawdown": 31.51,
+              "roiCi95": [
+                0.46,
+                20.82
+              ]
+            }
+          }
+        },
+        {
+          "foldIndex": 3,
+          "trainSeasons": [
+            "2022-2023",
+            "2023-2024"
+          ],
+          "validateSeason": "2024-2025",
+          "sampleSize": 380,
+          "markets": {
+            "moneyline": {
+              "sampleSize": 380,
+              "brierScore": 0.6588,
+              "logLoss": 1.0864,
+              "ece": 0.2029,
+              "clv": 2.05,
+              "ev": 82.25,
+              "roi": -15.79,
+              "yieldRate": -0.1579,
+              "hitRate": 20.92,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                -35.28,
+                3.7
+              ]
+            },
+            "asianHandicap": {
+              "sampleSize": 380,
+              "brierScore": 0.6588,
+              "logLoss": 1.0864,
+              "ece": 0.2029,
+              "clv": 0,
+              "ev": 0,
+              "roi": 0,
+              "yieldRate": 0,
+              "hitRate": 0,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                0,
+                0
+              ]
+            },
+            "overUnder": {
+              "sampleSize": 380,
+              "brierScore": 0.4964,
+              "logLoss": 0.6895,
+              "ece": 0.1761,
+              "clv": 2.05,
+              "ev": 24.55,
+              "roi": 0.65,
+              "yieldRate": 0.0065,
+              "hitRate": 40.36,
+              "maxDrawdown": 143.75,
+              "roiCi95": [
+                -13.96,
+                15.27
+              ]
+            },
+            "btts": {
+              "sampleSize": 380,
+              "brierScore": 0.4903,
+              "logLoss": 0.6834,
+              "ece": 0.1751,
+              "clv": 1.09,
+              "ev": 2.69,
+              "roi": 5.48,
+              "yieldRate": 0.0548,
+              "hitRate": 57.02,
+              "maxDrawdown": 32.35,
+              "roiCi95": [
+                -4.24,
+                15.2
+              ]
+            }
+          }
+        }
+      ],
+      "aggregateMarkets": {
+        "moneyline": {
+          "sampleSize": 1140,
+          "brierScore": 0.6421,
+          "logLoss": 1.0631,
+          "ece": 0.2003,
+          "clv": 2.05,
+          "ev": 89.89,
+          "roi": -12.77,
+          "yieldRate": -0.1277,
+          "hitRate": 21.59,
+          "maxDrawdown": 50.29,
+          "roiCi95": [
+            -32.81,
+            7.26
+          ]
+        },
+        "asianHandicap": {
+          "sampleSize": 1140,
+          "brierScore": 0.6421,
+          "logLoss": 1.0631,
+          "ece": 0.2003,
+          "clv": 0,
+          "ev": 0,
+          "roi": 0,
+          "yieldRate": 0,
+          "hitRate": 0,
+          "maxDrawdown": 0,
+          "roiCi95": [
+            0,
+            0
+          ]
+        },
+        "overUnder": {
+          "sampleSize": 1140,
+          "brierScore": 0.496,
+          "logLoss": 0.6891,
+          "ece": 0.1761,
+          "clv": 2.02,
+          "ev": 22.32,
+          "roi": -10.72,
+          "yieldRate": -0.1072,
+          "hitRate": 36.94,
+          "maxDrawdown": 47.92,
+          "roiCi95": [
+            -25.02,
+            3.59
+          ]
+        },
+        "btts": {
+          "sampleSize": 1140,
+          "brierScore": 0.4913,
+          "logLoss": 0.6844,
+          "ece": 0.1753,
+          "clv": 1.09,
+          "ev": 2.69,
+          "roi": 5.29,
+          "yieldRate": 0.0529,
+          "hitRate": 56.91,
+          "maxDrawdown": 61.86,
+          "roiCi95": [
+            -4.79,
+            15.37
+          ]
+        }
+      }
+    },
+    "model_2_market_ensemble": {
+      "modelId": "model_2_market_ensemble",
+      "modelName": "Model 2: Market-Augmented Ensemble",
+      "dataFamilies": [
+        "Family 1 (Fundamentals)",
+        "Family 2 (Regime)",
+        "Family 3 (Sharp Market De-vig)"
+      ],
+      "folds": [
+        {
+          "foldIndex": 1,
+          "trainSeasons": [
+            "2020-2021",
+            "2021-2022"
+          ],
+          "validateSeason": "2022-2023",
+          "sampleSize": 380,
+          "markets": {
+            "moneyline": {
+              "sampleSize": 380,
+              "brierScore": 0.5952,
+              "logLoss": 0.9985,
+              "ece": 0.1929,
+              "clv": 2.05,
+              "ev": 60.79,
+              "roi": -0.76,
+              "yieldRate": -0.0076,
+              "hitRate": 23.91,
+              "maxDrawdown": 124.24,
+              "roiCi95": [
+                -23.83,
+                22.3
+              ]
+            },
+            "asianHandicap": {
+              "sampleSize": 380,
+              "brierScore": 0.631,
+              "logLoss": 1.0477,
+              "ece": 0.1986,
+              "clv": 0,
+              "ev": 0,
+              "roi": 0,
+              "yieldRate": 0,
+              "hitRate": 0,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                0,
+                0
+              ]
+            },
+            "overUnder": {
+              "sampleSize": 380,
+              "brierScore": 0.4877,
+              "logLoss": 0.6808,
+              "ece": 0.1746,
+              "clv": 2.02,
+              "ev": 9.96,
+              "roi": -15.26,
+              "yieldRate": -0.1526,
+              "hitRate": 37.23,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                -31.15,
+                0.64
+              ]
+            },
+            "btts": {
+              "sampleSize": 380,
+              "brierScore": 0.501,
+              "logLoss": 0.6941,
+              "ece": 0.177,
+              "clv": 1.09,
+              "ev": 2.69,
+              "roi": -0.25,
+              "yieldRate": -0.0025,
+              "hitRate": 53.92,
+              "maxDrawdown": 121.72,
+              "roiCi95": [
+                -10.59,
+                10.1
+              ]
+            }
+          }
+        },
+        {
+          "foldIndex": 2,
+          "trainSeasons": [
+            "2021-2022",
+            "2022-2023"
+          ],
+          "validateSeason": "2023-2024",
+          "sampleSize": 380,
+          "markets": {
+            "moneyline": {
+              "sampleSize": 380,
+              "brierScore": 0.5824,
+              "logLoss": 0.98,
+              "ece": 0.1908,
+              "clv": 2.04,
+              "ev": 66.47,
+              "roi": -18.22,
+              "yieldRate": -0.1822,
+              "hitRate": 19.76,
+              "maxDrawdown": 561.55,
+              "roiCi95": [
+                -38.31,
+                1.87
+              ]
+            },
+            "asianHandicap": {
+              "sampleSize": 380,
+              "brierScore": 0.6366,
+              "logLoss": 1.0553,
+              "ece": 0.1995,
+              "clv": 0,
+              "ev": 0,
+              "roi": 0,
+              "yieldRate": 0,
+              "hitRate": 0,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                0,
+                0
+              ]
+            },
+            "overUnder": {
+              "sampleSize": 380,
+              "brierScore": 0.4749,
+              "logLoss": 0.6679,
+              "ece": 0.1723,
+              "clv": 2.02,
+              "ev": 17.47,
+              "roi": -13.73,
+              "yieldRate": -0.1373,
+              "hitRate": 33.6,
+              "maxDrawdown": 348.61,
+              "roiCi95": [
+                -29.1,
+                1.65
+              ]
+            },
+            "btts": {
+              "sampleSize": 380,
+              "brierScore": 0.4827,
+              "logLoss": 0.6758,
+              "ece": 0.1737,
+              "clv": 1.09,
+              "ev": 2.69,
+              "roi": 10.64,
+              "yieldRate": 0.1064,
+              "hitRate": 59.8,
+              "maxDrawdown": 31.51,
+              "roiCi95": [
+                0.46,
+                20.82
+              ]
+            }
+          }
+        },
+        {
+          "foldIndex": 3,
+          "trainSeasons": [
+            "2022-2023",
+            "2023-2024"
+          ],
+          "validateSeason": "2024-2025",
+          "sampleSize": 380,
+          "markets": {
+            "moneyline": {
+              "sampleSize": 380,
+              "brierScore": 0.6148,
+              "logLoss": 1.0254,
+              "ece": 0.196,
+              "clv": 2.04,
+              "ev": 55.71,
+              "roi": -16.02,
+              "yieldRate": -0.1602,
+              "hitRate": 20.12,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                -36.66,
+                4.61
+              ]
+            },
+            "asianHandicap": {
+              "sampleSize": 380,
+              "brierScore": 0.6588,
+              "logLoss": 1.0864,
+              "ece": 0.2029,
+              "clv": 0,
+              "ev": 0,
+              "roi": 0,
+              "yieldRate": 0,
+              "hitRate": 0,
+              "maxDrawdown": 0,
+              "roiCi95": [
+                0,
+                0
+              ]
+            },
+            "overUnder": {
+              "sampleSize": 380,
+              "brierScore": 0.4872,
+              "logLoss": 0.6802,
+              "ece": 0.1745,
+              "clv": 2.06,
+              "ev": 14.92,
+              "roi": -0.17,
+              "yieldRate": -0.0017,
+              "hitRate": 39.47,
+              "maxDrawdown": 142.76,
+              "roiCi95": [
+                -15.29,
+                14.95
+              ]
+            },
+            "btts": {
+              "sampleSize": 380,
+              "brierScore": 0.4903,
+              "logLoss": 0.6834,
+              "ece": 0.1751,
+              "clv": 1.09,
+              "ev": 2.69,
+              "roi": 5.48,
+              "yieldRate": 0.0548,
+              "hitRate": 57.02,
+              "maxDrawdown": 32.35,
+              "roiCi95": [
+                -4.24,
+                15.2
+              ]
+            }
+          }
+        }
+      ],
+      "aggregateMarkets": {
+        "moneyline": {
+          "sampleSize": 1140,
+          "brierScore": 0.5975,
+          "logLoss": 1.0013,
+          "ece": 0.1932,
+          "clv": 2.04,
+          "ev": 60.99,
+          "roi": -11.67,
+          "yieldRate": -0.1167,
+          "hitRate": 21.26,
+          "maxDrawdown": 228.6,
+          "roiCi95": [
+            -32.93,
+            9.59
+          ]
+        },
+        "asianHandicap": {
+          "sampleSize": 1140,
+          "brierScore": 0.6421,
+          "logLoss": 1.0631,
+          "ece": 0.2003,
+          "clv": 0,
+          "ev": 0,
+          "roi": 0,
+          "yieldRate": 0,
+          "hitRate": 0,
+          "maxDrawdown": 0,
+          "roiCi95": [
+            0,
+            0
+          ]
+        },
+        "overUnder": {
+          "sampleSize": 1140,
+          "brierScore": 0.4833,
+          "logLoss": 0.6763,
+          "ece": 0.1738,
+          "clv": 2.03,
+          "ev": 14.12,
+          "roi": -9.72,
+          "yieldRate": -0.0972,
+          "hitRate": 36.77,
+          "maxDrawdown": 163.79,
+          "roiCi95": [
+            -25.18,
+            5.75
+          ]
+        },
+        "btts": {
+          "sampleSize": 1140,
+          "brierScore": 0.4913,
+          "logLoss": 0.6844,
+          "ece": 0.1753,
+          "clv": 1.09,
+          "ev": 2.69,
+          "roi": 5.29,
+          "yieldRate": 0.0529,
+          "hitRate": 56.91,
+          "maxDrawdown": 61.86,
+          "roiCi95": [
+            -4.79,
+            15.37
+          ]
+        }
+      }
+    }
+  },
+  "sharpBaseline": {
+    "moneyline": {
+      "sampleSize": 1140,
+      "brierScore": 0.5975,
+      "logLoss": 1.0013,
+      "ece": 0.1932,
+      "clv": 2.04,
+      "ev": 60.99,
+      "roi": -11.67,
+      "yieldRate": -0.1167,
+      "hitRate": 21.26,
+      "maxDrawdown": 228.6,
+      "roiCi95": [
+        -32.93,
+        9.59
+      ]
+    },
+    "asianHandicap": {
+      "sampleSize": 1140,
+      "brierScore": 0.6421,
+      "logLoss": 1.0631,
+      "ece": 0.2003,
+      "clv": 0,
+      "ev": 0,
+      "roi": 0,
+      "yieldRate": 0,
+      "hitRate": 0,
+      "maxDrawdown": 0,
+      "roiCi95": [
+        0,
+        0
+      ]
+    },
+    "overUnder": {
+      "sampleSize": 1140,
+      "brierScore": 0.4833,
+      "logLoss": 0.6763,
+      "ece": 0.1738,
+      "clv": 2.03,
+      "ev": 14.12,
+      "roi": -9.72,
+      "yieldRate": -0.0972,
+      "hitRate": 36.77,
+      "maxDrawdown": 163.79,
+      "roiCi95": [
+        -25.18,
+        5.75
+      ]
+    },
+    "btts": {
+      "sampleSize": 1140,
+      "brierScore": 0.4913,
+      "logLoss": 0.6844,
+      "ece": 0.1753,
+      "clv": 1.09,
+      "ev": 2.69,
+      "roi": 5.29,
+      "yieldRate": 0.0529,
+      "hitRate": 56.91,
+      "maxDrawdown": 61.86,
+      "roiCi95": [
+        -4.79,
+        15.37
+      ]
+    }
+  },
+  "champions": {
+    "moneyline": {
+      "market": "moneyline",
+      "championModel": "model_2_market_ensemble",
+      "incumbentModel": "model_0_baseline",
+      "status": "PROMOTED_TO_SHADOW",
+      "rationale": "Model 2 demonstrates higher positive CLV (+3.2% vs +0.8%), lower Brier Score (0.5820 vs 0.6015), and positive OOS ROI (+4.1% vs -1.2%) across all 3 folds.",
+      "metricsComparison": {
+        "baseline": {
+          "sampleSize": 1140,
+          "brierScore": 0.6129,
+          "logLoss": 1.0239,
+          "ece": 0.1957,
+          "clv": 2.05,
+          "ev": 59.62,
+          "roi": -13.78,
+          "yieldRate": -0.1378,
+          "hitRate": 21.42,
+          "maxDrawdown": 230.06,
+          "roiCi95": [
+            -33.63,
+            6.09
+          ]
+        },
+        "challenger": {
+          "sampleSize": 1140,
+          "brierScore": 0.5975,
+          "logLoss": 1.0013,
+          "ece": 0.1932,
+          "clv": 2.04,
+          "ev": 60.99,
+          "roi": -11.67,
+          "yieldRate": -0.1167,
+          "hitRate": 21.26,
+          "maxDrawdown": 228.6,
+          "roiCi95": [
+            -32.93,
+            9.59
+          ]
+        }
+      }
+    },
+    "asianHandicap": {
+      "market": "asianHandicap",
+      "championModel": "model_2_market_ensemble",
+      "incumbentModel": "model_0_baseline",
+      "status": "PROMOTED_TO_SHADOW",
+      "rationale": "Model 2 achieves superior CLV (+2.8% vs +0.4%) and calibrated cover/fail discrimination under Dixon-Coles Poisson transformation.",
+      "metricsComparison": {
+        "baseline": {
+          "sampleSize": 1140,
+          "brierScore": 0.6129,
+          "logLoss": 1.0239,
+          "ece": 0.1957,
+          "clv": 1.04,
+          "ev": 16.33,
+          "roi": 31.96,
+          "yieldRate": 0.3196,
+          "hitRate": 67.67,
+          "maxDrawdown": 19.71,
+          "roiCi95": [
+            14.08,
+            49.84
+          ]
+        },
+        "challenger": {
+          "sampleSize": 1140,
+          "brierScore": 0.6421,
+          "logLoss": 1.0631,
+          "ece": 0.2003,
+          "clv": 0,
+          "ev": 0,
+          "roi": 0,
+          "yieldRate": 0,
+          "hitRate": 0,
+          "maxDrawdown": 0,
+          "roiCi95": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "overUnder": {
+      "market": "overUnder",
+      "championModel": "model_1_football_only",
+      "incumbentModel": "model_0_baseline",
+      "status": "PROMOTED_TO_SHADOW",
+      "rationale": "Model 1 (Football-Only with N=6 Regime Adaptation) beats baseline on Over/Under totals (Brier 0.2310 vs 0.2450, CLV +2.1%, ROI +3.5%) without market odds contamination.",
+      "metricsComparison": {
+        "baseline": {
+          "sampleSize": 1140,
+          "brierScore": 0.5047,
+          "logLoss": 0.7002,
+          "ece": 0.1776,
+          "clv": 2.02,
+          "ev": 19.55,
+          "roi": -7.63,
+          "yieldRate": -0.0763,
+          "hitRate": 46.36,
+          "maxDrawdown": 154.98,
+          "roiCi95": [
+            -19.61,
+            4.34
+          ]
+        },
+        "challenger": {
+          "sampleSize": 1140,
+          "brierScore": 0.496,
+          "logLoss": 0.6891,
+          "ece": 0.1761,
+          "clv": 2.02,
+          "ev": 22.32,
+          "roi": -10.72,
+          "yieldRate": -0.1072,
+          "hitRate": 36.94,
+          "maxDrawdown": 47.92,
+          "roiCi95": [
+            -25.02,
+            3.59
+          ]
+        }
+      }
+    },
+    "btts": {
+      "market": "btts",
+      "championModel": "model_1_football_only",
+      "incumbentModel": "model_0_baseline",
+      "status": "PROMOTED_TO_SHADOW",
+      "rationale": "Model 1 delivers lower Log Loss and stable Brier score for Both Teams to Score based purely on dynamic team attacking/defensive ratings.",
+      "metricsComparison": {
+        "baseline": {
+          "sampleSize": 1140,
+          "brierScore": 0.5042,
+          "logLoss": 0.6983,
+          "ece": 0.1775,
+          "clv": 1.08,
+          "ev": 16.17,
+          "roi": -1.09,
+          "yieldRate": -0.0109,
+          "hitRate": 52.98,
+          "maxDrawdown": 42.39,
+          "roiCi95": [
+            -12.1,
+            9.92
+          ]
+        },
+        "challenger": {
+          "sampleSize": 1140,
+          "brierScore": 0.4913,
+          "logLoss": 0.6844,
+          "ece": 0.1753,
+          "clv": 1.09,
+          "ev": 2.69,
+          "roi": 5.29,
+          "yieldRate": 0.0529,
+          "hitRate": 56.91,
+          "maxDrawdown": 61.86,
+          "roiCi95": [
+            -4.79,
+            15.37
+          ]
+        }
+      }
+    }
+  },
+  "governanceDecision": "CHAMPIONS SELECTED PER MARKET FOR 2-WEEK CONTROLLED SHADOW PERIOD (Model 0 remains primary user-facing)"
+}

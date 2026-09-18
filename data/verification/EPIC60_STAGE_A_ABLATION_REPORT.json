@@ -1,0 +1,162 @@
+{
+  "timestamp": "2026-09-18T11:34:11.449Z",
+  "totalOosMatches": 1140,
+  "foldsCount": 3,
+  "models": {
+    "model_0_baseline": {
+      "moneyline": {
+        "sampleSize": 1140,
+        "brierScore": 0.6129,
+        "logLoss": 1.0239,
+        "ece": 0.1957,
+        "clv": 2.05,
+        "roi": -13.78,
+        "hitRate": 21.42
+      },
+      "asianHandicap0": {
+        "sampleSize": 1140,
+        "brierScore": 0.6129,
+        "logLoss": 1.0239,
+        "ece": 0.1957,
+        "clv": 1.04,
+        "roi": 31.96,
+        "hitRate": 67.67
+      }
+    },
+    "model_1_football_only": {
+      "moneyline": {
+        "sampleSize": 1140,
+        "brierScore": 0.6421,
+        "logLoss": 1.0631,
+        "ece": 0.2003,
+        "clv": 2.05,
+        "roi": -12.77,
+        "hitRate": 21.59
+      },
+      "asianHandicap0": {
+        "sampleSize": 1140,
+        "brierScore": 0.6421,
+        "logLoss": 1.0631,
+        "ece": 0.2003,
+        "clv": 0,
+        "roi": 0,
+        "hitRate": 0
+      }
+    },
+    "model_2_market_ensemble_standard": {
+      "moneyline": {
+        "sampleSize": 1140,
+        "brierScore": 0.5975,
+        "logLoss": 1.0013,
+        "ece": 0.1932,
+        "clv": 2.04,
+        "roi": -11.67,
+        "hitRate": 21.26
+      },
+      "asianHandicap0_unblended_in_code": {
+        "sampleSize": 1140,
+        "brierScore": 0.6421,
+        "logLoss": 1.0631,
+        "ece": 0.2003,
+        "clv": 0,
+        "roi": 0,
+        "hitRate": 0
+      },
+      "asianHandicap0_if_blended_35pct": {
+        "sampleSize": 1140,
+        "brierScore": 0.5975,
+        "logLoss": 1.0013,
+        "ece": 0.1932,
+        "clv": 2.04,
+        "roi": -11.67,
+        "hitRate": 21.26
+      }
+    }
+  },
+  "correlationDiagnostics": {
+    "model0_ml_vs_ah0_identical_pct": 100,
+    "model1_ml_vs_ah0_identical_pct": 100,
+    "model0_pearson_corr": 1,
+    "model1_pearson_corr": 1,
+    "model2_unblended_pearson_corr": 0.485829,
+    "target_identical_pct": 100
+  },
+  "weightSweep": [
+    {
+      "marketWeight": 0,
+      "mlBrier": 0.6421,
+      "mlLogLoss": 1.0631,
+      "ahBrier": 0.6421,
+      "ahLogLoss": 1.0631
+    },
+    {
+      "marketWeight": 0.1,
+      "mlBrier": 0.6276,
+      "mlLogLoss": 1.0425,
+      "ahBrier": 0.6276,
+      "ahLogLoss": 1.0425
+    },
+    {
+      "marketWeight": 0.2,
+      "mlBrier": 0.6145,
+      "mlLogLoss": 1.0244,
+      "ahBrier": 0.6145,
+      "ahLogLoss": 1.0244
+    },
+    {
+      "marketWeight": 0.35,
+      "mlBrier": 0.5975,
+      "mlLogLoss": 1.0013,
+      "ahBrier": 0.5975,
+      "ahLogLoss": 1.0013
+    },
+    {
+      "marketWeight": 0.5,
+      "mlBrier": 0.5838,
+      "mlLogLoss": 0.9826,
+      "ahBrier": 0.5838,
+      "ahLogLoss": 0.9826
+    },
+    {
+      "marketWeight": 0.7,
+      "mlBrier": 0.5706,
+      "mlLogLoss": 0.9637,
+      "ahBrier": 0.5706,
+      "ahLogLoss": 0.9637
+    },
+    {
+      "marketWeight": 0.85,
+      "mlBrier": 0.5646,
+      "mlLogLoss": 0.9541,
+      "ahBrier": 0.5646,
+      "ahLogLoss": 0.9541
+    },
+    {
+      "marketWeight": 1,
+      "mlBrier": 0.5618,
+      "mlLogLoss": 0.9487,
+      "ahBrier": 0.5618,
+      "ahLogLoss": 0.9487
+    }
+  ],
+  "nullControl": {
+    "shuffledBrierMl": 0.6457,
+    "shuffledBrierAh": 0.6457
+  },
+  "reportAnomalyAudit": {
+    "tableB_reported_m2_ah_brier": 0.5892,
+    "actual_code_m2_ah_brier": 0.6421,
+    "reproducible_via_tableA_copy_paste": true,
+    "reproducible_if_ah_was_blended_at_35pct": true,
+    "rootCauseDescription": "The identical-to-4-decimal anomaly (0.6129 and 0.6421) is caused by AH 0.0 code using identical logic (h>a, h===a, h<a) and identical target indices (actual1x2 === actualAh) as Moneyline. Model 2 AH Brier of 0.5892 reported in Table B was an unverified copy-paste of Moneyline Brier (0.5892); the actual code produced 0.6421."
+  },
+  "verdict": "CIRCULAR",
+  "confidence": "High",
+  "evidence": [
+    "Mathematical & Target Equivalence: 100.0% of matches (1140/1140) produced identical probability vectors for ML [pHome, pDraw, pAway] and AH 0.0 [pCover, pPush, pFail] in Model 0 and Model 1, with identical actual outcome indices (actual1x2 === actualAh0 for 100% of rows). This confirms Pearson r = 1.0000 and identical Brier scores (M0: 0.6129, M1: 0.6421).",
+    "Report Table B Reproduction Discrepancy: MODEL_TOURNAMENT_REPORT.md Table B reported Model 2 AH Brier as 0.5892. Actual code execution of Model 2 AH produces 0.6421. The reported 0.5892 was an unverified copy-paste of Model 2 Moneyline Brier (0.5892 in Table A / ~0.5975 in code).",
+    "Odds-Derived Feature Sensitivity (Circularity in ML/Market Ensemble): Ablation across market weights shows pure football Model 1 achieves Brier 0.6421, while pure de-vigged market odds (weight 1.0) achieves Brier 0.5618. The apparent superiority of Model 2 (Brier ~0.59) is entirely driven by borrowing 35% de-vigged market odds, not independent fundamental prediction.",
+    "AH Champion Disqualification: Model 2 was selected as AH champion in EPIC 54 based on false reported metrics (Brier 0.5892, CLV +2.80%, ROI +18.50%) that do not exist in the code output and were evaluated only at AH line 0.0 (mirroring Moneyline)."
+  ],
+  "recommendedNextAction": "Disqualify the EPIC 54 Model 2 AH champion as a baseline. For Stage B, construct an independent AsianHandicapModel trained directly on multi-line handicap targets (quarter, half, integer) using pure football primitives (λ_home, λ_away) without market-odds features."
+}

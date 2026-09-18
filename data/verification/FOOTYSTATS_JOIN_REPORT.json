@@ -1,0 +1,3062 @@
+{
+  "generatedAt": "2026-09-16T20:07:46.563Z",
+  "season": "2024-2025",
+  "gateGC": {
+    "targetMetric": "EPL team join rate FootyStats ↔ Gold >= 95%",
+    "thresholdPct": 95,
+    "actualPct": 100,
+    "status": "PASS"
+  },
+  "joinResult": {
+    "canonicalEplFixtureCount": 380,
+    "footystatsFixtureCount": 380,
+    "successfulJoinCount": 380,
+    "joinRatePct": 100,
+    "unmatchedFootyStats": [],
+    "unmatchedGold": [],
+    "ambiguousMatches": [],
+    "matchingMethodology": "Exact join on (season, normalizeTeamName(home), normalizeTeamName(away)) with kickoff date diff <= 2.0 days",
+    "pairs": [
+      {
+        "footyId": 7466677,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-16|man-united|fulham",
+        "matchDate": "2024-08-16",
+        "home": "Manchester United",
+        "away": "Fulham",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466678,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-17|ipswich|liverpool",
+        "matchDate": "2024-08-17",
+        "home": "Ipswich Town",
+        "away": "Liverpool",
+        "dateDiffDays": 0.48
+      },
+      {
+        "footyId": 7466679,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-17|arsenal|wolves",
+        "matchDate": "2024-08-17",
+        "home": "Arsenal",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466680,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-17|everton|brighton",
+        "matchDate": "2024-08-17",
+        "home": "Everton",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466681,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-17|newcastle|southampton",
+        "matchDate": "2024-08-17",
+        "home": "Newcastle United",
+        "away": "Southampton",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466682,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-17|nott-m-forest|bournemouth",
+        "matchDate": "2024-08-17",
+        "home": "Nottingham Forest",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466683,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-17|west-ham|aston-villa",
+        "matchDate": "2024-08-17",
+        "home": "West Ham United",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466684,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-18|brentford|crystal-palace",
+        "matchDate": "2024-08-18",
+        "home": "Brentford",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466685,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-18|chelsea|man-city",
+        "matchDate": "2024-08-18",
+        "home": "Chelsea",
+        "away": "Manchester City",
+        "dateDiffDays": 0.65
+      },
+      {
+        "footyId": 7466686,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-19|leicester|tottenham",
+        "matchDate": "2024-08-19",
+        "home": "Leicester City",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466687,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-25|bournemouth|newcastle",
+        "matchDate": "2024-08-25",
+        "home": "AFC Bournemouth",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466688,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-24|aston-villa|arsenal",
+        "matchDate": "2024-08-24",
+        "home": "Aston Villa",
+        "away": "Arsenal",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466689,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-24|brighton|man-united",
+        "matchDate": "2024-08-24",
+        "home": "Brighton & Hove Albion",
+        "away": "Manchester United",
+        "dateDiffDays": 0.48
+      },
+      {
+        "footyId": 7466690,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-24|crystal-palace|west-ham",
+        "matchDate": "2024-08-24",
+        "home": "Crystal Palace",
+        "away": "West Ham United",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466691,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-24|fulham|leicester",
+        "matchDate": "2024-08-24",
+        "home": "Fulham",
+        "away": "Leicester City",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466692,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-25|liverpool|brentford",
+        "matchDate": "2024-08-25",
+        "home": "Liverpool",
+        "away": "Brentford",
+        "dateDiffDays": 0.65
+      },
+      {
+        "footyId": 7466693,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-24|man-city|ipswich",
+        "matchDate": "2024-08-24",
+        "home": "Manchester City",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466694,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-24|southampton|nott-m-forest",
+        "matchDate": "2024-08-24",
+        "home": "Southampton",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466695,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-24|tottenham|everton",
+        "matchDate": "2024-08-24",
+        "home": "Tottenham Hotspur",
+        "away": "Everton",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466696,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-25|wolves|chelsea",
+        "matchDate": "2024-08-25",
+        "home": "Wolverhampton Wanderers",
+        "away": "Chelsea",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466697,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-31|arsenal|brighton",
+        "matchDate": "2024-08-31",
+        "home": "Arsenal",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.48
+      },
+      {
+        "footyId": 7466698,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-31|brentford|southampton",
+        "matchDate": "2024-08-31",
+        "home": "Brentford",
+        "away": "Southampton",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466699,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-01|chelsea|crystal-palace",
+        "matchDate": "2024-09-01",
+        "home": "Chelsea",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.52
+      },
+      {
+        "footyId": 7466700,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-31|everton|bournemouth",
+        "matchDate": "2024-08-31",
+        "home": "Everton",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466701,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-31|ipswich|fulham",
+        "matchDate": "2024-08-31",
+        "home": "Ipswich Town",
+        "away": "Fulham",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466702,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-31|leicester|aston-villa",
+        "matchDate": "2024-08-31",
+        "home": "Leicester City",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466703,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-01|man-united|liverpool",
+        "matchDate": "2024-09-01",
+        "home": "Manchester United",
+        "away": "Liverpool",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466704,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-01|newcastle|tottenham",
+        "matchDate": "2024-09-01",
+        "home": "Newcastle United",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.52
+      },
+      {
+        "footyId": 7466705,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-31|nott-m-forest|wolves",
+        "matchDate": "2024-08-31",
+        "home": "Nottingham Forest",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466706,
+        "canonicalId": "ENG-PL|2024-2025|2024-08-31|west-ham|man-city",
+        "matchDate": "2024-08-31",
+        "home": "West Ham United",
+        "away": "Manchester City",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466707,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-14|bournemouth|chelsea",
+        "matchDate": "2024-09-14",
+        "home": "AFC Bournemouth",
+        "away": "Chelsea",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466708,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-14|aston-villa|everton",
+        "matchDate": "2024-09-14",
+        "home": "Aston Villa",
+        "away": "Everton",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466709,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-14|brighton|ipswich",
+        "matchDate": "2024-09-14",
+        "home": "Brighton & Hove Albion",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466710,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-14|crystal-palace|leicester",
+        "matchDate": "2024-09-14",
+        "home": "Crystal Palace",
+        "away": "Leicester City",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466711,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-14|fulham|west-ham",
+        "matchDate": "2024-09-14",
+        "home": "Fulham",
+        "away": "West Ham United",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466712,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-14|liverpool|nott-m-forest",
+        "matchDate": "2024-09-14",
+        "home": "Liverpool",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466713,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-14|man-city|brentford",
+        "matchDate": "2024-09-14",
+        "home": "Manchester City",
+        "away": "Brentford",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466714,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-14|southampton|man-united",
+        "matchDate": "2024-09-14",
+        "home": "Southampton",
+        "away": "Manchester United",
+        "dateDiffDays": 0.48
+      },
+      {
+        "footyId": 7466715,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-15|tottenham|arsenal",
+        "matchDate": "2024-09-15",
+        "home": "Tottenham Hotspur",
+        "away": "Arsenal",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466716,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-15|wolves|newcastle",
+        "matchDate": "2024-09-15",
+        "home": "Wolverhampton Wanderers",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.65
+      },
+      {
+        "footyId": 7466717,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-21|aston-villa|wolves",
+        "matchDate": "2024-09-21",
+        "home": "Aston Villa",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466718,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-22|brighton|nott-m-forest",
+        "matchDate": "2024-09-22",
+        "home": "Brighton & Hove Albion",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466719,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-21|crystal-palace|man-united",
+        "matchDate": "2024-09-21",
+        "home": "Crystal Palace",
+        "away": "Manchester United",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466720,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-21|fulham|newcastle",
+        "matchDate": "2024-09-21",
+        "home": "Fulham",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466721,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-21|leicester|everton",
+        "matchDate": "2024-09-21",
+        "home": "Leicester City",
+        "away": "Everton",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466722,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-21|liverpool|bournemouth",
+        "matchDate": "2024-09-21",
+        "home": "Liverpool",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466723,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-22|man-city|arsenal",
+        "matchDate": "2024-09-22",
+        "home": "Manchester City",
+        "away": "Arsenal",
+        "dateDiffDays": 0.65
+      },
+      {
+        "footyId": 7466724,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-21|southampton|ipswich",
+        "matchDate": "2024-09-21",
+        "home": "Southampton",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466725,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-21|tottenham|brentford",
+        "matchDate": "2024-09-21",
+        "home": "Tottenham Hotspur",
+        "away": "Brentford",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466726,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-21|west-ham|chelsea",
+        "matchDate": "2024-09-21",
+        "home": "West Ham United",
+        "away": "Chelsea",
+        "dateDiffDays": 0.48
+      },
+      {
+        "footyId": 7466727,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-30|bournemouth|southampton",
+        "matchDate": "2024-09-30",
+        "home": "AFC Bournemouth",
+        "away": "Southampton",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466728,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-28|arsenal|leicester",
+        "matchDate": "2024-09-28",
+        "home": "Arsenal",
+        "away": "Leicester City",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466729,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-28|brentford|west-ham",
+        "matchDate": "2024-09-28",
+        "home": "Brentford",
+        "away": "West Ham United",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466730,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-28|chelsea|brighton",
+        "matchDate": "2024-09-28",
+        "home": "Chelsea",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466731,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-28|everton|crystal-palace",
+        "matchDate": "2024-09-28",
+        "home": "Everton",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466732,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-29|ipswich|aston-villa",
+        "matchDate": "2024-09-29",
+        "home": "Ipswich Town",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466733,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-29|man-united|tottenham",
+        "matchDate": "2024-09-29",
+        "home": "Manchester United",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.65
+      },
+      {
+        "footyId": 7466734,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-28|newcastle|man-city",
+        "matchDate": "2024-09-28",
+        "home": "Newcastle United",
+        "away": "Manchester City",
+        "dateDiffDays": 0.48
+      },
+      {
+        "footyId": 7466735,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-28|nott-m-forest|fulham",
+        "matchDate": "2024-09-28",
+        "home": "Nottingham Forest",
+        "away": "Fulham",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466736,
+        "canonicalId": "ENG-PL|2024-2025|2024-09-28|wolves|liverpool",
+        "matchDate": "2024-09-28",
+        "home": "Wolverhampton Wanderers",
+        "away": "Liverpool",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466737,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-05|arsenal|southampton",
+        "matchDate": "2024-10-05",
+        "home": "Arsenal",
+        "away": "Southampton",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466738,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-06|aston-villa|man-united",
+        "matchDate": "2024-10-06",
+        "home": "Aston Villa",
+        "away": "Manchester United",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466739,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-05|brentford|wolves",
+        "matchDate": "2024-10-05",
+        "home": "Brentford",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466740,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-06|brighton|tottenham",
+        "matchDate": "2024-10-06",
+        "home": "Brighton & Hove Albion",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.65
+      },
+      {
+        "footyId": 7466741,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-06|chelsea|nott-m-forest",
+        "matchDate": "2024-10-06",
+        "home": "Chelsea",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466742,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-05|crystal-palace|liverpool",
+        "matchDate": "2024-10-05",
+        "home": "Crystal Palace",
+        "away": "Liverpool",
+        "dateDiffDays": 0.48
+      },
+      {
+        "footyId": 7466743,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-05|everton|newcastle",
+        "matchDate": "2024-10-05",
+        "home": "Everton",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466744,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-05|leicester|bournemouth",
+        "matchDate": "2024-10-05",
+        "home": "Leicester City",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466745,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-05|man-city|fulham",
+        "matchDate": "2024-10-05",
+        "home": "Manchester City",
+        "away": "Fulham",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466746,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-05|west-ham|ipswich",
+        "matchDate": "2024-10-05",
+        "home": "West Ham United",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466747,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-19|bournemouth|arsenal",
+        "matchDate": "2024-10-19",
+        "home": "AFC Bournemouth",
+        "away": "Arsenal",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466748,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-19|fulham|aston-villa",
+        "matchDate": "2024-10-19",
+        "home": "Fulham",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466749,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-19|ipswich|everton",
+        "matchDate": "2024-10-19",
+        "home": "Ipswich Town",
+        "away": "Everton",
+        "dateDiffDays": 0.59
+      },
+      {
+        "footyId": 7466750,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-20|liverpool|chelsea",
+        "matchDate": "2024-10-20",
+        "home": "Liverpool",
+        "away": "Chelsea",
+        "dateDiffDays": 0.65
+      },
+      {
+        "footyId": 7466751,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-19|man-united|brentford",
+        "matchDate": "2024-10-19",
+        "home": "Manchester United",
+        "away": "Brentford",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466752,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-19|newcastle|brighton",
+        "matchDate": "2024-10-19",
+        "home": "Newcastle United",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466753,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-21|nott-m-forest|crystal-palace",
+        "matchDate": "2024-10-21",
+        "home": "Nottingham Forest",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466754,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-19|southampton|leicester",
+        "matchDate": "2024-10-19",
+        "home": "Southampton",
+        "away": "Leicester City",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466755,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-19|tottenham|west-ham",
+        "matchDate": "2024-10-19",
+        "home": "Tottenham Hotspur",
+        "away": "West Ham United",
+        "dateDiffDays": 0.48
+      },
+      {
+        "footyId": 7466756,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-20|wolves|man-city",
+        "matchDate": "2024-10-20",
+        "home": "Wolverhampton Wanderers",
+        "away": "Manchester City",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466757,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-27|arsenal|liverpool",
+        "matchDate": "2024-10-27",
+        "home": "Arsenal",
+        "away": "Liverpool",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466758,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-26|aston-villa|bournemouth",
+        "matchDate": "2024-10-26",
+        "home": "Aston Villa",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466759,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-26|brentford|ipswich",
+        "matchDate": "2024-10-26",
+        "home": "Brentford",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466760,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-26|brighton|wolves",
+        "matchDate": "2024-10-26",
+        "home": "Brighton & Hove Albion",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466761,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-27|chelsea|newcastle",
+        "matchDate": "2024-10-27",
+        "home": "Chelsea",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466762,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-27|crystal-palace|tottenham",
+        "matchDate": "2024-10-27",
+        "home": "Crystal Palace",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466763,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-26|everton|fulham",
+        "matchDate": "2024-10-26",
+        "home": "Everton",
+        "away": "Fulham",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466764,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-25|leicester|nott-m-forest",
+        "matchDate": "2024-10-25",
+        "home": "Leicester City",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466765,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-26|man-city|southampton",
+        "matchDate": "2024-10-26",
+        "home": "Manchester City",
+        "away": "Southampton",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466766,
+        "canonicalId": "ENG-PL|2024-2025|2024-10-27|west-ham|man-united",
+        "matchDate": "2024-10-27",
+        "home": "West Ham United",
+        "away": "Manchester United",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466767,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-02|bournemouth|man-city",
+        "matchDate": "2024-11-02",
+        "home": "AFC Bournemouth",
+        "away": "Manchester City",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466768,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-04|fulham|brentford",
+        "matchDate": "2024-11-04",
+        "home": "Fulham",
+        "away": "Brentford",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466769,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-02|ipswich|leicester",
+        "matchDate": "2024-11-02",
+        "home": "Ipswich Town",
+        "away": "Leicester City",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466770,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-02|liverpool|brighton",
+        "matchDate": "2024-11-02",
+        "home": "Liverpool",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466771,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-03|man-united|chelsea",
+        "matchDate": "2024-11-03",
+        "home": "Manchester United",
+        "away": "Chelsea",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466772,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-02|newcastle|arsenal",
+        "matchDate": "2024-11-02",
+        "home": "Newcastle United",
+        "away": "Arsenal",
+        "dateDiffDays": 0.52
+      },
+      {
+        "footyId": 7466773,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-02|nott-m-forest|west-ham",
+        "matchDate": "2024-11-02",
+        "home": "Nottingham Forest",
+        "away": "West Ham United",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466774,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-02|southampton|everton",
+        "matchDate": "2024-11-02",
+        "home": "Southampton",
+        "away": "Everton",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466775,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-03|tottenham|aston-villa",
+        "matchDate": "2024-11-03",
+        "home": "Tottenham Hotspur",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466776,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-02|wolves|crystal-palace",
+        "matchDate": "2024-11-02",
+        "home": "Wolverhampton Wanderers",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466777,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-09|brentford|bournemouth",
+        "matchDate": "2024-11-09",
+        "home": "Brentford",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466778,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-09|brighton|man-city",
+        "matchDate": "2024-11-09",
+        "home": "Brighton & Hove Albion",
+        "away": "Manchester City",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466779,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-10|chelsea|arsenal",
+        "matchDate": "2024-11-10",
+        "home": "Chelsea",
+        "away": "Arsenal",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466780,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-09|crystal-palace|fulham",
+        "matchDate": "2024-11-09",
+        "home": "Crystal Palace",
+        "away": "Fulham",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466781,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-09|liverpool|aston-villa",
+        "matchDate": "2024-11-09",
+        "home": "Liverpool",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466782,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-10|man-united|leicester",
+        "matchDate": "2024-11-10",
+        "home": "Manchester United",
+        "away": "Leicester City",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466783,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-10|nott-m-forest|newcastle",
+        "matchDate": "2024-11-10",
+        "home": "Nottingham Forest",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466784,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-10|tottenham|ipswich",
+        "matchDate": "2024-11-10",
+        "home": "Tottenham Hotspur",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466785,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-09|west-ham|everton",
+        "matchDate": "2024-11-09",
+        "home": "West Ham United",
+        "away": "Everton",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466786,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-09|wolves|southampton",
+        "matchDate": "2024-11-09",
+        "home": "Wolverhampton Wanderers",
+        "away": "Southampton",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466787,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-23|bournemouth|brighton",
+        "matchDate": "2024-11-23",
+        "home": "AFC Bournemouth",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466788,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-23|arsenal|nott-m-forest",
+        "matchDate": "2024-11-23",
+        "home": "Arsenal",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466789,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-23|aston-villa|crystal-palace",
+        "matchDate": "2024-11-23",
+        "home": "Aston Villa",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466790,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-23|everton|brentford",
+        "matchDate": "2024-11-23",
+        "home": "Everton",
+        "away": "Brentford",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466791,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-23|fulham|wolves",
+        "matchDate": "2024-11-23",
+        "home": "Fulham",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466792,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-24|ipswich|man-united",
+        "matchDate": "2024-11-24",
+        "home": "Ipswich Town",
+        "away": "Manchester United",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466793,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-23|leicester|chelsea",
+        "matchDate": "2024-11-23",
+        "home": "Leicester City",
+        "away": "Chelsea",
+        "dateDiffDays": 0.52
+      },
+      {
+        "footyId": 7466794,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-23|man-city|tottenham",
+        "matchDate": "2024-11-23",
+        "home": "Manchester City",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466795,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-25|newcastle|west-ham",
+        "matchDate": "2024-11-25",
+        "home": "Newcastle United",
+        "away": "West Ham United",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466796,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-24|southampton|liverpool",
+        "matchDate": "2024-11-24",
+        "home": "Southampton",
+        "away": "Liverpool",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466797,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-30|brentford|leicester",
+        "matchDate": "2024-11-30",
+        "home": "Brentford",
+        "away": "Leicester City",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466798,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-29|brighton|southampton",
+        "matchDate": "2024-11-29",
+        "home": "Brighton & Hove Albion",
+        "away": "Southampton",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466799,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-01|chelsea|aston-villa",
+        "matchDate": "2024-12-01",
+        "home": "Chelsea",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.56
+      },
+      {
+        "footyId": 7466800,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-30|crystal-palace|newcastle",
+        "matchDate": "2024-11-30",
+        "home": "Crystal Palace",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466801,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-01|liverpool|man-city",
+        "matchDate": "2024-12-01",
+        "home": "Liverpool",
+        "away": "Manchester City",
+        "dateDiffDays": 0.67
+      },
+      {
+        "footyId": 7466802,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-01|man-united|everton",
+        "matchDate": "2024-12-01",
+        "home": "Manchester United",
+        "away": "Everton",
+        "dateDiffDays": 0.56
+      },
+      {
+        "footyId": 7466803,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-30|nott-m-forest|ipswich",
+        "matchDate": "2024-11-30",
+        "home": "Nottingham Forest",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466804,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-01|tottenham|fulham",
+        "matchDate": "2024-12-01",
+        "home": "Tottenham Hotspur",
+        "away": "Fulham",
+        "dateDiffDays": 0.56
+      },
+      {
+        "footyId": 7466805,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-30|west-ham|arsenal",
+        "matchDate": "2024-11-30",
+        "home": "West Ham United",
+        "away": "Arsenal",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466806,
+        "canonicalId": "ENG-PL|2024-2025|2024-11-30|wolves|bournemouth",
+        "matchDate": "2024-11-30",
+        "home": "Wolverhampton Wanderers",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466807,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-05|bournemouth|tottenham",
+        "matchDate": "2024-12-05",
+        "home": "AFC Bournemouth",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.84
+      },
+      {
+        "footyId": 7466808,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-04|arsenal|man-united",
+        "matchDate": "2024-12-04",
+        "home": "Arsenal",
+        "away": "Manchester United",
+        "dateDiffDays": 0.84
+      },
+      {
+        "footyId": 7466809,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-04|aston-villa|brentford",
+        "matchDate": "2024-12-04",
+        "home": "Aston Villa",
+        "away": "Brentford",
+        "dateDiffDays": 0.84
+      },
+      {
+        "footyId": 7466810,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-04|everton|wolves",
+        "matchDate": "2024-12-04",
+        "home": "Everton",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466811,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-05|fulham|brighton",
+        "matchDate": "2024-12-05",
+        "home": "Fulham",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466812,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-03|ipswich|crystal-palace",
+        "matchDate": "2024-12-03",
+        "home": "Ipswich Town",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466813,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-03|leicester|west-ham",
+        "matchDate": "2024-12-03",
+        "home": "Leicester City",
+        "away": "West Ham United",
+        "dateDiffDays": 0.84
+      },
+      {
+        "footyId": 7466814,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-04|man-city|nott-m-forest",
+        "matchDate": "2024-12-04",
+        "home": "Manchester City",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466815,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-04|newcastle|liverpool",
+        "matchDate": "2024-12-04",
+        "home": "Newcastle United",
+        "away": "Liverpool",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466816,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-04|southampton|chelsea",
+        "matchDate": "2024-12-04",
+        "home": "Southampton",
+        "away": "Chelsea",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466817,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-07|aston-villa|southampton",
+        "matchDate": "2024-12-07",
+        "home": "Aston Villa",
+        "away": "Southampton",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466818,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-07|brentford|newcastle",
+        "matchDate": "2024-12-07",
+        "home": "Brentford",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466819,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-07|crystal-palace|man-city",
+        "matchDate": "2024-12-07",
+        "home": "Crystal Palace",
+        "away": "Manchester City",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466820,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-12|everton|liverpool",
+        "matchDate": "2025-02-12",
+        "home": "Everton",
+        "away": "Liverpool",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466821,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-08|fulham|arsenal",
+        "matchDate": "2024-12-08",
+        "home": "Fulham",
+        "away": "Arsenal",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466822,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-08|ipswich|bournemouth",
+        "matchDate": "2024-12-08",
+        "home": "Ipswich Town",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466823,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-08|leicester|brighton",
+        "matchDate": "2024-12-08",
+        "home": "Leicester City",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466824,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-07|man-united|nott-m-forest",
+        "matchDate": "2024-12-07",
+        "home": "Manchester United",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466825,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-08|tottenham|chelsea",
+        "matchDate": "2024-12-08",
+        "home": "Tottenham Hotspur",
+        "away": "Chelsea",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466826,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-09|west-ham|wolves",
+        "matchDate": "2024-12-09",
+        "home": "West Ham United",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466827,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-16|bournemouth|west-ham",
+        "matchDate": "2024-12-16",
+        "home": "AFC Bournemouth",
+        "away": "West Ham United",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466828,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-14|arsenal|everton",
+        "matchDate": "2024-12-14",
+        "home": "Arsenal",
+        "away": "Everton",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466829,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-15|brighton|crystal-palace",
+        "matchDate": "2024-12-15",
+        "home": "Brighton & Hove Albion",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466830,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-15|chelsea|brentford",
+        "matchDate": "2024-12-15",
+        "home": "Chelsea",
+        "away": "Brentford",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466831,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-14|liverpool|fulham",
+        "matchDate": "2024-12-14",
+        "home": "Liverpool",
+        "away": "Fulham",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466832,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-15|man-city|man-united",
+        "matchDate": "2024-12-15",
+        "home": "Manchester City",
+        "away": "Manchester United",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466833,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-14|newcastle|leicester",
+        "matchDate": "2024-12-14",
+        "home": "Newcastle United",
+        "away": "Leicester City",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466834,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-14|nott-m-forest|aston-villa",
+        "matchDate": "2024-12-14",
+        "home": "Nottingham Forest",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466835,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-15|southampton|tottenham",
+        "matchDate": "2024-12-15",
+        "home": "Southampton",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466840,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-14|wolves|ipswich",
+        "matchDate": "2024-12-14",
+        "home": "Wolverhampton Wanderers",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466841,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-21|aston-villa|man-city",
+        "matchDate": "2024-12-21",
+        "home": "Aston Villa",
+        "away": "Manchester City",
+        "dateDiffDays": 0.52
+      },
+      {
+        "footyId": 7466842,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-21|brentford|nott-m-forest",
+        "matchDate": "2024-12-21",
+        "home": "Brentford",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466843,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-21|crystal-palace|arsenal",
+        "matchDate": "2024-12-21",
+        "home": "Crystal Palace",
+        "away": "Arsenal",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466844,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-22|everton|chelsea",
+        "matchDate": "2024-12-22",
+        "home": "Everton",
+        "away": "Chelsea",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466845,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-22|fulham|southampton",
+        "matchDate": "2024-12-22",
+        "home": "Fulham",
+        "away": "Southampton",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466846,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-21|ipswich|newcastle",
+        "matchDate": "2024-12-21",
+        "home": "Ipswich Town",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466847,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-22|leicester|wolves",
+        "matchDate": "2024-12-22",
+        "home": "Leicester City",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466848,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-22|man-united|bournemouth",
+        "matchDate": "2024-12-22",
+        "home": "Manchester United",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466849,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-22|tottenham|liverpool",
+        "matchDate": "2024-12-22",
+        "home": "Tottenham Hotspur",
+        "away": "Liverpool",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466850,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-21|west-ham|brighton",
+        "matchDate": "2024-12-21",
+        "home": "West Ham United",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466851,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-26|bournemouth|crystal-palace",
+        "matchDate": "2024-12-26",
+        "home": "AFC Bournemouth",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466852,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-27|arsenal|ipswich",
+        "matchDate": "2024-12-27",
+        "home": "Arsenal",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.84
+      },
+      {
+        "footyId": 7466853,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-27|brighton|brentford",
+        "matchDate": "2024-12-27",
+        "home": "Brighton & Hove Albion",
+        "away": "Brentford",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466854,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-26|chelsea|fulham",
+        "matchDate": "2024-12-26",
+        "home": "Chelsea",
+        "away": "Fulham",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466855,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-26|liverpool|leicester",
+        "matchDate": "2024-12-26",
+        "home": "Liverpool",
+        "away": "Leicester City",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466856,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-26|man-city|everton",
+        "matchDate": "2024-12-26",
+        "home": "Manchester City",
+        "away": "Everton",
+        "dateDiffDays": 0.52
+      },
+      {
+        "footyId": 7466857,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-26|newcastle|aston-villa",
+        "matchDate": "2024-12-26",
+        "home": "Newcastle United",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466858,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-26|nott-m-forest|tottenham",
+        "matchDate": "2024-12-26",
+        "home": "Nottingham Forest",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466859,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-26|southampton|west-ham",
+        "matchDate": "2024-12-26",
+        "home": "Southampton",
+        "away": "West Ham United",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466860,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-26|wolves|man-united",
+        "matchDate": "2024-12-26",
+        "home": "Wolverhampton Wanderers",
+        "away": "Manchester United",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466861,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-30|aston-villa|brighton",
+        "matchDate": "2024-12-30",
+        "home": "Aston Villa",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.82
+      },
+      {
+        "footyId": 7466862,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-01|brentford|arsenal",
+        "matchDate": "2025-01-01",
+        "home": "Brentford",
+        "away": "Arsenal",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466863,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-29|crystal-palace|southampton",
+        "matchDate": "2024-12-29",
+        "home": "Crystal Palace",
+        "away": "Southampton",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466864,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-29|everton|nott-m-forest",
+        "matchDate": "2024-12-29",
+        "home": "Everton",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466865,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-29|fulham|bournemouth",
+        "matchDate": "2024-12-29",
+        "home": "Fulham",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466866,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-30|ipswich|chelsea",
+        "matchDate": "2024-12-30",
+        "home": "Ipswich Town",
+        "away": "Chelsea",
+        "dateDiffDays": 0.82
+      },
+      {
+        "footyId": 7466867,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-29|leicester|man-city",
+        "matchDate": "2024-12-29",
+        "home": "Leicester City",
+        "away": "Manchester City",
+        "dateDiffDays": 0.6
+      },
+      {
+        "footyId": 7466868,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-30|man-united|newcastle",
+        "matchDate": "2024-12-30",
+        "home": "Manchester United",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466869,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-29|tottenham|wolves",
+        "matchDate": "2024-12-29",
+        "home": "Tottenham Hotspur",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466870,
+        "canonicalId": "ENG-PL|2024-2025|2024-12-29|west-ham|liverpool",
+        "matchDate": "2024-12-29",
+        "home": "West Ham United",
+        "away": "Liverpool",
+        "dateDiffDays": 0.72
+      },
+      {
+        "footyId": 7466871,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-04|bournemouth|everton",
+        "matchDate": "2025-01-04",
+        "home": "AFC Bournemouth",
+        "away": "Everton",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466872,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-04|aston-villa|leicester",
+        "matchDate": "2025-01-04",
+        "home": "Aston Villa",
+        "away": "Leicester City",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466873,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-04|brighton|arsenal",
+        "matchDate": "2025-01-04",
+        "home": "Brighton & Hove Albion",
+        "away": "Arsenal",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466874,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-04|crystal-palace|chelsea",
+        "matchDate": "2025-01-04",
+        "home": "Crystal Palace",
+        "away": "Chelsea",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466875,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-05|fulham|ipswich",
+        "matchDate": "2025-01-05",
+        "home": "Fulham",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466876,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-05|liverpool|man-united",
+        "matchDate": "2025-01-05",
+        "home": "Liverpool",
+        "away": "Manchester United",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466877,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-04|man-city|west-ham",
+        "matchDate": "2025-01-04",
+        "home": "Manchester City",
+        "away": "West Ham United",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466878,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-04|southampton|brentford",
+        "matchDate": "2025-01-04",
+        "home": "Southampton",
+        "away": "Brentford",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466879,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-04|tottenham|newcastle",
+        "matchDate": "2025-01-04",
+        "home": "Tottenham Hotspur",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.52
+      },
+      {
+        "footyId": 7466880,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-06|wolves|nott-m-forest",
+        "matchDate": "2025-01-06",
+        "home": "Wolverhampton Wanderers",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466881,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-15|arsenal|tottenham",
+        "matchDate": "2025-01-15",
+        "home": "Arsenal",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466882,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-14|brentford|man-city",
+        "matchDate": "2025-01-14",
+        "home": "Brentford",
+        "away": "Manchester City",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466883,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-15|everton|aston-villa",
+        "matchDate": "2025-01-15",
+        "home": "Everton",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466884,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-16|ipswich|brighton",
+        "matchDate": "2025-01-16",
+        "home": "Ipswich Town",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466885,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-15|leicester|crystal-palace",
+        "matchDate": "2025-01-15",
+        "home": "Leicester City",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466886,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-14|nott-m-forest|liverpool",
+        "matchDate": "2025-01-14",
+        "home": "Nottingham Forest",
+        "away": "Liverpool",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466887,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-14|west-ham|fulham",
+        "matchDate": "2025-01-14",
+        "home": "West Ham United",
+        "away": "Fulham",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466888,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-14|chelsea|bournemouth",
+        "matchDate": "2025-01-14",
+        "home": "Chelsea",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466889,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-15|newcastle|wolves",
+        "matchDate": "2025-01-15",
+        "home": "Newcastle United",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466890,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-16|man-united|southampton",
+        "matchDate": "2025-01-16",
+        "home": "Manchester United",
+        "away": "Southampton",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466891,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-18|arsenal|aston-villa",
+        "matchDate": "2025-01-18",
+        "home": "Arsenal",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466892,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-18|brentford|liverpool",
+        "matchDate": "2025-01-18",
+        "home": "Brentford",
+        "away": "Liverpool",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466893,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-20|chelsea|wolves",
+        "matchDate": "2025-01-20",
+        "home": "Chelsea",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466894,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-19|everton|tottenham",
+        "matchDate": "2025-01-19",
+        "home": "Everton",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466895,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-19|ipswich|man-city",
+        "matchDate": "2025-01-19",
+        "home": "Ipswich Town",
+        "away": "Manchester City",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466896,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-18|leicester|fulham",
+        "matchDate": "2025-01-18",
+        "home": "Leicester City",
+        "away": "Fulham",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466897,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-19|man-united|brighton",
+        "matchDate": "2025-01-19",
+        "home": "Manchester United",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466898,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-18|newcastle|bournemouth",
+        "matchDate": "2025-01-18",
+        "home": "Newcastle United",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.52
+      },
+      {
+        "footyId": 7466899,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-19|nott-m-forest|southampton",
+        "matchDate": "2025-01-19",
+        "home": "Nottingham Forest",
+        "away": "Southampton",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466900,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-18|west-ham|crystal-palace",
+        "matchDate": "2025-01-18",
+        "home": "West Ham United",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466901,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-25|bournemouth|nott-m-forest",
+        "matchDate": "2025-01-25",
+        "home": "AFC Bournemouth",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466902,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-26|aston-villa|west-ham",
+        "matchDate": "2025-01-26",
+        "home": "Aston Villa",
+        "away": "West Ham United",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466903,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-25|brighton|everton",
+        "matchDate": "2025-01-25",
+        "home": "Brighton & Hove Albion",
+        "away": "Everton",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466904,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-26|crystal-palace|brentford",
+        "matchDate": "2025-01-26",
+        "home": "Crystal Palace",
+        "away": "Brentford",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466905,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-26|fulham|man-united",
+        "matchDate": "2025-01-26",
+        "home": "Fulham",
+        "away": "Manchester United",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466906,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-25|liverpool|ipswich",
+        "matchDate": "2025-01-25",
+        "home": "Liverpool",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466907,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-25|man-city|chelsea",
+        "matchDate": "2025-01-25",
+        "home": "Manchester City",
+        "away": "Chelsea",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466908,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-25|southampton|newcastle",
+        "matchDate": "2025-01-25",
+        "home": "Southampton",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466909,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-26|tottenham|leicester",
+        "matchDate": "2025-01-26",
+        "home": "Tottenham Hotspur",
+        "away": "Leicester City",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466910,
+        "canonicalId": "ENG-PL|2024-2025|2025-01-25|wolves|arsenal",
+        "matchDate": "2025-01-25",
+        "home": "Wolverhampton Wanderers",
+        "away": "Arsenal",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466911,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-02|arsenal|man-city",
+        "matchDate": "2025-02-02",
+        "home": "Arsenal",
+        "away": "Manchester City",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466912,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-02|brentford|tottenham",
+        "matchDate": "2025-02-02",
+        "home": "Brentford",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466913,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-03|chelsea|west-ham",
+        "matchDate": "2025-02-03",
+        "home": "Chelsea",
+        "away": "West Ham United",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466914,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-01|everton|leicester",
+        "matchDate": "2025-02-01",
+        "home": "Everton",
+        "away": "Leicester City",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466915,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-02|man-united|crystal-palace",
+        "matchDate": "2025-02-02",
+        "home": "Manchester United",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466916,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-01|newcastle|fulham",
+        "matchDate": "2025-02-01",
+        "home": "Newcastle United",
+        "away": "Fulham",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466917,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-01|nott-m-forest|brighton",
+        "matchDate": "2025-02-01",
+        "home": "Nottingham Forest",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.52
+      },
+      {
+        "footyId": 7466918,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-01|wolves|aston-villa",
+        "matchDate": "2025-02-01",
+        "home": "Wolverhampton Wanderers",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466919,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-15|aston-villa|ipswich",
+        "matchDate": "2025-02-15",
+        "home": "Aston Villa",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466920,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-14|brighton|chelsea",
+        "matchDate": "2025-02-14",
+        "home": "Brighton & Hove Albion",
+        "away": "Chelsea",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466921,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-15|crystal-palace|everton",
+        "matchDate": "2025-02-15",
+        "home": "Crystal Palace",
+        "away": "Everton",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466922,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-15|fulham|nott-m-forest",
+        "matchDate": "2025-02-15",
+        "home": "Fulham",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466923,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-15|leicester|arsenal",
+        "matchDate": "2025-02-15",
+        "home": "Leicester City",
+        "away": "Arsenal",
+        "dateDiffDays": 0.52
+      },
+      {
+        "footyId": 7466924,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-16|liverpool|wolves",
+        "matchDate": "2025-02-16",
+        "home": "Liverpool",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466925,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-15|man-city|newcastle",
+        "matchDate": "2025-02-15",
+        "home": "Manchester City",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466926,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-15|southampton|bournemouth",
+        "matchDate": "2025-02-15",
+        "home": "Southampton",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466927,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-16|tottenham|man-united",
+        "matchDate": "2025-02-16",
+        "home": "Tottenham Hotspur",
+        "away": "Manchester United",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466928,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-15|west-ham|brentford",
+        "matchDate": "2025-02-15",
+        "home": "West Ham United",
+        "away": "Brentford",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466929,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-22|bournemouth|wolves",
+        "matchDate": "2025-02-22",
+        "home": "AFC Bournemouth",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466930,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-22|arsenal|west-ham",
+        "matchDate": "2025-02-22",
+        "home": "Arsenal",
+        "away": "West Ham United",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466931,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-22|aston-villa|chelsea",
+        "matchDate": "2025-02-22",
+        "home": "Aston Villa",
+        "away": "Chelsea",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466932,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-22|everton|man-united",
+        "matchDate": "2025-02-22",
+        "home": "Everton",
+        "away": "Manchester United",
+        "dateDiffDays": 0.52
+      },
+      {
+        "footyId": 7466933,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-22|fulham|crystal-palace",
+        "matchDate": "2025-02-22",
+        "home": "Fulham",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466934,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-22|ipswich|tottenham",
+        "matchDate": "2025-02-22",
+        "home": "Ipswich Town",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466935,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-21|leicester|brentford",
+        "matchDate": "2025-02-21",
+        "home": "Leicester City",
+        "away": "Brentford",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466936,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-23|man-city|liverpool",
+        "matchDate": "2025-02-23",
+        "home": "Manchester City",
+        "away": "Liverpool",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466937,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-23|newcastle|nott-m-forest",
+        "matchDate": "2025-02-23",
+        "home": "Newcastle United",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466938,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-22|southampton|brighton",
+        "matchDate": "2025-02-22",
+        "home": "Southampton",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466939,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-26|brentford|everton",
+        "matchDate": "2025-02-26",
+        "home": "Brentford",
+        "away": "Everton",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466940,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-25|brighton|bournemouth",
+        "matchDate": "2025-02-25",
+        "home": "Brighton & Hove Albion",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466941,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-26|nott-m-forest|arsenal",
+        "matchDate": "2025-02-26",
+        "home": "Nottingham Forest",
+        "away": "Arsenal",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466942,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-26|tottenham|man-city",
+        "matchDate": "2025-02-26",
+        "home": "Tottenham Hotspur",
+        "away": "Manchester City",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466943,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-27|west-ham|leicester",
+        "matchDate": "2025-02-27",
+        "home": "West Ham United",
+        "away": "Leicester City",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466944,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-25|wolves|fulham",
+        "matchDate": "2025-02-25",
+        "home": "Wolverhampton Wanderers",
+        "away": "Fulham",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466945,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-25|crystal-palace|aston-villa",
+        "matchDate": "2025-02-25",
+        "home": "Crystal Palace",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466946,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-25|chelsea|southampton",
+        "matchDate": "2025-02-25",
+        "home": "Chelsea",
+        "away": "Southampton",
+        "dateDiffDays": 0.84
+      },
+      {
+        "footyId": 7466947,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-26|liverpool|newcastle",
+        "matchDate": "2025-02-26",
+        "home": "Liverpool",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.84
+      },
+      {
+        "footyId": 7466948,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-26|man-united|ipswich",
+        "matchDate": "2025-02-26",
+        "home": "Manchester United",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466949,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-08|brentford|aston-villa",
+        "matchDate": "2025-03-08",
+        "home": "Brentford",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466950,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-08|brighton|fulham",
+        "matchDate": "2025-03-08",
+        "home": "Brighton & Hove Albion",
+        "away": "Fulham",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466951,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-09|chelsea|leicester",
+        "matchDate": "2025-03-09",
+        "home": "Chelsea",
+        "away": "Leicester City",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466952,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-08|crystal-palace|ipswich",
+        "matchDate": "2025-03-08",
+        "home": "Crystal Palace",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466953,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-08|liverpool|southampton",
+        "matchDate": "2025-03-08",
+        "home": "Liverpool",
+        "away": "Southampton",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466954,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-09|man-united|arsenal",
+        "matchDate": "2025-03-09",
+        "home": "Manchester United",
+        "away": "Arsenal",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466955,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-08|nott-m-forest|man-city",
+        "matchDate": "2025-03-08",
+        "home": "Nottingham Forest",
+        "away": "Manchester City",
+        "dateDiffDays": 0.52
+      },
+      {
+        "footyId": 7466956,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-09|tottenham|bournemouth",
+        "matchDate": "2025-03-09",
+        "home": "Tottenham Hotspur",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466957,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-10|west-ham|newcastle",
+        "matchDate": "2025-03-10",
+        "home": "West Ham United",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466958,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-08|wolves|everton",
+        "matchDate": "2025-03-08",
+        "home": "Wolverhampton Wanderers",
+        "away": "Everton",
+        "dateDiffDays": 0.83
+      },
+      {
+        "footyId": 7466959,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-15|bournemouth|brentford",
+        "matchDate": "2025-03-15",
+        "home": "AFC Bournemouth",
+        "away": "Brentford",
+        "dateDiffDays": 0.73
+      },
+      {
+        "footyId": 7466960,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-16|arsenal|chelsea",
+        "matchDate": "2025-03-16",
+        "home": "Arsenal",
+        "away": "Chelsea",
+        "dateDiffDays": 0.56
+      },
+      {
+        "footyId": 7466961,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-19|aston-villa|liverpool",
+        "matchDate": "2025-02-19",
+        "home": "Aston Villa",
+        "away": "Liverpool",
+        "dateDiffDays": 0.81
+      },
+      {
+        "footyId": 7466962,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-15|everton|west-ham",
+        "matchDate": "2025-03-15",
+        "home": "Everton",
+        "away": "West Ham United",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466963,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-16|fulham|tottenham",
+        "matchDate": "2025-03-16",
+        "home": "Fulham",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.56
+      },
+      {
+        "footyId": 7466964,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-15|ipswich|nott-m-forest",
+        "matchDate": "2025-03-15",
+        "home": "Ipswich Town",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466965,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-16|leicester|man-united",
+        "matchDate": "2025-03-16",
+        "home": "Leicester City",
+        "away": "Manchester United",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466966,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-15|man-city|brighton",
+        "matchDate": "2025-03-15",
+        "home": "Manchester City",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466967,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-16|newcastle|crystal-palace",
+        "matchDate": "2025-04-16",
+        "home": "Newcastle United",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.77
+      },
+      {
+        "footyId": 7466968,
+        "canonicalId": "ENG-PL|2024-2025|2025-03-15|southampton|wolves",
+        "matchDate": "2025-03-15",
+        "home": "Southampton",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7466969,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-02|bournemouth|ipswich",
+        "matchDate": "2025-04-02",
+        "home": "AFC Bournemouth",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.78
+      },
+      {
+        "footyId": 7466970,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-01|arsenal|fulham",
+        "matchDate": "2025-04-01",
+        "home": "Arsenal",
+        "away": "Fulham",
+        "dateDiffDays": 0.78
+      },
+      {
+        "footyId": 7466971,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-02|brighton|aston-villa",
+        "matchDate": "2025-04-02",
+        "home": "Brighton & Hove Albion",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.78
+      },
+      {
+        "footyId": 7466972,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-01|nott-m-forest|man-united",
+        "matchDate": "2025-04-01",
+        "home": "Nottingham Forest",
+        "away": "Manchester United",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466973,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-01|wolves|west-ham",
+        "matchDate": "2025-04-01",
+        "home": "Wolverhampton Wanderers",
+        "away": "West Ham United",
+        "dateDiffDays": 0.78
+      },
+      {
+        "footyId": 7466974,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-03|chelsea|tottenham",
+        "matchDate": "2025-04-03",
+        "home": "Chelsea",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466975,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-02|man-city|leicester",
+        "matchDate": "2025-04-02",
+        "home": "Manchester City",
+        "away": "Leicester City",
+        "dateDiffDays": 0.78
+      },
+      {
+        "footyId": 7466976,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-02|newcastle|brentford",
+        "matchDate": "2025-04-02",
+        "home": "Newcastle United",
+        "away": "Brentford",
+        "dateDiffDays": 0.78
+      },
+      {
+        "footyId": 7466977,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-02|southampton|crystal-palace",
+        "matchDate": "2025-04-02",
+        "home": "Southampton",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.78
+      },
+      {
+        "footyId": 7466978,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-02|liverpool|everton",
+        "matchDate": "2025-04-02",
+        "home": "Liverpool",
+        "away": "Everton",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466979,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-05|aston-villa|nott-m-forest",
+        "matchDate": "2025-04-05",
+        "home": "Aston Villa",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466980,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-06|brentford|chelsea",
+        "matchDate": "2025-04-06",
+        "home": "Brentford",
+        "away": "Chelsea",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466981,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-05|crystal-palace|brighton",
+        "matchDate": "2025-04-05",
+        "home": "Crystal Palace",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466982,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-05|everton|arsenal",
+        "matchDate": "2025-04-05",
+        "home": "Everton",
+        "away": "Arsenal",
+        "dateDiffDays": 0.48
+      },
+      {
+        "footyId": 7466983,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-06|fulham|liverpool",
+        "matchDate": "2025-04-06",
+        "home": "Fulham",
+        "away": "Liverpool",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466984,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-05|ipswich|wolves",
+        "matchDate": "2025-04-05",
+        "home": "Ipswich Town",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466985,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-07|leicester|newcastle",
+        "matchDate": "2025-04-07",
+        "home": "Leicester City",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466986,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-06|man-united|man-city",
+        "matchDate": "2025-04-06",
+        "home": "Manchester United",
+        "away": "Manchester City",
+        "dateDiffDays": 0.65
+      },
+      {
+        "footyId": 7466987,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-06|tottenham|southampton",
+        "matchDate": "2025-04-06",
+        "home": "Tottenham Hotspur",
+        "away": "Southampton",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466988,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-05|west-ham|bournemouth",
+        "matchDate": "2025-04-05",
+        "home": "West Ham United",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466989,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-14|bournemouth|fulham",
+        "matchDate": "2025-04-14",
+        "home": "AFC Bournemouth",
+        "away": "Fulham",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7466990,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-12|arsenal|brentford",
+        "matchDate": "2025-04-12",
+        "home": "Arsenal",
+        "away": "Brentford",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7466991,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-12|brighton|leicester",
+        "matchDate": "2025-04-12",
+        "home": "Brighton & Hove Albion",
+        "away": "Leicester City",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466992,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-13|chelsea|ipswich",
+        "matchDate": "2025-04-13",
+        "home": "Chelsea",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466993,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-13|liverpool|west-ham",
+        "matchDate": "2025-04-13",
+        "home": "Liverpool",
+        "away": "West Ham United",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466994,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-12|man-city|crystal-palace",
+        "matchDate": "2025-04-12",
+        "home": "Manchester City",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.48
+      },
+      {
+        "footyId": 7466995,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-13|newcastle|man-united",
+        "matchDate": "2025-04-13",
+        "home": "Newcastle United",
+        "away": "Manchester United",
+        "dateDiffDays": 0.65
+      },
+      {
+        "footyId": 7466996,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-12|nott-m-forest|everton",
+        "matchDate": "2025-04-12",
+        "home": "Nottingham Forest",
+        "away": "Everton",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466997,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-12|southampton|aston-villa",
+        "matchDate": "2025-04-12",
+        "home": "Southampton",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7466998,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-13|wolves|tottenham",
+        "matchDate": "2025-04-13",
+        "home": "Wolverhampton Wanderers",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7466999,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-19|aston-villa|newcastle",
+        "matchDate": "2025-04-19",
+        "home": "Aston Villa",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7467000,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-19|brentford|brighton",
+        "matchDate": "2025-04-19",
+        "home": "Brentford",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467001,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-19|crystal-palace|bournemouth",
+        "matchDate": "2025-04-19",
+        "home": "Crystal Palace",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467002,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-19|everton|man-city",
+        "matchDate": "2025-04-19",
+        "home": "Everton",
+        "away": "Manchester City",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467003,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-20|fulham|chelsea",
+        "matchDate": "2025-04-20",
+        "home": "Fulham",
+        "away": "Chelsea",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7467004,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-20|ipswich|arsenal",
+        "matchDate": "2025-04-20",
+        "home": "Ipswich Town",
+        "away": "Arsenal",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7467005,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-20|leicester|liverpool",
+        "matchDate": "2025-04-20",
+        "home": "Leicester City",
+        "away": "Liverpool",
+        "dateDiffDays": 0.65
+      },
+      {
+        "footyId": 7467006,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-20|man-united|wolves",
+        "matchDate": "2025-04-20",
+        "home": "Manchester United",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7467007,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-21|tottenham|nott-m-forest",
+        "matchDate": "2025-04-21",
+        "home": "Tottenham Hotspur",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7467008,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-19|west-ham|southampton",
+        "matchDate": "2025-04-19",
+        "home": "West Ham United",
+        "away": "Southampton",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467009,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-27|bournemouth|man-united",
+        "matchDate": "2025-04-27",
+        "home": "AFC Bournemouth",
+        "away": "Manchester United",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7467010,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-23|arsenal|crystal-palace",
+        "matchDate": "2025-04-23",
+        "home": "Arsenal",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7467011,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-26|brighton|west-ham",
+        "matchDate": "2025-04-26",
+        "home": "Brighton & Hove Albion",
+        "away": "West Ham United",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467012,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-26|chelsea|everton",
+        "matchDate": "2025-04-26",
+        "home": "Chelsea",
+        "away": "Everton",
+        "dateDiffDays": 0.48
+      },
+      {
+        "footyId": 7467013,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-27|liverpool|tottenham",
+        "matchDate": "2025-04-27",
+        "home": "Liverpool",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.65
+      },
+      {
+        "footyId": 7467014,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-22|man-city|aston-villa",
+        "matchDate": "2025-04-22",
+        "home": "Manchester City",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7467015,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-26|newcastle|ipswich",
+        "matchDate": "2025-04-26",
+        "home": "Newcastle United",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467016,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-01|nott-m-forest|brentford",
+        "matchDate": "2025-05-01",
+        "home": "Nottingham Forest",
+        "away": "Brentford",
+        "dateDiffDays": 0.77
+      },
+      {
+        "footyId": 7467017,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-26|southampton|fulham",
+        "matchDate": "2025-04-26",
+        "home": "Southampton",
+        "away": "Fulham",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467018,
+        "canonicalId": "ENG-PL|2024-2025|2025-04-26|wolves|leicester",
+        "matchDate": "2025-04-26",
+        "home": "Wolverhampton Wanderers",
+        "away": "Leicester City",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467019,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-03|arsenal|bournemouth",
+        "matchDate": "2025-05-03",
+        "home": "Arsenal",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7467020,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-03|aston-villa|fulham",
+        "matchDate": "2025-05-03",
+        "home": "Aston Villa",
+        "away": "Fulham",
+        "dateDiffDays": 0.48
+      },
+      {
+        "footyId": 7467021,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-04|brentford|man-united",
+        "matchDate": "2025-05-04",
+        "home": "Brentford",
+        "away": "Manchester United",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7467022,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-04|brighton|newcastle",
+        "matchDate": "2025-05-04",
+        "home": "Brighton & Hove Albion",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7467023,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-04|chelsea|liverpool",
+        "matchDate": "2025-05-04",
+        "home": "Chelsea",
+        "away": "Liverpool",
+        "dateDiffDays": 0.65
+      },
+      {
+        "footyId": 7467024,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-05|crystal-palace|nott-m-forest",
+        "matchDate": "2025-05-05",
+        "home": "Crystal Palace",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7467025,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-03|everton|ipswich",
+        "matchDate": "2025-05-03",
+        "home": "Everton",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467026,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-03|leicester|southampton",
+        "matchDate": "2025-05-03",
+        "home": "Leicester City",
+        "away": "Southampton",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467027,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-02|man-city|wolves",
+        "matchDate": "2025-05-02",
+        "home": "Manchester City",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7467028,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-04|west-ham|tottenham",
+        "matchDate": "2025-05-04",
+        "home": "West Ham United",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.54
+      },
+      {
+        "footyId": 7467029,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-10|bournemouth|aston-villa",
+        "matchDate": "2025-05-10",
+        "home": "AFC Bournemouth",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.69
+      },
+      {
+        "footyId": 7467030,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-10|fulham|everton",
+        "matchDate": "2025-05-10",
+        "home": "Fulham",
+        "away": "Everton",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467031,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-10|ipswich|brentford",
+        "matchDate": "2025-05-10",
+        "home": "Ipswich Town",
+        "away": "Brentford",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467032,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-11|liverpool|arsenal",
+        "matchDate": "2025-05-11",
+        "home": "Liverpool",
+        "away": "Arsenal",
+        "dateDiffDays": 0.65
+      },
+      {
+        "footyId": 7467033,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-11|man-united|west-ham",
+        "matchDate": "2025-05-11",
+        "home": "Manchester United",
+        "away": "West Ham United",
+        "dateDiffDays": 0.55
+      },
+      {
+        "footyId": 7467034,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-11|newcastle|chelsea",
+        "matchDate": "2025-05-11",
+        "home": "Newcastle United",
+        "away": "Chelsea",
+        "dateDiffDays": 0.46
+      },
+      {
+        "footyId": 7467035,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-11|nott-m-forest|leicester",
+        "matchDate": "2025-05-11",
+        "home": "Nottingham Forest",
+        "away": "Leicester City",
+        "dateDiffDays": 0.55
+      },
+      {
+        "footyId": 7467036,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-10|southampton|man-city",
+        "matchDate": "2025-05-10",
+        "home": "Southampton",
+        "away": "Manchester City",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467037,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-11|tottenham|crystal-palace",
+        "matchDate": "2025-05-11",
+        "home": "Tottenham Hotspur",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.55
+      },
+      {
+        "footyId": 7467038,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-10|wolves|brighton",
+        "matchDate": "2025-05-10",
+        "home": "Wolverhampton Wanderers",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467039,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-18|arsenal|newcastle",
+        "matchDate": "2025-05-18",
+        "home": "Arsenal",
+        "away": "Newcastle United",
+        "dateDiffDays": 0.65
+      },
+      {
+        "footyId": 7467040,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-16|aston-villa|tottenham",
+        "matchDate": "2025-05-16",
+        "home": "Aston Villa",
+        "away": "Tottenham Hotspur",
+        "dateDiffDays": 0.77
+      },
+      {
+        "footyId": 7467041,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-18|brentford|fulham",
+        "matchDate": "2025-05-18",
+        "home": "Brentford",
+        "away": "Fulham",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467042,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-19|brighton|liverpool",
+        "matchDate": "2025-05-19",
+        "home": "Brighton & Hove Albion",
+        "away": "Liverpool",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7467043,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-16|chelsea|man-united",
+        "matchDate": "2025-05-16",
+        "home": "Chelsea",
+        "away": "Manchester United",
+        "dateDiffDays": 0.8
+      },
+      {
+        "footyId": 7467044,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-20|crystal-palace|wolves",
+        "matchDate": "2025-05-20",
+        "home": "Crystal Palace",
+        "away": "Wolverhampton Wanderers",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7467045,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-18|everton|southampton",
+        "matchDate": "2025-05-18",
+        "home": "Everton",
+        "away": "Southampton",
+        "dateDiffDays": 0.46
+      },
+      {
+        "footyId": 7467046,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-18|leicester|ipswich",
+        "matchDate": "2025-05-18",
+        "home": "Leicester City",
+        "away": "Ipswich Town",
+        "dateDiffDays": 0.58
+      },
+      {
+        "footyId": 7467047,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-20|man-city|bournemouth",
+        "matchDate": "2025-05-20",
+        "home": "Manchester City",
+        "away": "AFC Bournemouth",
+        "dateDiffDays": 0.79
+      },
+      {
+        "footyId": 7467048,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-18|west-ham|nott-m-forest",
+        "matchDate": "2025-05-18",
+        "home": "West Ham United",
+        "away": "Nottingham Forest",
+        "dateDiffDays": 0.55
+      },
+      {
+        "footyId": 7467049,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-25|bournemouth|leicester",
+        "matchDate": "2025-05-25",
+        "home": "AFC Bournemouth",
+        "away": "Leicester City",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7467050,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-25|fulham|man-city",
+        "matchDate": "2025-05-25",
+        "home": "Fulham",
+        "away": "Manchester City",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7467051,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-25|ipswich|west-ham",
+        "matchDate": "2025-05-25",
+        "home": "Ipswich Town",
+        "away": "West Ham United",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7467052,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-25|liverpool|crystal-palace",
+        "matchDate": "2025-05-25",
+        "home": "Liverpool",
+        "away": "Crystal Palace",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7467053,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-25|man-united|aston-villa",
+        "matchDate": "2025-05-25",
+        "home": "Manchester United",
+        "away": "Aston Villa",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7467054,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-25|newcastle|everton",
+        "matchDate": "2025-05-25",
+        "home": "Newcastle United",
+        "away": "Everton",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7467055,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-25|nott-m-forest|chelsea",
+        "matchDate": "2025-05-25",
+        "home": "Nottingham Forest",
+        "away": "Chelsea",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7467056,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-25|southampton|arsenal",
+        "matchDate": "2025-05-25",
+        "home": "Southampton",
+        "away": "Arsenal",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7467057,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-25|tottenham|brighton",
+        "matchDate": "2025-05-25",
+        "home": "Tottenham Hotspur",
+        "away": "Brighton & Hove Albion",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7467058,
+        "canonicalId": "ENG-PL|2024-2025|2025-05-25|wolves|brentford",
+        "matchDate": "2025-05-25",
+        "home": "Wolverhampton Wanderers",
+        "away": "Brentford",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7467146,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-01|bournemouth|liverpool",
+        "matchDate": "2025-02-01",
+        "home": "AFC Bournemouth",
+        "away": "Liverpool",
+        "dateDiffDays": 0.63
+      },
+      {
+        "footyId": 7467147,
+        "canonicalId": "ENG-PL|2024-2025|2025-02-01|ipswich|southampton",
+        "matchDate": "2025-02-01",
+        "home": "Ipswich Town",
+        "away": "Southampton",
+        "dateDiffDays": 0.63
+      }
+    ]
+  }
+}

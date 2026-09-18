@@ -1,0 +1,230 @@
+{
+  "folds": [
+    {
+      "foldIndex": 1,
+      "trainSeasons": [
+        "2020-2021",
+        "2021-2022"
+      ],
+      "validateSeason": "2022-2023",
+      "sampleSize": 380,
+      "markets": {
+        "moneyline": {
+          "sampleSize": 380,
+          "brierScore": 0.5952,
+          "logLoss": 0.9985,
+          "ece": 0.1929,
+          "clv": 2.05,
+          "ev": 60.79,
+          "roi": -0.76,
+          "yieldRate": -0.0076,
+          "hitRate": 23.91,
+          "maxDrawdown": 124.24,
+          "roiCi95": [
+            -23.83,
+            22.3
+          ]
+        },
+        "asianHandicap": {
+          "sampleSize": 380,
+          "brierScore": 0.631,
+          "logLoss": 1.0477,
+          "ece": 0.1986,
+          "clv": 0,
+          "ev": 0,
+          "roi": 0,
+          "yieldRate": 0,
+          "hitRate": 0,
+          "maxDrawdown": 0,
+          "roiCi95": [
+            0,
+            0
+          ]
+        },
+        "overUnder": {
+          "sampleSize": 380,
+          "brierScore": 0.4877,
+          "logLoss": 0.6808,
+          "ece": 0.1746,
+          "clv": 2.02,
+          "ev": 9.96,
+          "roi": -15.26,
+          "yieldRate": -0.1526,
+          "hitRate": 37.23,
+          "maxDrawdown": 0,
+          "roiCi95": [
+            -31.15,
+            0.64
+          ]
+        },
+        "btts": {
+          "sampleSize": 380,
+          "brierScore": 0.501,
+          "logLoss": 0.6941,
+          "ece": 0.177,
+          "clv": 1.09,
+          "ev": 2.69,
+          "roi": -0.25,
+          "yieldRate": -0.0025,
+          "hitRate": 53.92,
+          "maxDrawdown": 121.72,
+          "roiCi95": [
+            -10.59,
+            10.1
+          ]
+        }
+      }
+    },
+    {
+      "foldIndex": 2,
+      "trainSeasons": [
+        "2021-2022",
+        "2022-2023"
+      ],
+      "validateSeason": "2023-2024",
+      "sampleSize": 380,
+      "markets": {
+        "moneyline": {
+          "sampleSize": 380,
+          "brierScore": 0.5824,
+          "logLoss": 0.98,
+          "ece": 0.1908,
+          "clv": 2.04,
+          "ev": 66.47,
+          "roi": -18.22,
+          "yieldRate": -0.1822,
+          "hitRate": 19.76,
+          "maxDrawdown": 561.55,
+          "roiCi95": [
+            -38.31,
+            1.87
+          ]
+        },
+        "asianHandicap": {
+          "sampleSize": 380,
+          "brierScore": 0.6366,
+          "logLoss": 1.0553,
+          "ece": 0.1995,
+          "clv": 0,
+          "ev": 0,
+          "roi": 0,
+          "yieldRate": 0,
+          "hitRate": 0,
+          "maxDrawdown": 0,
+          "roiCi95": [
+            0,
+            0
+          ]
+        },
+        "overUnder": {
+          "sampleSize": 380,
+          "brierScore": 0.4749,
+          "logLoss": 0.6679,
+          "ece": 0.1723,
+          "clv": 2.02,
+          "ev": 17.47,
+          "roi": -13.73,
+          "yieldRate": -0.1373,
+          "hitRate": 33.6,
+          "maxDrawdown": 348.61,
+          "roiCi95": [
+            -29.1,
+            1.65
+          ]
+        },
+        "btts": {
+          "sampleSize": 380,
+          "brierScore": 0.4827,
+          "logLoss": 0.6758,
+          "ece": 0.1737,
+          "clv": 1.09,
+          "ev": 2.69,
+          "roi": 10.64,
+          "yieldRate": 0.1064,
+          "hitRate": 59.8,
+          "maxDrawdown": 31.51,
+          "roiCi95": [
+            0.46,
+            20.82
+          ]
+        }
+      }
+    },
+    {
+      "foldIndex": 3,
+      "trainSeasons": [
+        "2022-2023",
+        "2023-2024"
+      ],
+      "validateSeason": "2024-2025",
+      "sampleSize": 380,
+      "markets": {
+        "moneyline": {
+          "sampleSize": 380,
+          "brierScore": 0.6148,
+          "logLoss": 1.0254,
+          "ece": 0.196,
+          "clv": 2.04,
+          "ev": 55.71,
+          "roi": -16.02,
+          "yieldRate": -0.1602,
+          "hitRate": 20.12,
+          "maxDrawdown": 0,
+          "roiCi95": [
+            -36.66,
+            4.61
+          ]
+        },
+        "asianHandicap": {
+          "sampleSize": 380,
+          "brierScore": 0.6588,
+          "logLoss": 1.0864,
+          "ece": 0.2029,
+          "clv": 0,
+          "ev": 0,
+          "roi": 0,
+          "yieldRate": 0,
+          "hitRate": 0,
+          "maxDrawdown": 0,
+          "roiCi95": [
+            0,
+            0
+          ]
+        },
+        "overUnder": {
+          "sampleSize": 380,
+          "brierScore": 0.4872,
+          "logLoss": 0.6802,
+          "ece": 0.1745,
+          "clv": 2.06,
+          "ev": 14.92,
+          "roi": -0.17,
+          "yieldRate": -0.0017,
+          "hitRate": 39.47,
+          "maxDrawdown": 142.76,
+          "roiCi95": [
+            -15.29,
+            14.95
+          ]
+        },
+        "btts": {
+          "sampleSize": 380,
+          "brierScore": 0.4903,
+          "logLoss": 0.6834,
+          "ece": 0.1751,
+          "clv": 1.09,
+          "ev": 2.69,
+          "roi": 5.48,
+          "yieldRate": 0.0548,
+          "hitRate": 57.02,
+          "maxDrawdown": 32.35,
+          "roiCi95": [
+            -4.24,
+            15.2
+          ]
+        }
+      }
+    }
+  ],
+  "totalOosMatches": 1140
+}

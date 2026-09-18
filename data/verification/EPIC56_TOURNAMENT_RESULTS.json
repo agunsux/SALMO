@@ -1,0 +1,2268 @@
+{
+  "timestamp": "2026-08-29T11:21:08.997Z",
+  "totalMatches": 8898,
+  "totalAhObservations": 40212,
+  "folds": [
+    {
+      "foldIndex": 1,
+      "trainStart": "2015-08-08",
+      "trainEnd": "2017-05-28",
+      "trainSeasons": [
+        "2015-2016",
+        "2016-2017"
+      ],
+      "valStart": "2017-08-04",
+      "valEnd": "2018-05-20",
+      "valSeason": "2017-2018",
+      "trainMatchesCount": 2206,
+      "valMatchesCount": 1826,
+      "valAhObservationsCount": 7304
+    },
+    {
+      "foldIndex": 2,
+      "trainStart": "2015-08-08",
+      "trainEnd": "2018-05-20",
+      "trainSeasons": [
+        "2015-2016",
+        "2016-2017",
+        "2017-2018"
+      ],
+      "valStart": "2018-08-10",
+      "valEnd": "2019-05-26",
+      "valSeason": "2018-2019",
+      "trainMatchesCount": 4032,
+      "valMatchesCount": 1826,
+      "valAhObservationsCount": 7304
+    },
+    {
+      "foldIndex": 3,
+      "trainStart": "2015-08-08",
+      "trainEnd": "2019-05-26",
+      "trainSeasons": [
+        "2015-2016",
+        "2016-2017",
+        "2017-2018",
+        "2018-2019"
+      ],
+      "valStart": "2019-08-09",
+      "valEnd": "2020-07-26",
+      "valSeason": "2019-2020",
+      "trainMatchesCount": 5858,
+      "valMatchesCount": 760,
+      "valAhObservationsCount": 4108
+    },
+    {
+      "foldIndex": 4,
+      "trainStart": "2015-08-08",
+      "trainEnd": "2020-07-26",
+      "trainSeasons": [
+        "2015-2016",
+        "2016-2017",
+        "2017-2018",
+        "2018-2019",
+        "2019-2020"
+      ],
+      "valStart": "2020-09-12",
+      "valEnd": "2021-05-23",
+      "valSeason": "2020-2021",
+      "trainMatchesCount": 6618,
+      "valMatchesCount": 380,
+      "valAhObservationsCount": 2184
+    },
+    {
+      "foldIndex": 5,
+      "trainStart": "2015-08-08",
+      "trainEnd": "2021-05-23",
+      "trainSeasons": [
+        "2015-2016",
+        "2016-2017",
+        "2017-2018",
+        "2018-2019",
+        "2019-2020",
+        "2020-2021"
+      ],
+      "valStart": "2021-08-13",
+      "valEnd": "2022-05-22",
+      "valSeason": "2021-2022",
+      "trainMatchesCount": 6998,
+      "valMatchesCount": 380,
+      "valAhObservationsCount": 2086
+    },
+    {
+      "foldIndex": 6,
+      "trainStart": "2015-08-08",
+      "trainEnd": "2022-05-22",
+      "trainSeasons": [
+        "2015-2016",
+        "2016-2017",
+        "2017-2018",
+        "2018-2019",
+        "2019-2020",
+        "2020-2021",
+        "2021-2022"
+      ],
+      "valStart": "2022-08-05",
+      "valEnd": "2026-05-24",
+      "valSeason": "2022-2026_CONFIRMATION",
+      "trainMatchesCount": 7378,
+      "valMatchesCount": 1520,
+      "valAhObservationsCount": 8402
+    }
+  ],
+  "models": {
+    "AH-poisson-v1": {
+      "modelId": "AH-poisson-v1",
+      "modelName": "Independent Poisson Goal Difference Model",
+      "modelVersion": "AH-poisson-v1.0.0",
+      "overallBrier": 0.2334,
+      "overallLogLoss": 0.727,
+      "overallEce": 0.1459,
+      "overallClv": 0.02,
+      "overallEv": -2.72,
+      "overallRoi": -2.37,
+      "overallHitRate": 46.48,
+      "roiCi95": [
+        -3.92,
+        -0.93
+      ],
+      "lineMetrics": {
+        "-1.50": {
+          "line": -1.5,
+          "sampleSize": 1048,
+          "status": "ADEQUATE",
+          "brierScore": 0.2777,
+          "logLoss": 0.7619,
+          "ece": 0.1436,
+          "clvMean": 0.15,
+          "clvCoveragePct": 34.92,
+          "evMean": -7.84,
+          "roiRealized": -1.82,
+          "hitRate": 49.61,
+          "roiCi95": [
+            -11.11,
+            8.08
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+1.50": {
+          "line": 1.5,
+          "sampleSize": 1048,
+          "status": "ADEQUATE",
+          "brierScore": 0.2777,
+          "logLoss": 0.7619,
+          "ece": 0.1436,
+          "clvMean": -0.1,
+          "clvCoveragePct": 34.92,
+          "evMean": 1.46,
+          "roiRealized": 5.36,
+          "hitRate": 55.08,
+          "roiCi95": [
+            -2.33,
+            13.67
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-1.25": {
+          "line": -1.25,
+          "sampleSize": 850,
+          "status": "ADEQUATE",
+          "brierScore": 0.2254,
+          "logLoss": 0.733,
+          "ece": 0.153,
+          "clvMean": 0.09,
+          "clvCoveragePct": 50.59,
+          "evMean": -8.43,
+          "roiRealized": -12.86,
+          "hitRate": 36.77,
+          "roiCi95": [
+            -22.19,
+            -2.82
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+1.25": {
+          "line": 1.25,
+          "sampleSize": 850,
+          "status": "ADEQUATE",
+          "brierScore": 0.2218,
+          "logLoss": 0.7289,
+          "ece": 0.1225,
+          "clvMean": -0.15,
+          "clvCoveragePct": 50.59,
+          "evMean": 3.36,
+          "roiRealized": -0.5,
+          "hitRate": 58.28,
+          "roiCi95": [
+            -8.55,
+            7.4
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+0.00": {
+          "line": 0,
+          "sampleSize": 2748,
+          "status": "ADEQUATE",
+          "brierScore": 0.2133,
+          "logLoss": 0.7018,
+          "ece": 0.1594,
+          "clvMean": 0.02,
+          "clvCoveragePct": 45.85,
+          "evMean": -2.14,
+          "roiRealized": -1.52,
+          "hitRate": 35.42,
+          "roiCi95": [
+            -5.88,
+            3.11
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-0.50": {
+          "line": -0.5,
+          "sampleSize": 2096,
+          "status": "ADEQUATE",
+          "brierScore": 0.2759,
+          "logLoss": 0.7543,
+          "ece": 0.1424,
+          "clvMean": 0.04,
+          "clvCoveragePct": 51.05,
+          "evMean": -7.44,
+          "roiRealized": -10.34,
+          "hitRate": 45.39,
+          "roiCi95": [
+            -17.39,
+            -3.43
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+0.50": {
+          "line": 0.5,
+          "sampleSize": 2096,
+          "status": "ADEQUATE",
+          "brierScore": 0.2759,
+          "logLoss": 0.7543,
+          "ece": 0.1424,
+          "clvMean": 0,
+          "clvCoveragePct": 51.05,
+          "evMean": 1.88,
+          "roiRealized": 2.36,
+          "hitRate": 53.47,
+          "roiCi95": [
+            -2.93,
+            8
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-2.50": {
+          "line": -2.5,
+          "sampleSize": 184,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2576,
+          "logLoss": 0.7153,
+          "ece": 0.1029,
+          "clvMean": 0.12,
+          "clvCoveragePct": 31.52,
+          "evMean": -17.97,
+          "roiRealized": 11.35,
+          "hitRate": 55,
+          "roiCi95": [
+            -19.2,
+            43.73
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+2.50": {
+          "line": 2.5,
+          "sampleSize": 184,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2576,
+          "logLoss": 0.7153,
+          "ece": 0.1029,
+          "clvMean": 0,
+          "clvCoveragePct": 31.52,
+          "evMean": 10.59,
+          "roiRealized": 10.63,
+          "hitRate": 59.35,
+          "roiCi95": [
+            -5.46,
+            28.11
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-0.25": {
+          "line": -0.25,
+          "sampleSize": 4511,
+          "status": "ADEQUATE",
+          "brierScore": 0.2288,
+          "logLoss": 0.7415,
+          "ece": 0.1648,
+          "clvMean": 0.1,
+          "clvCoveragePct": 33.94,
+          "evMean": -8.73,
+          "roiRealized": -1.6,
+          "hitRate": 42.13,
+          "roiCi95": [
+            -5.61,
+            2.72
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+0.25": {
+          "line": 0.25,
+          "sampleSize": 4511,
+          "status": "ADEQUATE",
+          "brierScore": 0.2188,
+          "logLoss": 0.7246,
+          "ece": 0.1316,
+          "clvMean": -0.08,
+          "clvCoveragePct": 33.94,
+          "evMean": 3.31,
+          "roiRealized": -3.18,
+          "hitRate": 57.4,
+          "roiCi95": [
+            -6.57,
+            0.19
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-1.00": {
+          "line": -1,
+          "sampleSize": 2464,
+          "status": "ADEQUATE",
+          "brierScore": 0.2211,
+          "logLoss": 0.6857,
+          "ece": 0.1918,
+          "clvMean": -0.16,
+          "clvCoveragePct": 27.35,
+          "evMean": -9.85,
+          "roiRealized": 2.99,
+          "hitRate": 37.55,
+          "roiCi95": [
+            -3.1,
+            9.03
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+1.00": {
+          "line": 1,
+          "sampleSize": 2464,
+          "status": "ADEQUATE",
+          "brierScore": 0.2017,
+          "logLoss": 0.7076,
+          "ece": 0.1041,
+          "clvMean": 0.29,
+          "clvCoveragePct": 27.35,
+          "evMean": 4.08,
+          "roiRealized": -2.4,
+          "hitRate": 38.31,
+          "roiCi95": [
+            -6.63,
+            1.94
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-1.75": {
+          "line": -1.75,
+          "sampleSize": 436,
+          "status": "LIMITED",
+          "brierScore": 0.2337,
+          "logLoss": 0.6552,
+          "ece": 0.1545,
+          "clvMean": 0.07,
+          "clvCoveragePct": 46.79,
+          "evMean": -15.77,
+          "roiRealized": -38.87,
+          "hitRate": 34.91,
+          "roiCi95": [
+            -55.42,
+            -23.64
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+1.75": {
+          "line": 1.75,
+          "sampleSize": 436,
+          "status": "LIMITED",
+          "brierScore": 0.2426,
+          "logLoss": 0.7838,
+          "ece": 0.1523,
+          "clvMean": -0.12,
+          "clvCoveragePct": 46.79,
+          "evMean": 10.5,
+          "roiRealized": 6,
+          "hitRate": 48.23,
+          "roiCi95": [
+            -4.4,
+            15.92
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-0.75": {
+          "line": -0.75,
+          "sampleSize": 1861,
+          "status": "ADEQUATE",
+          "brierScore": 0.2373,
+          "logLoss": 0.6884,
+          "ece": 0.1614,
+          "clvMean": -0.01,
+          "clvCoveragePct": 46.32,
+          "evMean": -8.94,
+          "roiRealized": -6.5,
+          "hitRate": 53.26,
+          "roiCi95": [
+            -13.34,
+            0.88
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+0.75": {
+          "line": 0.75,
+          "sampleSize": 1861,
+          "status": "ADEQUATE",
+          "brierScore": 0.2314,
+          "logLoss": 0.7604,
+          "ece": 0.1558,
+          "clvMean": 0.05,
+          "clvCoveragePct": 46.32,
+          "evMean": 3.59,
+          "roiRealized": -7.31,
+          "hitRate": 40.67,
+          "roiCi95": [
+            -12.36,
+            -2.45
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-2.00": {
+          "line": -2,
+          "sampleSize": 584,
+          "status": "LIMITED",
+          "brierScore": 0.2058,
+          "logLoss": 0.6623,
+          "ece": 0.1581,
+          "clvMean": -0.97,
+          "clvCoveragePct": 26.37,
+          "evMean": -10.21,
+          "roiRealized": -16.35,
+          "hitRate": 27.43,
+          "roiCi95": [
+            -28.55,
+            -3.63
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+2.00": {
+          "line": 2,
+          "sampleSize": 584,
+          "status": "LIMITED",
+          "brierScore": 0.2104,
+          "logLoss": 0.7189,
+          "ece": 0.1314,
+          "clvMean": 1.19,
+          "clvCoveragePct": 26.37,
+          "evMean": 5.29,
+          "roiRealized": 11.25,
+          "hitRate": 44.16,
+          "roiCi95": [
+            2.95,
+            19.75
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-2.75": {
+          "line": -2.75,
+          "sampleSize": 76,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2863,
+          "logLoss": 0.7696,
+          "ece": 0.3271,
+          "clvMean": -0.68,
+          "clvCoveragePct": 26.32,
+          "evMean": -25.26,
+          "roiRealized": -72.43,
+          "hitRate": 14.29,
+          "roiCi95": [
+            -100,
+            -31.07
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+2.75": {
+          "line": 2.75,
+          "sampleSize": 76,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2885,
+          "logLoss": 0.8733,
+          "ece": 0.3022,
+          "clvMean": 0.63,
+          "clvCoveragePct": 26.32,
+          "evMean": 19.58,
+          "roiRealized": -1.05,
+          "hitRate": 45.76,
+          "roiCi95": [
+            -26.76,
+            22.36
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-2.25": {
+          "line": -2.25,
+          "sampleSize": 152,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.242,
+          "logLoss": 0.7655,
+          "ece": 0.2123,
+          "clvMean": -0.31,
+          "clvCoveragePct": 43.42,
+          "evMean": -17.22,
+          "roiRealized": -20.62,
+          "hitRate": 33.33,
+          "roiCi95": [
+            -47.19,
+            7.31
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+2.25": {
+          "line": 2.25,
+          "sampleSize": 152,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2354,
+          "logLoss": 0.7998,
+          "ece": 0.2161,
+          "clvMean": 0.21,
+          "clvCoveragePct": 43.42,
+          "evMean": 11.76,
+          "roiRealized": -2.51,
+          "hitRate": 58,
+          "roiCi95": [
+            -19,
+            14.3
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-3.00": {
+          "line": -3,
+          "sampleSize": 48,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2282,
+          "logLoss": 0.6959,
+          "ece": 0.2063,
+          "clvMean": 0.87,
+          "clvCoveragePct": 20.83,
+          "evMean": -11.66,
+          "roiRealized": -58,
+          "hitRate": 14.29,
+          "roiCi95": [
+            -92.86,
+            -16.21
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+3.00": {
+          "line": 3,
+          "sampleSize": 48,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2591,
+          "logLoss": 0.8214,
+          "ece": 0.2244,
+          "clvMean": -1.53,
+          "clvCoveragePct": 20.83,
+          "evMean": 5.11,
+          "roiRealized": 19.77,
+          "hitRate": 53.33,
+          "roiCi95": [
+            -7.8,
+            47.37
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-3.25": {
+          "line": -3.25,
+          "sampleSize": 6,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.0162,
+          "logLoss": 0.2036,
+          "ece": 0.0175,
+          "clvMean": 0,
+          "clvCoveragePct": 33.33,
+          "evMean": -55.79,
+          "roiRealized": 0,
+          "hitRate": 0,
+          "roiCi95": [
+            0,
+            0
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+3.25": {
+          "line": 3.25,
+          "sampleSize": 6,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.0262,
+          "logLoss": 1.004,
+          "ece": 0.1008,
+          "clvMean": 0,
+          "clvCoveragePct": 33.33,
+          "evMean": 48.04,
+          "roiRealized": 61.5,
+          "hitRate": 100,
+          "roiCi95": [
+            61.5,
+            61.5
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-3.50": {
+          "line": -3.5,
+          "sampleSize": 2,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.1904,
+          "logLoss": 0.5734,
+          "ece": 0.4364,
+          "clvMean": 0,
+          "clvCoveragePct": 0,
+          "evMean": -17.52,
+          "roiRealized": 0,
+          "hitRate": 0,
+          "roiCi95": [
+            0,
+            0
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+3.50": {
+          "line": 3.5,
+          "sampleSize": 2,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.1904,
+          "logLoss": 0.5734,
+          "ece": 0.4364,
+          "clvMean": 0,
+          "clvCoveragePct": 0,
+          "evMean": 10.47,
+          "roiRealized": 96,
+          "hitRate": 100,
+          "roiCi95": [
+            96,
+            96
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-3.75": {
+          "line": -3.75,
+          "sampleSize": 2,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.3543,
+          "logLoss": 0.9044,
+          "ece": 0.5952,
+          "clvMean": 0,
+          "clvCoveragePct": 100,
+          "evMean": -8.84,
+          "roiRealized": 0,
+          "hitRate": 0,
+          "roiCi95": [
+            0,
+            0
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+3.75": {
+          "line": 3.75,
+          "sampleSize": 2,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2513,
+          "logLoss": 0.6958,
+          "ece": 0.5013,
+          "clvMean": 0,
+          "clvCoveragePct": 100,
+          "evMean": 3.38,
+          "roiRealized": -100,
+          "hitRate": 0,
+          "roiCi95": [
+            -100,
+            -100
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        }
+      },
+      "folds": [
+        {
+          "foldIndex": 1,
+          "valSeason": "2017-2018",
+          "brier": 0.2344,
+          "logLoss": 0.737,
+          "ece": 0.1526,
+          "clv": 0,
+          "ev": -3.16,
+          "roi": -1.32
+        },
+        {
+          "foldIndex": 2,
+          "valSeason": "2018-2019",
+          "brier": 0.2265,
+          "logLoss": 0.7176,
+          "ece": 0.1414,
+          "clv": 0,
+          "ev": -3.4,
+          "roi": -1.77
+        },
+        {
+          "foldIndex": 3,
+          "valSeason": "2019-2020",
+          "brier": 0.2337,
+          "logLoss": 0.7295,
+          "ece": 0.1443,
+          "clv": 0.08,
+          "ev": -2.11,
+          "roi": -2.76
+        },
+        {
+          "foldIndex": 4,
+          "valSeason": "2020-2021",
+          "brier": 0.2251,
+          "logLoss": 0.6936,
+          "ece": 0.111,
+          "clv": 0.09,
+          "ev": -1.99,
+          "roi": 6.4
+        },
+        {
+          "foldIndex": 5,
+          "valSeason": "2021-2022",
+          "brier": 0.2309,
+          "logLoss": 0.708,
+          "ece": 0.1409,
+          "clv": 0.13,
+          "ev": -1.98,
+          "roi": -4.54
+        },
+        {
+          "foldIndex": 6,
+          "valSeason": "2022-2026_CONFIRMATION",
+          "brier": 0.2411,
+          "logLoss": 0.7386,
+          "ece": 0.1551,
+          "clv": -0.06,
+          "ev": -2.41,
+          "roi": -5.28
+        }
+      ],
+      "persistence": {
+        "positiveFoldRate": 0,
+        "meanFoldEv": -2.51,
+        "medianFoldEv": -2.11,
+        "evStdDev": 0.57,
+        "bestFoldEv": -1.98,
+        "worstFoldEv": -3.4
+      }
+    },
+    "AH-dixoncoles-v1": {
+      "modelId": "AH-dixoncoles-v1",
+      "modelName": "Dixon-Coles Model with Dynamic MLE Rho",
+      "modelVersion": "AH-dixoncoles-v1.0.0",
+      "overallBrier": 0.2337,
+      "overallLogLoss": 0.7274,
+      "overallEce": 0.1469,
+      "overallClv": 0.02,
+      "overallEv": -2.72,
+      "overallRoi": -2.4,
+      "overallHitRate": 46.5,
+      "roiCi95": [
+        -3.78,
+        -1.01
+      ],
+      "lineMetrics": {
+        "-1.50": {
+          "line": -1.5,
+          "sampleSize": 1048,
+          "status": "ADEQUATE",
+          "brierScore": 0.2777,
+          "logLoss": 0.7619,
+          "ece": 0.1436,
+          "clvMean": 0.15,
+          "clvCoveragePct": 34.92,
+          "evMean": -7.84,
+          "roiRealized": -1.82,
+          "hitRate": 49.61,
+          "roiCi95": [
+            -11.57,
+            7.72
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+1.50": {
+          "line": 1.5,
+          "sampleSize": 1048,
+          "status": "ADEQUATE",
+          "brierScore": 0.2777,
+          "logLoss": 0.7619,
+          "ece": 0.1436,
+          "clvMean": -0.1,
+          "clvCoveragePct": 34.92,
+          "evMean": 1.46,
+          "roiRealized": 5.36,
+          "hitRate": 55.08,
+          "roiCi95": [
+            -2.44,
+            13.03
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-1.25": {
+          "line": -1.25,
+          "sampleSize": 850,
+          "status": "ADEQUATE",
+          "brierScore": 0.2254,
+          "logLoss": 0.733,
+          "ece": 0.153,
+          "clvMean": 0.09,
+          "clvCoveragePct": 50.59,
+          "evMean": -8.61,
+          "roiRealized": -12.43,
+          "hitRate": 37.02,
+          "roiCi95": [
+            -21.63,
+            -1.64
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+1.25": {
+          "line": 1.25,
+          "sampleSize": 850,
+          "status": "ADEQUATE",
+          "brierScore": 0.2218,
+          "logLoss": 0.7304,
+          "ece": 0.1253,
+          "clvMean": -0.15,
+          "clvCoveragePct": 50.59,
+          "evMean": 3.52,
+          "roiRealized": -0.5,
+          "hitRate": 58.28,
+          "roiCi95": [
+            -7.97,
+            6.99
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+0.00": {
+          "line": 0,
+          "sampleSize": 2748,
+          "status": "ADEQUATE",
+          "brierScore": 0.2145,
+          "logLoss": 0.702,
+          "ece": 0.1621,
+          "clvMean": 0.02,
+          "clvCoveragePct": 45.85,
+          "evMean": -2.11,
+          "roiRealized": -1.52,
+          "hitRate": 35.42,
+          "roiCi95": [
+            -6.31,
+            3.09
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-0.50": {
+          "line": -0.5,
+          "sampleSize": 2096,
+          "status": "ADEQUATE",
+          "brierScore": 0.276,
+          "logLoss": 0.7546,
+          "ece": 0.1429,
+          "clvMean": 0.04,
+          "clvCoveragePct": 51.05,
+          "evMean": -8.3,
+          "roiRealized": -10.2,
+          "hitRate": 45.45,
+          "roiCi95": [
+            -17.33,
+            -3.02
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+0.50": {
+          "line": 0.5,
+          "sampleSize": 2096,
+          "status": "ADEQUATE",
+          "brierScore": 0.276,
+          "logLoss": 0.7546,
+          "ece": 0.1429,
+          "clvMean": 0,
+          "clvCoveragePct": 51.05,
+          "evMean": 2.71,
+          "roiRealized": 1.96,
+          "hitRate": 53.24,
+          "roiCi95": [
+            -3.57,
+            7.88
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-2.50": {
+          "line": -2.5,
+          "sampleSize": 184,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2576,
+          "logLoss": 0.7153,
+          "ece": 0.1029,
+          "clvMean": 0.12,
+          "clvCoveragePct": 31.52,
+          "evMean": -17.97,
+          "roiRealized": 11.35,
+          "hitRate": 55,
+          "roiCi95": [
+            -20.2,
+            41.85
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+2.50": {
+          "line": 2.5,
+          "sampleSize": 184,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2576,
+          "logLoss": 0.7153,
+          "ece": 0.1029,
+          "clvMean": 0,
+          "clvCoveragePct": 31.52,
+          "evMean": 10.59,
+          "roiRealized": 10.63,
+          "hitRate": 59.35,
+          "roiCi95": [
+            -6.38,
+            26.43
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-0.25": {
+          "line": -0.25,
+          "sampleSize": 4511,
+          "status": "ADEQUATE",
+          "brierScore": 0.2298,
+          "logLoss": 0.7425,
+          "ece": 0.1654,
+          "clvMean": 0.1,
+          "clvCoveragePct": 33.94,
+          "evMean": -9.17,
+          "roiRealized": -1.95,
+          "hitRate": 41.92,
+          "roiCi95": [
+            -5.95,
+            2.57
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+0.25": {
+          "line": 0.25,
+          "sampleSize": 4511,
+          "status": "ADEQUATE",
+          "brierScore": 0.2188,
+          "logLoss": 0.7246,
+          "ece": 0.1316,
+          "clvMean": -0.08,
+          "clvCoveragePct": 33.94,
+          "evMean": 3.76,
+          "roiRealized": -3.18,
+          "hitRate": 57.39,
+          "roiCi95": [
+            -6.66,
+            -0.06
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-1.00": {
+          "line": -1,
+          "sampleSize": 2464,
+          "status": "ADEQUATE",
+          "brierScore": 0.2211,
+          "logLoss": 0.6857,
+          "ece": 0.1918,
+          "clvMean": -0.16,
+          "clvCoveragePct": 27.35,
+          "evMean": -10.27,
+          "roiRealized": 2.98,
+          "hitRate": 37.92,
+          "roiCi95": [
+            -3.06,
+            8.85
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+1.00": {
+          "line": 1,
+          "sampleSize": 2464,
+          "status": "ADEQUATE",
+          "brierScore": 0.2014,
+          "logLoss": 0.7092,
+          "ece": 0.1069,
+          "clvMean": 0.29,
+          "clvCoveragePct": 27.35,
+          "evMean": 4.44,
+          "roiRealized": -2.15,
+          "hitRate": 38.51,
+          "roiCi95": [
+            -6.21,
+            1.49
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-1.75": {
+          "line": -1.75,
+          "sampleSize": 436,
+          "status": "LIMITED",
+          "brierScore": 0.2337,
+          "logLoss": 0.6552,
+          "ece": 0.1545,
+          "clvMean": 0.07,
+          "clvCoveragePct": 46.79,
+          "evMean": -15.77,
+          "roiRealized": -38.87,
+          "hitRate": 34.91,
+          "roiCi95": [
+            -55.01,
+            -21.23
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+1.75": {
+          "line": 1.75,
+          "sampleSize": 436,
+          "status": "LIMITED",
+          "brierScore": 0.2426,
+          "logLoss": 0.7838,
+          "ece": 0.1523,
+          "clvMean": -0.12,
+          "clvCoveragePct": 46.79,
+          "evMean": 10.5,
+          "roiRealized": 6,
+          "hitRate": 48.23,
+          "roiCi95": [
+            -4.49,
+            16.62
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-0.75": {
+          "line": -0.75,
+          "sampleSize": 1861,
+          "status": "ADEQUATE",
+          "brierScore": 0.2377,
+          "logLoss": 0.6879,
+          "ece": 0.1612,
+          "clvMean": -0.01,
+          "clvCoveragePct": 46.32,
+          "evMean": -9.54,
+          "roiRealized": -6.59,
+          "hitRate": 53.13,
+          "roiCi95": [
+            -13.98,
+            0.24
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+0.75": {
+          "line": 0.75,
+          "sampleSize": 1861,
+          "status": "ADEQUATE",
+          "brierScore": 0.2314,
+          "logLoss": 0.7617,
+          "ece": 0.1585,
+          "clvMean": 0.05,
+          "clvCoveragePct": 46.32,
+          "evMean": 4.16,
+          "roiRealized": -7.3,
+          "hitRate": 40.68,
+          "roiCi95": [
+            -12.26,
+            -2.34
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-2.00": {
+          "line": -2,
+          "sampleSize": 584,
+          "status": "LIMITED",
+          "brierScore": 0.2058,
+          "logLoss": 0.6623,
+          "ece": 0.1581,
+          "clvMean": -0.97,
+          "clvCoveragePct": 26.37,
+          "evMean": -10.21,
+          "roiRealized": -16.35,
+          "hitRate": 27.43,
+          "roiCi95": [
+            -28.27,
+            -4.51
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+2.00": {
+          "line": 2,
+          "sampleSize": 584,
+          "status": "LIMITED",
+          "brierScore": 0.2104,
+          "logLoss": 0.7189,
+          "ece": 0.1314,
+          "clvMean": 1.19,
+          "clvCoveragePct": 26.37,
+          "evMean": 5.29,
+          "roiRealized": 11.25,
+          "hitRate": 44.16,
+          "roiCi95": [
+            2.93,
+            20.22
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-2.75": {
+          "line": -2.75,
+          "sampleSize": 76,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2863,
+          "logLoss": 0.7696,
+          "ece": 0.3271,
+          "clvMean": -0.68,
+          "clvCoveragePct": 26.32,
+          "evMean": -25.26,
+          "roiRealized": -72.43,
+          "hitRate": 14.29,
+          "roiCi95": [
+            -100,
+            -31.07
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+2.75": {
+          "line": 2.75,
+          "sampleSize": 76,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2885,
+          "logLoss": 0.8733,
+          "ece": 0.3022,
+          "clvMean": 0.63,
+          "clvCoveragePct": 26.32,
+          "evMean": 19.58,
+          "roiRealized": -1.05,
+          "hitRate": 45.76,
+          "roiCi95": [
+            -23.93,
+            23.98
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-2.25": {
+          "line": -2.25,
+          "sampleSize": 152,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.242,
+          "logLoss": 0.7655,
+          "ece": 0.2123,
+          "clvMean": -0.31,
+          "clvCoveragePct": 43.42,
+          "evMean": -17.22,
+          "roiRealized": -20.62,
+          "hitRate": 33.33,
+          "roiCi95": [
+            -45.9,
+            5.6
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+2.25": {
+          "line": 2.25,
+          "sampleSize": 152,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2354,
+          "logLoss": 0.7998,
+          "ece": 0.2161,
+          "clvMean": 0.21,
+          "clvCoveragePct": 43.42,
+          "evMean": 11.76,
+          "roiRealized": -2.51,
+          "hitRate": 58,
+          "roiCi95": [
+            -18.95,
+            13.6
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-3.00": {
+          "line": -3,
+          "sampleSize": 48,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2282,
+          "logLoss": 0.6959,
+          "ece": 0.2063,
+          "clvMean": 0.87,
+          "clvCoveragePct": 20.83,
+          "evMean": -11.66,
+          "roiRealized": -58,
+          "hitRate": 14.29,
+          "roiCi95": [
+            -92.86,
+            -16.5
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+3.00": {
+          "line": 3,
+          "sampleSize": 48,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2591,
+          "logLoss": 0.8214,
+          "ece": 0.2244,
+          "clvMean": -1.53,
+          "clvCoveragePct": 20.83,
+          "evMean": 5.11,
+          "roiRealized": 19.77,
+          "hitRate": 53.33,
+          "roiCi95": [
+            -11.57,
+            46.43
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-3.25": {
+          "line": -3.25,
+          "sampleSize": 6,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.0162,
+          "logLoss": 0.2036,
+          "ece": 0.0175,
+          "clvMean": 0,
+          "clvCoveragePct": 33.33,
+          "evMean": -55.79,
+          "roiRealized": 0,
+          "hitRate": 0,
+          "roiCi95": [
+            0,
+            0
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+3.25": {
+          "line": 3.25,
+          "sampleSize": 6,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.0262,
+          "logLoss": 1.004,
+          "ece": 0.1008,
+          "clvMean": 0,
+          "clvCoveragePct": 33.33,
+          "evMean": 48.04,
+          "roiRealized": 61.5,
+          "hitRate": 100,
+          "roiCi95": [
+            61.5,
+            61.5
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-3.50": {
+          "line": -3.5,
+          "sampleSize": 2,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.1904,
+          "logLoss": 0.5734,
+          "ece": 0.4364,
+          "clvMean": 0,
+          "clvCoveragePct": 0,
+          "evMean": -17.52,
+          "roiRealized": 0,
+          "hitRate": 0,
+          "roiCi95": [
+            0,
+            0
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+3.50": {
+          "line": 3.5,
+          "sampleSize": 2,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.1904,
+          "logLoss": 0.5734,
+          "ece": 0.4364,
+          "clvMean": 0,
+          "clvCoveragePct": 0,
+          "evMean": 10.47,
+          "roiRealized": 96,
+          "hitRate": 100,
+          "roiCi95": [
+            96,
+            96
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-3.75": {
+          "line": -3.75,
+          "sampleSize": 2,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.3543,
+          "logLoss": 0.9044,
+          "ece": 0.5952,
+          "clvMean": 0,
+          "clvCoveragePct": 100,
+          "evMean": -8.84,
+          "roiRealized": 0,
+          "hitRate": 0,
+          "roiCi95": [
+            0,
+            0
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+3.75": {
+          "line": 3.75,
+          "sampleSize": 2,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2513,
+          "logLoss": 0.6958,
+          "ece": 0.5013,
+          "clvMean": 0,
+          "clvCoveragePct": 100,
+          "evMean": 3.38,
+          "roiRealized": -100,
+          "hitRate": 0,
+          "roiCi95": [
+            -100,
+            -100
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        }
+      },
+      "folds": [
+        {
+          "foldIndex": 1,
+          "valSeason": "2017-2018",
+          "brier": 0.2347,
+          "logLoss": 0.7375,
+          "ece": 0.153,
+          "clv": 0,
+          "ev": -3.16,
+          "roi": -1.63
+        },
+        {
+          "foldIndex": 2,
+          "valSeason": "2018-2019",
+          "brier": 0.2268,
+          "logLoss": 0.7181,
+          "ece": 0.1444,
+          "clv": 0,
+          "ev": -3.42,
+          "roi": -1.97
+        },
+        {
+          "foldIndex": 3,
+          "valSeason": "2019-2020",
+          "brier": 0.2341,
+          "logLoss": 0.7303,
+          "ece": 0.1456,
+          "clv": 0.08,
+          "ev": -2.11,
+          "roi": -2.64
+        },
+        {
+          "foldIndex": 4,
+          "valSeason": "2020-2021",
+          "brier": 0.2253,
+          "logLoss": 0.6938,
+          "ece": 0.1089,
+          "clv": 0.09,
+          "ev": -1.99,
+          "roi": 6.74
+        },
+        {
+          "foldIndex": 5,
+          "valSeason": "2021-2022",
+          "brier": 0.2312,
+          "logLoss": 0.7085,
+          "ece": 0.1414,
+          "clv": 0.13,
+          "ev": -1.99,
+          "roi": -4.29
+        },
+        {
+          "foldIndex": 6,
+          "valSeason": "2022-2026_CONFIRMATION",
+          "brier": 0.2412,
+          "logLoss": 0.7387,
+          "ece": 0.1557,
+          "clv": -0.06,
+          "ev": -2.41,
+          "roi": -5.18
+        }
+      ],
+      "persistence": {
+        "positiveFoldRate": 0,
+        "meanFoldEv": -2.51,
+        "medianFoldEv": -2.11,
+        "evStdDev": 0.57,
+        "bestFoldEv": -1.99,
+        "worstFoldEv": -3.42
+      }
+    },
+    "prematch-v1": {
+      "modelId": "prematch-v1",
+      "modelName": "prematch-v1 Production Engine Baseline",
+      "modelVersion": "prematch-v1-blended",
+      "overallBrier": 0.2338,
+      "overallLogLoss": 0.7276,
+      "overallEce": 0.148,
+      "overallClv": 0.02,
+      "overallEv": -2.73,
+      "overallRoi": -2.37,
+      "overallHitRate": 46.52,
+      "roiCi95": [
+        -3.85,
+        -0.87
+      ],
+      "lineMetrics": {
+        "-1.50": {
+          "line": -1.5,
+          "sampleSize": 1048,
+          "status": "ADEQUATE",
+          "brierScore": 0.2777,
+          "logLoss": 0.7619,
+          "ece": 0.1436,
+          "clvMean": 0.15,
+          "clvCoveragePct": 34.92,
+          "evMean": -7.84,
+          "roiRealized": -1.82,
+          "hitRate": 49.61,
+          "roiCi95": [
+            -11.77,
+            7.66
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+1.50": {
+          "line": 1.5,
+          "sampleSize": 1048,
+          "status": "ADEQUATE",
+          "brierScore": 0.2777,
+          "logLoss": 0.7619,
+          "ece": 0.1436,
+          "clvMean": -0.1,
+          "clvCoveragePct": 34.92,
+          "evMean": 1.46,
+          "roiRealized": 5.36,
+          "hitRate": 55.08,
+          "roiCi95": [
+            -2.68,
+            13.68
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-1.25": {
+          "line": -1.25,
+          "sampleSize": 850,
+          "status": "ADEQUATE",
+          "brierScore": 0.2254,
+          "logLoss": 0.733,
+          "ece": 0.153,
+          "clvMean": 0.09,
+          "clvCoveragePct": 50.59,
+          "evMean": -8.69,
+          "roiRealized": -12.43,
+          "hitRate": 37.02,
+          "roiCi95": [
+            -22.09,
+            -2.66
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+1.25": {
+          "line": 1.25,
+          "sampleSize": 850,
+          "status": "ADEQUATE",
+          "brierScore": 0.2218,
+          "logLoss": 0.7312,
+          "ece": 0.1255,
+          "clvMean": -0.15,
+          "clvCoveragePct": 50.59,
+          "evMean": 3.6,
+          "roiRealized": -0.5,
+          "hitRate": 58.28,
+          "roiCi95": [
+            -8.3,
+            7.1
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+0.00": {
+          "line": 0,
+          "sampleSize": 2748,
+          "status": "ADEQUATE",
+          "brierScore": 0.215,
+          "logLoss": 0.7021,
+          "ece": 0.166,
+          "clvMean": 0.02,
+          "clvCoveragePct": 45.85,
+          "evMean": -2.1,
+          "roiRealized": -1.52,
+          "hitRate": 35.42,
+          "roiCi95": [
+            -6.03,
+            3.07
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-0.50": {
+          "line": -0.5,
+          "sampleSize": 2096,
+          "status": "ADEQUATE",
+          "brierScore": 0.2761,
+          "logLoss": 0.7548,
+          "ece": 0.1447,
+          "clvMean": 0.04,
+          "clvCoveragePct": 51.05,
+          "evMean": -8.68,
+          "roiRealized": -10.26,
+          "hitRate": 45.42,
+          "roiCi95": [
+            -17.03,
+            -2.89
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+0.50": {
+          "line": 0.5,
+          "sampleSize": 2096,
+          "status": "ADEQUATE",
+          "brierScore": 0.2761,
+          "logLoss": 0.7548,
+          "ece": 0.1447,
+          "clvMean": 0,
+          "clvCoveragePct": 51.05,
+          "evMean": 3.08,
+          "roiRealized": 1.84,
+          "hitRate": 53.21,
+          "roiCi95": [
+            -3.54,
+            7.44
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-2.50": {
+          "line": -2.5,
+          "sampleSize": 184,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2576,
+          "logLoss": 0.7153,
+          "ece": 0.1029,
+          "clvMean": 0.12,
+          "clvCoveragePct": 31.52,
+          "evMean": -17.97,
+          "roiRealized": 11.35,
+          "hitRate": 55,
+          "roiCi95": [
+            -19.68,
+            42.38
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+2.50": {
+          "line": 2.5,
+          "sampleSize": 184,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2576,
+          "logLoss": 0.7153,
+          "ece": 0.1029,
+          "clvMean": 0,
+          "clvCoveragePct": 31.52,
+          "evMean": 10.59,
+          "roiRealized": 10.63,
+          "hitRate": 59.35,
+          "roiCi95": [
+            -6.29,
+            27.94
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-0.25": {
+          "line": -0.25,
+          "sampleSize": 4511,
+          "status": "ADEQUATE",
+          "brierScore": 0.2302,
+          "logLoss": 0.7432,
+          "ece": 0.1674,
+          "clvMean": 0.1,
+          "clvCoveragePct": 33.94,
+          "evMean": -9.37,
+          "roiRealized": -1.95,
+          "hitRate": 41.91,
+          "roiCi95": [
+            -6.19,
+            2.19
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+0.25": {
+          "line": 0.25,
+          "sampleSize": 4511,
+          "status": "ADEQUATE",
+          "brierScore": 0.2188,
+          "logLoss": 0.7246,
+          "ece": 0.1316,
+          "clvMean": -0.08,
+          "clvCoveragePct": 33.94,
+          "evMean": 3.96,
+          "roiRealized": -3.16,
+          "hitRate": 57.43,
+          "roiCi95": [
+            -6.3,
+            0.12
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-1.00": {
+          "line": -1,
+          "sampleSize": 2464,
+          "status": "ADEQUATE",
+          "brierScore": 0.2211,
+          "logLoss": 0.6857,
+          "ece": 0.1918,
+          "clvMean": -0.16,
+          "clvCoveragePct": 27.35,
+          "evMean": -10.43,
+          "roiRealized": 2.98,
+          "hitRate": 37.92,
+          "roiCi95": [
+            -3.09,
+            8.84
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+1.00": {
+          "line": 1,
+          "sampleSize": 2464,
+          "status": "ADEQUATE",
+          "brierScore": 0.2012,
+          "logLoss": 0.7099,
+          "ece": 0.1068,
+          "clvMean": 0.29,
+          "clvCoveragePct": 27.35,
+          "evMean": 4.59,
+          "roiRealized": -2.15,
+          "hitRate": 38.46,
+          "roiCi95": [
+            -6.2,
+            1.67
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-1.75": {
+          "line": -1.75,
+          "sampleSize": 436,
+          "status": "LIMITED",
+          "brierScore": 0.2337,
+          "logLoss": 0.6552,
+          "ece": 0.1545,
+          "clvMean": 0.07,
+          "clvCoveragePct": 46.79,
+          "evMean": -15.77,
+          "roiRealized": -38.87,
+          "hitRate": 34.91,
+          "roiCi95": [
+            -54.64,
+            -22.7
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+1.75": {
+          "line": 1.75,
+          "sampleSize": 436,
+          "status": "LIMITED",
+          "brierScore": 0.2426,
+          "logLoss": 0.7838,
+          "ece": 0.1523,
+          "clvMean": -0.12,
+          "clvCoveragePct": 46.79,
+          "evMean": 10.5,
+          "roiRealized": 6,
+          "hitRate": 48.23,
+          "roiCi95": [
+            -3.99,
+            15.94
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-0.75": {
+          "line": -0.75,
+          "sampleSize": 1861,
+          "status": "ADEQUATE",
+          "brierScore": 0.238,
+          "logLoss": 0.6876,
+          "ece": 0.1614,
+          "clvMean": -0.01,
+          "clvCoveragePct": 46.32,
+          "evMean": -9.84,
+          "roiRealized": -6.27,
+          "hitRate": 53.25,
+          "roiCi95": [
+            -13.51,
+            1.08
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+0.75": {
+          "line": 0.75,
+          "sampleSize": 1861,
+          "status": "ADEQUATE",
+          "brierScore": 0.2315,
+          "logLoss": 0.7624,
+          "ece": 0.1617,
+          "clvMean": 0.05,
+          "clvCoveragePct": 46.32,
+          "evMean": 4.44,
+          "roiRealized": -7.07,
+          "hitRate": 40.84,
+          "roiCi95": [
+            -12.17,
+            -1.33
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-2.00": {
+          "line": -2,
+          "sampleSize": 584,
+          "status": "LIMITED",
+          "brierScore": 0.2058,
+          "logLoss": 0.6623,
+          "ece": 0.1581,
+          "clvMean": -0.97,
+          "clvCoveragePct": 26.37,
+          "evMean": -10.21,
+          "roiRealized": -16.35,
+          "hitRate": 27.43,
+          "roiCi95": [
+            -28.9,
+            -3.95
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+2.00": {
+          "line": 2,
+          "sampleSize": 584,
+          "status": "LIMITED",
+          "brierScore": 0.2104,
+          "logLoss": 0.7189,
+          "ece": 0.1314,
+          "clvMean": 1.19,
+          "clvCoveragePct": 26.37,
+          "evMean": 5.29,
+          "roiRealized": 11.25,
+          "hitRate": 44.16,
+          "roiCi95": [
+            2.34,
+            19.31
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-2.75": {
+          "line": -2.75,
+          "sampleSize": 76,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2863,
+          "logLoss": 0.7696,
+          "ece": 0.3271,
+          "clvMean": -0.68,
+          "clvCoveragePct": 26.32,
+          "evMean": -25.26,
+          "roiRealized": -72.43,
+          "hitRate": 14.29,
+          "roiCi95": [
+            -100,
+            -31.07
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+2.75": {
+          "line": 2.75,
+          "sampleSize": 76,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2885,
+          "logLoss": 0.8733,
+          "ece": 0.3022,
+          "clvMean": 0.63,
+          "clvCoveragePct": 26.32,
+          "evMean": 19.58,
+          "roiRealized": -1.05,
+          "hitRate": 45.76,
+          "roiCi95": [
+            -23.1,
+            21.59
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-2.25": {
+          "line": -2.25,
+          "sampleSize": 152,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.242,
+          "logLoss": 0.7655,
+          "ece": 0.2123,
+          "clvMean": -0.31,
+          "clvCoveragePct": 43.42,
+          "evMean": -17.22,
+          "roiRealized": -20.62,
+          "hitRate": 33.33,
+          "roiCi95": [
+            -44.88,
+            5.19
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+2.25": {
+          "line": 2.25,
+          "sampleSize": 152,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2354,
+          "logLoss": 0.7998,
+          "ece": 0.2161,
+          "clvMean": 0.21,
+          "clvCoveragePct": 43.42,
+          "evMean": 11.76,
+          "roiRealized": -2.51,
+          "hitRate": 58,
+          "roiCi95": [
+            -19.11,
+            15.86
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-3.00": {
+          "line": -3,
+          "sampleSize": 48,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2282,
+          "logLoss": 0.6959,
+          "ece": 0.2063,
+          "clvMean": 0.87,
+          "clvCoveragePct": 20.83,
+          "evMean": -11.66,
+          "roiRealized": -58,
+          "hitRate": 14.29,
+          "roiCi95": [
+            -92.86,
+            -16.57
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+3.00": {
+          "line": 3,
+          "sampleSize": 48,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2591,
+          "logLoss": 0.8214,
+          "ece": 0.2244,
+          "clvMean": -1.53,
+          "clvCoveragePct": 20.83,
+          "evMean": 5.11,
+          "roiRealized": 19.77,
+          "hitRate": 53.33,
+          "roiCi95": [
+            -8.27,
+            48.73
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-3.25": {
+          "line": -3.25,
+          "sampleSize": 6,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.0162,
+          "logLoss": 0.2036,
+          "ece": 0.0175,
+          "clvMean": 0,
+          "clvCoveragePct": 33.33,
+          "evMean": -55.79,
+          "roiRealized": 0,
+          "hitRate": 0,
+          "roiCi95": [
+            0,
+            0
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+3.25": {
+          "line": 3.25,
+          "sampleSize": 6,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.0262,
+          "logLoss": 1.004,
+          "ece": 0.1008,
+          "clvMean": 0,
+          "clvCoveragePct": 33.33,
+          "evMean": 48.04,
+          "roiRealized": 61.5,
+          "hitRate": 100,
+          "roiCi95": [
+            61.5,
+            61.5
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-3.50": {
+          "line": -3.5,
+          "sampleSize": 2,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.1904,
+          "logLoss": 0.5734,
+          "ece": 0.4364,
+          "clvMean": 0,
+          "clvCoveragePct": 0,
+          "evMean": -17.52,
+          "roiRealized": 0,
+          "hitRate": 0,
+          "roiCi95": [
+            0,
+            0
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+3.50": {
+          "line": 3.5,
+          "sampleSize": 2,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.1904,
+          "logLoss": 0.5734,
+          "ece": 0.4364,
+          "clvMean": 0,
+          "clvCoveragePct": 0,
+          "evMean": 10.47,
+          "roiRealized": 96,
+          "hitRate": 100,
+          "roiCi95": [
+            96,
+            96
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "-3.75": {
+          "line": -3.75,
+          "sampleSize": 2,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.3543,
+          "logLoss": 0.9044,
+          "ece": 0.5952,
+          "clvMean": 0,
+          "clvCoveragePct": 100,
+          "evMean": -8.84,
+          "roiRealized": 0,
+          "hitRate": 0,
+          "roiCi95": [
+            0,
+            0
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        },
+        "+3.75": {
+          "line": 3.75,
+          "sampleSize": 2,
+          "status": "INSUFFICIENT",
+          "brierScore": 0.2513,
+          "logLoss": 0.6958,
+          "ece": 0.5013,
+          "clvMean": 0,
+          "clvCoveragePct": 100,
+          "evMean": 3.38,
+          "roiRealized": -100,
+          "hitRate": 0,
+          "roiCi95": [
+            -100,
+            -100
+          ],
+          "positiveFoldsCount": 0,
+          "totalFoldsCount": 6
+        }
+      },
+      "folds": [
+        {
+          "foldIndex": 1,
+          "valSeason": "2017-2018",
+          "brier": 0.235,
+          "logLoss": 0.738,
+          "ece": 0.1553,
+          "clv": 0,
+          "ev": -3.16,
+          "roi": -1.54
+        },
+        {
+          "foldIndex": 2,
+          "valSeason": "2018-2019",
+          "brier": 0.2268,
+          "logLoss": 0.7182,
+          "ece": 0.1448,
+          "clv": 0,
+          "ev": -3.42,
+          "roi": -1.93
+        },
+        {
+          "foldIndex": 3,
+          "valSeason": "2019-2020",
+          "brier": 0.2342,
+          "logLoss": 0.7304,
+          "ece": 0.1454,
+          "clv": 0.08,
+          "ev": -2.11,
+          "roi": -2.52
+        },
+        {
+          "foldIndex": 4,
+          "valSeason": "2020-2021",
+          "brier": 0.2253,
+          "logLoss": 0.6937,
+          "ece": 0.1087,
+          "clv": 0.09,
+          "ev": -1.99,
+          "roi": 6.45
+        },
+        {
+          "foldIndex": 5,
+          "valSeason": "2021-2022",
+          "brier": 0.2313,
+          "logLoss": 0.7086,
+          "ece": 0.1425,
+          "clv": 0.13,
+          "ev": -1.99,
+          "roi": -4.08
+        },
+        {
+          "foldIndex": 6,
+          "valSeason": "2022-2026_CONFIRMATION",
+          "brier": 0.2414,
+          "logLoss": 0.7389,
+          "ece": 0.1574,
+          "clv": -0.06,
+          "ev": -2.41,
+          "roi": -5.22
+        }
+      ],
+      "persistence": {
+        "positiveFoldRate": 0,
+        "meanFoldEv": -2.51,
+        "medianFoldEv": -2.11,
+        "evStdDev": 0.57,
+        "bestFoldEv": -1.99,
+        "worstFoldEv": -3.42
+      }
+    }
+  },
+  "discoveryHypotheses": [
+    {
+      "line": -0.75,
+      "leagueId": "ALL_LEAGUES",
+      "discoveryEv": -10.12,
+      "discoveryRoi": -5.56,
+      "discoveryClv": -0.36,
+      "discoverySampleSize": 1243,
+      "pVal": 0.999,
+      "bonferroniSig": false,
+      "fdrSig": false,
+      "confirmationSampleSize": 618,
+      "confirmationEv": -8.38,
+      "confirmationRoi": -8.47,
+      "confirmationClv": 0.32,
+      "confirmed": false
+    },
+    {
+      "line": -0.5,
+      "leagueId": "ALL_LEAGUES",
+      "discoveryEv": -9.64,
+      "discoveryRoi": -6.84,
+      "discoveryClv": 0.3,
+      "discoverySampleSize": 1358,
+      "pVal": 0.999,
+      "bonferroniSig": false,
+      "fdrSig": false,
+      "confirmationSampleSize": 738,
+      "confirmationEv": -5.84,
+      "confirmationRoi": -16.24,
+      "confirmationClv": -0.21,
+      "confirmed": false
+    },
+    {
+      "line": -0.25,
+      "leagueId": "ALL_LEAGUES",
+      "discoveryEv": -10.6,
+      "discoveryRoi": -0.75,
+      "discoveryClv": 0.39,
+      "discoverySampleSize": 3575,
+      "pVal": 0.999,
+      "bonferroniSig": false,
+      "fdrSig": false,
+      "confirmationSampleSize": 936,
+      "confirmationEv": -3.74,
+      "confirmationRoi": -5.67,
+      "confirmationClv": -0.22,
+      "confirmed": false
+    },
+    {
+      "line": 0,
+      "leagueId": "ALL_LEAGUES",
+      "discoveryEv": -2.17,
+      "discoveryRoi": 0.96,
+      "discoveryClv": 0.09,
+      "discoverySampleSize": 1862,
+      "pVal": 0.999,
+      "bonferroniSig": false,
+      "fdrSig": false,
+      "confirmationSampleSize": 886,
+      "confirmationEv": -1.99,
+      "confirmationRoi": -6.84,
+      "confirmationClv": -0.05,
+      "confirmed": false
+    },
+    {
+      "line": 0.25,
+      "leagueId": "ALL_LEAGUES",
+      "discoveryEv": 5.05,
+      "discoveryRoi": -3.69,
+      "discoveryClv": -0.19,
+      "discoverySampleSize": 3575,
+      "pVal": 0.001,
+      "bonferroniSig": true,
+      "fdrSig": true,
+      "confirmationSampleSize": 936,
+      "confirmationEv": -1.17,
+      "confirmationRoi": -0.87,
+      "confirmationClv": 0.05,
+      "confirmed": false
+    },
+    {
+      "line": 0.5,
+      "leagueId": "ALL_LEAGUES",
+      "discoveryEv": 3.89,
+      "discoveryRoi": 5,
+      "discoveryClv": -0.13,
+      "discoverySampleSize": 1358,
+      "pVal": 0.001,
+      "bonferroniSig": true,
+      "fdrSig": true,
+      "confirmationSampleSize": 738,
+      "confirmationEv": 0.52,
+      "confirmationRoi": -3.95,
+      "confirmationClv": 0.13,
+      "confirmed": true
+    },
+    {
+      "line": 0.75,
+      "leagueId": "ALL_LEAGUES",
+      "discoveryEv": 4.38,
+      "discoveryRoi": -7.76,
+      "discoveryClv": 0.61,
+      "discoverySampleSize": 1243,
+      "pVal": 0.001,
+      "bonferroniSig": true,
+      "fdrSig": true,
+      "confirmationSampleSize": 618,
+      "confirmationEv": 3.72,
+      "confirmationRoi": -6.34,
+      "confirmationClv": -0.48,
+      "confirmed": false
+    }
+  ],
+  "prematchComparison": {
+    "brierDiff": -0.0001,
+    "logLossDiff": -0.0002,
+    "eceDiff": -0.0011,
+    "clvDiff": 0,
+    "evDiff": 0.01,
+    "roiDiff": -0.03,
+    "championVerdict": "AH-dixoncoles-v1 wins on calibration & Log Loss over prematch-v1"
+  }
+}

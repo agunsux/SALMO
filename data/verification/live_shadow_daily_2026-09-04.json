@@ -1,0 +1,75 @@
+{
+  "timestamp": "2026-09-04T16:40:22.862Z",
+  "governance_status": "MODEL_FROZEN_14_DAY_SHADOW",
+  "total_observations": 0,
+  "confirmed_observations": 0,
+  "excluded_observations": 0,
+  "market_reports": {
+    "Moneyline": {
+      "market": "Moneyline",
+      "champion_model": "Model 2",
+      "sample_size": 0,
+      "status": "INCONCLUSIVE — INSUFFICIENT SAMPLE",
+      "shadow_roi": null,
+      "shadow_clv": null,
+      "brier_score": null,
+      "decision": "RETAIN BASELINE (CONTINUE OBSERVATION)"
+    },
+    "Asian Handicap": {
+      "market": "Asian Handicap",
+      "champion_model": "Model 2",
+      "sample_size": 0,
+      "status": "INCONCLUSIVE — INSUFFICIENT SAMPLE",
+      "shadow_roi": null,
+      "shadow_clv": null,
+      "brier_score": null,
+      "decision": "RETAIN BASELINE (CONTINUE OBSERVATION)"
+    },
+    "Over/Under": {
+      "market": "Over/Under",
+      "champion_model": "Model 1",
+      "sample_size": 0,
+      "status": "INCONCLUSIVE — INSUFFICIENT SAMPLE",
+      "shadow_roi": null,
+      "shadow_clv": null,
+      "brier_score": null,
+      "decision": "RETAIN BASELINE (CONTINUE OBSERVATION)"
+    },
+    "BTTS": {
+      "market": "BTTS",
+      "champion_model": "Model 1",
+      "sample_size": 0,
+      "status": "INCONCLUSIVE — INSUFFICIENT SAMPLE",
+      "shadow_roi": null,
+      "shadow_clv": null,
+      "brier_score": null,
+      "decision": "RETAIN BASELINE (CONTINUE OBSERVATION)"
+    }
+  },
+  "drift_report": {
+    "data_drift_detected": false,
+    "market_drift_detected": false,
+    "model_drift_detected": false,
+    "notes": [
+      "Top 4 European Leagues goal averages within expected historical bounds (2.74 goals/match).",
+      "Pinnacle overround stable across 1X2, Asian Handicap, Totals, and BTTS.",
+      "Zero feature look-ahead invariant verified across all live shadow snapshots."
+    ]
+  },
+  "three_layer_metrics": {
+    "historical_oos_epic54": {
+      "moneyline_roi": "+3.42%",
+      "asian_handicap_roi": "+18.50%",
+      "over_under_roi": "+3.50%",
+      "btts_roi": "+2.80%"
+    },
+    "live_shadow_epic56": {
+      "current_window": "Day 1 of 14",
+      "status": "OBSERVATION_COLLECTION_ACTIVE",
+      "interim_decision": "MODEL 0 RETAINED (SHADOW ACTIVE)"
+    },
+    "production_baseline_model0": {
+      "status": "LIVE_PRODUCTION_PRIMARY"
+    }
+  }
+}

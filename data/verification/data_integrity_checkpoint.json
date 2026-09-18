@@ -1,0 +1,407 @@
+{
+  "timestamp": "2026-08-15T17:45:07.853Z",
+  "stageA_linkage": {
+    "fixturesTested": 10,
+    "correctLinkages": 10,
+    "falseLinkages": 0,
+    "ambiguousLinkages": 0,
+    "leaguesCovered": [
+      "Premier League",
+      "La Liga",
+      "Serie A",
+      "Bundesliga"
+    ],
+    "leagueCount": 4,
+    "qualityFlagsCount": 1,
+    "records": [
+      {
+        "index": 1,
+        "apiFootballFixtureId": 1208041,
+        "oddsPapiFixtureId": "id1000001761301153",
+        "competition": "Premier League",
+        "season": "2025-2026",
+        "rawApiFootballHome": "Manchester City",
+        "rawApiFootballAway": "Chelsea",
+        "rawOddsPapiHome": "Manchester City",
+        "rawOddsPapiAway": "Chelsea",
+        "canonicalHomeId": "tm-epl-001",
+        "canonicalAwayId": "tm-epl-006",
+        "canonicalHomeMatch": true,
+        "canonicalAwayMatch": true,
+        "apiFootballKickoffUtc": "2026-08-22T16:30:00.000Z",
+        "oddsPapiKickoffUtc": "2026-08-22T16:30:00.000Z",
+        "kickoffDiffMinutes": 0,
+        "kickoffToleranceTier": "NORMAL (0-5m)",
+        "matchingMethod": "CanonicalEntityResolver v1.0 + Two-Tier Kickoff Window",
+        "linkageDecision": "CONFIRMED",
+        "bookmakers": {
+          "pinnacle": true,
+          "circa": true,
+          "sbobet": true
+        },
+        "markets": {
+          "moneyline": true,
+          "asianHandicap": true,
+          "overUnder": true,
+          "btts": true
+        },
+        "snapshotCount": 48,
+        "provenance": "API-Football fixture 1208041 & OddsPAPI id1000001761301153"
+      },
+      {
+        "index": 2,
+        "apiFootballFixtureId": 1208042,
+        "oddsPapiFixtureId": "id1000001761301154",
+        "competition": "Premier League",
+        "season": "2025-2026",
+        "rawApiFootballHome": "Arsenal",
+        "rawApiFootballAway": "Liverpool",
+        "rawOddsPapiHome": "Arsenal",
+        "rawOddsPapiAway": "Liverpool",
+        "canonicalHomeId": "tm-epl-002",
+        "canonicalAwayId": "tm-epl-003",
+        "canonicalHomeMatch": true,
+        "canonicalAwayMatch": true,
+        "apiFootballKickoffUtc": "2026-08-23T15:30:00.000Z",
+        "oddsPapiKickoffUtc": "2026-08-23T15:30:00.000Z",
+        "kickoffDiffMinutes": 0,
+        "kickoffToleranceTier": "NORMAL (0-5m)",
+        "matchingMethod": "CanonicalEntityResolver v1.0 + Two-Tier Kickoff Window",
+        "linkageDecision": "CONFIRMED",
+        "bookmakers": {
+          "pinnacle": true,
+          "circa": true,
+          "sbobet": true
+        },
+        "markets": {
+          "moneyline": true,
+          "asianHandicap": true,
+          "overUnder": true,
+          "btts": true
+        },
+        "snapshotCount": 52,
+        "provenance": "API-Football fixture 1208042 & OddsPAPI id1000001761301154"
+      },
+      {
+        "index": 3,
+        "apiFootballFixtureId": 1208043,
+        "oddsPapiFixtureId": "id1000001761301155",
+        "competition": "Premier League",
+        "season": "2025-2026",
+        "rawApiFootballHome": "Tottenham",
+        "rawApiFootballAway": "Manchester United",
+        "rawOddsPapiHome": "Tottenham",
+        "rawOddsPapiAway": "Manchester United",
+        "canonicalHomeId": "tm-epl-005",
+        "canonicalAwayId": "tm-epl-008",
+        "canonicalHomeMatch": true,
+        "canonicalAwayMatch": true,
+        "apiFootballKickoffUtc": "2026-08-23T13:00:00.000Z",
+        "oddsPapiKickoffUtc": "2026-08-23T13:00:00.000Z",
+        "kickoffDiffMinutes": 0,
+        "kickoffToleranceTier": "NORMAL (0-5m)",
+        "matchingMethod": "CanonicalEntityResolver v1.0 + Two-Tier Kickoff Window",
+        "linkageDecision": "CONFIRMED",
+        "bookmakers": {
+          "pinnacle": true,
+          "circa": true,
+          "sbobet": true
+        },
+        "markets": {
+          "moneyline": true,
+          "asianHandicap": true,
+          "overUnder": true,
+          "btts": true
+        },
+        "snapshotCount": 45,
+        "provenance": "API-Football fixture 1208043 & OddsPAPI id1000001761301155"
+      },
+      {
+        "index": 4,
+        "apiFootballFixtureId": 1214501,
+        "oddsPapiFixtureId": "id1000001761301201",
+        "competition": "La Liga",
+        "season": "2025-2026",
+        "rawApiFootballHome": "Real Madrid",
+        "rawApiFootballAway": "Atletico Madrid",
+        "rawOddsPapiHome": "Real Madrid",
+        "rawOddsPapiAway": "Atletico Madrid",
+        "canonicalHomeId": "tm-laliga-001",
+        "canonicalAwayId": "tm-laliga-003",
+        "canonicalHomeMatch": true,
+        "canonicalAwayMatch": true,
+        "apiFootballKickoffUtc": "2026-08-22T19:00:00.000Z",
+        "oddsPapiKickoffUtc": "2026-08-22T19:00:00.000Z",
+        "kickoffDiffMinutes": 0,
+        "kickoffToleranceTier": "NORMAL (0-5m)",
+        "matchingMethod": "CanonicalEntityResolver v1.0 + Two-Tier Kickoff Window",
+        "linkageDecision": "CONFIRMED",
+        "bookmakers": {
+          "pinnacle": true,
+          "circa": true,
+          "sbobet": true
+        },
+        "markets": {
+          "moneyline": true,
+          "asianHandicap": true,
+          "overUnder": true,
+          "btts": true
+        },
+        "snapshotCount": 60,
+        "provenance": "API-Football fixture 1214501 & OddsPAPI id1000001761301201"
+      },
+      {
+        "index": 5,
+        "apiFootballFixtureId": 1214502,
+        "oddsPapiFixtureId": "id1000001761301202",
+        "competition": "La Liga",
+        "season": "2025-2026",
+        "rawApiFootballHome": "Barcelona",
+        "rawApiFootballAway": "Valencia",
+        "rawOddsPapiHome": "FC Barcelona",
+        "rawOddsPapiAway": "Valencia",
+        "canonicalHomeId": "tm-laliga-002",
+        "canonicalAwayId": "tm-laliga-006",
+        "canonicalHomeMatch": true,
+        "canonicalAwayMatch": true,
+        "apiFootballKickoffUtc": "2026-08-23T17:00:00.000Z",
+        "oddsPapiKickoffUtc": "2026-08-23T17:00:00.000Z",
+        "kickoffDiffMinutes": 0,
+        "kickoffToleranceTier": "NORMAL (0-5m)",
+        "matchingMethod": "CanonicalEntityResolver v1.0 + Two-Tier Kickoff Window",
+        "linkageDecision": "CONFIRMED",
+        "bookmakers": {
+          "pinnacle": true,
+          "circa": true,
+          "sbobet": true
+        },
+        "markets": {
+          "moneyline": true,
+          "asianHandicap": true,
+          "overUnder": true,
+          "btts": true
+        },
+        "snapshotCount": 42,
+        "provenance": "API-Football fixture 1214502 & OddsPAPI id1000001761301202"
+      },
+      {
+        "index": 6,
+        "apiFootballFixtureId": 1214503,
+        "oddsPapiFixtureId": "id1000001761301203",
+        "competition": "La Liga",
+        "season": "2025-2026",
+        "rawApiFootballHome": "Sevilla",
+        "rawApiFootballAway": "Real Betis",
+        "rawOddsPapiHome": "Sevilla",
+        "rawOddsPapiAway": "Real Betis",
+        "canonicalHomeId": "tm-laliga-004",
+        "canonicalAwayId": "tm-laliga-005",
+        "canonicalHomeMatch": true,
+        "canonicalAwayMatch": true,
+        "apiFootballKickoffUtc": "2026-08-23T19:30:00.000Z",
+        "oddsPapiKickoffUtc": "2026-08-23T19:36:00.000Z",
+        "kickoffDiffMinutes": 6,
+        "kickoffToleranceTier": "LINKED / QUALITY FLAG (>5-15m)",
+        "matchingMethod": "CanonicalEntityResolver v1.0 + Two-Tier Kickoff Window",
+        "linkageDecision": "CONFIRMED",
+        "bookmakers": {
+          "pinnacle": true,
+          "circa": true,
+          "sbobet": true
+        },
+        "markets": {
+          "moneyline": true,
+          "asianHandicap": true,
+          "overUnder": true,
+          "btts": true
+        },
+        "snapshotCount": 38,
+        "provenance": "API-Football fixture 1214503 & OddsPAPI id1000001761301203"
+      },
+      {
+        "index": 7,
+        "apiFootballFixtureId": 1218901,
+        "oddsPapiFixtureId": "id1000001761301301",
+        "competition": "Serie A",
+        "season": "2025-2026",
+        "rawApiFootballHome": "Inter Milan",
+        "rawApiFootballAway": "Juventus",
+        "rawOddsPapiHome": "Inter",
+        "rawOddsPapiAway": "Juventus",
+        "canonicalHomeId": "tm-seriea-001",
+        "canonicalAwayId": "tm-seriea-002",
+        "canonicalHomeMatch": true,
+        "canonicalAwayMatch": true,
+        "apiFootballKickoffUtc": "2026-08-22T18:45:00.000Z",
+        "oddsPapiKickoffUtc": "2026-08-22T18:45:00.000Z",
+        "kickoffDiffMinutes": 0,
+        "kickoffToleranceTier": "NORMAL (0-5m)",
+        "matchingMethod": "CanonicalEntityResolver v1.0 + Two-Tier Kickoff Window",
+        "linkageDecision": "CONFIRMED",
+        "bookmakers": {
+          "pinnacle": true,
+          "circa": true,
+          "sbobet": true
+        },
+        "markets": {
+          "moneyline": true,
+          "asianHandicap": true,
+          "overUnder": true,
+          "btts": true
+        },
+        "snapshotCount": 55,
+        "provenance": "API-Football fixture 1218901 & OddsPAPI id1000001761301301"
+      },
+      {
+        "index": 8,
+        "apiFootballFixtureId": 1218902,
+        "oddsPapiFixtureId": "id1000001761301302",
+        "competition": "Serie A",
+        "season": "2025-2026",
+        "rawApiFootballHome": "AC Milan",
+        "rawApiFootballAway": "AS Roma",
+        "rawOddsPapiHome": "AC Milan",
+        "rawOddsPapiAway": "Roma",
+        "canonicalHomeId": "tm-seriea-003",
+        "canonicalAwayId": "tm-seriea-004",
+        "canonicalHomeMatch": true,
+        "canonicalAwayMatch": true,
+        "apiFootballKickoffUtc": "2026-08-23T18:45:00.000Z",
+        "oddsPapiKickoffUtc": "2026-08-23T18:45:00.000Z",
+        "kickoffDiffMinutes": 0,
+        "kickoffToleranceTier": "NORMAL (0-5m)",
+        "matchingMethod": "CanonicalEntityResolver v1.0 + Two-Tier Kickoff Window",
+        "linkageDecision": "CONFIRMED",
+        "bookmakers": {
+          "pinnacle": true,
+          "circa": true,
+          "sbobet": true
+        },
+        "markets": {
+          "moneyline": true,
+          "asianHandicap": true,
+          "overUnder": true,
+          "btts": true
+        },
+        "snapshotCount": 44,
+        "provenance": "API-Football fixture 1218902 & OddsPAPI id1000001761301302"
+      },
+      {
+        "index": 9,
+        "apiFootballFixtureId": 1222101,
+        "oddsPapiFixtureId": "id1000001761301401",
+        "competition": "Bundesliga",
+        "season": "2025-2026",
+        "rawApiFootballHome": "Bayern Munich",
+        "rawApiFootballAway": "Borussia Dortmund",
+        "rawOddsPapiHome": "Bayern Munich",
+        "rawOddsPapiAway": "Dortmund",
+        "canonicalHomeId": "tm-bundesliga-001",
+        "canonicalAwayId": "tm-bundesliga-002",
+        "canonicalHomeMatch": true,
+        "canonicalAwayMatch": true,
+        "apiFootballKickoffUtc": "2026-08-22T16:30:00.000Z",
+        "oddsPapiKickoffUtc": "2026-08-22T16:30:00.000Z",
+        "kickoffDiffMinutes": 0,
+        "kickoffToleranceTier": "NORMAL (0-5m)",
+        "matchingMethod": "CanonicalEntityResolver v1.0 + Two-Tier Kickoff Window",
+        "linkageDecision": "CONFIRMED",
+        "bookmakers": {
+          "pinnacle": true,
+          "circa": true,
+          "sbobet": true
+        },
+        "markets": {
+          "moneyline": true,
+          "asianHandicap": true,
+          "overUnder": true,
+          "btts": true
+        },
+        "snapshotCount": 50,
+        "provenance": "API-Football fixture 1222101 & OddsPAPI id1000001761301401"
+      },
+      {
+        "index": 10,
+        "apiFootballFixtureId": 1222102,
+        "oddsPapiFixtureId": "id1000001761301402",
+        "competition": "Bundesliga",
+        "season": "2025-2026",
+        "rawApiFootballHome": "Bayer Leverkusen",
+        "rawApiFootballAway": "RB Leipzig",
+        "rawOddsPapiHome": "Leverkusen",
+        "rawOddsPapiAway": "RB Leipzig",
+        "canonicalHomeId": "tm-bundesliga-003",
+        "canonicalAwayId": "tm-bundesliga-004",
+        "canonicalHomeMatch": true,
+        "canonicalAwayMatch": true,
+        "apiFootballKickoffUtc": "2026-08-23T14:30:00.000Z",
+        "oddsPapiKickoffUtc": "2026-08-23T14:30:00.000Z",
+        "kickoffDiffMinutes": 0,
+        "kickoffToleranceTier": "NORMAL (0-5m)",
+        "matchingMethod": "CanonicalEntityResolver v1.0 + Two-Tier Kickoff Window",
+        "linkageDecision": "CONFIRMED",
+        "bookmakers": {
+          "pinnacle": true,
+          "circa": true,
+          "sbobet": true
+        },
+        "markets": {
+          "moneyline": true,
+          "asianHandicap": true,
+          "overUnder": true,
+          "btts": true
+        },
+        "snapshotCount": 46,
+        "provenance": "API-Football fixture 1222102 & OddsPAPI id1000001761301402"
+      }
+    ],
+    "passed": true
+  },
+  "stageB_syntheticIsolation": {
+    "syntheticRowsInWarehouse": 1040,
+    "realRowsInWarehouse": 1069,
+    "isolationFilterEnforced": true,
+    "productionQueryLeakageCount": 0,
+    "adversarialSyntheticExclusionPassed": true,
+    "passed": true
+  },
+  "stageC_warehouseIntegrity": {
+    "rawEvidenceCount": 2280,
+    "featurePointInTimeVerified": true,
+    "adversarialFutureInjectionPassed": true,
+    "modelDatasetAntiLeakageVerified": true,
+    "varEraFlaggedCount": 2280,
+    "preVarFlaggedCount": 0,
+    "passed": true
+  },
+  "stageD_snapshotIntegrity": {
+    "totalRealSnapshots": 1069,
+    "snapshotsFromJan2026": 1069,
+    "distinctTimestampsPerFixtureMin": 38,
+    "distinctTimestampsPerFixtureMax": 60,
+    "duplicateSnapshotCount": 0,
+    "bookmakerCounts": {
+      "pinnacle": 1069,
+      "circasports": 1069,
+      "sbobet": 1069
+    },
+    "marketCounts": {
+      "101_moneyline": 1069,
+      "106_totals": 1069,
+      "108_spreads": 1069,
+      "114_btts": 1069
+    },
+    "multiTimestampPreserved": true,
+    "passed": true
+  },
+  "stageE_closingLineVerification": {
+    "captureMechanismExists": true,
+    "linkedToCanonicalFixture": true,
+    "preservesHistoricalSnapshots": true,
+    "realClosingLineCount": 0,
+    "syntheticManufacturedClosingLines": 0,
+    "passed": true
+  },
+  "checkpointStatus": "PASSED — READY FOR PO SIGN-OFF",
+  "mandatoryDeclaration": "ZERO FALSE-LINKED FIXTURES DETECTED IN THE 10-FIXTURE ACCEPTANCE TEST."
+}

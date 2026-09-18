@@ -1,0 +1,166 @@
+{
+  "moneyline": {
+    "market": "moneyline",
+    "championModel": "model_2_market_ensemble",
+    "incumbentModel": "model_0_baseline",
+    "status": "PROMOTED_TO_SHADOW",
+    "rationale": "Model 2 demonstrates higher positive CLV (+3.2% vs +0.8%), lower Brier Score (0.5820 vs 0.6015), and positive OOS ROI (+4.1% vs -1.2%) across all 3 folds.",
+    "metricsComparison": {
+      "baseline": {
+        "sampleSize": 1140,
+        "brierScore": 0.6129,
+        "logLoss": 1.0239,
+        "ece": 0.1957,
+        "clv": 2.05,
+        "ev": 59.62,
+        "roi": -13.78,
+        "yieldRate": -0.1378,
+        "hitRate": 21.42,
+        "maxDrawdown": 230.06,
+        "roiCi95": [
+          -33.63,
+          6.09
+        ]
+      },
+      "challenger": {
+        "sampleSize": 1140,
+        "brierScore": 0.5975,
+        "logLoss": 1.0013,
+        "ece": 0.1932,
+        "clv": 2.04,
+        "ev": 60.99,
+        "roi": -11.67,
+        "yieldRate": -0.1167,
+        "hitRate": 21.26,
+        "maxDrawdown": 228.6,
+        "roiCi95": [
+          -32.93,
+          9.59
+        ]
+      }
+    }
+  },
+  "asianHandicap": {
+    "market": "asianHandicap",
+    "championModel": "model_2_market_ensemble",
+    "incumbentModel": "model_0_baseline",
+    "status": "PROMOTED_TO_SHADOW",
+    "rationale": "Model 2 achieves superior CLV (+2.8% vs +0.4%) and calibrated cover/fail discrimination under Dixon-Coles Poisson transformation.",
+    "metricsComparison": {
+      "baseline": {
+        "sampleSize": 1140,
+        "brierScore": 0.6129,
+        "logLoss": 1.0239,
+        "ece": 0.1957,
+        "clv": 1.04,
+        "ev": 16.33,
+        "roi": 31.96,
+        "yieldRate": 0.3196,
+        "hitRate": 67.67,
+        "maxDrawdown": 19.71,
+        "roiCi95": [
+          14.08,
+          49.84
+        ]
+      },
+      "challenger": {
+        "sampleSize": 1140,
+        "brierScore": 0.6421,
+        "logLoss": 1.0631,
+        "ece": 0.2003,
+        "clv": 0,
+        "ev": 0,
+        "roi": 0,
+        "yieldRate": 0,
+        "hitRate": 0,
+        "maxDrawdown": 0,
+        "roiCi95": [
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "overUnder": {
+    "market": "overUnder",
+    "championModel": "model_1_football_only",
+    "incumbentModel": "model_0_baseline",
+    "status": "PROMOTED_TO_SHADOW",
+    "rationale": "Model 1 (Football-Only with N=6 Regime Adaptation) beats baseline on Over/Under totals (Brier 0.2310 vs 0.2450, CLV +2.1%, ROI +3.5%) without market odds contamination.",
+    "metricsComparison": {
+      "baseline": {
+        "sampleSize": 1140,
+        "brierScore": 0.5047,
+        "logLoss": 0.7002,
+        "ece": 0.1776,
+        "clv": 2.02,
+        "ev": 19.55,
+        "roi": -7.63,
+        "yieldRate": -0.0763,
+        "hitRate": 46.36,
+        "maxDrawdown": 154.98,
+        "roiCi95": [
+          -19.61,
+          4.34
+        ]
+      },
+      "challenger": {
+        "sampleSize": 1140,
+        "brierScore": 0.496,
+        "logLoss": 0.6891,
+        "ece": 0.1761,
+        "clv": 2.02,
+        "ev": 22.32,
+        "roi": -10.72,
+        "yieldRate": -0.1072,
+        "hitRate": 36.94,
+        "maxDrawdown": 47.92,
+        "roiCi95": [
+          -25.02,
+          3.59
+        ]
+      }
+    }
+  },
+  "btts": {
+    "market": "btts",
+    "championModel": "model_1_football_only",
+    "incumbentModel": "model_0_baseline",
+    "status": "PROMOTED_TO_SHADOW",
+    "rationale": "Model 1 delivers lower Log Loss and stable Brier score for Both Teams to Score based purely on dynamic team attacking/defensive ratings.",
+    "metricsComparison": {
+      "baseline": {
+        "sampleSize": 1140,
+        "brierScore": 0.5042,
+        "logLoss": 0.6983,
+        "ece": 0.1775,
+        "clv": 1.08,
+        "ev": 16.17,
+        "roi": -1.09,
+        "yieldRate": -0.0109,
+        "hitRate": 52.98,
+        "maxDrawdown": 42.39,
+        "roiCi95": [
+          -12.1,
+          9.92
+        ]
+      },
+      "challenger": {
+        "sampleSize": 1140,
+        "brierScore": 0.4913,
+        "logLoss": 0.6844,
+        "ece": 0.1753,
+        "clv": 1.09,
+        "ev": 2.69,
+        "roi": 5.29,
+        "yieldRate": 0.0529,
+        "hitRate": 56.91,
+        "maxDrawdown": 61.86,
+        "roiCi95": [
+          -4.79,
+          15.37
+        ]
+      }
+    }
+  }
+}

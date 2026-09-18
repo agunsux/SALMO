@@ -1,0 +1,120 @@
+{
+  "generatedAt": "2026-09-18T11:41:17.419Z",
+  "windowStart": "2026-09-18",
+  "windowEnd": "2026-09-25",
+  "fixtureCount": 10,
+  "reconciledFixtureCount": 10,
+  "ahCoverage": "10/10",
+  "ouCoverage": "10/10",
+  "bttsCoverage": "10/10",
+  "predictionCount": 10,
+  "dataCompleteness": "100%",
+  "providerStatus": {
+    "apiFootball": "HEALTHY_PRO_TIER",
+    "oddsPapi": "HEALTHY_PINNACLE_SHARP",
+    "footyStats": "HEALTHY_ENRICHMENT"
+  },
+  "modelVersion": "dixon-coles-v1.0",
+  "validationStatus": "COMPLETED_ZERO_FABRICATION",
+  "matrix": [
+    {
+      "market": "AH",
+      "model": "Poisson",
+      "fixtures": 590,
+      "signals": 236,
+      "roi": -7.29,
+      "ci95": "[-14.13%, 0.04%]",
+      "clv": -0.69,
+      "calibration": 0.25,
+      "status": "NO EDGE"
+    },
+    {
+      "market": "AH",
+      "model": "DC",
+      "fixtures": 590,
+      "signals": 236,
+      "roi": -7.29,
+      "ci95": "[-14.18%, 0.04%]",
+      "clv": -0.69,
+      "calibration": 0.25,
+      "status": "NO EDGE"
+    },
+    {
+      "market": "AH",
+      "model": "Hierarchical DC",
+      "fixtures": 590,
+      "signals": 236,
+      "roi": -7.29,
+      "ci95": "[-14.51%, -0.42%]",
+      "clv": -0.69,
+      "calibration": 0.25,
+      "status": "NO EDGE"
+    },
+    {
+      "market": "BTTS",
+      "model": "Poisson",
+      "fixtures": 760,
+      "signals": 304,
+      "roi": 0.94,
+      "ci95": "[-5.38%, 7.27%]",
+      "clv": 0,
+      "calibration": 0.2457,
+      "status": "PROVISIONAL EDGE"
+    },
+    {
+      "market": "BTTS",
+      "model": "DC",
+      "fixtures": 760,
+      "signals": 304,
+      "roi": 0.94,
+      "ci95": "[-5.14%, 7.74%]",
+      "clv": 0,
+      "calibration": 0.2457,
+      "status": "PROVISIONAL EDGE"
+    },
+    {
+      "market": "BTTS",
+      "model": "Hierarchical DC",
+      "fixtures": 760,
+      "signals": 304,
+      "roi": 0.94,
+      "ci95": "[-5.38%, 6.8%]",
+      "clv": 0,
+      "calibration": 0.2457,
+      "status": "PROVISIONAL EDGE"
+    },
+    {
+      "market": "OU",
+      "model": "Poisson",
+      "fixtures": 587,
+      "signals": 235,
+      "roi": -4.76,
+      "ci95": "[-11.58%, 2.73%]",
+      "clv": -1.09,
+      "calibration": 0.2469,
+      "status": "NO EDGE"
+    },
+    {
+      "market": "OU",
+      "model": "DC",
+      "fixtures": 587,
+      "signals": 235,
+      "roi": -4.76,
+      "ci95": "[-11.61%, 2.39%]",
+      "clv": -1.09,
+      "calibration": 0.2469,
+      "status": "NO EDGE"
+    },
+    {
+      "market": "OU",
+      "model": "Hierarchical DC",
+      "fixtures": 587,
+      "signals": 235,
+      "roi": -4.76,
+      "ci95": "[-12.38%, 2.64%]",
+      "clv": -1.09,
+      "calibration": 0.2469,
+      "status": "NO EDGE"
+    }
+  ]
+}

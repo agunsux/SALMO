@@ -1,0 +1,1565 @@
+{
+  "schemaVersion": "real-market-yield-preregistration-v1",
+  "datasetHash": "22e8e80a8d9c53aa878972bc42603d9b231fed709357c9d05cf8defc1ac1d727",
+  "bookmaker": "pinnacle",
+  "priceObservation": "opening",
+  "marketUniverse": [
+    "AH",
+    "OU_2_5",
+    "1X2"
+  ],
+  "selectionRule": {
+    "minEvThreshold": 0.02,
+    "stakeUnit": 1,
+    "maxSelectionsPerFixturePerMarket": 1,
+    "tieBreaker": "highest_ev_with_deterministic_fallback"
+  },
+  "oddsBands": [
+    {
+      "bandKey": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20,
+      "inclusiveMin": true,
+      "inclusiveMax": true
+    },
+    {
+      "bandKey": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7,
+      "inclusiveMin": true,
+      "inclusiveMax": false
+    },
+    {
+      "bandKey": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2,
+      "inclusiveMin": true,
+      "inclusiveMax": true
+    },
+    {
+      "bandKey": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3,
+      "inclusiveMin": false,
+      "inclusiveMax": true
+    },
+    {
+      "bandKey": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20,
+      "inclusiveMin": false,
+      "inclusiveMax": true
+    }
+  ],
+  "ahHypothesisFamily": {
+    "individualLines": [
+      -2,
+      -1.75,
+      -1.5,
+      -1.25,
+      -1,
+      -0.75,
+      -0.5,
+      -0.25,
+      0,
+      0.25,
+      0.5,
+      0.75,
+      1,
+      1.25,
+      1.5,
+      1.75,
+      2
+    ],
+    "aggregateFamilies": [
+      "AH_ALL",
+      "AH_FAVOURITE",
+      "AH_UNDERDOG",
+      "AH_LEVEL"
+    ],
+    "excludedLinesDueToCoverage": [
+      -3.5,
+      -3.25,
+      -3,
+      -2.75,
+      -2.5,
+      -2.25,
+      2.25,
+      2.5,
+      3
+    ],
+    "rationale": "Preregistered research design (Option A): 17 individual lines within [-2.00, +2.00] plus 4 aggregates (21 AH targets). Lines with insufficient sample coverage (< 35 matches in Gold) are excluded from individual line evaluation prior to seeing yield results."
+  },
+  "ouHypothesisFamily": {
+    "outcomes": [
+      "OVER",
+      "UNDER"
+    ],
+    "aggregateFamilies": [
+      "OU_ALL"
+    ]
+  },
+  "mlHypothesisFamily": {
+    "outcomes": [
+      "HOME",
+      "DRAW",
+      "AWAY"
+    ],
+    "aggregateFamilies": [
+      "1X2_ALL"
+    ]
+  },
+  "discoveryPeriod": [
+    "2015-2016",
+    "2016-2017",
+    "2017-2018",
+    "2018-2019",
+    "2019-2020",
+    "2020-2021"
+  ],
+  "confirmationPeriod": [
+    "2021-2022",
+    "2022-2023",
+    "2023-2024",
+    "2024-2025",
+    "2025-2026"
+  ],
+  "minimumConfirmationBets": 200,
+  "multipleTesting": {
+    "procedure": "Benjamini-Hochberg",
+    "fdrQ": 0.1,
+    "appliedTo": "COMPLETE_PREREGISTERED_DISCOVERY_FAMILY"
+  },
+  "bootstrap": {
+    "iterations": 1000,
+    "seed": 24301,
+    "ciLevel": 0.95
+  },
+  "settlementRules": {
+    "ah": "settleAsianHandicapBet (canonical ahSettlementEngine.ts)",
+    "ou25": "totalGoals >= 3 ? WIN : LOSS (1.0 unit flat stake)",
+    "ml": "homeWin: h > a, draw: h == a, awayWin: h < a (1.0 unit flat stake)"
+  },
+  "missingDataRules": {
+    "oddsMin": 1.2,
+    "oddsMax": 20,
+    "oddsLteOne": "REJECT",
+    "missingOrMalformed": "REJECT",
+    "duplicates": "DETERMINISTIC_FIRST_SEEN"
+  },
+  "probabilityModel": {
+    "name": "HierarchicalDixonColes-ModelA-v1",
+    "scoreDistribution": "Bivariate Dixon-Coles up to maxGoals = 10",
+    "decayConstant": 0.0018,
+    "l2Penalty": 2
+  },
+  "strictWalkForwardProtocol": {
+    "temporalConstraint": "training_information_timestamp < kickoff(T)",
+    "antiLeakageEnforcement": "hard assertion in predictFixture",
+    "metadataAuditExposed": true
+  },
+  "familySize": 140,
+  "hypotheses": [
+    {
+      "id": "AH|LINE_-2.00|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-2.00",
+      "line": -2,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-2.00|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-2.00",
+      "line": -2,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_-2.00|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-2.00",
+      "line": -2,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_-2.00|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-2.00",
+      "line": -2,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_-2.00|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-2.00",
+      "line": -2,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-1.75|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.75",
+      "line": -1.75,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-1.75|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.75",
+      "line": -1.75,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_-1.75|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.75",
+      "line": -1.75,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_-1.75|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.75",
+      "line": -1.75,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_-1.75|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.75",
+      "line": -1.75,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-1.50|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.50",
+      "line": -1.5,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-1.50|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.50",
+      "line": -1.5,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_-1.50|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.50",
+      "line": -1.5,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_-1.50|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.50",
+      "line": -1.5,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_-1.50|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.50",
+      "line": -1.5,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-1.25|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.25",
+      "line": -1.25,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-1.25|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.25",
+      "line": -1.25,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_-1.25|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.25",
+      "line": -1.25,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_-1.25|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.25",
+      "line": -1.25,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_-1.25|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.25",
+      "line": -1.25,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-1.00|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.00",
+      "line": -1,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-1.00|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.00",
+      "line": -1,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_-1.00|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.00",
+      "line": -1,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_-1.00|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.00",
+      "line": -1,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_-1.00|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-1.00",
+      "line": -1,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-0.75|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.75",
+      "line": -0.75,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-0.75|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.75",
+      "line": -0.75,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_-0.75|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.75",
+      "line": -0.75,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_-0.75|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.75",
+      "line": -0.75,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_-0.75|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.75",
+      "line": -0.75,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-0.50|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.50",
+      "line": -0.5,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-0.50|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.50",
+      "line": -0.5,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_-0.50|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.50",
+      "line": -0.5,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_-0.50|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.50",
+      "line": -0.5,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_-0.50|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.50",
+      "line": -0.5,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-0.25|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.25",
+      "line": -0.25,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_-0.25|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.25",
+      "line": -0.25,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_-0.25|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.25",
+      "line": -0.25,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_-0.25|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.25",
+      "line": -0.25,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_-0.25|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "-0.25",
+      "line": -0.25,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_0.00|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.00",
+      "line": 0,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_0.00|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.00",
+      "line": 0,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_0.00|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.00",
+      "line": 0,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_0.00|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.00",
+      "line": 0,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_0.00|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.00",
+      "line": 0,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_0.25|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.25",
+      "line": 0.25,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_0.25|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.25",
+      "line": 0.25,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_0.25|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.25",
+      "line": 0.25,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_0.25|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.25",
+      "line": 0.25,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_0.25|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.25",
+      "line": 0.25,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_0.50|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.50",
+      "line": 0.5,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_0.50|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.50",
+      "line": 0.5,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_0.50|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.50",
+      "line": 0.5,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_0.50|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.50",
+      "line": 0.5,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_0.50|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.50",
+      "line": 0.5,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_0.75|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.75",
+      "line": 0.75,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_0.75|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.75",
+      "line": 0.75,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_0.75|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.75",
+      "line": 0.75,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_0.75|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.75",
+      "line": 0.75,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_0.75|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "0.75",
+      "line": 0.75,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_1.00|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.00",
+      "line": 1,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_1.00|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.00",
+      "line": 1,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_1.00|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.00",
+      "line": 1,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_1.00|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.00",
+      "line": 1,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_1.00|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.00",
+      "line": 1,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_1.25|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.25",
+      "line": 1.25,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_1.25|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.25",
+      "line": 1.25,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_1.25|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.25",
+      "line": 1.25,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_1.25|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.25",
+      "line": 1.25,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_1.25|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.25",
+      "line": 1.25,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_1.50|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.50",
+      "line": 1.5,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_1.50|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.50",
+      "line": 1.5,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_1.50|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.50",
+      "line": 1.5,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_1.50|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.50",
+      "line": 1.5,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_1.50|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.50",
+      "line": 1.5,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_1.75|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.75",
+      "line": 1.75,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_1.75|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.75",
+      "line": 1.75,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_1.75|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.75",
+      "line": 1.75,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_1.75|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.75",
+      "line": 1.75,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_1.75|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "1.75",
+      "line": 1.75,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_2.00|ALL",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "2.00",
+      "line": 2,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|LINE_2.00|<1.70",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "2.00",
+      "line": 2,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|LINE_2.00|1.70-2.00",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "2.00",
+      "line": 2,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|LINE_2.00|2.01-2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "2.00",
+      "line": 2,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|LINE_2.00|>2.30",
+      "market": "AH",
+      "targetType": "INDIVIDUAL_LINE",
+      "targetKey": "2.00",
+      "line": 2,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|AH_ALL|ALL",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_ALL",
+      "line": null,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|AH_ALL|<1.70",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_ALL",
+      "line": null,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|AH_ALL|1.70-2.00",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_ALL",
+      "line": null,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|AH_ALL|2.01-2.30",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_ALL",
+      "line": null,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|AH_ALL|>2.30",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_ALL",
+      "line": null,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|AH_FAVOURITE|ALL",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_FAVOURITE",
+      "line": null,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|AH_FAVOURITE|<1.70",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_FAVOURITE",
+      "line": null,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|AH_FAVOURITE|1.70-2.00",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_FAVOURITE",
+      "line": null,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|AH_FAVOURITE|2.01-2.30",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_FAVOURITE",
+      "line": null,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|AH_FAVOURITE|>2.30",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_FAVOURITE",
+      "line": null,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|AH_UNDERDOG|ALL",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_UNDERDOG",
+      "line": null,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|AH_UNDERDOG|<1.70",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_UNDERDOG",
+      "line": null,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|AH_UNDERDOG|1.70-2.00",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_UNDERDOG",
+      "line": null,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|AH_UNDERDOG|2.01-2.30",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_UNDERDOG",
+      "line": null,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|AH_UNDERDOG|>2.30",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_UNDERDOG",
+      "line": null,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|AH_LEVEL|ALL",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_LEVEL",
+      "line": null,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "AH|AH_LEVEL|<1.70",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_LEVEL",
+      "line": null,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "AH|AH_LEVEL|1.70-2.00",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_LEVEL",
+      "line": null,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "AH|AH_LEVEL|2.01-2.30",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_LEVEL",
+      "line": null,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "AH|AH_LEVEL|>2.30",
+      "market": "AH",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "AH_LEVEL",
+      "line": null,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "OU_2_5|OVER|ALL",
+      "market": "OU_2_5",
+      "targetType": "OUTCOME",
+      "targetKey": "OVER",
+      "line": 2.5,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "OU_2_5|OVER|<1.70",
+      "market": "OU_2_5",
+      "targetType": "OUTCOME",
+      "targetKey": "OVER",
+      "line": 2.5,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "OU_2_5|OVER|1.70-2.00",
+      "market": "OU_2_5",
+      "targetType": "OUTCOME",
+      "targetKey": "OVER",
+      "line": 2.5,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "OU_2_5|OVER|2.01-2.30",
+      "market": "OU_2_5",
+      "targetType": "OUTCOME",
+      "targetKey": "OVER",
+      "line": 2.5,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "OU_2_5|OVER|>2.30",
+      "market": "OU_2_5",
+      "targetType": "OUTCOME",
+      "targetKey": "OVER",
+      "line": 2.5,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "OU_2_5|UNDER|ALL",
+      "market": "OU_2_5",
+      "targetType": "OUTCOME",
+      "targetKey": "UNDER",
+      "line": 2.5,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "OU_2_5|UNDER|<1.70",
+      "market": "OU_2_5",
+      "targetType": "OUTCOME",
+      "targetKey": "UNDER",
+      "line": 2.5,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "OU_2_5|UNDER|1.70-2.00",
+      "market": "OU_2_5",
+      "targetType": "OUTCOME",
+      "targetKey": "UNDER",
+      "line": 2.5,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "OU_2_5|UNDER|2.01-2.30",
+      "market": "OU_2_5",
+      "targetType": "OUTCOME",
+      "targetKey": "UNDER",
+      "line": 2.5,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "OU_2_5|UNDER|>2.30",
+      "market": "OU_2_5",
+      "targetType": "OUTCOME",
+      "targetKey": "UNDER",
+      "line": 2.5,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "OU_2_5|OU_ALL|ALL",
+      "market": "OU_2_5",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "OU_ALL",
+      "line": 2.5,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "OU_2_5|OU_ALL|<1.70",
+      "market": "OU_2_5",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "OU_ALL",
+      "line": 2.5,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "OU_2_5|OU_ALL|1.70-2.00",
+      "market": "OU_2_5",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "OU_ALL",
+      "line": 2.5,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "OU_2_5|OU_ALL|2.01-2.30",
+      "market": "OU_2_5",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "OU_ALL",
+      "line": 2.5,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "OU_2_5|OU_ALL|>2.30",
+      "market": "OU_2_5",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "OU_ALL",
+      "line": 2.5,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "1X2|HOME|ALL",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "HOME",
+      "line": null,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "1X2|HOME|<1.70",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "HOME",
+      "line": null,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "1X2|HOME|1.70-2.00",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "HOME",
+      "line": null,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "1X2|HOME|2.01-2.30",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "HOME",
+      "line": null,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "1X2|HOME|>2.30",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "HOME",
+      "line": null,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "1X2|DRAW|ALL",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "DRAW",
+      "line": null,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "1X2|DRAW|<1.70",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "DRAW",
+      "line": null,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "1X2|DRAW|1.70-2.00",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "DRAW",
+      "line": null,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "1X2|DRAW|2.01-2.30",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "DRAW",
+      "line": null,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "1X2|DRAW|>2.30",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "DRAW",
+      "line": null,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "1X2|AWAY|ALL",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "AWAY",
+      "line": null,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "1X2|AWAY|<1.70",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "AWAY",
+      "line": null,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "1X2|AWAY|1.70-2.00",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "AWAY",
+      "line": null,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "1X2|AWAY|2.01-2.30",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "AWAY",
+      "line": null,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "1X2|AWAY|>2.30",
+      "market": "1X2",
+      "targetType": "OUTCOME",
+      "targetKey": "AWAY",
+      "line": null,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    },
+    {
+      "id": "1X2|1X2_ALL|ALL",
+      "market": "1X2",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "1X2_ALL",
+      "line": null,
+      "oddsBand": "ALL",
+      "minOdds": 1.2,
+      "maxOdds": 20
+    },
+    {
+      "id": "1X2|1X2_ALL|<1.70",
+      "market": "1X2",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "1X2_ALL",
+      "line": null,
+      "oddsBand": "<1.70",
+      "minOdds": 1.2,
+      "maxOdds": 1.7
+    },
+    {
+      "id": "1X2|1X2_ALL|1.70-2.00",
+      "market": "1X2",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "1X2_ALL",
+      "line": null,
+      "oddsBand": "1.70-2.00",
+      "minOdds": 1.7,
+      "maxOdds": 2
+    },
+    {
+      "id": "1X2|1X2_ALL|2.01-2.30",
+      "market": "1X2",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "1X2_ALL",
+      "line": null,
+      "oddsBand": "2.01-2.30",
+      "minOdds": 2,
+      "maxOdds": 2.3
+    },
+    {
+      "id": "1X2|1X2_ALL|>2.30",
+      "market": "1X2",
+      "targetType": "AGGREGATE_FAMILY",
+      "targetKey": "1X2_ALL",
+      "line": null,
+      "oddsBand": ">2.30",
+      "minOdds": 2.3,
+      "maxOdds": 20
+    }
+  ],
+  "familyHash": "05d8292c14066496f9b83226509536879d1becca8ebafa772370f0787115a2eb"
+}

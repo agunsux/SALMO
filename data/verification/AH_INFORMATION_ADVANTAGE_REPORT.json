@@ -1,0 +1,1088 @@
+{
+  "generatedAt": "2026-09-11T17:55:01.674Z",
+  "timestampAudit": {
+    "sourceName": "football-data.co.uk (Canonical Europe Golden Manifest)",
+    "hasKickoffTime": true,
+    "hasIntradaySnapshots": false,
+    "snapshotLabelsAvailable": [
+      "EARLY / OPENING SNAPSHOT",
+      "CLOSING SNAPSHOT"
+    ],
+    "oddspapiProbeFixturesCount": 4,
+    "historicalIntradayCoveragePct": 0,
+    "dataClassification": "DATA_INSUFFICIENT_FOR_INTRADAY",
+    "governanceNote": "Per Critical Data Rule 2, timestamps must not be fabricated or interpolated. The 3,040-match historical dataset contains discrete Early/Opening and Closing snapshots, but lacks continuous intraday intervals (T-24h, T-12h, T-6h, T-3h, T-1h, T-30m). High-frequency tick data is restricted to 4 probe fixtures in OddsPAPI raw. The continuous efficiency curve is therefore formally classified as DATA INSUFFICIENT, and analyzed strictly as a two-point discrete macro transition."
+  },
+  "twoPointEfficiency": {
+    "earlyBrier": 0.2481,
+    "closingBrier": 0.2502,
+    "brierImprovement": -0.0021,
+    "earlyLogLoss": 0.6895,
+    "closingLogLoss": 0.6937,
+    "logLossImprovement": -0.0042,
+    "earlyEce": 0.0116,
+    "closingEce": 0.0341,
+    "eceImprovement": -0.0225,
+    "earlyOverroundPct": 3.25,
+    "closingOverroundPct": 2.45,
+    "overroundCompression": 0.7999999999999998,
+    "interpretation": "Early market prices exhibit lower forecast error than closing prices, indicating closing line noise or overreaction."
+  },
+  "ablationStats": {
+    "M0": {
+      "bets": 12316,
+      "pushes": 1062,
+      "brier": 0.2902,
+      "logLoss": 0.829,
+      "ece": 0.1567,
+      "hitRate": 50,
+      "allBetsRoi": -2.71,
+      "evPositiveBets": 6239,
+      "evPositiveRoi": -2.48,
+      "evPositiveCi95": [
+        -4.96,
+        0
+      ],
+      "evPositiveClv": -0.16,
+      "positiveFolds": 2,
+      "medianFoldRoi": -1.3,
+      "deltaBrierVsBaseline": 0.04206,
+      "deltaBrierCi95": [
+        0.03816,
+        0.04597
+      ],
+      "deltaBrierPValue": 0,
+      "deltaBrierZ": 21.11
+    },
+    "M1": {
+      "bets": 12316,
+      "pushes": 1062,
+      "brier": 0.3336,
+      "logLoss": 1.0463,
+      "ece": 0.2478,
+      "hitRate": 50,
+      "allBetsRoi": -2.71,
+      "evPositiveBets": 6460,
+      "evPositiveRoi": -2.74,
+      "evPositiveCi95": [
+        -5.17,
+        -0.3
+      ],
+      "evPositiveClv": 0,
+      "positiveFolds": 2,
+      "medianFoldRoi": -2.72,
+      "deltaBrierVsBaseline": 0.08551,
+      "deltaBrierCi95": [
+        0.08015,
+        0.09087
+      ],
+      "deltaBrierPValue": 0,
+      "deltaBrierZ": 31.25
+    },
+    "M2": {
+      "bets": 12316,
+      "pushes": 1062,
+      "brier": 0.3109,
+      "logLoss": 0.9372,
+      "ece": 0.2131,
+      "hitRate": 50,
+      "allBetsRoi": -2.71,
+      "evPositiveBets": 6398,
+      "evPositiveRoi": -1.86,
+      "evPositiveCi95": [
+        -4.32,
+        0.59
+      ],
+      "evPositiveClv": -0.08,
+      "positiveFolds": 4,
+      "medianFoldRoi": -0.95,
+      "deltaBrierVsBaseline": 0.06279,
+      "deltaBrierCi95": [
+        0.05802,
+        0.06756
+      ],
+      "deltaBrierPValue": 0,
+      "deltaBrierZ": 25.81
+    },
+    "M3": {
+      "bets": 12316,
+      "pushes": 1062,
+      "brier": 0.3024,
+      "logLoss": 0.895,
+      "ece": 0.1778,
+      "hitRate": 50,
+      "allBetsRoi": -2.71,
+      "evPositiveBets": 6356,
+      "evPositiveRoi": -2.49,
+      "evPositiveCi95": [
+        -4.95,
+        -0.03
+      ],
+      "evPositiveClv": -0.1,
+      "positiveFolds": 2,
+      "medianFoldRoi": -2.49,
+      "deltaBrierVsBaseline": 0.05423,
+      "deltaBrierCi95": [
+        0.04981,
+        0.05865
+      ],
+      "deltaBrierPValue": 0,
+      "deltaBrierZ": 24.03
+    },
+    "M4": {
+      "bets": 12316,
+      "pushes": 1062,
+      "brier": 0.2965,
+      "logLoss": 0.8604,
+      "ece": 0.1769,
+      "hitRate": 50,
+      "allBetsRoi": -2.71,
+      "evPositiveBets": 6322,
+      "evPositiveRoi": -2.36,
+      "evPositiveCi95": [
+        -4.83,
+        0.1
+      ],
+      "evPositiveClv": -0.03,
+      "positiveFolds": 2,
+      "medianFoldRoi": -2.09,
+      "deltaBrierVsBaseline": 0.0484,
+      "deltaBrierCi95": [
+        0.04419,
+        0.0526
+      ],
+      "deltaBrierPValue": 0,
+      "deltaBrierZ": 22.55
+    },
+    "M5": {
+      "bets": 12316,
+      "pushes": 1062,
+      "brier": 0.3496,
+      "logLoss": 1.1981,
+      "ece": 0.2867,
+      "hitRate": 50,
+      "allBetsRoi": -2.71,
+      "evPositiveBets": 6521,
+      "evPositiveRoi": -1.25,
+      "evPositiveCi95": [
+        -3.67,
+        1.18
+      ],
+      "evPositiveClv": -0.08,
+      "positiveFolds": 4,
+      "medianFoldRoi": -2.13,
+      "deltaBrierVsBaseline": 0.10144,
+      "deltaBrierCi95": [
+        0.09546,
+        0.10742
+      ],
+      "deltaBrierPValue": 0,
+      "deltaBrierZ": 33.25
+    },
+    "M6": {
+      "bets": 12316,
+      "pushes": 1062,
+      "brier": 0.3604,
+      "logLoss": 1.2592,
+      "ece": 0.3072,
+      "hitRate": 50,
+      "allBetsRoi": -2.71,
+      "evPositiveBets": 6549,
+      "evPositiveRoi": -1.8,
+      "evPositiveCi95": [
+        -4.22,
+        0.62
+      ],
+      "evPositiveClv": 0.05,
+      "positiveFolds": 3,
+      "medianFoldRoi": -2.31,
+      "deltaBrierVsBaseline": 0.11229,
+      "deltaBrierCi95": [
+        0.10606,
+        0.11852
+      ],
+      "deltaBrierPValue": 0,
+      "deltaBrierZ": 35.32
+    },
+    "M7": {
+      "bets": 12316,
+      "pushes": 1062,
+      "brier": 0.3648,
+      "logLoss": 1.2732,
+      "ece": 0.3112,
+      "hitRate": 50,
+      "allBetsRoi": -2.71,
+      "evPositiveBets": 6551,
+      "evPositiveRoi": -2.47,
+      "evPositiveCi95": [
+        -4.9,
+        -0.05
+      ],
+      "evPositiveClv": 0.25,
+      "positiveFolds": 1,
+      "medianFoldRoi": -2.32,
+      "deltaBrierVsBaseline": 0.11671,
+      "deltaBrierCi95": [
+        0.11039,
+        0.12302
+      ],
+      "deltaBrierPValue": 0,
+      "deltaBrierZ": 36.22
+    },
+    "F0": {
+      "bets": 12316,
+      "pushes": 1062,
+      "brier": 0.3422,
+      "logLoss": 1.1277,
+      "ece": 0.2611,
+      "hitRate": 50,
+      "allBetsRoi": -2.71,
+      "evPositiveBets": 6535,
+      "evPositiveRoi": -2.23,
+      "evPositiveCi95": [
+        -4.66,
+        0.19
+      ],
+      "evPositiveClv": 0.14,
+      "positiveFolds": 1,
+      "medianFoldRoi": -3.66,
+      "deltaBrierVsBaseline": 0.09409,
+      "deltaBrierCi95": [
+        0.08841,
+        0.09977
+      ],
+      "deltaBrierPValue": 0,
+      "deltaBrierZ": 32.46
+    }
+  },
+  "earlyVsClosing": {
+    "earlyMarketStats": {
+      "bets": 12316,
+      "pushes": 1062,
+      "brier": 0.2481,
+      "logLoss": 0.6895,
+      "ece": 0.0116,
+      "hitRate": 50,
+      "allBetsRoi": -2.71,
+      "evPositiveBets": 564,
+      "evPositiveRoi": 9.33,
+      "evPositiveCi95": [
+        1.08,
+        17.58
+      ],
+      "evPositiveClv": 0.36,
+      "positiveFolds": 8,
+      "medianFoldRoi": 6.58,
+      "deltaBrierVsBaseline": 0,
+      "deltaBrierCi95": [
+        0,
+        0
+      ],
+      "deltaBrierPValue": 1,
+      "deltaBrierZ": 0
+    },
+    "closingMarketStats": {
+      "bets": 5676,
+      "pushes": 404,
+      "brier": 0.2502,
+      "logLoss": 0.6937,
+      "ece": 0.0341,
+      "hitRate": 50,
+      "allBetsRoi": -1.71,
+      "evPositiveBets": 583,
+      "evPositiveRoi": 6.4,
+      "evPositiveCi95": [
+        -1.71,
+        14.52
+      ],
+      "evPositiveClv": 0,
+      "positiveFolds": 4,
+      "medianFoldRoi": 3.08,
+      "deltaBrierVsBaseline": 0,
+      "deltaBrierCi95": [
+        0,
+        0
+      ],
+      "deltaBrierPValue": 1,
+      "deltaBrierZ": 0
+    },
+    "earlyPlusFootballStats": {
+      "bets": 12316,
+      "pushes": 1062,
+      "brier": 0.3648,
+      "logLoss": 1.2732,
+      "ece": 0.3112,
+      "hitRate": 50,
+      "allBetsRoi": -2.71,
+      "evPositiveBets": 6551,
+      "evPositiveRoi": -2.47,
+      "evPositiveCi95": [
+        -4.9,
+        -0.05
+      ],
+      "evPositiveClv": 0.25,
+      "positiveFolds": 1,
+      "medianFoldRoi": -2.32,
+      "deltaBrierVsBaseline": 0.11671,
+      "deltaBrierCi95": [
+        0.11039,
+        0.12302
+      ],
+      "deltaBrierPValue": 0,
+      "deltaBrierZ": 36.22
+    },
+    "earlyPlusFootballPlusMovementStats": {
+      "bets": 12316,
+      "pushes": 1062,
+      "brier": 0.3684,
+      "logLoss": 1.3437,
+      "ece": 0.3171,
+      "hitRate": 50,
+      "allBetsRoi": -2.71,
+      "evPositiveBets": 6543,
+      "evPositiveRoi": -0.98,
+      "evPositiveCi95": [
+        -3.4,
+        1.45
+      ],
+      "evPositiveClv": 0.62,
+      "positiveFolds": 4,
+      "medianFoldRoi": -1.21,
+      "deltaBrierVsBaseline": 0.12023,
+      "deltaBrierCi95": [
+        0.11377,
+        0.12669
+      ],
+      "deltaBrierPValue": 0,
+      "deltaBrierZ": 36.45
+    },
+    "footballOnlyStats": {
+      "bets": 12316,
+      "pushes": 1062,
+      "brier": 0.3422,
+      "logLoss": 1.1277,
+      "ece": 0.2611,
+      "hitRate": 50,
+      "allBetsRoi": -2.71,
+      "evPositiveBets": 6535,
+      "evPositiveRoi": -2.23,
+      "evPositiveCi95": [
+        -4.66,
+        0.19
+      ],
+      "evPositiveClv": 0.14,
+      "positiveFolds": 1,
+      "medianFoldRoi": -3.66,
+      "deltaBrierVsBaseline": 0.09409,
+      "deltaBrierCi95": [
+        0.08841,
+        0.09977
+      ],
+      "deltaBrierPValue": 0,
+      "deltaBrierZ": 32.46
+    }
+  },
+  "lineMovementResults": [
+    {
+      "pattern": "LINE_MOVES_TOWARD_FAVORITE",
+      "n": 1088,
+      "wins": 485,
+      "pushes": 118,
+      "losses": 485,
+      "hitRate": 50,
+      "roi": -1.97,
+      "ci95": [
+        -7.91,
+        3.97
+      ],
+      "brier": 0.4067,
+      "avgClv": null
+    },
+    {
+      "pattern": "LINE_MOVES_TOWARD_UNDERDOG",
+      "n": 1024,
+      "wins": 488,
+      "pushes": 48,
+      "losses": 488,
+      "hitRate": 50,
+      "roi": -2.7,
+      "ci95": [
+        -8.82,
+        3.43
+      ],
+      "brier": 0.3726,
+      "avgClv": null
+    },
+    {
+      "pattern": "PRICE_COMPRESSION",
+      "n": 1106,
+      "wins": 518,
+      "pushes": 70,
+      "losses": 518,
+      "hitRate": 50,
+      "roi": -1.75,
+      "ci95": [
+        -7.65,
+        4.14
+      ],
+      "brier": 0.347,
+      "avgClv": 0.08
+    },
+    {
+      "pattern": "PRICE_EXPANSION",
+      "n": 1222,
+      "wins": 567,
+      "pushes": 88,
+      "losses": 567,
+      "hitRate": 50,
+      "roi": -1.76,
+      "ci95": [
+        -7.37,
+        3.85
+      ],
+      "brier": 0.3915,
+      "avgClv": -0.02
+    },
+    {
+      "pattern": "LINE_UNCHANGED_PRICE_CHANGES",
+      "n": 952,
+      "wins": 451,
+      "pushes": 50,
+      "losses": 451,
+      "hitRate": 50,
+      "roi": -1.83,
+      "ci95": [
+        -8.18,
+        4.52
+      ],
+      "brier": 0.3488,
+      "avgClv": -0.18
+    },
+    {
+      "pattern": "PRICE_UNCHANGED_LINE_CHANGES",
+      "n": 204,
+      "wins": 96,
+      "pushes": 12,
+      "losses": 96,
+      "hitRate": 50,
+      "roi": -2.17,
+      "ci95": [
+        -15.89,
+        11.56
+      ],
+      "brier": 0.3803,
+      "avgClv": null
+    },
+    {
+      "pattern": "NO_MOVEMENT",
+      "n": 7782,
+      "wins": 3553,
+      "pushes": 676,
+      "losses": 3553,
+      "hitRate": 50,
+      "roi": -3.22,
+      "ci95": [
+        -5.44,
+        -1
+      ],
+      "brier": 0.358,
+      "avgClv": -0.16
+    }
+  ],
+  "clvDecomposition": {
+    "totalEarlyBets": 13378,
+    "betsWithClosingQuote": 3758,
+    "avgClv": -0.05,
+    "positiveClvPct": 45.5,
+    "realizedRoiAll": -1.82,
+    "realizedRoiPositiveClv": -0.85,
+    "realizedRoiNegativeClv": -2.62,
+    "clvToRoiPearsonCorr": 0.026,
+    "conclusion": "Negative mean CLV corresponds to negative realized ROI, confirming market convergence toward closing efficiency."
+  },
+  "incrementalTests": [
+    {
+      "testedAddition": "Team Form (last 3/5/10, venue, PPM)",
+      "baselineModel": "M0 (Market)",
+      "augmentedModel": "M1 (Market + Form)",
+      "deltaBrier": 0.0434,
+      "deltaBrierCi95": [
+        0.03804,
+        0.04876
+      ],
+      "zScore": -15.86,
+      "pValue": 0,
+      "deltaLogLoss": 0.2173,
+      "deltaEce": 0.0911,
+      "deltaRoi": -0.26,
+      "isStatisticallySignificant": false
+    },
+    {
+      "testedAddition": "Team Strength (Elo, rolling, opponent-adjusted)",
+      "baselineModel": "M0 (Market)",
+      "augmentedModel": "M2 (Market + Strength)",
+      "deltaBrier": 0.0207,
+      "deltaBrierCi95": [
+        0.01593,
+        0.02547
+      ],
+      "zScore": -8.51,
+      "pValue": 0,
+      "deltaLogLoss": 0.1082,
+      "deltaEce": 0.0564,
+      "deltaRoi": 0.62,
+      "isStatisticallySignificant": false
+    },
+    {
+      "testedAddition": "Match Context (Rest, Home Advantage, Density)",
+      "baselineModel": "M0 (Market)",
+      "augmentedModel": "M3 (Market + Context)",
+      "deltaBrier": 0.0122,
+      "deltaBrierCi95": [
+        0.00778,
+        0.01662
+      ],
+      "zScore": -5.41,
+      "pValue": 0,
+      "deltaLogLoss": 0.066,
+      "deltaEce": 0.0211,
+      "deltaRoi": -0.01,
+      "isStatisticallySignificant": false
+    },
+    {
+      "testedAddition": "Goal Environment (Scoring rates, Over/Under)",
+      "baselineModel": "M0 (Market)",
+      "augmentedModel": "M4 (Market + Goal Env)",
+      "deltaBrier": 0.0063,
+      "deltaBrierCi95": [
+        0.00209,
+        0.01051
+      ],
+      "zScore": -2.94,
+      "pValue": 0,
+      "deltaLogLoss": 0.0314,
+      "deltaEce": 0.0202,
+      "deltaRoi": 0.12,
+      "isStatisticallySignificant": false
+    },
+    {
+      "testedAddition": "Form + Strength combined",
+      "baselineModel": "M0 (Market)",
+      "augmentedModel": "M5 (Market + Form + Strength)",
+      "deltaBrier": 0.0594,
+      "deltaBrierCi95": [
+        0.05342,
+        0.06538
+      ],
+      "zScore": -19.47,
+      "pValue": 0,
+      "deltaLogLoss": 0.3691,
+      "deltaEce": 0.13,
+      "deltaRoi": 1.23,
+      "isStatisticallySignificant": false
+    },
+    {
+      "testedAddition": "All Football Features (Form + Strength + Context + Goal)",
+      "baselineModel": "M0 (Market)",
+      "augmentedModel": "M7 (Market + All Football)",
+      "deltaBrier": 0.0746,
+      "deltaBrierCi95": [
+        0.06828,
+        0.08092
+      ],
+      "zScore": -23.15,
+      "pValue": 0,
+      "deltaLogLoss": 0.4442,
+      "deltaEce": 0.1545,
+      "deltaRoi": 0.01,
+      "isStatisticallySignificant": false
+    },
+    {
+      "testedAddition": "Line & Price Movement (Early -> Closing bridge)",
+      "baselineModel": "M7 (Early + All Football)",
+      "augmentedModel": "M7 + Movement",
+      "deltaBrier": 0.0782,
+      "deltaBrierCi95": [
+        0.07173,
+        0.08467
+      ],
+      "zScore": -23.71,
+      "pValue": 0,
+      "deltaLogLoss": 0.5147,
+      "deltaEce": 0.1604,
+      "deltaRoi": 1.5,
+      "isStatisticallySignificant": false
+    }
+  ],
+  "leagueStability": [
+    {
+      "leagueId": "DEU-BUNDESLIGA",
+      "leagueName": "Bundesliga",
+      "n": 1120,
+      "modelBrier": 0.3783,
+      "marketBrier": 0.2471,
+      "deltaBrier": 0.1312,
+      "evPositiveBets": 597,
+      "evPositiveRoi": -2.81,
+      "ci95": [
+        -10.83,
+        5.21
+      ],
+      "signalDirection": "UNDERPERFORM"
+    },
+    {
+      "leagueId": "ENG-PL",
+      "leagueName": "Premier League",
+      "n": 7074,
+      "modelBrier": 0.3832,
+      "marketBrier": 0.2495,
+      "deltaBrier": 0.1337,
+      "evPositiveBets": 3727,
+      "evPositiveRoi": -2.47,
+      "ci95": [
+        -5.68,
+        0.74
+      ],
+      "signalDirection": "UNDERPERFORM"
+    },
+    {
+      "leagueId": "ESP-LALIGA",
+      "leagueName": "La Liga",
+      "n": 2110,
+      "modelBrier": 0.3832,
+      "marketBrier": 0.247,
+      "deltaBrier": 0.1362,
+      "evPositiveBets": 1123,
+      "evPositiveRoi": 1.03,
+      "ci95": [
+        -4.81,
+        6.88
+      ],
+      "signalDirection": "UNDERPERFORM"
+    },
+    {
+      "leagueId": "FRA-LIGUE1",
+      "leagueName": "Ligue 1",
+      "n": 1376,
+      "modelBrier": 0.3747,
+      "marketBrier": 0.2476,
+      "deltaBrier": 0.1271,
+      "evPositiveBets": 731,
+      "evPositiveRoi": -4.08,
+      "ci95": [
+        -11.33,
+        3.17
+      ],
+      "signalDirection": "UNDERPERFORM"
+    },
+    {
+      "leagueId": "ITA-SERIEA",
+      "leagueName": "Serie A",
+      "n": 1318,
+      "modelBrier": 0.3852,
+      "marketBrier": 0.2457,
+      "deltaBrier": 0.1395,
+      "evPositiveBets": 740,
+      "evPositiveRoi": -7.61,
+      "ci95": [
+        -14.82,
+        -0.41
+      ],
+      "signalDirection": "UNDERPERFORM"
+    }
+  ],
+  "robustnessSlices": [
+    {
+      "sliceCategory": "Season",
+      "sliceValue": "2017-2018",
+      "n": 3652,
+      "hitRate": 50,
+      "roi": -3.16,
+      "ci95": [
+        -6.41,
+        0.08
+      ],
+      "clv": null
+    },
+    {
+      "sliceCategory": "Season",
+      "sliceValue": "2018-2019",
+      "n": 3652,
+      "hitRate": 50,
+      "roi": -3.43,
+      "ci95": [
+        -6.67,
+        -0.18
+      ],
+      "clv": null
+    },
+    {
+      "sliceCategory": "Season",
+      "sliceValue": "2019-2020",
+      "n": 1516,
+      "hitRate": 50,
+      "roi": -1.91,
+      "ci95": [
+        -6.95,
+        3.12
+      ],
+      "clv": 0.12
+    },
+    {
+      "sliceCategory": "Season",
+      "sliceValue": "2020-2021",
+      "n": 760,
+      "hitRate": 50,
+      "roi": -1.69,
+      "ci95": [
+        -8.8,
+        5.42
+      ],
+      "clv": 0.1
+    },
+    {
+      "sliceCategory": "Season",
+      "sliceValue": "2021-2022",
+      "n": 760,
+      "hitRate": 50,
+      "roi": -1.73,
+      "ci95": [
+        -8.84,
+        5.38
+      ],
+      "clv": 0.08
+    },
+    {
+      "sliceCategory": "Season",
+      "sliceValue": "2022-2023",
+      "n": 760,
+      "hitRate": 50,
+      "roi": -1.97,
+      "ci95": [
+        -9.08,
+        5.14
+      ],
+      "clv": -0.02
+    },
+    {
+      "sliceCategory": "Season",
+      "sliceValue": "2023-2024",
+      "n": 760,
+      "hitRate": 50,
+      "roi": -2,
+      "ci95": [
+        -9.11,
+        5.11
+      ],
+      "clv": -0.34
+    },
+    {
+      "sliceCategory": "Season",
+      "sliceValue": "2024-2025",
+      "n": 760,
+      "hitRate": 50,
+      "roi": -2.31,
+      "ci95": [
+        -9.42,
+        4.8
+      ],
+      "clv": -0.37
+    },
+    {
+      "sliceCategory": "Season",
+      "sliceValue": "2025-2026",
+      "n": 758,
+      "hitRate": 50,
+      "roi": -2.51,
+      "ci95": [
+        -9.63,
+        4.61
+      ],
+      "clv": -0.11
+    },
+    {
+      "sliceCategory": "Role",
+      "sliceValue": "Favorite",
+      "n": 6671,
+      "hitRate": 46.2,
+      "roi": -5.05,
+      "ci95": [
+        -7.45,
+        -2.66
+      ],
+      "clv": -0.31
+    },
+    {
+      "sliceCategory": "Role",
+      "sliceValue": "Underdog",
+      "n": 6101,
+      "hitRate": 54.2,
+      "roi": -0.23,
+      "ci95": [
+        -2.74,
+        2.28
+      ],
+      "clv": -0.09
+    },
+    {
+      "sliceCategory": "Role",
+      "sliceValue": "Market Neutral (AH 0)",
+      "n": 606,
+      "hitRate": 47.7,
+      "roi": -1.83,
+      "ci95": [
+        -9.8,
+        6.13
+      ],
+      "clv": 2.36
+    },
+    {
+      "sliceCategory": "Line Type",
+      "sliceValue": "Zero Line (0.0)",
+      "n": 1176,
+      "hitRate": 50,
+      "roi": -1.89,
+      "ci95": [
+        -7.61,
+        3.82
+      ],
+      "clv": -0.04
+    },
+    {
+      "sliceCategory": "Line Type",
+      "sliceValue": "Quarter Lines (±0.25, ±0.75, ±1.25)",
+      "n": 6730,
+      "hitRate": 50,
+      "roi": -2.58,
+      "ci95": [
+        -4.97,
+        -0.19
+      ],
+      "clv": -0.06
+    },
+    {
+      "sliceCategory": "Line Type",
+      "sliceValue": "Half Lines (±0.5, ±1.5)",
+      "n": 2746,
+      "hitRate": 50,
+      "roi": -3.08,
+      "ci95": [
+        -6.82,
+        0.66
+      ],
+      "clv": -0.05
+    },
+    {
+      "sliceCategory": "Line Type",
+      "sliceValue": "Integer Lines (±1.0, ±2.0)",
+      "n": 2726,
+      "hitRate": 50,
+      "roi": -3.01,
+      "ci95": [
+        -6.76,
+        0.75
+      ],
+      "clv": -0.01
+    },
+    {
+      "sliceCategory": "Odds Range",
+      "sliceValue": "< 1.80",
+      "n": 1635,
+      "hitRate": 58.6,
+      "roi": -0.55,
+      "ci95": [
+        -5.4,
+        4.3
+      ],
+      "clv": -5.66
+    },
+    {
+      "sliceCategory": "Odds Range",
+      "sliceValue": "1.80 - 2.05",
+      "n": 8927,
+      "hitRate": 50.4,
+      "roi": -2.62,
+      "ci95": [
+        -4.7,
+        -0.55
+      ],
+      "clv": -0.66
+    },
+    {
+      "sliceCategory": "Odds Range",
+      "sliceValue": "> 2.05",
+      "n": 2816,
+      "hitRate": 43.8,
+      "roi": -4.24,
+      "ci95": [
+        -7.94,
+        -0.55
+      ],
+      "clv": 3.96
+    },
+    {
+      "sliceCategory": "EV Threshold",
+      "sliceValue": "EV >= 0%",
+      "n": 6551,
+      "hitRate": 50.9,
+      "roi": -2.47,
+      "ci95": [
+        -4.9,
+        -0.05
+      ],
+      "clv": 0.25
+    },
+    {
+      "sliceCategory": "EV Threshold",
+      "sliceValue": "EV >= 1%",
+      "n": 6487,
+      "hitRate": 51,
+      "roi": -2.38,
+      "ci95": [
+        -4.82,
+        0.05
+      ],
+      "clv": 0.24
+    },
+    {
+      "sliceCategory": "EV Threshold",
+      "sliceValue": "EV >= 2%",
+      "n": 6418,
+      "hitRate": 51,
+      "roi": -2.44,
+      "ci95": [
+        -4.89,
+        0
+      ],
+      "clv": 0.24
+    },
+    {
+      "sliceCategory": "EV Threshold",
+      "sliceValue": "EV >= 3%",
+      "n": 6367,
+      "hitRate": 51,
+      "roi": -2.45,
+      "ci95": [
+        -4.91,
+        0
+      ],
+      "clv": 0.22
+    },
+    {
+      "sliceCategory": "EV Threshold",
+      "sliceValue": "EV >= 5%",
+      "n": 6269,
+      "hitRate": 51,
+      "roi": -2.44,
+      "ci95": [
+        -4.92,
+        0.04
+      ],
+      "clv": 0.25
+    },
+    {
+      "sliceCategory": "EV Threshold",
+      "sliceValue": "EV >= 7%",
+      "n": 6163,
+      "hitRate": 51,
+      "roi": -2.34,
+      "ci95": [
+        -4.84,
+        0.15
+      ],
+      "clv": 0.24
+    },
+    {
+      "sliceCategory": "EV Threshold",
+      "sliceValue": "EV >= 10%",
+      "n": 6034,
+      "hitRate": 50.9,
+      "roi": -2.5,
+      "ci95": [
+        -5.02,
+        0.03
+      ],
+      "clv": 0.24
+    }
+  ],
+  "multipleTestingAudit": [
+    {
+      "hypothesisId": "H1_M1__Market___Form_",
+      "description": "Incremental edge from Team Form (last 3/5/10, venue, PPM)",
+      "rawPValue": 1,
+      "bonferroniThreshold": 0.00714,
+      "fdrQValue": 1,
+      "isFdrSignificant": false
+    },
+    {
+      "hypothesisId": "H2_M2__Market___Strength_",
+      "description": "Incremental edge from Team Strength (Elo, rolling, opponent-adjusted)",
+      "rawPValue": 1,
+      "bonferroniThreshold": 0.00714,
+      "fdrQValue": 1,
+      "isFdrSignificant": false
+    },
+    {
+      "hypothesisId": "H3_M3__Market___Context_",
+      "description": "Incremental edge from Match Context (Rest, Home Advantage, Density)",
+      "rawPValue": 1,
+      "bonferroniThreshold": 0.00714,
+      "fdrQValue": 1,
+      "isFdrSignificant": false
+    },
+    {
+      "hypothesisId": "H4_M4__Market___Goal_Env_",
+      "description": "Incremental edge from Goal Environment (Scoring rates, Over/Under)",
+      "rawPValue": 1,
+      "bonferroniThreshold": 0.00714,
+      "fdrQValue": 1,
+      "isFdrSignificant": false
+    },
+    {
+      "hypothesisId": "H5_M5__Market___Form___Strength_",
+      "description": "Incremental edge from Form + Strength combined",
+      "rawPValue": 1,
+      "bonferroniThreshold": 0.00714,
+      "fdrQValue": 1,
+      "isFdrSignificant": false
+    },
+    {
+      "hypothesisId": "H6_M7__Market___All_Football_",
+      "description": "Incremental edge from All Football Features (Form + Strength + Context + Goal)",
+      "rawPValue": 1,
+      "bonferroniThreshold": 0.00714,
+      "fdrQValue": 1,
+      "isFdrSignificant": false
+    },
+    {
+      "hypothesisId": "H7_M7___Movement",
+      "description": "Incremental edge from Line & Price Movement (Early -> Closing bridge)",
+      "rawPValue": 1,
+      "bonferroniThreshold": 0.00714,
+      "fdrQValue": 1,
+      "isFdrSignificant": false
+    }
+  ],
+  "verdict": {
+    "verdictCode": "C",
+    "verdictLabel": "NO DEMONSTRATED INFORMATION ADVANTAGE",
+    "verdictDescription": "Early market prices incorporate nearly all measurable fundamental information. Fundamental features fail to generate statistically significant edge over market quotes.",
+    "threeQuestions": {
+      "questionA": {
+        "title": "Question A: Can we predict AH settlement?",
+        "answered": false,
+        "summary": "NO. Model cannot beat naive settlement baselines."
+      },
+      "questionB": {
+        "title": "Question B: Can we predict better than the opening market?",
+        "answered": false,
+        "summary": "NO. Early market quotes already reflect equal or superior predictive calibration (Early Market Brier: 0.2481, Early+Football: 0.3648)."
+      },
+      "questionC": {
+        "title": "Question C: Can we generate positive realized betting ROI?",
+        "answered": false,
+        "summary": "NO. Realized betting ROI is negative (-2.47%), confirming bookmaker margin barrier."
+      }
+    }
+  }
+}

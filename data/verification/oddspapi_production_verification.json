@@ -1,0 +1,66 @@
+{
+  "timestamp": "2026-08-15T09:23:27.887Z",
+  "environment": {
+    "local_env": "ABSENT",
+    "local_env_production": "ABSENT",
+    "vercel_production": "PRESENT"
+  },
+  "authentication": {
+    "status": "AUTH_EMPTY",
+    "http_status_com": null,
+    "http_status_io": null,
+    "error_code": "LOCAL_KEY_EMPTY",
+    "error_message": "ODDS_PAPI_KEY is EMPTY in local environment. Vercel Production has encrypted key set 17d ago.",
+    "active_base_url": null
+  },
+  "odds_data": {
+    "sports_returned": 0,
+    "football_sports": [],
+    "fixtures_returned": 0,
+    "odds_records_returned": 0,
+    "bookmakers_found": [],
+    "markets_found": [],
+    "sample_fixture_ids": [],
+    "timestamps_present": false,
+    "kickoff_present": false
+  },
+  "bookmakers": {
+    "pinnacle": "NOT_AVAILABLE",
+    "circa": "NOT_AVAILABLE",
+    "sbo": "NOT_AVAILABLE"
+  },
+  "markets": {
+    "moneyline": "NOT_AVAILABLE",
+    "asian_handicap": "NOT_AVAILABLE",
+    "over_under": "NOT_AVAILABLE",
+    "btts": "NOT_AVAILABLE"
+  },
+  "fixture_linkage": {
+    "tested": 0,
+    "matched": 0,
+    "unmatched": 0,
+    "match_rate": "N/A"
+  },
+  "model_snapshot_linkage": {
+    "tested": 0,
+    "matched": 0,
+    "missing": 0
+  },
+  "c3_readiness": {
+    "status": "VERIFICATION_BLOCKED",
+    "checklist": {
+      "production_credential_present": true,
+      "authentication_succeeds": false,
+      "real_odds_returned": false,
+      "bookmaker_identity_available": false,
+      "market_identity_available": false,
+      "line_identity_available": false,
+      "timestamp_available": false,
+      "fixture_mapping_works": false,
+      "model_snapshot_mapping_possible": false,
+      "no_synthetic_odds_required": false
+    },
+    "blocker": "Key exists in Vercel but EMPTY locally — cannot authenticate. Provide local key for live test.",
+    "recommended_action": "Pull key from OddsPAPI dashboard and test locally OR verify Production key validity via smoke test endpoint"
+  }
+}

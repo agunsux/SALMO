@@ -1,0 +1,3014 @@
+{
+  "datasetHash": "22e8e80a8d9c53aa878972bc42603d9b231fed709357c9d05cf8defc1ac1d727",
+  "matchesCount": 8898,
+  "oddsRowCount": 77471,
+  "bookmakerCoverage": {
+    "betbrain": {
+      "opening": {
+        "AH": 5858,
+        "OU": 5858
+      }
+    },
+    "pinnacle": {
+      "opening": {
+        "AH": 8897,
+        "ML": 8898,
+        "OU": 8898
+      },
+      "closing": {
+        "ML": 8896,
+        "AH": 3040,
+        "OU": 3040
+      }
+    },
+    "bet365": {
+      "opening": {
+        "ML": 8898,
+        "AH": 3030,
+        "OU": 3039
+      },
+      "closing": {
+        "AH": 3039,
+        "ML": 3040,
+        "OU": 3040
+      }
+    }
+  },
+  "ahLinesByBookmaker": {
+    "betbrain": {
+      "opening": {
+        "0": {
+          "line": 0,
+          "totalCount": 455,
+          "validOddsCount": 455,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 175,
+            "2017-2018": 105,
+            "2018-2019": 131,
+            "2015-2016": 44
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 97,
+            "ENG-PL": 76,
+            "ESP-LALIGA": 61,
+            "FRA-LIGUE1": 132,
+            "ITA-SERIEA": 89
+          },
+          "oddsMin": 1.52,
+          "oddsMax": 2.62
+        },
+        "1": {
+          "line": 1,
+          "totalCount": 359,
+          "validOddsCount": 359,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 117,
+            "2017-2018": 79,
+            "2018-2019": 145,
+            "2015-2016": 18
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 46,
+            "ENG-PL": 122,
+            "ESP-LALIGA": 48,
+            "FRA-LIGUE1": 36,
+            "ITA-SERIEA": 107
+          },
+          "oddsMin": 1.44,
+          "oddsMax": 2.84
+        },
+        "2": {
+          "line": 2,
+          "totalCount": 65,
+          "validOddsCount": 65,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 18,
+            "2017-2018": 25,
+            "2018-2019": 22
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 11,
+            "ENG-PL": 11,
+            "ESP-LALIGA": 20,
+            "FRA-LIGUE1": 12,
+            "ITA-SERIEA": 11
+          },
+          "oddsMin": 1.61,
+          "oddsMax": 2.37
+        },
+        "3": {
+          "line": 3,
+          "totalCount": 1,
+          "validOddsCount": 1,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 1
+          },
+          "leagues": {
+            "ESP-LALIGA": 1
+          },
+          "oddsMin": 1.91,
+          "oddsMax": 1.95
+        },
+        "-2.5": {
+          "line": -2.5,
+          "totalCount": 73,
+          "validOddsCount": 73,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 29,
+            "2017-2018": 17,
+            "2018-2019": 27
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 13,
+            "ENG-PL": 11,
+            "ESP-LALIGA": 27,
+            "FRA-LIGUE1": 12,
+            "ITA-SERIEA": 10
+          },
+          "oddsMin": 1.66,
+          "oddsMax": 3.53
+        },
+        "-1.5": {
+          "line": -1.5,
+          "totalCount": 304,
+          "validOddsCount": 304,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 102,
+            "2017-2018": 54,
+            "2018-2019": 120,
+            "2015-2016": 28
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 46,
+            "ENG-PL": 102,
+            "ESP-LALIGA": 38,
+            "FRA-LIGUE1": 38,
+            "ITA-SERIEA": 80
+          },
+          "oddsMin": 1.6,
+          "oddsMax": 2.39
+        },
+        "0.25": {
+          "line": 0.25,
+          "totalCount": 590,
+          "validOddsCount": 590,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 153,
+            "2017-2018": 185,
+            "2018-2019": 212,
+            "2015-2016": 40
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 97,
+            "ENG-PL": 155,
+            "ESP-LALIGA": 131,
+            "FRA-LIGUE1": 95,
+            "ITA-SERIEA": 112
+          },
+          "oddsMin": 1.56,
+          "oddsMax": 2.47
+        },
+        "-1": {
+          "line": -1,
+          "totalCount": 822,
+          "validOddsCount": 822,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 226,
+            "2017-2018": 173,
+            "2018-2019": 377,
+            "2015-2016": 46
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 149,
+            "ENG-PL": 174,
+            "ESP-LALIGA": 170,
+            "FRA-LIGUE1": 128,
+            "ITA-SERIEA": 201
+          },
+          "oddsMin": 1.4,
+          "oddsMax": 3.02
+        },
+        "-0.25": {
+          "line": -0.25,
+          "totalCount": 1290,
+          "validOddsCount": 1290,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 361,
+            "2017-2018": 457,
+            "2018-2019": 412,
+            "2015-2016": 60
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 187,
+            "ENG-PL": 350,
+            "ESP-LALIGA": 271,
+            "FRA-LIGUE1": 310,
+            "ITA-SERIEA": 172
+          },
+          "oddsMin": 1.58,
+          "oddsMax": 2.47
+        },
+        "1.5": {
+          "line": 1.5,
+          "totalCount": 126,
+          "validOddsCount": 126,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 44,
+            "2017-2018": 37,
+            "2018-2019": 45
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 19,
+            "ENG-PL": 37,
+            "ESP-LALIGA": 26,
+            "FRA-LIGUE1": 20,
+            "ITA-SERIEA": 24
+          },
+          "oddsMin": 1.62,
+          "oddsMax": 2.36
+        },
+        "0.5": {
+          "line": 0.5,
+          "totalCount": 197,
+          "validOddsCount": 197,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 63,
+            "2017-2018": 54,
+            "2018-2019": 57,
+            "2015-2016": 23
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 39,
+            "ENG-PL": 41,
+            "ESP-LALIGA": 24,
+            "FRA-LIGUE1": 42,
+            "ITA-SERIEA": 51
+          },
+          "oddsMin": 1.63,
+          "oddsMax": 2.69
+        },
+        "-0.5": {
+          "line": -0.5,
+          "totalCount": 504,
+          "validOddsCount": 504,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 227,
+            "2017-2018": 138,
+            "2018-2019": 75,
+            "2015-2016": 64
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 80,
+            "ENG-PL": 129,
+            "ESP-LALIGA": 84,
+            "FRA-LIGUE1": 123,
+            "ITA-SERIEA": 88
+          },
+          "oddsMin": 1.57,
+          "oddsMax": 2.47
+        },
+        "-0.75": {
+          "line": -0.75,
+          "totalCount": 351,
+          "validOddsCount": 351,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 96,
+            "2017-2018": 169,
+            "2018-2019": 64,
+            "2015-2016": 22
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 55,
+            "ENG-PL": 79,
+            "ESP-LALIGA": 94,
+            "FRA-LIGUE1": 90,
+            "ITA-SERIEA": 33
+          },
+          "oddsMin": 1.61,
+          "oddsMax": 2.39
+        },
+        "-2.25": {
+          "line": -2.25,
+          "totalCount": 45,
+          "validOddsCount": 45,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 19,
+            "2017-2018": 21,
+            "2015-2016": 1,
+            "2018-2019": 4
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 7,
+            "ENG-PL": 10,
+            "ESP-LALIGA": 12,
+            "FRA-LIGUE1": 8,
+            "ITA-SERIEA": 8
+          },
+          "oddsMin": 1.79,
+          "oddsMax": 2.08
+        },
+        "-2": {
+          "line": -2,
+          "totalCount": 206,
+          "validOddsCount": 206,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 66,
+            "2017-2018": 69,
+            "2018-2019": 66,
+            "2015-2016": 5
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 22,
+            "ENG-PL": 66,
+            "ESP-LALIGA": 35,
+            "FRA-LIGUE1": 20,
+            "ITA-SERIEA": 63
+          },
+          "oddsMin": 1.6,
+          "oddsMax": 3.35
+        },
+        "0.75": {
+          "line": 0.75,
+          "totalCount": 171,
+          "validOddsCount": 171,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 54,
+            "2017-2018": 66,
+            "2018-2019": 32,
+            "2015-2016": 19
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 15,
+            "ENG-PL": 70,
+            "ESP-LALIGA": 28,
+            "FRA-LIGUE1": 21,
+            "ITA-SERIEA": 37
+          },
+          "oddsMin": 1.59,
+          "oddsMax": 2.45
+        },
+        "2.5": {
+          "line": 2.5,
+          "totalCount": 8,
+          "validOddsCount": 8,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 2,
+            "2018-2019": 4,
+            "2017-2018": 2
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 2,
+            "ENG-PL": 3,
+            "ESP-LALIGA": 1,
+            "FRA-LIGUE1": 2
+          },
+          "oddsMin": 1.64,
+          "oddsMax": 2.3
+        },
+        "1.25": {
+          "line": 1.25,
+          "totalCount": 49,
+          "validOddsCount": 49,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 10,
+            "2017-2018": 34,
+            "2015-2016": 1,
+            "2018-2019": 4
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 8,
+            "ENG-PL": 14,
+            "ESP-LALIGA": 8,
+            "FRA-LIGUE1": 3,
+            "ITA-SERIEA": 16
+          },
+          "oddsMin": 1.71,
+          "oddsMax": 2.2
+        },
+        "-1.25": {
+          "line": -1.25,
+          "totalCount": 101,
+          "validOddsCount": 101,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 31,
+            "2017-2018": 60,
+            "2018-2019": 5,
+            "2015-2016": 5
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 16,
+            "ENG-PL": 19,
+            "ESP-LALIGA": 23,
+            "FRA-LIGUE1": 21,
+            "ITA-SERIEA": 22
+          },
+          "oddsMin": 1.68,
+          "oddsMax": 2.25
+        },
+        "-3.25": {
+          "line": -3.25,
+          "totalCount": 5,
+          "validOddsCount": 5,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 3,
+            "2017-2018": 2
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 1,
+            "ESP-LALIGA": 3,
+            "FRA-LIGUE1": 1
+          },
+          "oddsMin": 1.85,
+          "oddsMax": 2.02
+        },
+        "-1.75": {
+          "line": -1.75,
+          "totalCount": 74,
+          "validOddsCount": 74,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2017-2018": 44,
+            "2015-2016": 4,
+            "2016-2017": 16,
+            "2018-2019": 10
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 3,
+            "ENG-PL": 37,
+            "ESP-LALIGA": 10,
+            "FRA-LIGUE1": 12,
+            "ITA-SERIEA": 12
+          },
+          "oddsMin": 1.77,
+          "oddsMax": 2.11
+        },
+        "-2.75": {
+          "line": -2.75,
+          "totalCount": 26,
+          "validOddsCount": 26,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2017-2018": 16,
+            "2018-2019": 7,
+            "2016-2017": 3
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 3,
+            "ENG-PL": 7,
+            "ESP-LALIGA": 8,
+            "FRA-LIGUE1": 8
+          },
+          "oddsMin": 1.8,
+          "oddsMax": 2.06
+        },
+        "-3": {
+          "line": -3,
+          "totalCount": 21,
+          "validOddsCount": 21,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2018-2019": 6,
+            "2016-2017": 5,
+            "2017-2018": 10
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 1,
+            "ENG-PL": 4,
+            "ESP-LALIGA": 10,
+            "FRA-LIGUE1": 3,
+            "ITA-SERIEA": 3
+          },
+          "oddsMin": 1.68,
+          "oddsMax": 2.24
+        },
+        "-3.5": {
+          "line": -3.5,
+          "totalCount": 3,
+          "validOddsCount": 3,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2018-2019": 1,
+            "2016-2017": 2
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 1,
+            "ESP-LALIGA": 2
+          },
+          "oddsMin": 1.75,
+          "oddsMax": 2.13
+        },
+        "1.75": {
+          "line": 1.75,
+          "totalCount": 10,
+          "validOddsCount": 10,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 2,
+            "2017-2018": 8
+          },
+          "leagues": {
+            "ENG-PL": 3,
+            "ESP-LALIGA": 5,
+            "FRA-LIGUE1": 2
+          },
+          "oddsMin": 1.76,
+          "oddsMax": 2.11
+        },
+        "2.25": {
+          "line": 2.25,
+          "totalCount": 2,
+          "validOddsCount": 2,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2017-2018": 1,
+            "2016-2017": 1
+          },
+          "leagues": {
+            "FRA-LIGUE1": 1,
+            "ITA-SERIEA": 1
+          },
+          "oddsMin": 1.85,
+          "oddsMax": 2
+        }
+      }
+    },
+    "pinnacle": {
+      "opening": {
+        "0": {
+          "line": 0,
+          "totalCount": 807,
+          "validOddsCount": 807,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 175,
+            "2017-2018": 105,
+            "2018-2019": 131,
+            "2015-2016": 44,
+            "2019-2020": 92,
+            "2020-2021": 43,
+            "2021-2022": 46,
+            "2022-2023": 46,
+            "2023-2024": 36,
+            "2024-2025": 43,
+            "2025-2026": 46
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 97,
+            "ENG-PL": 376,
+            "ESP-LALIGA": 113,
+            "FRA-LIGUE1": 132,
+            "ITA-SERIEA": 89
+          },
+          "oddsMin": 1.52,
+          "oddsMax": 2.62
+        },
+        "1": {
+          "line": 1,
+          "totalCount": 469,
+          "validOddsCount": 468,
+          "missingOrInvalidCount": 1,
+          "seasons": {
+            "2016-2017": 117,
+            "2017-2018": 79,
+            "2018-2019": 145,
+            "2015-2016": 18,
+            "2019-2020": 17,
+            "2020-2021": 21,
+            "2021-2022": 13,
+            "2022-2023": 14,
+            "2023-2024": 17,
+            "2024-2025": 17,
+            "2025-2026": 11
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 46,
+            "ENG-PL": 225,
+            "ESP-LALIGA": 55,
+            "FRA-LIGUE1": 36,
+            "ITA-SERIEA": 107
+          },
+          "oddsMin": 1.44,
+          "oddsMax": 2.84
+        },
+        "2": {
+          "line": 2,
+          "totalCount": 78,
+          "validOddsCount": 78,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 18,
+            "2017-2018": 25,
+            "2018-2019": 22,
+            "2019-2020": 2,
+            "2020-2021": 3,
+            "2021-2022": 3,
+            "2023-2024": 4,
+            "2024-2025": 1
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 11,
+            "ENG-PL": 24,
+            "ESP-LALIGA": 20,
+            "FRA-LIGUE1": 12,
+            "ITA-SERIEA": 11
+          },
+          "oddsMin": 1.61,
+          "oddsMax": 2.37
+        },
+        "3": {
+          "line": 3,
+          "totalCount": 1,
+          "validOddsCount": 1,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 1
+          },
+          "leagues": {
+            "ESP-LALIGA": 1
+          },
+          "oddsMin": 1.91,
+          "oddsMax": 1.95
+        },
+        "-2.5": {
+          "line": -2.5,
+          "totalCount": 103,
+          "validOddsCount": 103,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 29,
+            "2017-2018": 17,
+            "2018-2019": 27,
+            "2019-2020": 7,
+            "2020-2021": 4,
+            "2021-2022": 5,
+            "2022-2023": 4,
+            "2023-2024": 6,
+            "2024-2025": 3,
+            "2025-2026": 1
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 13,
+            "ENG-PL": 40,
+            "ESP-LALIGA": 28,
+            "FRA-LIGUE1": 12,
+            "ITA-SERIEA": 10
+          },
+          "oddsMin": 1.33,
+          "oddsMax": 3.65
+        },
+        "-1.5": {
+          "line": -1.5,
+          "totalCount": 436,
+          "validOddsCount": 436,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 102,
+            "2017-2018": 54,
+            "2018-2019": 120,
+            "2015-2016": 28,
+            "2019-2020": 33,
+            "2020-2021": 13,
+            "2021-2022": 13,
+            "2022-2023": 17,
+            "2023-2024": 21,
+            "2024-2025": 27,
+            "2025-2026": 8
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 46,
+            "ENG-PL": 225,
+            "ESP-LALIGA": 47,
+            "FRA-LIGUE1": 38,
+            "ITA-SERIEA": 80
+          },
+          "oddsMin": 1.6,
+          "oddsMax": 2.39
+        },
+        "0.25": {
+          "line": 0.25,
+          "totalCount": 901,
+          "validOddsCount": 901,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 153,
+            "2017-2018": 185,
+            "2018-2019": 212,
+            "2015-2016": 40,
+            "2019-2020": 74,
+            "2020-2021": 44,
+            "2021-2022": 41,
+            "2022-2023": 37,
+            "2023-2024": 44,
+            "2024-2025": 35,
+            "2025-2026": 36
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 97,
+            "ENG-PL": 429,
+            "ESP-LALIGA": 168,
+            "FRA-LIGUE1": 95,
+            "ITA-SERIEA": 112
+          },
+          "oddsMin": 1.56,
+          "oddsMax": 2.47
+        },
+        "-1": {
+          "line": -1,
+          "totalCount": 1025,
+          "validOddsCount": 1024,
+          "missingOrInvalidCount": 1,
+          "seasons": {
+            "2016-2017": 226,
+            "2017-2018": 173,
+            "2018-2019": 377,
+            "2015-2016": 46,
+            "2019-2020": 42,
+            "2020-2021": 34,
+            "2021-2022": 25,
+            "2022-2023": 23,
+            "2023-2024": 22,
+            "2024-2025": 31,
+            "2025-2026": 26
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 149,
+            "ENG-PL": 352,
+            "ESP-LALIGA": 195,
+            "FRA-LIGUE1": 128,
+            "ITA-SERIEA": 201
+          },
+          "oddsMin": 1.4,
+          "oddsMax": 3.02
+        },
+        "-0.25": {
+          "line": -0.25,
+          "totalCount": 1727,
+          "validOddsCount": 1727,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 361,
+            "2017-2018": 457,
+            "2018-2019": 412,
+            "2015-2016": 60,
+            "2019-2020": 134,
+            "2020-2021": 51,
+            "2021-2022": 56,
+            "2022-2023": 46,
+            "2023-2024": 47,
+            "2024-2025": 50,
+            "2025-2026": 53
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 187,
+            "ENG-PL": 715,
+            "ESP-LALIGA": 343,
+            "FRA-LIGUE1": 310,
+            "ITA-SERIEA": 172
+          },
+          "oddsMin": 1.58,
+          "oddsMax": 2.47
+        },
+        "1.5": {
+          "line": 1.5,
+          "totalCount": 192,
+          "validOddsCount": 192,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 44,
+            "2017-2018": 37,
+            "2018-2019": 45,
+            "2019-2020": 15,
+            "2020-2021": 11,
+            "2021-2022": 10,
+            "2022-2023": 8,
+            "2023-2024": 9,
+            "2024-2025": 10,
+            "2025-2026": 3
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 19,
+            "ENG-PL": 100,
+            "ESP-LALIGA": 29,
+            "FRA-LIGUE1": 20,
+            "ITA-SERIEA": 24
+          },
+          "oddsMin": 1.62,
+          "oddsMax": 2.36
+        },
+        "0.5": {
+          "line": 0.5,
+          "totalCount": 380,
+          "validOddsCount": 380,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 63,
+            "2017-2018": 54,
+            "2018-2019": 57,
+            "2015-2016": 23,
+            "2019-2020": 39,
+            "2020-2021": 24,
+            "2021-2022": 20,
+            "2022-2023": 27,
+            "2023-2024": 17,
+            "2024-2025": 25,
+            "2025-2026": 31
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 39,
+            "ENG-PL": 206,
+            "ESP-LALIGA": 42,
+            "FRA-LIGUE1": 42,
+            "ITA-SERIEA": 51
+          },
+          "oddsMin": 1.63,
+          "oddsMax": 2.69
+        },
+        "-0.5": {
+          "line": -0.5,
+          "totalCount": 833,
+          "validOddsCount": 833,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 227,
+            "2017-2018": 138,
+            "2018-2019": 75,
+            "2015-2016": 64,
+            "2019-2020": 98,
+            "2020-2021": 37,
+            "2021-2022": 32,
+            "2022-2023": 47,
+            "2023-2024": 34,
+            "2024-2025": 32,
+            "2025-2026": 49
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 80,
+            "ENG-PL": 401,
+            "ESP-LALIGA": 141,
+            "FRA-LIGUE1": 123,
+            "ITA-SERIEA": 88
+          },
+          "oddsMin": 1.57,
+          "oddsMax": 2.47
+        },
+        "-0.75": {
+          "line": -0.75,
+          "totalCount": 626,
+          "validOddsCount": 626,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 96,
+            "2017-2018": 169,
+            "2018-2019": 64,
+            "2015-2016": 22,
+            "2019-2020": 68,
+            "2020-2021": 34,
+            "2021-2022": 32,
+            "2022-2023": 34,
+            "2023-2024": 35,
+            "2024-2025": 34,
+            "2025-2026": 38
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 55,
+            "ENG-PL": 316,
+            "ESP-LALIGA": 132,
+            "FRA-LIGUE1": 90,
+            "ITA-SERIEA": 33
+          },
+          "oddsMin": 1.61,
+          "oddsMax": 2.39
+        },
+        "-2.25": {
+          "line": -2.25,
+          "totalCount": 76,
+          "validOddsCount": 76,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 19,
+            "2017-2018": 21,
+            "2015-2016": 1,
+            "2018-2019": 4,
+            "2019-2020": 11,
+            "2020-2021": 3,
+            "2021-2022": 6,
+            "2022-2023": 3,
+            "2023-2024": 4,
+            "2024-2025": 3,
+            "2025-2026": 1
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 7,
+            "ENG-PL": 35,
+            "ESP-LALIGA": 18,
+            "FRA-LIGUE1": 8,
+            "ITA-SERIEA": 8
+          },
+          "oddsMin": 1.79,
+          "oddsMax": 2.08
+        },
+        "-2": {
+          "line": -2,
+          "totalCount": 269,
+          "validOddsCount": 269,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 66,
+            "2017-2018": 69,
+            "2018-2019": 66,
+            "2015-2016": 5,
+            "2019-2020": 12,
+            "2020-2021": 4,
+            "2021-2022": 13,
+            "2022-2023": 9,
+            "2023-2024": 12,
+            "2024-2025": 8,
+            "2025-2026": 5
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 22,
+            "ENG-PL": 123,
+            "ESP-LALIGA": 41,
+            "FRA-LIGUE1": 20,
+            "ITA-SERIEA": 63
+          },
+          "oddsMin": 1.6,
+          "oddsMax": 3.35
+        },
+        "0.75": {
+          "line": 0.75,
+          "totalCount": 338,
+          "validOddsCount": 338,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 54,
+            "2017-2018": 66,
+            "2018-2019": 32,
+            "2015-2016": 19,
+            "2019-2020": 40,
+            "2020-2021": 23,
+            "2021-2022": 19,
+            "2022-2023": 20,
+            "2023-2024": 22,
+            "2024-2025": 18,
+            "2025-2026": 25
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 15,
+            "ENG-PL": 220,
+            "ESP-LALIGA": 45,
+            "FRA-LIGUE1": 21,
+            "ITA-SERIEA": 37
+          },
+          "oddsMin": 1.59,
+          "oddsMax": 2.45
+        },
+        "2.5": {
+          "line": 2.5,
+          "totalCount": 10,
+          "validOddsCount": 10,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 2,
+            "2018-2019": 4,
+            "2019-2020": 1,
+            "2025-2026": 1,
+            "2017-2018": 2
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 2,
+            "ENG-PL": 5,
+            "ESP-LALIGA": 1,
+            "FRA-LIGUE1": 2
+          },
+          "oddsMin": 1.64,
+          "oddsMax": 2.3
+        },
+        "1.25": {
+          "line": 1.25,
+          "totalCount": 114,
+          "validOddsCount": 114,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 10,
+            "2017-2018": 34,
+            "2015-2016": 1,
+            "2018-2019": 4,
+            "2019-2020": 14,
+            "2020-2021": 7,
+            "2021-2022": 10,
+            "2022-2023": 6,
+            "2023-2024": 12,
+            "2024-2025": 10,
+            "2025-2026": 6
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 8,
+            "ENG-PL": 73,
+            "ESP-LALIGA": 14,
+            "FRA-LIGUE1": 3,
+            "ITA-SERIEA": 16
+          },
+          "oddsMin": 1.71,
+          "oddsMax": 2.2
+        },
+        "-1.25": {
+          "line": -1.25,
+          "totalCount": 264,
+          "validOddsCount": 264,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 31,
+            "2017-2018": 60,
+            "2018-2019": 5,
+            "2015-2016": 5,
+            "2019-2020": 37,
+            "2020-2021": 14,
+            "2021-2022": 21,
+            "2022-2023": 23,
+            "2023-2024": 19,
+            "2024-2025": 20,
+            "2025-2026": 29
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 16,
+            "ENG-PL": 165,
+            "ESP-LALIGA": 40,
+            "FRA-LIGUE1": 21,
+            "ITA-SERIEA": 22
+          },
+          "oddsMin": 1.68,
+          "oddsMax": 2.25
+        },
+        "-3.25": {
+          "line": -3.25,
+          "totalCount": 5,
+          "validOddsCount": 5,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 3,
+            "2017-2018": 2
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 1,
+            "ESP-LALIGA": 3,
+            "FRA-LIGUE1": 1
+          },
+          "oddsMin": 1.85,
+          "oddsMax": 2.02
+        },
+        "-1.75": {
+          "line": -1.75,
+          "totalCount": 146,
+          "validOddsCount": 146,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2017-2018": 44,
+            "2015-2016": 4,
+            "2016-2017": 16,
+            "2018-2019": 10,
+            "2019-2020": 15,
+            "2020-2021": 9,
+            "2021-2022": 8,
+            "2022-2023": 8,
+            "2023-2024": 13,
+            "2024-2025": 9,
+            "2025-2026": 10
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 3,
+            "ENG-PL": 101,
+            "ESP-LALIGA": 18,
+            "FRA-LIGUE1": 12,
+            "ITA-SERIEA": 12
+          },
+          "oddsMin": 1.77,
+          "oddsMax": 2.11
+        },
+        "-2.75": {
+          "line": -2.75,
+          "totalCount": 33,
+          "validOddsCount": 33,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2017-2018": 16,
+            "2018-2019": 7,
+            "2016-2017": 3,
+            "2019-2020": 1,
+            "2022-2023": 1,
+            "2023-2024": 3,
+            "2024-2025": 2
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 3,
+            "ENG-PL": 14,
+            "ESP-LALIGA": 8,
+            "FRA-LIGUE1": 8
+          },
+          "oddsMin": 1.8,
+          "oddsMax": 2.06
+        },
+        "-3": {
+          "line": -3,
+          "totalCount": 25,
+          "validOddsCount": 25,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2018-2019": 6,
+            "2019-2020": 3,
+            "2022-2023": 1,
+            "2016-2017": 5,
+            "2017-2018": 10
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 1,
+            "ENG-PL": 8,
+            "ESP-LALIGA": 10,
+            "FRA-LIGUE1": 3,
+            "ITA-SERIEA": 3
+          },
+          "oddsMin": 1.68,
+          "oddsMax": 2.24
+        },
+        "-3.5": {
+          "line": -3.5,
+          "totalCount": 3,
+          "validOddsCount": 3,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2018-2019": 1,
+            "2016-2017": 2
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 1,
+            "ESP-LALIGA": 2
+          },
+          "oddsMin": 1.75,
+          "oddsMax": 2.13
+        },
+        "1.75": {
+          "line": 1.75,
+          "totalCount": 31,
+          "validOddsCount": 31,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 2,
+            "2017-2018": 8,
+            "2019-2020": 4,
+            "2020-2021": 1,
+            "2021-2022": 6,
+            "2022-2023": 6,
+            "2023-2024": 2,
+            "2024-2025": 2
+          },
+          "leagues": {
+            "ENG-PL": 23,
+            "ESP-LALIGA": 6,
+            "FRA-LIGUE1": 2
+          },
+          "oddsMin": 1.76,
+          "oddsMax": 2.11
+        },
+        "2.25": {
+          "line": 2.25,
+          "totalCount": 5,
+          "validOddsCount": 5,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1,
+            "2021-2022": 1,
+            "2023-2024": 1,
+            "2017-2018": 1,
+            "2016-2017": 1
+          },
+          "leagues": {
+            "ENG-PL": 3,
+            "FRA-LIGUE1": 1,
+            "ITA-SERIEA": 1
+          },
+          "oddsMin": 1.85,
+          "oddsMax": 2.02
+        }
+      },
+      "closing": {
+        "0": {
+          "line": 0,
+          "totalCount": 315,
+          "validOddsCount": 315,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 88,
+            "2020-2021": 32,
+            "2021-2022": 39,
+            "2022-2023": 43,
+            "2023-2024": 39,
+            "2024-2025": 33,
+            "2025-2026": 41
+          },
+          "leagues": {
+            "ENG-PL": 265,
+            "ESP-LALIGA": 50
+          },
+          "oddsMin": 1.7,
+          "oddsMax": 2.24
+        },
+        "1": {
+          "line": 1,
+          "totalCount": 119,
+          "validOddsCount": 119,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 29,
+            "2020-2021": 17,
+            "2021-2022": 14,
+            "2022-2023": 13,
+            "2023-2024": 18,
+            "2024-2025": 11,
+            "2025-2026": 17
+          },
+          "leagues": {
+            "ENG-PL": 109,
+            "ESP-LALIGA": 10
+          },
+          "oddsMin": 1.66,
+          "oddsMax": 2.38
+        },
+        "2": {
+          "line": 2,
+          "totalCount": 16,
+          "validOddsCount": 16,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 3,
+            "2020-2021": 2,
+            "2021-2022": 4,
+            "2023-2024": 5,
+            "2024-2025": 2
+          },
+          "leagues": {
+            "ENG-PL": 16
+          },
+          "oddsMin": 1.76,
+          "oddsMax": 2.17
+        },
+        "3": {
+          "line": 3,
+          "totalCount": 1,
+          "validOddsCount": 1,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1
+          },
+          "leagues": {
+            "ENG-PL": 1
+          },
+          "oddsMin": 1.78,
+          "oddsMax": 2.19
+        },
+        "-2.25": {
+          "line": -2.25,
+          "totalCount": 29,
+          "validOddsCount": 29,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 8,
+            "2020-2021": 1,
+            "2021-2022": 8,
+            "2022-2023": 6,
+            "2023-2024": 2,
+            "2024-2025": 3,
+            "2025-2026": 1
+          },
+          "leagues": {
+            "ENG-PL": 27,
+            "ESP-LALIGA": 2
+          },
+          "oddsMin": 1.76,
+          "oddsMax": 2.19
+        },
+        "-0.5": {
+          "line": -0.5,
+          "totalCount": 325,
+          "validOddsCount": 325,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 92,
+            "2020-2021": 38,
+            "2021-2022": 38,
+            "2022-2023": 37,
+            "2023-2024": 33,
+            "2024-2025": 37,
+            "2025-2026": 50
+          },
+          "leagues": {
+            "ENG-PL": 274,
+            "ESP-LALIGA": 51
+          },
+          "oddsMin": 1.74,
+          "oddsMax": 2.21
+        },
+        "0.25": {
+          "line": 0.25,
+          "totalCount": 325,
+          "validOddsCount": 325,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 73,
+            "2020-2021": 55,
+            "2021-2022": 38,
+            "2022-2023": 37,
+            "2023-2024": 40,
+            "2024-2025": 37,
+            "2025-2026": 45
+          },
+          "leagues": {
+            "ENG-PL": 290,
+            "ESP-LALIGA": 35
+          },
+          "oddsMin": 1.7,
+          "oddsMax": 2.23
+        },
+        "-1.5": {
+          "line": -1.5,
+          "totalCount": 122,
+          "validOddsCount": 122,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 33,
+            "2020-2021": 15,
+            "2021-2022": 14,
+            "2022-2023": 10,
+            "2023-2024": 19,
+            "2024-2025": 20,
+            "2025-2026": 11
+          },
+          "leagues": {
+            "ENG-PL": 111,
+            "ESP-LALIGA": 11
+          },
+          "oddsMin": 1.76,
+          "oddsMax": 2.19
+        },
+        "1.75": {
+          "line": 1.75,
+          "totalCount": 23,
+          "validOddsCount": 23,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 4,
+            "2020-2021": 4,
+            "2021-2022": 3,
+            "2022-2023": 4,
+            "2023-2024": 4,
+            "2024-2025": 2,
+            "2025-2026": 2
+          },
+          "leagues": {
+            "ENG-PL": 22,
+            "ESP-LALIGA": 1
+          },
+          "oddsMin": 1.82,
+          "oddsMax": 2.11
+        },
+        "-0.25": {
+          "line": -0.25,
+          "totalCount": 441,
+          "validOddsCount": 441,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 134,
+            "2020-2021": 52,
+            "2021-2022": 56,
+            "2022-2023": 51,
+            "2023-2024": 40,
+            "2024-2025": 50,
+            "2025-2026": 58
+          },
+          "leagues": {
+            "ENG-PL": 367,
+            "ESP-LALIGA": 74
+          },
+          "oddsMin": 1.7,
+          "oddsMax": 2.27
+        },
+        "-0.75": {
+          "line": -0.75,
+          "totalCount": 279,
+          "validOddsCount": 279,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 73,
+            "2020-2021": 33,
+            "2021-2022": 34,
+            "2022-2023": 34,
+            "2023-2024": 38,
+            "2024-2025": 39,
+            "2025-2026": 28
+          },
+          "leagues": {
+            "ENG-PL": 235,
+            "ESP-LALIGA": 44
+          },
+          "oddsMin": 1.61,
+          "oddsMax": 2.48
+        },
+        "-1.25": {
+          "line": -1.25,
+          "totalCount": 150,
+          "validOddsCount": 150,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 37,
+            "2020-2021": 16,
+            "2021-2022": 16,
+            "2022-2023": 20,
+            "2023-2024": 15,
+            "2024-2025": 21,
+            "2025-2026": 25
+          },
+          "leagues": {
+            "ENG-PL": 133,
+            "ESP-LALIGA": 17
+          },
+          "oddsMin": 1.79,
+          "oddsMax": 2.15
+        },
+        "0.5": {
+          "line": 0.5,
+          "totalCount": 210,
+          "validOddsCount": 210,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 44,
+            "2020-2021": 27,
+            "2021-2022": 25,
+            "2022-2023": 32,
+            "2023-2024": 22,
+            "2024-2025": 30,
+            "2025-2026": 30
+          },
+          "leagues": {
+            "ENG-PL": 192,
+            "ESP-LALIGA": 18
+          },
+          "oddsMin": 1.68,
+          "oddsMax": 2.33
+        },
+        "2.25": {
+          "line": 2.25,
+          "totalCount": 4,
+          "validOddsCount": 4,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1,
+            "2020-2021": 1,
+            "2021-2022": 1,
+            "2025-2026": 1
+          },
+          "leagues": {
+            "ENG-PL": 4
+          },
+          "oddsMin": 1.75,
+          "oddsMax": 2.18
+        },
+        "1.5": {
+          "line": 1.5,
+          "totalCount": 61,
+          "validOddsCount": 61,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 13,
+            "2020-2021": 7,
+            "2021-2022": 9,
+            "2022-2023": 10,
+            "2023-2024": 11,
+            "2024-2025": 10,
+            "2025-2026": 1
+          },
+          "leagues": {
+            "ENG-PL": 57,
+            "ESP-LALIGA": 4
+          },
+          "oddsMin": 1.78,
+          "oddsMax": 2.16
+        },
+        "-2.5": {
+          "line": -2.5,
+          "totalCount": 27,
+          "validOddsCount": 27,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 8,
+            "2020-2021": 5,
+            "2021-2022": 5,
+            "2022-2023": 1,
+            "2023-2024": 4,
+            "2024-2025": 3,
+            "2025-2026": 1
+          },
+          "leagues": {
+            "ENG-PL": 24,
+            "ESP-LALIGA": 3
+          },
+          "oddsMin": 1.3,
+          "oddsMax": 3.93
+        },
+        "-1.75": {
+          "line": -1.75,
+          "totalCount": 79,
+          "validOddsCount": 79,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 14,
+            "2020-2021": 3,
+            "2021-2022": 10,
+            "2022-2023": 13,
+            "2023-2024": 16,
+            "2024-2025": 16,
+            "2025-2026": 7
+          },
+          "leagues": {
+            "ENG-PL": 73,
+            "ESP-LALIGA": 6
+          },
+          "oddsMin": 1.79,
+          "oddsMax": 2.15
+        },
+        "-1": {
+          "line": -1,
+          "totalCount": 218,
+          "validOddsCount": 218,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 43,
+            "2020-2021": 31,
+            "2021-2022": 23,
+            "2022-2023": 35,
+            "2023-2024": 27,
+            "2024-2025": 24,
+            "2025-2026": 35
+          },
+          "leagues": {
+            "ENG-PL": 193,
+            "ESP-LALIGA": 25
+          },
+          "oddsMin": 1.56,
+          "oddsMax": 2.59
+        },
+        "0.75": {
+          "line": 0.75,
+          "totalCount": 152,
+          "validOddsCount": 152,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 28,
+            "2020-2021": 22,
+            "2021-2022": 21,
+            "2022-2023": 17,
+            "2023-2024": 22,
+            "2024-2025": 22,
+            "2025-2026": 20
+          },
+          "leagues": {
+            "ENG-PL": 140,
+            "ESP-LALIGA": 12
+          },
+          "oddsMin": 1.79,
+          "oddsMax": 2.15
+        },
+        "-3.25": {
+          "line": -3.25,
+          "totalCount": 1,
+          "validOddsCount": 1,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1
+          },
+          "leagues": {
+            "ENG-PL": 1
+          },
+          "oddsMin": 1.78,
+          "oddsMax": 2.16
+        },
+        "-3": {
+          "line": -3,
+          "totalCount": 4,
+          "validOddsCount": 4,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1,
+            "2023-2024": 2,
+            "2024-2025": 1
+          },
+          "leagues": {
+            "ENG-PL": 4
+          },
+          "oddsMin": 1.89,
+          "oddsMax": 1.99
+        },
+        "-2": {
+          "line": -2,
+          "totalCount": 61,
+          "validOddsCount": 61,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 13,
+            "2020-2021": 6,
+            "2021-2022": 9,
+            "2022-2023": 7,
+            "2023-2024": 15,
+            "2024-2025": 8,
+            "2025-2026": 3
+          },
+          "leagues": {
+            "ENG-PL": 53,
+            "ESP-LALIGA": 8
+          },
+          "oddsMin": 1.75,
+          "oddsMax": 2.18
+        },
+        "1.25": {
+          "line": 1.25,
+          "totalCount": 65,
+          "validOddsCount": 65,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 14,
+            "2020-2021": 13,
+            "2021-2022": 11,
+            "2022-2023": 8,
+            "2023-2024": 5,
+            "2024-2025": 10,
+            "2025-2026": 4
+          },
+          "leagues": {
+            "ENG-PL": 57,
+            "ESP-LALIGA": 8
+          },
+          "oddsMin": 1.71,
+          "oddsMax": 2.26
+        },
+        "2.5": {
+          "line": 2.5,
+          "totalCount": 2,
+          "validOddsCount": 2,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1,
+            "2021-2022": 1
+          },
+          "leagues": {
+            "ENG-PL": 2
+          },
+          "oddsMin": 1.8,
+          "oddsMax": 2.12
+        },
+        "-2.75": {
+          "line": -2.75,
+          "totalCount": 10,
+          "validOddsCount": 10,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 3,
+            "2021-2022": 1,
+            "2022-2023": 2,
+            "2023-2024": 3,
+            "2024-2025": 1
+          },
+          "leagues": {
+            "ENG-PL": 9,
+            "ESP-LALIGA": 1
+          },
+          "oddsMin": 1.83,
+          "oddsMax": 2.04
+        },
+        "-3.75": {
+          "line": -3.75,
+          "totalCount": 1,
+          "validOddsCount": 1,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1
+          },
+          "leagues": {
+            "ENG-PL": 1
+          },
+          "oddsMin": 1.88,
+          "oddsMax": 2.01
+        }
+      }
+    },
+    "bet365": {
+      "closing": {
+        "0": {
+          "line": 0,
+          "totalCount": 315,
+          "validOddsCount": 315,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 88,
+            "2020-2021": 32,
+            "2021-2022": 39,
+            "2022-2023": 43,
+            "2023-2024": 39,
+            "2024-2025": 33,
+            "2025-2026": 41
+          },
+          "leagues": {
+            "ENG-PL": 265,
+            "ESP-LALIGA": 50
+          },
+          "oddsMin": 1.7,
+          "oddsMax": 2.16
+        },
+        "1": {
+          "line": 1,
+          "totalCount": 119,
+          "validOddsCount": 119,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 29,
+            "2020-2021": 17,
+            "2021-2022": 14,
+            "2022-2023": 13,
+            "2023-2024": 18,
+            "2024-2025": 11,
+            "2025-2026": 17
+          },
+          "leagues": {
+            "ENG-PL": 109,
+            "ESP-LALIGA": 10
+          },
+          "oddsMin": 1.67,
+          "oddsMax": 2.15
+        },
+        "2": {
+          "line": 2,
+          "totalCount": 16,
+          "validOddsCount": 16,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 3,
+            "2020-2021": 2,
+            "2021-2022": 4,
+            "2023-2024": 5,
+            "2024-2025": 2
+          },
+          "leagues": {
+            "ENG-PL": 16
+          },
+          "oddsMin": 1.75,
+          "oddsMax": 2.09
+        },
+        "3": {
+          "line": 3,
+          "totalCount": 1,
+          "validOddsCount": 1,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1
+          },
+          "leagues": {
+            "ENG-PL": 1
+          },
+          "oddsMin": 1.72,
+          "oddsMax": 2.07
+        },
+        "-2.25": {
+          "line": -2.25,
+          "totalCount": 29,
+          "validOddsCount": 29,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 8,
+            "2020-2021": 1,
+            "2021-2022": 8,
+            "2022-2023": 6,
+            "2023-2024": 2,
+            "2024-2025": 3,
+            "2025-2026": 1
+          },
+          "leagues": {
+            "ENG-PL": 27,
+            "ESP-LALIGA": 2
+          },
+          "oddsMin": 1.7,
+          "oddsMax": 2.1
+        },
+        "-0.5": {
+          "line": -0.5,
+          "totalCount": 325,
+          "validOddsCount": 325,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 92,
+            "2020-2021": 38,
+            "2021-2022": 38,
+            "2022-2023": 37,
+            "2023-2024": 33,
+            "2024-2025": 37,
+            "2025-2026": 50
+          },
+          "leagues": {
+            "ENG-PL": 274,
+            "ESP-LALIGA": 51
+          },
+          "oddsMin": 1.72,
+          "oddsMax": 2.13
+        },
+        "0.25": {
+          "line": 0.25,
+          "totalCount": 325,
+          "validOddsCount": 325,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 73,
+            "2020-2021": 55,
+            "2021-2022": 38,
+            "2022-2023": 37,
+            "2023-2024": 40,
+            "2024-2025": 37,
+            "2025-2026": 45
+          },
+          "leagues": {
+            "ENG-PL": 290,
+            "ESP-LALIGA": 35
+          },
+          "oddsMin": 1.68,
+          "oddsMax": 2.2
+        },
+        "-1.5": {
+          "line": -1.5,
+          "totalCount": 122,
+          "validOddsCount": 122,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 33,
+            "2020-2021": 15,
+            "2021-2022": 14,
+            "2022-2023": 10,
+            "2023-2024": 19,
+            "2024-2025": 20,
+            "2025-2026": 11
+          },
+          "leagues": {
+            "ENG-PL": 111,
+            "ESP-LALIGA": 11
+          },
+          "oddsMin": 1.7,
+          "oddsMax": 2.13
+        },
+        "1.75": {
+          "line": 1.75,
+          "totalCount": 23,
+          "validOddsCount": 23,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 4,
+            "2020-2021": 4,
+            "2021-2022": 3,
+            "2022-2023": 4,
+            "2023-2024": 4,
+            "2024-2025": 2,
+            "2025-2026": 2
+          },
+          "leagues": {
+            "ENG-PL": 22,
+            "ESP-LALIGA": 1
+          },
+          "oddsMin": 1.75,
+          "oddsMax": 2.14
+        },
+        "-0.25": {
+          "line": -0.25,
+          "totalCount": 440,
+          "validOddsCount": 440,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 134,
+            "2020-2021": 52,
+            "2021-2022": 55,
+            "2022-2023": 51,
+            "2023-2024": 40,
+            "2024-2025": 50,
+            "2025-2026": 58
+          },
+          "leagues": {
+            "ENG-PL": 366,
+            "ESP-LALIGA": 74
+          },
+          "oddsMin": 1.65,
+          "oddsMax": 2.2
+        },
+        "-0.75": {
+          "line": -0.75,
+          "totalCount": 279,
+          "validOddsCount": 279,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 73,
+            "2020-2021": 33,
+            "2021-2022": 34,
+            "2022-2023": 34,
+            "2023-2024": 38,
+            "2024-2025": 39,
+            "2025-2026": 28
+          },
+          "leagues": {
+            "ENG-PL": 235,
+            "ESP-LALIGA": 44
+          },
+          "oddsMin": 1.58,
+          "oddsMax": 2.35
+        },
+        "-1.25": {
+          "line": -1.25,
+          "totalCount": 150,
+          "validOddsCount": 150,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 37,
+            "2020-2021": 16,
+            "2021-2022": 16,
+            "2022-2023": 20,
+            "2023-2024": 15,
+            "2024-2025": 21,
+            "2025-2026": 25
+          },
+          "leagues": {
+            "ENG-PL": 133,
+            "ESP-LALIGA": 17
+          },
+          "oddsMin": 1.75,
+          "oddsMax": 2.14
+        },
+        "0.5": {
+          "line": 0.5,
+          "totalCount": 210,
+          "validOddsCount": 210,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 44,
+            "2020-2021": 27,
+            "2021-2022": 25,
+            "2022-2023": 32,
+            "2023-2024": 22,
+            "2024-2025": 30,
+            "2025-2026": 30
+          },
+          "leagues": {
+            "ENG-PL": 192,
+            "ESP-LALIGA": 18
+          },
+          "oddsMin": 1.65,
+          "oddsMax": 2.2
+        },
+        "2.25": {
+          "line": 2.25,
+          "totalCount": 4,
+          "validOddsCount": 4,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1,
+            "2020-2021": 1,
+            "2021-2022": 1,
+            "2025-2026": 1
+          },
+          "leagues": {
+            "ENG-PL": 4
+          },
+          "oddsMin": 1.7,
+          "oddsMax": 2.1
+        },
+        "1.5": {
+          "line": 1.5,
+          "totalCount": 61,
+          "validOddsCount": 61,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 13,
+            "2020-2021": 7,
+            "2021-2022": 9,
+            "2022-2023": 10,
+            "2023-2024": 11,
+            "2024-2025": 10,
+            "2025-2026": 1
+          },
+          "leagues": {
+            "ENG-PL": 57,
+            "ESP-LALIGA": 4
+          },
+          "oddsMin": 1.72,
+          "oddsMax": 2.11
+        },
+        "-2.5": {
+          "line": -2.5,
+          "totalCount": 27,
+          "validOddsCount": 27,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 8,
+            "2020-2021": 5,
+            "2021-2022": 5,
+            "2022-2023": 1,
+            "2023-2024": 4,
+            "2024-2025": 3,
+            "2025-2026": 1
+          },
+          "leagues": {
+            "ENG-PL": 24,
+            "ESP-LALIGA": 3
+          },
+          "oddsMin": 1.27,
+          "oddsMax": 3.55
+        },
+        "-1.75": {
+          "line": -1.75,
+          "totalCount": 79,
+          "validOddsCount": 79,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 14,
+            "2020-2021": 3,
+            "2021-2022": 10,
+            "2022-2023": 13,
+            "2023-2024": 16,
+            "2024-2025": 16,
+            "2025-2026": 7
+          },
+          "leagues": {
+            "ENG-PL": 73,
+            "ESP-LALIGA": 6
+          },
+          "oddsMin": 1.75,
+          "oddsMax": 2.13
+        },
+        "-1": {
+          "line": -1,
+          "totalCount": 218,
+          "validOddsCount": 218,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 43,
+            "2020-2021": 31,
+            "2021-2022": 23,
+            "2022-2023": 35,
+            "2023-2024": 27,
+            "2024-2025": 24,
+            "2025-2026": 35
+          },
+          "leagues": {
+            "ENG-PL": 193,
+            "ESP-LALIGA": 25
+          },
+          "oddsMin": 1.58,
+          "oddsMax": 2.35
+        },
+        "0.75": {
+          "line": 0.75,
+          "totalCount": 152,
+          "validOddsCount": 152,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 28,
+            "2020-2021": 22,
+            "2021-2022": 21,
+            "2022-2023": 17,
+            "2023-2024": 22,
+            "2024-2025": 22,
+            "2025-2026": 20
+          },
+          "leagues": {
+            "ENG-PL": 140,
+            "ESP-LALIGA": 12
+          },
+          "oddsMin": 1.72,
+          "oddsMax": 2.13
+        },
+        "-3.25": {
+          "line": -3.25,
+          "totalCount": 1,
+          "validOddsCount": 1,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1
+          },
+          "leagues": {
+            "ENG-PL": 1
+          },
+          "oddsMin": 1.72,
+          "oddsMax": 2.07
+        },
+        "-3": {
+          "line": -3,
+          "totalCount": 4,
+          "validOddsCount": 4,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1,
+            "2023-2024": 2,
+            "2024-2025": 1
+          },
+          "leagues": {
+            "ENG-PL": 4
+          },
+          "oddsMin": 1.87,
+          "oddsMax": 2.03
+        },
+        "-2": {
+          "line": -2,
+          "totalCount": 61,
+          "validOddsCount": 61,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 13,
+            "2020-2021": 6,
+            "2021-2022": 9,
+            "2022-2023": 7,
+            "2023-2024": 15,
+            "2024-2025": 8,
+            "2025-2026": 3
+          },
+          "leagues": {
+            "ENG-PL": 53,
+            "ESP-LALIGA": 8
+          },
+          "oddsMin": 1.7,
+          "oddsMax": 2.11
+        },
+        "1.25": {
+          "line": 1.25,
+          "totalCount": 65,
+          "validOddsCount": 65,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 14,
+            "2020-2021": 13,
+            "2021-2022": 11,
+            "2022-2023": 8,
+            "2023-2024": 5,
+            "2024-2025": 10,
+            "2025-2026": 4
+          },
+          "leagues": {
+            "ENG-PL": 57,
+            "ESP-LALIGA": 8
+          },
+          "oddsMin": 1.68,
+          "oddsMax": 2.15
+        },
+        "2.5": {
+          "line": 2.5,
+          "totalCount": 2,
+          "validOddsCount": 2,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1,
+            "2021-2022": 1
+          },
+          "leagues": {
+            "ENG-PL": 2
+          },
+          "oddsMin": 1.75,
+          "oddsMax": 2.05
+        },
+        "-2.75": {
+          "line": -2.75,
+          "totalCount": 10,
+          "validOddsCount": 10,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 3,
+            "2021-2022": 1,
+            "2022-2023": 2,
+            "2023-2024": 3,
+            "2024-2025": 1
+          },
+          "leagues": {
+            "ENG-PL": 9,
+            "ESP-LALIGA": 1
+          },
+          "oddsMin": 1.8,
+          "oddsMax": 2.07
+        },
+        "-3.75": {
+          "line": -3.75,
+          "totalCount": 1,
+          "validOddsCount": 1,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1
+          },
+          "leagues": {
+            "ENG-PL": 1
+          },
+          "oddsMin": 1.87,
+          "oddsMax": 2.03
+        }
+      },
+      "opening": {
+        "0": {
+          "line": 0,
+          "totalCount": 351,
+          "validOddsCount": 351,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 91,
+            "2020-2021": 43,
+            "2021-2022": 46,
+            "2022-2023": 46,
+            "2023-2024": 36,
+            "2024-2025": 43,
+            "2025-2026": 46
+          },
+          "leagues": {
+            "ENG-PL": 300,
+            "ESP-LALIGA": 51
+          },
+          "oddsMin": 1.67,
+          "oddsMax": 2.16
+        },
+        "1": {
+          "line": 1,
+          "totalCount": 109,
+          "validOddsCount": 109,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 16,
+            "2020-2021": 21,
+            "2021-2022": 13,
+            "2022-2023": 14,
+            "2023-2024": 17,
+            "2024-2025": 17,
+            "2025-2026": 11
+          },
+          "leagues": {
+            "ENG-PL": 103,
+            "ESP-LALIGA": 6
+          },
+          "oddsMin": 1.72,
+          "oddsMax": 2.1
+        },
+        "2": {
+          "line": 2,
+          "totalCount": 13,
+          "validOddsCount": 13,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 2,
+            "2020-2021": 3,
+            "2021-2022": 3,
+            "2023-2024": 4,
+            "2024-2025": 1
+          },
+          "leagues": {
+            "ENG-PL": 13
+          },
+          "oddsMin": 1.75,
+          "oddsMax": 2.11
+        },
+        "-2.25": {
+          "line": -2.25,
+          "totalCount": 31,
+          "validOddsCount": 31,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 11,
+            "2020-2021": 3,
+            "2021-2022": 6,
+            "2022-2023": 3,
+            "2023-2024": 4,
+            "2024-2025": 3,
+            "2025-2026": 1
+          },
+          "leagues": {
+            "ENG-PL": 25,
+            "ESP-LALIGA": 6
+          },
+          "oddsMin": 1.8,
+          "oddsMax": 2.06
+        },
+        "-0.5": {
+          "line": -0.5,
+          "totalCount": 325,
+          "validOddsCount": 325,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 94,
+            "2020-2021": 37,
+            "2021-2022": 32,
+            "2022-2023": 47,
+            "2023-2024": 34,
+            "2024-2025": 32,
+            "2025-2026": 49
+          },
+          "leagues": {
+            "ENG-PL": 272,
+            "ESP-LALIGA": 53
+          },
+          "oddsMin": 1.72,
+          "oddsMax": 2.13
+        },
+        "0.25": {
+          "line": 0.25,
+          "totalCount": 310,
+          "validOddsCount": 310,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 73,
+            "2020-2021": 44,
+            "2021-2022": 41,
+            "2022-2023": 37,
+            "2023-2024": 44,
+            "2024-2025": 35,
+            "2025-2026": 36
+          },
+          "leagues": {
+            "ENG-PL": 274,
+            "ESP-LALIGA": 36
+          },
+          "oddsMin": 1.42,
+          "oddsMax": 2.15
+        },
+        "-1.5": {
+          "line": -1.5,
+          "totalCount": 132,
+          "validOddsCount": 132,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 33,
+            "2020-2021": 13,
+            "2021-2022": 13,
+            "2022-2023": 17,
+            "2023-2024": 21,
+            "2024-2025": 27,
+            "2025-2026": 8
+          },
+          "leagues": {
+            "ENG-PL": 123,
+            "ESP-LALIGA": 9
+          },
+          "oddsMin": 1.72,
+          "oddsMax": 2.1
+        },
+        "1.75": {
+          "line": 1.75,
+          "totalCount": 21,
+          "validOddsCount": 21,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 4,
+            "2020-2021": 1,
+            "2021-2022": 6,
+            "2022-2023": 6,
+            "2023-2024": 2,
+            "2024-2025": 2
+          },
+          "leagues": {
+            "ENG-PL": 20,
+            "ESP-LALIGA": 1
+          },
+          "oddsMin": 1.8,
+          "oddsMax": 2.08
+        },
+        "-0.25": {
+          "line": -0.25,
+          "totalCount": 437,
+          "validOddsCount": 437,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 134,
+            "2020-2021": 51,
+            "2021-2022": 56,
+            "2022-2023": 46,
+            "2023-2024": 47,
+            "2024-2025": 50,
+            "2025-2026": 53
+          },
+          "leagues": {
+            "ENG-PL": 365,
+            "ESP-LALIGA": 72
+          },
+          "oddsMin": 1.67,
+          "oddsMax": 2.17
+        },
+        "0.75": {
+          "line": 0.75,
+          "totalCount": 165,
+          "validOddsCount": 165,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 38,
+            "2020-2021": 23,
+            "2021-2022": 19,
+            "2022-2023": 20,
+            "2023-2024": 22,
+            "2024-2025": 18,
+            "2025-2026": 25
+          },
+          "leagues": {
+            "ENG-PL": 150,
+            "ESP-LALIGA": 15
+          },
+          "oddsMin": 1.65,
+          "oddsMax": 2.2
+        },
+        "-0.75": {
+          "line": -0.75,
+          "totalCount": 275,
+          "validOddsCount": 275,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 68,
+            "2020-2021": 34,
+            "2021-2022": 32,
+            "2022-2023": 34,
+            "2023-2024": 35,
+            "2024-2025": 34,
+            "2025-2026": 38
+          },
+          "leagues": {
+            "ENG-PL": 237,
+            "ESP-LALIGA": 38
+          },
+          "oddsMin": 1.72,
+          "oddsMax": 2.11
+        },
+        "1.25": {
+          "line": 1.25,
+          "totalCount": 65,
+          "validOddsCount": 65,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 14,
+            "2020-2021": 7,
+            "2021-2022": 10,
+            "2022-2023": 6,
+            "2023-2024": 12,
+            "2024-2025": 10,
+            "2025-2026": 6
+          },
+          "leagues": {
+            "ENG-PL": 59,
+            "ESP-LALIGA": 6
+          },
+          "oddsMin": 1.75,
+          "oddsMax": 2.11
+        },
+        "-1.25": {
+          "line": -1.25,
+          "totalCount": 163,
+          "validOddsCount": 163,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 37,
+            "2020-2021": 14,
+            "2021-2022": 21,
+            "2022-2023": 23,
+            "2023-2024": 19,
+            "2024-2025": 20,
+            "2025-2026": 29
+          },
+          "leagues": {
+            "ENG-PL": 146,
+            "ESP-LALIGA": 17
+          },
+          "oddsMin": 1.72,
+          "oddsMax": 2.1
+        },
+        "-1.75": {
+          "line": -1.75,
+          "totalCount": 72,
+          "validOddsCount": 72,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 15,
+            "2020-2021": 9,
+            "2021-2022": 8,
+            "2022-2023": 8,
+            "2023-2024": 13,
+            "2024-2025": 9,
+            "2025-2026": 10
+          },
+          "leagues": {
+            "ENG-PL": 64,
+            "ESP-LALIGA": 8
+          },
+          "oddsMin": 1.75,
+          "oddsMax": 2.07
+        },
+        "1.5": {
+          "line": 1.5,
+          "totalCount": 66,
+          "validOddsCount": 66,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 15,
+            "2020-2021": 11,
+            "2021-2022": 10,
+            "2022-2023": 8,
+            "2023-2024": 9,
+            "2024-2025": 10,
+            "2025-2026": 3
+          },
+          "leagues": {
+            "ENG-PL": 63,
+            "ESP-LALIGA": 3
+          },
+          "oddsMin": 1.72,
+          "oddsMax": 2.1
+        },
+        "-2.75": {
+          "line": -2.75,
+          "totalCount": 7,
+          "validOddsCount": 7,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1,
+            "2022-2023": 1,
+            "2023-2024": 3,
+            "2024-2025": 2
+          },
+          "leagues": {
+            "ENG-PL": 7
+          },
+          "oddsMin": 1.86,
+          "oddsMax": 2.04
+        },
+        "2.5": {
+          "line": 2.5,
+          "totalCount": 2,
+          "validOddsCount": 2,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1,
+            "2025-2026": 1
+          },
+          "leagues": {
+            "ENG-PL": 2
+          },
+          "oddsMin": 1.83,
+          "oddsMax": 2.04
+        },
+        "0.5": {
+          "line": 0.5,
+          "totalCount": 183,
+          "validOddsCount": 183,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 39,
+            "2020-2021": 24,
+            "2021-2022": 20,
+            "2022-2023": 27,
+            "2023-2024": 17,
+            "2024-2025": 25,
+            "2025-2026": 31
+          },
+          "leagues": {
+            "ENG-PL": 165,
+            "ESP-LALIGA": 18
+          },
+          "oddsMin": 1.75,
+          "oddsMax": 2.13
+        },
+        "-2.5": {
+          "line": -2.5,
+          "totalCount": 30,
+          "validOddsCount": 30,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 7,
+            "2020-2021": 4,
+            "2021-2022": 5,
+            "2022-2023": 4,
+            "2023-2024": 6,
+            "2024-2025": 3,
+            "2025-2026": 1
+          },
+          "leagues": {
+            "ENG-PL": 29,
+            "ESP-LALIGA": 1
+          },
+          "oddsMin": 1.32,
+          "oddsMax": 3.3
+        },
+        "-1": {
+          "line": -1,
+          "totalCount": 202,
+          "validOddsCount": 202,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 41,
+            "2020-2021": 34,
+            "2021-2022": 25,
+            "2022-2023": 23,
+            "2023-2024": 22,
+            "2024-2025": 31,
+            "2025-2026": 26
+          },
+          "leagues": {
+            "ENG-PL": 178,
+            "ESP-LALIGA": 24
+          },
+          "oddsMin": 1.7,
+          "oddsMax": 2.14
+        },
+        "-3": {
+          "line": -3,
+          "totalCount": 4,
+          "validOddsCount": 4,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 3,
+            "2022-2023": 1
+          },
+          "leagues": {
+            "ENG-PL": 4
+          },
+          "oddsMin": 1.8,
+          "oddsMax": 2.02
+        },
+        "-2": {
+          "line": -2,
+          "totalCount": 63,
+          "validOddsCount": 63,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 12,
+            "2020-2021": 4,
+            "2021-2022": 13,
+            "2022-2023": 9,
+            "2023-2024": 12,
+            "2024-2025": 8,
+            "2025-2026": 5
+          },
+          "leagues": {
+            "ENG-PL": 57,
+            "ESP-LALIGA": 6
+          },
+          "oddsMin": 1.73,
+          "oddsMax": 2.1
+        },
+        "2.25": {
+          "line": 2.25,
+          "totalCount": 3,
+          "validOddsCount": 3,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 1,
+            "2021-2022": 1,
+            "2023-2024": 1
+          },
+          "leagues": {
+            "ENG-PL": 3
+          },
+          "oddsMin": 1.88,
+          "oddsMax": 2.05
+        },
+        "null": {
+          "line": null,
+          "totalCount": 1,
+          "validOddsCount": 1,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2025-2026": 1
+          },
+          "leagues": {
+            "ENG-PL": 1
+          },
+          "oddsMin": 1.78,
+          "oddsMax": 2.1
+        }
+      }
+    }
+  },
+  "ouLinesByBookmaker": {
+    "betbrain": {
+      "opening": {
+        "2.5": {
+          "line": 2.5,
+          "totalCount": 5858,
+          "validOddsCount": 5858,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 1826,
+            "2017-2018": 1826,
+            "2018-2019": 1826,
+            "2015-2016": 380
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 918,
+            "ENG-PL": 1520,
+            "ESP-LALIGA": 1140,
+            "FRA-LIGUE1": 1140,
+            "ITA-SERIEA": 1140
+          },
+          "oddsMin": 1.09,
+          "oddsMax": 6.75
+        }
+      }
+    },
+    "pinnacle": {
+      "opening": {
+        "2.5": {
+          "line": 2.5,
+          "totalCount": 8898,
+          "validOddsCount": 8898,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2016-2017": 1826,
+            "2017-2018": 1826,
+            "2018-2019": 1826,
+            "2015-2016": 380,
+            "2019-2020": 760,
+            "2020-2021": 380,
+            "2021-2022": 380,
+            "2022-2023": 380,
+            "2023-2024": 380,
+            "2024-2025": 380,
+            "2025-2026": 380
+          },
+          "leagues": {
+            "DEU-BUNDESLIGA": 918,
+            "ENG-PL": 4180,
+            "ESP-LALIGA": 1520,
+            "FRA-LIGUE1": 1140,
+            "ITA-SERIEA": 1140
+          },
+          "oddsMin": 1.09,
+          "oddsMax": 6.75
+        }
+      },
+      "closing": {
+        "2.5": {
+          "line": 2.5,
+          "totalCount": 3040,
+          "validOddsCount": 3040,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 760,
+            "2020-2021": 380,
+            "2021-2022": 380,
+            "2022-2023": 380,
+            "2023-2024": 380,
+            "2024-2025": 380,
+            "2025-2026": 380
+          },
+          "leagues": {
+            "ENG-PL": 2660,
+            "ESP-LALIGA": 380
+          },
+          "oddsMin": 1.12,
+          "oddsMax": 6.72
+        }
+      }
+    },
+    "bet365": {
+      "closing": {
+        "2.5": {
+          "line": 2.5,
+          "totalCount": 3040,
+          "validOddsCount": 3039,
+          "missingOrInvalidCount": 1,
+          "seasons": {
+            "2019-2020": 760,
+            "2020-2021": 380,
+            "2021-2022": 380,
+            "2022-2023": 380,
+            "2023-2024": 380,
+            "2024-2025": 380,
+            "2025-2026": 380
+          },
+          "leagues": {
+            "ENG-PL": 2660,
+            "ESP-LALIGA": 380
+          },
+          "oddsMin": 1.12,
+          "oddsMax": 6
+        }
+      },
+      "opening": {
+        "2.5": {
+          "line": 2.5,
+          "totalCount": 3039,
+          "validOddsCount": 3039,
+          "missingOrInvalidCount": 0,
+          "seasons": {
+            "2019-2020": 760,
+            "2020-2021": 380,
+            "2021-2022": 379,
+            "2022-2023": 380,
+            "2023-2024": 380,
+            "2024-2025": 380,
+            "2025-2026": 380
+          },
+          "leagues": {
+            "ENG-PL": 2659,
+            "ESP-LALIGA": 380
+          },
+          "oddsMin": 1.2,
+          "oddsMax": 4.5
+        }
+      }
+    }
+  },
+  "mlByBookmaker": {
+    "pinnacle": {
+      "closing": {
+        "line": null,
+        "totalCount": 8896,
+        "validOddsCount": 8896,
+        "missingOrInvalidCount": 0,
+        "seasons": {
+          "2016-2017": 1826,
+          "2017-2018": 1825,
+          "2018-2019": 1825,
+          "2015-2016": 380,
+          "2019-2020": 760,
+          "2020-2021": 380,
+          "2021-2022": 380,
+          "2022-2023": 380,
+          "2023-2024": 380,
+          "2024-2025": 380,
+          "2025-2026": 380
+        },
+        "leagues": {
+          "DEU-BUNDESLIGA": 917,
+          "ENG-PL": 4180,
+          "ESP-LALIGA": 1519,
+          "FRA-LIGUE1": 1140,
+          "ITA-SERIEA": 1140
+        },
+        "oddsMin": 1.04,
+        "oddsMax": 52.77
+      },
+      "opening": {
+        "line": null,
+        "totalCount": 8898,
+        "validOddsCount": 8898,
+        "missingOrInvalidCount": 0,
+        "seasons": {
+          "2016-2017": 1826,
+          "2017-2018": 1826,
+          "2018-2019": 1826,
+          "2015-2016": 380,
+          "2019-2020": 760,
+          "2020-2021": 380,
+          "2021-2022": 380,
+          "2022-2023": 380,
+          "2023-2024": 380,
+          "2024-2025": 380,
+          "2025-2026": 380
+        },
+        "leagues": {
+          "DEU-BUNDESLIGA": 918,
+          "ENG-PL": 4180,
+          "ESP-LALIGA": 1520,
+          "FRA-LIGUE1": 1140,
+          "ITA-SERIEA": 1140
+        },
+        "oddsMin": 1.03,
+        "oddsMax": 48.75
+      }
+    },
+    "bet365": {
+      "opening": {
+        "line": null,
+        "totalCount": 8898,
+        "validOddsCount": 8898,
+        "missingOrInvalidCount": 0,
+        "seasons": {
+          "2016-2017": 1826,
+          "2017-2018": 1826,
+          "2018-2019": 1826,
+          "2015-2016": 380,
+          "2019-2020": 760,
+          "2020-2021": 380,
+          "2021-2022": 380,
+          "2022-2023": 380,
+          "2023-2024": 380,
+          "2024-2025": 380,
+          "2025-2026": 380
+        },
+        "leagues": {
+          "DEU-BUNDESLIGA": 918,
+          "ENG-PL": 4180,
+          "ESP-LALIGA": 1520,
+          "FRA-LIGUE1": 1140,
+          "ITA-SERIEA": 1140
+        },
+        "oddsMin": 1.02,
+        "oddsMax": 41
+      },
+      "closing": {
+        "line": null,
+        "totalCount": 3040,
+        "validOddsCount": 3040,
+        "missingOrInvalidCount": 0,
+        "seasons": {
+          "2019-2020": 760,
+          "2020-2021": 380,
+          "2021-2022": 380,
+          "2022-2023": 380,
+          "2023-2024": 380,
+          "2024-2025": 380,
+          "2025-2026": 380
+        },
+        "leagues": {
+          "ENG-PL": 2660,
+          "ESP-LALIGA": 380
+        },
+        "oddsMin": 1.03,
+        "oddsMax": 41
+      }
+    }
+  },
+  "seasonsSummary": {
+    "2016-2017": {
+      "matches": 1826,
+      "pinnacleOpeningAh": 1826,
+      "pinnacleOpeningOu": 1826,
+      "pinnacleOpeningMl": 1826
+    },
+    "2017-2018": {
+      "matches": 1826,
+      "pinnacleOpeningAh": 1826,
+      "pinnacleOpeningOu": 1826,
+      "pinnacleOpeningMl": 1826
+    },
+    "2018-2019": {
+      "matches": 1826,
+      "pinnacleOpeningAh": 1826,
+      "pinnacleOpeningOu": 1826,
+      "pinnacleOpeningMl": 1826
+    },
+    "2015-2016": {
+      "matches": 380,
+      "pinnacleOpeningAh": 380,
+      "pinnacleOpeningOu": 380,
+      "pinnacleOpeningMl": 380
+    },
+    "2019-2020": {
+      "matches": 760,
+      "pinnacleOpeningAh": 760,
+      "pinnacleOpeningOu": 760,
+      "pinnacleOpeningMl": 760
+    },
+    "2020-2021": {
+      "matches": 380,
+      "pinnacleOpeningAh": 380,
+      "pinnacleOpeningOu": 380,
+      "pinnacleOpeningMl": 380
+    },
+    "2021-2022": {
+      "matches": 380,
+      "pinnacleOpeningAh": 380,
+      "pinnacleOpeningOu": 380,
+      "pinnacleOpeningMl": 380
+    },
+    "2022-2023": {
+      "matches": 380,
+      "pinnacleOpeningAh": 380,
+      "pinnacleOpeningOu": 380,
+      "pinnacleOpeningMl": 380
+    },
+    "2023-2024": {
+      "matches": 380,
+      "pinnacleOpeningAh": 380,
+      "pinnacleOpeningOu": 380,
+      "pinnacleOpeningMl": 380
+    },
+    "2024-2025": {
+      "matches": 380,
+      "pinnacleOpeningAh": 380,
+      "pinnacleOpeningOu": 380,
+      "pinnacleOpeningMl": 380
+    },
+    "2025-2026": {
+      "matches": 380,
+      "pinnacleOpeningAh": 379,
+      "pinnacleOpeningOu": 380,
+      "pinnacleOpeningMl": 380
+    }
+  }
+}

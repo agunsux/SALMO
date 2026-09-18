@@ -1,0 +1,70 @@
+{
+  "generatedAt": "2026-09-16T19:50:45.621Z",
+  "pilotScope": [
+    "2024-2025",
+    "2025-2026"
+  ],
+  "gateGD": {
+    "targetMetric": "odds_btts_yes/no fill rate on EPL matched fixtures >= 80%",
+    "thresholdPct": 80,
+    "actualPct": 100,
+    "status": "PASS"
+  },
+  "providerAudit": {
+    "footystatsRequestsThisRun": 0,
+    "apiFootballRequestsThisRun": 0,
+    "oddsPapiRequestsThisRun": 0
+  },
+  "seasons": {
+    "2024-2025": {
+      "season": "2024-2025",
+      "seasonId": 12325,
+      "fromCache": true,
+      "fixtureCount": 380,
+      "completedFixtureCount": 380,
+      "statusMessage": "Usage of the API is bound to our Terms of Use : https://footystats.org/api/documentations/terms-of-use-and-legal",
+      "fields": {
+        "scoresValidCount": 380,
+        "scoresValidPct": 100,
+        "odds1x2QuotedCount": 380,
+        "odds1x2FillRatePct": 100,
+        "oddsBttsQuotedCount": 380,
+        "oddsBttsFillRatePct": 100,
+        "oddsOu25QuotedCount": 380,
+        "oddsOu25FillRatePct": 100,
+        "oddsOuOtherQuotedCount": 380,
+        "oddsCsQuotedCount": 380
+      }
+    },
+    "2025-2026": {
+      "season": "2025-2026",
+      "seasonId": 15050,
+      "fromCache": true,
+      "fixtureCount": 0,
+      "completedFixtureCount": 0,
+      "statusMessage": "League is not chosen by the user (this might be delayed by cache if you chose the league recently, wait 1 hour). League may not exist, or is not available to this user.",
+      "fields": {
+        "scoresValidCount": 0,
+        "scoresValidPct": 0,
+        "odds1x2QuotedCount": 0,
+        "odds1x2FillRatePct": 0,
+        "oddsBttsQuotedCount": 0,
+        "oddsBttsFillRatePct": 0,
+        "oddsOu25QuotedCount": 0,
+        "oddsOu25FillRatePct": 0,
+        "oddsOuOtherQuotedCount": 0,
+        "oddsCsQuotedCount": 0
+      }
+    }
+  },
+  "normalizationSummary": {
+    "totalNormalizedOddsRows": 7213,
+    "byMarket": {
+      "1X2": 1140,
+      "BTTS": 760,
+      "OU": 3795,
+      "CS_A": 758,
+      "CS_B": 760
+    }
+  }
+}

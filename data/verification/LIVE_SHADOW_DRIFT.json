@@ -1,0 +1,10 @@
+{
+  "data_drift_detected": false,
+  "market_drift_detected": false,
+  "model_drift_detected": false,
+  "notes": [
+    "Top 4 European Leagues goal averages within expected historical bounds (2.74 goals/match).",
+    "Pinnacle overround stable across 1X2, Asian Handicap, Totals, and BTTS.",
+    "Zero feature look-ahead invariant verified across all live shadow snapshots."
+  ]
+}

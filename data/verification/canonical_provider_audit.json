@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-08-15T09:38:18.416Z",
+  "finalStatus": "RED — BLOCKED",
+  "apiFootball": {
+    "baseUrl": "https://v3.football.api-sports.io",
+    "configured": false,
+    "authenticated": false,
+    "quotaStatus": "UNKNOWN",
+    "realData": false,
+    "fixturesFound": 0,
+    "sampleFixtures": [],
+    "error": null,
+    "latencyMs": 0
+  },
+  "oddsPapi": {
+    "baseUrl": "https://api.oddspapi.io",
+    "configured": false,
+    "authenticated": false,
+    "realOdds": false,
+    "eventsFound": 0,
+    "bookmakersFound": [],
+    "marketsFound": [],
+    "sampleOdds": [],
+    "error": null,
+    "latencyMs": 0
+  },
+  "bookmakers": {
+    "pinnacle": "UNKNOWN",
+    "circa": "UNKNOWN",
+    "sbo": "UNKNOWN"
+  },
+  "markets": {
+    "moneyline": "UNKNOWN",
+    "asian_handicap": "UNKNOWN",
+    "over_under": "UNKNOWN",
+    "btts": "UNKNOWN"
+  },
+  "linkage": {
+    "tested": 0,
+    "matched": 0,
+    "unmatched": 0,
+    "matchRate": "N/A",
+    "details": []
+  },
+  "database": {
+    "historicalCsvMatches": 2282,
+    "syntheticOddsSnapshots": 1040,
+    "realClosingLines": 0,
+    "metadataMatches": 495
+  }
+}

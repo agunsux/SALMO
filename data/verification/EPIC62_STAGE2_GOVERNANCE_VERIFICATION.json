@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-09-02T17:58:30.000Z",
+  "audit_version": "EPIC62_STAGE_2_FINALIZATION",
+  "verdict": "STAGE 2 PASS — DATA INVENTORY & CONSTRAINTS PROVEN",
+  "stage3_status": "BLOCKED",
+  "data_inventory": {
+    "total_matches": 8898,
+    "leagues": {
+      "ENG-PL": { "matches": 4180, "ah_coverage": 4179, "ou_coverage": 4180, "btts_odds": 0 },
+      "ESP-LALIGA": { "matches": 1520, "ah_coverage": 1518, "ou_coverage": 1520, "btts_odds": 0 },
+      "DEU-BUNDESLIGA": { "matches": 918, "ah_coverage": 918, "ou_coverage": 918, "btts_odds": 0 },
+      "ITA-SERIEA": { "matches": 1140, "ah_coverage": 1140, "ou_coverage": 1140, "btts_odds": 0 },
+      "FRA-LIGUE1": { "matches": 1140, "ah_coverage": 1140, "ou_coverage": 1140, "btts_odds": 0 }
+    },
+    "odds_depth": {
+      "ah_total_rows": 23864,
+      "ou_total_rows": 23875,
+      "ou_lines": { "2.5": 23875, "others": 0 },
+      "btts_total_rows": 0
+    }
+  },
+  "var_era_governance": {
+    "schema_support": true,
+    "materialized_in_canonical_jsonl": false,
+    "active_db_true_count": 0,
+    "active_db_false_count": 495,
+    "rule": "Kickoff timestamp >= league-specific cutoff",
+    "cutoffs": {
+      "ENG-PL": "2019-08-01",
+      "ESP-LALIGA": "2018-08-01",
+      "DEU-BUNDESLIGA": "2017-08-01",
+      "ITA-SERIEA": "2017-08-01",
+      "FRA-LIGUE1": "2018-08-01"
+    },
+    "cohort_label": "theoretical date-qualified VAR-era cohort",
+    "cohort_count": 5172,
+    "cohort_percentage": 58.13
+  },
+  "market_constraints": {
+    "ou_profitability_restriction": "Line 2.5 only (23,875 rows, 0 rows for other lines)",
+    "btts_profitability_restriction": "CALIBRATION_ONLY (N=0 odds rows; EV/CLV/ROI/Kelly prohibited)",
+    "universal_gate": "NO REAL HISTORICAL ODDS -> NO EV -> NO CLV -> NO ROI -> NO KELLY -> NO PROFITABILITY CLAIM",
+    "leakage_safety": "Strict point-in-time causality enforced; zero post-kickoff feature contamination"
+  }
+}

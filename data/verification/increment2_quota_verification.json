@@ -1,0 +1,111 @@
+{
+  "generatedAt": "2026-09-11T06:40:21.999Z",
+  "databaseHost": "rgkrfzxipkrwqccfuqfq.supabase.co",
+  "checks": [
+    {
+      "check": "production database connectivity configuration",
+      "result": "PASS",
+      "evidence": "host=rgkrfzxipkrwqccfuqfq.supabase.co key=present"
+    },
+    {
+      "check": "required quota RPCs exist (PostgREST schema)",
+      "result": "PASS",
+      "evidence": "all 4 RPCs visible"
+    },
+    {
+      "check": "table quota_state",
+      "result": "PASS",
+      "evidence": "HTTP 200"
+    },
+    {
+      "check": "table quota_reservations",
+      "result": "PASS",
+      "evidence": "HTTP 200"
+    },
+    {
+      "check": "quota_state hard-limit alignment (20260911 migration)",
+      "result": "PASS",
+      "evidence": "31 rows aligned"
+    },
+    {
+      "check": "reserve_quota executes",
+      "result": "PASS",
+      "evidence": "reservation_id issued (safe_limit=100)"
+    },
+    {
+      "check": "confirm_quota executes",
+      "result": "PASS",
+      "evidence": "{\"ok\":true,\"state\":{\"consumed\":1,\"reserved\":0,\"limit_value\":100}}"
+    },
+    {
+      "check": "confirm_quota idempotency",
+      "result": "PASS",
+      "evidence": "second confirm → ALREADY_CONFIRMED"
+    },
+    {
+      "check": "rollback_quota executes",
+      "result": "PASS",
+      "evidence": "{\"ok\":true}"
+    },
+    {
+      "check": "rollback_quota idempotency",
+      "result": "PASS",
+      "evidence": "second rollback → ALREADY_ROLLED_BACK"
+    },
+    {
+      "check": "hard-limit protection (concurrent reserve cannot exceed limit)",
+      "result": "PASS",
+      "evidence": "first=true second=false reason=QUOTA_EXHAUSTED"
+    },
+    {
+      "check": "cleanup_stale_reservations executes",
+      "result": "PASS",
+      "evidence": "HTTP 204"
+    },
+    {
+      "check": "probe residue removed",
+      "result": "PASS",
+      "evidence": "verification providers deleted"
+    },
+    {
+      "check": "API-Football hard limit = 7,500/day",
+      "result": "PASS",
+      "evidence": "7500"
+    },
+    {
+      "check": "API-Football soft limit = 6,000/day",
+      "result": "PASS",
+      "evidence": "6000"
+    },
+    {
+      "check": "OddsPapi hard limit = 250/month",
+      "result": "PASS",
+      "evidence": "250"
+    },
+    {
+      "check": "OddsPapi soft limit = 200/month",
+      "result": "PASS",
+      "evidence": "200"
+    },
+    {
+      "check": "historical odds classified unmetered",
+      "result": "PASS",
+      "evidence": "oddspapi historical-odds/account"
+    },
+    {
+      "check": "unmetered classification is not a generic bypass",
+      "result": "PASS",
+      "evidence": "metered endpoints remain metered"
+    },
+    {
+      "check": "live OddsPapi account reconciliation",
+      "result": "PASS",
+      "evidence": "HTTP 200 limit=250 used=187 remaining=63"
+    }
+  ],
+  "summary": {
+    "pass": 20,
+    "fail": 0,
+    "skip": 0
+  }
+}

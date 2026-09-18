@@ -5,8 +5,11 @@ import { useI18n } from '@/i18n/context';
 
 export type MarketFilter = 'ALL' | 'AH' | 'BTTS' | 'OU';
 export type QualityFilter = 'ALL' | 'VALUE_ONLY' | 'HIGH_CONFIDENCE';
+export type TimeHorizonFilter = '7_DAYS' | 'TODAY' | 'TOMORROW' | 'WEEKEND';
 
 interface FilterBarProps {
+  timeHorizonFilter?: TimeHorizonFilter;
+  onTimeHorizonFilterChange?: (filter: TimeHorizonFilter) => void;
   marketFilter: MarketFilter;
   onMarketFilterChange: (filter: MarketFilter) => void;
   qualityFilter: QualityFilter;
@@ -15,6 +18,8 @@ interface FilterBarProps {
 }
 
 export const FilterBar: React.FC<FilterBarProps> = ({
+  timeHorizonFilter = '7_DAYS',
+  onTimeHorizonFilterChange,
   marketFilter,
   onMarketFilterChange,
   qualityFilter,
@@ -24,19 +29,47 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   const { t } = useI18n();
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-y border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] bg-[#111418]/60 dark:bg-[#111418]/60 light:bg-[#EFF1F5]/60 px-4 py-3 sm:px-6">
-      {/* Market Selector Chips */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-        <button
-          onClick={() => onMarketFilterChange('ALL')}
-          className={`rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-colors ${
-            marketFilter === 'ALL'
-              ? 'bg-emerald-500 text-black shadow-sm font-bold'
-              : 'bg-[#171B20] dark:bg-[#171B20] light:bg-[#FFFFFF] text-[#8A93A0] hover:text-white dark:hover:text-white light:hover:text-[#14171C] border border-[#232830] dark:border-[#232830] light:border-[#DCE0E7]'
-          }`}
-        >
-          {t.filters.allMarkets}
-        </button>
+    <div className="flex flex-col gap-3 border-y border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] bg-[#111418]/60 dark:bg-[#111418]/60 light:bg-[#EFF1F5]/60 px-4 py-3 sm:px-6">
+      {/* Time Horizon Selector Tabs */}
+      {onTimeHorizonFilterChange && (
+        <div className="flex items-center gap-2 border-b border-[#232830]/50 pb-2.5 overflow-x-auto text-xs">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#8A93A0] mr-1">Horizon:</span>
+          {(
+            [
+              { id: '7_DAYS', label: 'All 7 Days' },
+              { id: 'TODAY', label: 'Today (T-6h)' },
+              { id: 'TOMORROW', label: 'Tomorrow (T-24h)' },
+              { id: 'WEEKEND', label: 'Weekend (T-48h+)' },
+            ] as const
+          ).map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => onTimeHorizonFilterChange(tab.id)}
+              className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                timeHorizonFilter === tab.id
+                  ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 font-semibold'
+                  : 'bg-[#171B20] text-[#8A93A0] hover:text-white border border-[#232830]'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Market Selector Chips */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+          <button
+            onClick={() => onMarketFilterChange('ALL')}
+            className={`rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-colors ${
+              marketFilter === 'ALL'
+                ? 'bg-emerald-500 text-black shadow-sm font-bold'
+                : 'bg-[#171B20] dark:bg-[#171B20] light:bg-[#FFFFFF] text-[#8A93A0] hover:text-white dark:hover:text-white light:hover:text-[#14171C] border border-[#232830] dark:border-[#232830] light:border-[#DCE0E7]'
+            }`}
+          >
+            {t.filters.allMarkets}
+          </button>
 
         <button
           onClick={() => onMarketFilterChange('AH')}
@@ -101,6 +134,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <span className="text-[#8A93A0] font-tabular">
           <strong className="text-[#E6E9EE] dark:text-[#E6E9EE] light:text-[#14171C]">{matchCount}</strong> matches
         </span>
+      </div>
       </div>
     </div>
   );

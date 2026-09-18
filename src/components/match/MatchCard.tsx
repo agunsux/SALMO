@@ -2,18 +2,21 @@
 
 import React, { useState } from 'react';
 import { MatchIntelligence, MarketView, MarketType } from '@/types';
+import { MarketFilter } from '../layout/FilterBar';
 import { useI18n } from '@/i18n/context';
 import { InlineWhy } from './InlineWhy';
-import { Calendar, ChevronDown, ChevronUp, FileText, Calculator } from 'lucide-react';
+import { Calendar, ChevronDown, ChevronUp, FileText, Calculator, Clock, Activity } from 'lucide-react';
 
 interface MatchCardProps {
   match: MatchIntelligence;
+  marketFilter?: MarketFilter;
   onOpenEvidence: (market: MarketView, matchTitle: string) => void;
   onOpenTrace: (market: MarketView, matchTitle: string) => void;
 }
 
 export const MatchCard: React.FC<MatchCardProps> = ({
   match,
+  marketFilter = 'ALL',
   onOpenEvidence,
   onOpenTrace,
 }) => {
@@ -86,18 +89,26 @@ export const MatchCard: React.FC<MatchCardProps> = ({
     );
   };
 
-  const marketList: Array<{ type: MarketType; title: string; view: MarketView }> = [
+  const allMarkets: Array<{ type: MarketType; title: string; view: MarketView }> = [
     { type: 'ASIAN_HANDICAP', title: t.markets.asianHandicap, view: match.markets.asianHandicap },
     { type: 'BTTS', title: t.markets.btts, view: match.markets.btts },
     { type: 'OVER_UNDER', title: t.markets.overUnder, view: match.markets.overUnder },
   ];
+
+  const marketList = allMarkets.filter(({ type }) => {
+    if (!marketFilter || marketFilter === 'ALL') return true;
+    if (marketFilter === 'AH' && type === 'ASIAN_HANDICAP') return true;
+    if (marketFilter === 'BTTS' && type === 'BTTS') return true;
+    if (marketFilter === 'OU' && type === 'OVER_UNDER') return true;
+    return false;
+  });
 
   return (
     <div className="rounded-xl border border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] bg-[#111418] dark:bg-[#111418] light:bg-[#FFFFFF] p-4 sm:p-5 transition-all hover:border-[#333A46] shadow-sm">
       {/* Card Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] pb-3.5 mb-4 gap-2">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="rounded bg-[#171B20] dark:bg-[#171B20] light:bg-[#EFF1F5] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0]">
               {match.league}
             </span>
@@ -105,6 +116,18 @@ export const MatchCard: React.FC<MatchCardProps> = ({
               <Calendar className="h-3 w-3" />
               <span>{match.kickoffDisplay}</span>
             </span>
+            {match.horizon && (
+              <span className="inline-flex items-center gap-1 rounded bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 text-[10px] font-bold text-blue-400">
+                <Clock className="h-2.5 w-2.5" />
+                <span>{match.horizon} HORIZON</span>
+              </span>
+            )}
+            {match.scoreGridSummary && (
+              <span className="inline-flex items-center gap-1 rounded bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 text-[10px] text-purple-300">
+                <Activity className="h-2.5 w-2.5" />
+                <span>xG: {match.scoreGridSummary.homeXG.toFixed(2)} - {match.scoreGridSummary.awayXG.toFixed(2)}</span>
+              </span>
+            )}
           </div>
 
           <h3 className="mt-1.5 text-base sm:text-lg font-bold tracking-tight text-[#E6E9EE] dark:text-[#E6E9EE] light:text-[#14171C]">
@@ -116,14 +139,21 @@ export const MatchCard: React.FC<MatchCardProps> = ({
 
         <div className="text-left sm:text-right text-xs text-[#8A93A0]">
           {match.venue && <span className="block text-[11px] text-[#5B6370]">{match.venue}</span>}
-          <span className="inline-block mt-0.5 rounded px-1.5 py-0.5 bg-emerald-500/5 text-emerald-400 font-medium text-[10px]">
-            {match.isUpcoming ? 'PRE-MATCH INTEL' : 'REAL CLOSING ODDS'}
-          </span>
+          <div className="flex items-center sm:justify-end gap-2 mt-1">
+            <span className="inline-block rounded px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 font-medium text-[10px] border border-emerald-500/20">
+              REAL PINNACLE SHARP
+            </span>
+            {match.marketStateTimestamp && (
+              <span className="text-[10px] text-[#5B6370]">
+                Odds: {match.marketStateTimestamp.split('T')[1]?.slice(0, 5)} UTC
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
       {/* The Three-Market Columns */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
+      <div className={marketList.length === 1 ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4'}>
         {marketList.map(({ type, title, view }) => {
           const isExpanded = expandedMarket === type;
 
@@ -150,16 +180,29 @@ export const MatchCard: React.FC<MatchCardProps> = ({
                   <span className="font-tabular text-sm font-bold text-[#E6E9EE] dark:text-[#E6E9EE] light:text-[#14171C]">
                     {view.lineLabel}
                   </span>
-                  <span className="font-tabular text-sm font-semibold text-emerald-400">
-                    {view.odds ? `@ ${formatOdds(view.odds)}` : '—'}
-                  </span>
+                  <div className="text-right">
+                    <span className="font-tabular text-sm font-semibold text-emerald-400">
+                      {view.odds ? `@ ${formatOdds(view.odds)}` : '—'}
+                    </span>
+                    {view.fairOdds && (
+                      <span className="block text-[10px] text-[#8A93A0] font-tabular">
+                        Fair: {formatOdds(view.fairOdds)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Model vs Devig Probabilities */}
+                <div className="mt-1.5 flex items-center justify-between text-[10px] text-[#8A93A0]">
+                  <span>Model: <strong className="text-[#E6E9EE] font-tabular">{view.modelProbabilityPct !== null ? `${view.modelProbabilityPct}%` : '—'}</strong></span>
+                  <span>Devig: <strong className="text-[#E6E9EE] font-tabular">{view.devigProbabilityPct !== null && view.devigProbabilityPct !== undefined ? `${view.devigProbabilityPct}%` : `${view.marketImpliedProbabilityPct || '—'}%`}</strong></span>
                 </div>
 
                 {/* Confidence & Edge teaser */}
                 <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#232830]/60 dark:border-[#232830]/60 light:border-[#DCE0E7]">
                   <div>{renderConfidence(view)}</div>
                   {view.edgePercentagePoints !== null && (
-                    <span className="font-tabular text-xs font-bold text-emerald-400">
+                    <span className={`font-tabular text-xs font-bold ${view.edgePercentagePoints > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                       {formatEdge(view.edgePercentagePoints)}
                     </span>
                   )}

@@ -1,0 +1,309 @@
+{
+  "modelVersion": "Model A — Hierarchical Dixon-Coles v1.0.0",
+  "datasetHash": "22e8e80a8d9c53aa878972bc42603d9b231fed709357c9d05cf8defc1ac1d727",
+  "executedAt": "2026-09-15T18:30:38.375Z",
+  "totalMatches": 8898,
+  "totalAhOdds": 23864,
+  "leagues": [
+    "DEU-BUNDESLIGA",
+    "ENG-PL",
+    "ESP-LALIGA",
+    "FRA-LIGUE1",
+    "ITA-SERIEA"
+  ],
+  "splits": {
+    "trainSeasons": [
+      "2015-2016",
+      "2016-2017",
+      "2017-2018",
+      "2018-2019",
+      "2019-2020",
+      "2020-2021",
+      "2021-2022"
+    ],
+    "validationSeason": "2022-2023",
+    "oosTestSeasons": [
+      "2023-2024",
+      "2024-2025",
+      "2025-2026"
+    ]
+  },
+  "validationMetrics": {
+    "matchOutcome": {
+      "logLoss": 1.0274,
+      "brierScore": 0.615,
+      "maeHomeGoals": 1.0318,
+      "maeAwayGoals": 0.9447,
+      "totalMatches": 380
+    },
+    "ahOutcome": {
+      "ahBrierScore": 0.2334,
+      "ahLogLoss": 0.7442,
+      "ece": 0.1482,
+      "numEvaluatedOdds": 1520
+    },
+    "bettingDiagnostic": {
+      "selectionRule": "Fixed 1.0 unit stake where EV > 0.00",
+      "totalBets": 707,
+      "turnover": 707,
+      "totalProfit": -69.56,
+      "roi": -0.0984,
+      "maxDrawdown": 71.98,
+      "winCount": 251,
+      "halfWinCount": 60,
+      "pushCount": 38,
+      "halfLossCount": 46,
+      "lossCount": 312
+    }
+  },
+  "oosTestMetrics": {
+    "matchOutcome": {
+      "logLoss": 1.015,
+      "brierScore": 0.6078,
+      "maeHomeGoals": 0.9788,
+      "maeAwayGoals": 0.8992,
+      "totalMatches": 1140
+    },
+    "ahOutcome": {
+      "ahBrierScore": 0.2274,
+      "ahLogLoss": 0.7347,
+      "ece": 0.1214,
+      "numEvaluatedOdds": 4556
+    },
+    "bettingDiagnostic": {
+      "selectionRule": "Fixed 1.0 unit stake where EV > 0.00",
+      "totalBets": 2113,
+      "turnover": 2113,
+      "totalProfit": -33.765,
+      "roi": -0.016,
+      "maxDrawdown": 67.215,
+      "winCount": 850,
+      "halfWinCount": 143,
+      "pushCount": 140,
+      "halfLossCount": 152,
+      "lossCount": 828
+    }
+  },
+  "walkForwardFolds": [
+    {
+      "foldIndex": 1,
+      "trainSeasons": [
+        "2015-2016",
+        "2016-2017",
+        "2017-2018",
+        "2018-2019",
+        "2019-2020",
+        "2020-2021"
+      ],
+      "trainStart": "2015-08-08",
+      "trainEnd": "2021-05-23",
+      "trainMatchesCount": 6998,
+      "testSeason": "2022-2023",
+      "testStart": "2022-08-05",
+      "testEnd": "2023-05-28",
+      "testMatchesCount": 380,
+      "testOddsCount": 1520,
+      "metrics": {
+        "matchOutcome": {
+          "logLoss": 1.0393,
+          "brierScore": 0.6239,
+          "maeHomeGoals": 1.0351,
+          "maeAwayGoals": 0.9519,
+          "totalMatches": 380
+        },
+        "ahOutcome": {
+          "ahBrierScore": 0.2387,
+          "ahLogLoss": 0.7562,
+          "ece": 0.1463,
+          "numEvaluatedOdds": 1520
+        },
+        "bettingDiagnostic": {
+          "selectionRule": "Fixed 1.0 unit stake where EV > 0.00",
+          "totalBets": 713,
+          "turnover": 713,
+          "totalProfit": -71.425,
+          "roi": -0.1002,
+          "maxDrawdown": 82.125,
+          "winCount": 255,
+          "halfWinCount": 54,
+          "pushCount": 42,
+          "halfLossCount": 45,
+          "lossCount": 317
+        }
+      }
+    },
+    {
+      "foldIndex": 2,
+      "trainSeasons": [
+        "2015-2016",
+        "2016-2017",
+        "2017-2018",
+        "2018-2019",
+        "2019-2020",
+        "2020-2021",
+        "2021-2022"
+      ],
+      "trainStart": "2015-08-08",
+      "trainEnd": "2022-05-22",
+      "trainMatchesCount": 7378,
+      "testSeason": "2023-2024",
+      "testStart": "2023-08-11",
+      "testEnd": "2024-05-19",
+      "testMatchesCount": 380,
+      "testOddsCount": 1520,
+      "metrics": {
+        "matchOutcome": {
+          "logLoss": 0.9526,
+          "brierScore": 0.5633,
+          "maeHomeGoals": 1.0215,
+          "maeAwayGoals": 0.916,
+          "totalMatches": 380
+        },
+        "ahOutcome": {
+          "ahBrierScore": 0.2222,
+          "ahLogLoss": 0.7313,
+          "ece": 0.1072,
+          "numEvaluatedOdds": 1520
+        },
+        "bettingDiagnostic": {
+          "selectionRule": "Fixed 1.0 unit stake where EV > 0.00",
+          "totalBets": 717,
+          "turnover": 717,
+          "totalProfit": 32.035,
+          "roi": 0.0447,
+          "maxDrawdown": 29.445,
+          "winCount": 299,
+          "halfWinCount": 64,
+          "pushCount": 41,
+          "halfLossCount": 54,
+          "lossCount": 259
+        }
+      }
+    },
+    {
+      "foldIndex": 3,
+      "trainSeasons": [
+        "2015-2016",
+        "2016-2017",
+        "2017-2018",
+        "2018-2019",
+        "2019-2020",
+        "2020-2021",
+        "2021-2022",
+        "2022-2023"
+      ],
+      "trainStart": "2015-08-08",
+      "trainEnd": "2023-05-28",
+      "trainMatchesCount": 7758,
+      "testSeason": "2024-2025",
+      "testStart": "2024-08-16",
+      "testEnd": "2025-05-25",
+      "testMatchesCount": 380,
+      "testOddsCount": 1520,
+      "metrics": {
+        "matchOutcome": {
+          "logLoss": 1.0463,
+          "brierScore": 0.6297,
+          "maeHomeGoals": 0.967,
+          "maeAwayGoals": 0.9148,
+          "totalMatches": 380
+        },
+        "ahOutcome": {
+          "ahBrierScore": 0.2376,
+          "ahLogLoss": 0.7536,
+          "ece": 0.1343,
+          "numEvaluatedOdds": 1520
+        },
+        "bettingDiagnostic": {
+          "selectionRule": "Fixed 1.0 unit stake where EV > 0.00",
+          "totalBets": 717,
+          "turnover": 717,
+          "totalProfit": -24.505,
+          "roi": -0.0342,
+          "maxDrawdown": 46.29,
+          "winCount": 290,
+          "halfWinCount": 40,
+          "pushCount": 46,
+          "halfLossCount": 48,
+          "lossCount": 293
+        }
+      }
+    },
+    {
+      "foldIndex": 4,
+      "trainSeasons": [
+        "2015-2016",
+        "2016-2017",
+        "2017-2018",
+        "2018-2019",
+        "2019-2020",
+        "2020-2021",
+        "2021-2022",
+        "2022-2023",
+        "2023-2024"
+      ],
+      "trainStart": "2015-08-08",
+      "trainEnd": "2024-05-19",
+      "trainMatchesCount": 8138,
+      "testSeason": "2025-2026",
+      "testStart": "2025-08-15",
+      "testEnd": "2026-05-24",
+      "testMatchesCount": 380,
+      "testOddsCount": 1516,
+      "metrics": {
+        "matchOutcome": {
+          "logLoss": 1.042,
+          "brierScore": 0.6277,
+          "maeHomeGoals": 0.9474,
+          "maeAwayGoals": 0.8667,
+          "totalMatches": 380
+        },
+        "ahOutcome": {
+          "ahBrierScore": 0.221,
+          "ahLogLoss": 0.7168,
+          "ece": 0.0826,
+          "numEvaluatedOdds": 1516
+        },
+        "bettingDiagnostic": {
+          "selectionRule": "Fixed 1.0 unit stake where EV > 0.00",
+          "totalBets": 656,
+          "turnover": 656,
+          "totalProfit": 0.01,
+          "roi": 0,
+          "maxDrawdown": 47.845,
+          "winCount": 271,
+          "halfWinCount": 45,
+          "pushCount": 48,
+          "halfLossCount": 34,
+          "lossCount": 258
+        }
+      }
+    }
+  ],
+  "baselineComparison": {
+    "modelA_DixonColes": {
+      "logLoss": 1.015,
+      "brierScore": 0.6078,
+      "ahBrierScore": 0.2274,
+      "roi": -0.016
+    },
+    "baseline_IndependentPoisson": {
+      "logLoss": 1.0149,
+      "brierScore": 0.6077,
+      "ahBrierScore": 0.2276,
+      "roi": -0.0175
+    },
+    "diff": {
+      "logLossDelta": 0.0001,
+      "brierScoreDelta": 0.0001,
+      "ahBrierDelta": -0.0002
+    }
+  },
+  "invariantsAudit": {
+    "scoreMatrixSumOne": true,
+    "nonNegativeProbabilities": true,
+    "settlementPayoutSymmetry": true,
+    "zeroFutureLeakage": true,
+    "reproducible": true
+  }
+}

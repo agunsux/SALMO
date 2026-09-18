@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-09-18T11:34:04.627Z",
+  "clv_by_market": {
+    "Moneyline": {
+      "market": "Moneyline",
+      "champion_model": "Model 2",
+      "sample_size": 0,
+      "status": "INCONCLUSIVE — INSUFFICIENT SAMPLE",
+      "shadow_roi": null,
+      "shadow_clv": null,
+      "brier_score": null,
+      "decision": "RETAIN BASELINE (CONTINUE OBSERVATION)"
+    },
+    "Asian Handicap": {
+      "market": "Asian Handicap",
+      "champion_model": "Model 2",
+      "sample_size": 0,
+      "status": "INCONCLUSIVE — INSUFFICIENT SAMPLE",
+      "shadow_roi": null,
+      "shadow_clv": null,
+      "brier_score": null,
+      "decision": "RETAIN BASELINE (CONTINUE OBSERVATION)"
+    },
+    "Over/Under": {
+      "market": "Over/Under",
+      "champion_model": "Model 1",
+      "sample_size": 0,
+      "status": "INCONCLUSIVE — INSUFFICIENT SAMPLE",
+      "shadow_roi": null,
+      "shadow_clv": null,
+      "brier_score": null,
+      "decision": "RETAIN BASELINE (CONTINUE OBSERVATION)"
+    },
+    "BTTS": {
+      "market": "BTTS",
+      "champion_model": "Model 1",
+      "sample_size": 0,
+      "status": "INCONCLUSIVE — INSUFFICIENT SAMPLE",
+      "shadow_roi": null,
+      "shadow_clv": null,
+      "brier_score": null,
+      "decision": "RETAIN BASELINE (CONTINUE OBSERVATION)"
+    }
+  }
+}

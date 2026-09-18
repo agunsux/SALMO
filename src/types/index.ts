@@ -43,8 +43,10 @@ export interface MarketView {
   selection: string;        // e.g. "home", "yes", "over"
   available: boolean;
   odds: number | null;      // e.g. 1.91 (decimal odds, null if unavailable)
+  fairOdds?: number | null; // model fair odds (1 / prob)
   oppositeOdds?: number | null;
   bookmaker: string | null; // e.g. "Pinnacle"
+  oddsCapturedAt?: string;  // timestamp of market quote capture
   badge: DecisionBadge;
   status: DecisionStatus;
   statusLabel: string;
@@ -52,6 +54,7 @@ export interface MarketView {
   confidenceScore: number;  // 0 - 100
   modelProbabilityPct: number | null;      // e.g. 56.5%
   marketImpliedProbabilityPct: number | null; // e.g. 52.4%
+  devigProbabilityPct?: number | null;    // devigged market probability
   edgePercentagePoints: number | null;     // e.g. +4.1 pp
   expectedValuePct: number | null;         // e.g. +3.8%
   sampleSize: number;
@@ -105,18 +108,105 @@ export interface CalculationTrace {
 export interface MatchIntelligence {
   id: string;
   fixtureId: string;
+  canonicalMatchId?: string;
   homeTeam: string;
   awayTeam: string;
   league: string;
+  season?: string;
   kickoffIso: string;
   kickoffDisplay: string;
   venue?: string;
   isUpcoming: boolean;
+  horizon?: string;
+  predictionTimestamp?: string;
+  footballStateTimestamp?: string;
+  marketStateTimestamp?: string;
+  scoreGridSummary?: {
+    homeXG: number;
+    awayXG: number;
+    rho: number;
+  };
   markets: {
     asianHandicap: MarketView;
     btts: MarketView;
     overUnder: MarketView;
   };
+}
+
+export interface ActivePredictionMarket {
+  market: 'AH' | 'OU' | 'BTTS';
+  selection: string;
+  line: number;
+  modelProbabilityPct: number;
+  fairOdds: number | null;
+  marketOdds: number;
+  marketImpliedProbPct: number;
+  devigProbPct: number;
+  edgePct: number;
+  expectedValuePct: number | null;
+  signalState: string;
+  bookmaker: string;
+  oddsCapturedAt: string;
+}
+
+export interface ActiveMatchPrediction {
+  canonicalMatchId: string;
+  fixtureId: string;
+  oddsPapiFixtureId: string;
+  kickoffUtc: string;
+  homeTeam: string;
+  awayTeam: string;
+  league: string;
+  season: string;
+  venue: string;
+  predictionTimestamp: string;
+  footballStateTimestamp: string;
+  footystatsStateTimestamp: string;
+  marketStateTimestamp: string;
+  horizon: string;
+  modelVersion: string;
+  featureVersion: string;
+  markets: {
+    asianHandicap: ActivePredictionMarket;
+    overUnder: ActivePredictionMarket;
+    btts: ActivePredictionMarket;
+  };
+  scoreGridSummary: {
+    homeXG: number;
+    awayXG: number;
+    rho: number;
+  };
+}
+
+export interface LiveValidationSummary {
+  generatedAt: string;
+  windowStart: string;
+  windowEnd: string;
+  fixtureCount: number;
+  reconciledFixtureCount: number;
+  ahCoverage: string;
+  ouCoverage: string;
+  bttsCoverage: string;
+  predictionCount: number;
+  dataCompleteness: string;
+  providerStatus: {
+    apiFootball: string;
+    oddsPapi: string;
+    footyStats: string;
+  };
+  modelVersion: string;
+  validationStatus: string;
+  matrix: Array<{
+    market: 'AH' | 'BTTS' | 'OU';
+    model: string;
+    fixtures: number;
+    signals: number;
+    roi: number;
+    ci95: string;
+    clv: number;
+    calibration: number;
+    status: string;
+  }>;
 }
 
 export interface MatchObservation {

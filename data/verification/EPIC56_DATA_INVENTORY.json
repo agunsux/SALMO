@@ -1,0 +1,216 @@
+{
+  "totalMatches": 8898,
+  "validMatches": 8898,
+  "totalMarketOddsRows": 77471,
+  "ahMarketOddsRows": 23864,
+  "ouMarketOddsRows": 23875,
+  "mlMarketOddsRows": 29732,
+  "bttsMarketOddsRows": 0,
+  "uniqueAhFixtures": 8898,
+  "ahLineDistribution": {
+    "-2.50": {
+      "openingRows": 206,
+      "closingRows": 54,
+      "totalRows": 260
+    },
+    "+0.00": {
+      "openingRows": 1614,
+      "closingRows": 630,
+      "totalRows": 2244
+    },
+    "-1.50": {
+      "openingRows": 872,
+      "closingRows": 244,
+      "totalRows": 1116
+    },
+    "+0.25": {
+      "openingRows": 1801,
+      "closingRows": 650,
+      "totalRows": 2451
+    },
+    "-1.00": {
+      "openingRows": 2049,
+      "closingRows": 436,
+      "totalRows": 2485
+    },
+    "-0.25": {
+      "openingRows": 3454,
+      "closingRows": 881,
+      "totalRows": 4335
+    },
+    "+1.50": {
+      "openingRows": 384,
+      "closingRows": 122,
+      "totalRows": 506
+    },
+    "+0.50": {
+      "openingRows": 760,
+      "closingRows": 420,
+      "totalRows": 1180
+    },
+    "+1.00": {
+      "openingRows": 937,
+      "closingRows": 238,
+      "totalRows": 1175
+    },
+    "-0.50": {
+      "openingRows": 1662,
+      "closingRows": 650,
+      "totalRows": 2312
+    },
+    "-0.75": {
+      "openingRows": 1252,
+      "closingRows": 558,
+      "totalRows": 1810
+    },
+    "-2.25": {
+      "openingRows": 152,
+      "closingRows": 58,
+      "totalRows": 210
+    },
+    "-2.00": {
+      "openingRows": 538,
+      "closingRows": 122,
+      "totalRows": 660
+    },
+    "+2.00": {
+      "openingRows": 156,
+      "closingRows": 32,
+      "totalRows": 188
+    },
+    "+0.75": {
+      "openingRows": 674,
+      "closingRows": 304,
+      "totalRows": 978
+    },
+    "+2.50": {
+      "openingRows": 20,
+      "closingRows": 4,
+      "totalRows": 24
+    },
+    "+1.25": {
+      "openingRows": 228,
+      "closingRows": 130,
+      "totalRows": 358
+    },
+    "-1.25": {
+      "openingRows": 528,
+      "closingRows": 300,
+      "totalRows": 828
+    },
+    "-3.25": {
+      "openingRows": 10,
+      "closingRows": 2,
+      "totalRows": 12
+    },
+    "-1.75": {
+      "openingRows": 292,
+      "closingRows": 158,
+      "totalRows": 450
+    },
+    "-2.75": {
+      "openingRows": 66,
+      "closingRows": 20,
+      "totalRows": 86
+    },
+    "-3.00": {
+      "openingRows": 50,
+      "closingRows": 8,
+      "totalRows": 58
+    },
+    "-3.50": {
+      "openingRows": 6,
+      "closingRows": 0,
+      "totalRows": 6
+    },
+    "+1.75": {
+      "openingRows": 62,
+      "closingRows": 46,
+      "totalRows": 108
+    },
+    "+2.25": {
+      "openingRows": 10,
+      "closingRows": 8,
+      "totalRows": 18
+    },
+    "+3.00": {
+      "openingRows": 2,
+      "closingRows": 2,
+      "totalRows": 4
+    },
+    "-3.75": {
+      "openingRows": 0,
+      "closingRows": 2,
+      "totalRows": 2
+    }
+  },
+  "bookmakerCoverage": {
+    "betbrain": 5858,
+    "pinnacle": 11937,
+    "bet365": 6069
+  },
+  "closingOddsCoveragePct": 34.18,
+  "dateRange": {
+    "earliest": "2015-08-08",
+    "latest": "2026-05-24"
+  },
+  "leagues": {
+    "DEU-BUNDESLIGA": {
+      "matches": 918,
+      "ahRows": 1836,
+      "seasons": [
+        "2016-2017",
+        "2017-2018",
+        "2018-2019"
+      ]
+    },
+    "ENG-PL": {
+      "matches": 4180,
+      "ahRows": 13678,
+      "seasons": [
+        "2015-2016",
+        "2016-2017",
+        "2017-2018",
+        "2018-2019",
+        "2019-2020",
+        "2020-2021",
+        "2021-2022",
+        "2022-2023",
+        "2023-2024",
+        "2024-2025",
+        "2025-2026"
+      ]
+    },
+    "ESP-LALIGA": {
+      "matches": 1520,
+      "ahRows": 3790,
+      "seasons": [
+        "2016-2017",
+        "2017-2018",
+        "2018-2019",
+        "2019-2020"
+      ]
+    },
+    "FRA-LIGUE1": {
+      "matches": 1140,
+      "ahRows": 2280,
+      "seasons": [
+        "2016-2017",
+        "2017-2018",
+        "2018-2019"
+      ]
+    },
+    "ITA-SERIEA": {
+      "matches": 1140,
+      "ahRows": 2280,
+      "seasons": [
+        "2016-2017",
+        "2017-2018",
+        "2018-2019"
+      ]
+    }
+  },
+  "duplicateObservations": 0,
+  "invalidOddsCount": 2,
+  "orphanOddsCount": 0
+}

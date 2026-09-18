@@ -1,0 +1,745 @@
+{
+  "generatedAt": "2026-09-16T20:07:46.724Z",
+  "season": "2024-2025",
+  "pairedFixtureCount": 380,
+  "provenanceStatus": "FAILED_PROVENANCE",
+  "gates": {
+    "gateGE": {
+      "targetMetric": "odds_ft_over25 vs gold Pinnacle: r >= 0.95 & medDiff <= 0.05",
+      "rThreshold": 0.95,
+      "medDiffThreshold": 0.05,
+      "actualR": 0.8732,
+      "actualMedDiff": 0.05,
+      "status": "BLOCKED"
+    },
+    "gateGF": {
+      "targetMetric": ">= 90% FootyStats OU quotes within Pinnacle [Open - 0.10, Close + 0.10]",
+      "thresholdPct": 90,
+      "actualPct": 81.05,
+      "insideBandCount": 308,
+      "sampleSize": 380,
+      "status": "BLOCKED"
+    }
+  },
+  "overroundAudit": {
+    "ou25": {
+      "footystatsMedianOverroundPct": 6.961,
+      "pinnacleOpenMedianOverroundPct": 3.5731,
+      "pinnacleCloseMedianOverroundPct": 3.2719
+    },
+    "ml1x2": {
+      "footystatsMedianOverroundPct": 6.0056,
+      "pinnacleOpenMedianOverroundPct": 3.5668,
+      "pinnacleCloseMedianOverroundPct": 2.9384
+    }
+  },
+  "ou25Comparison": {
+    "over": {
+      "sampleSize": 380,
+      "correlationVsOpen": 0.8732,
+      "correlationVsClose": 0.812,
+      "medianAbsDiffVsOpen": 0.05,
+      "medianAbsDiffVsClose": 0.09,
+      "maxAbsDiffVsOpen": 0.64,
+      "maxAbsDiffVsClose": 0.89
+    },
+    "under": {
+      "sampleSize": 380,
+      "correlationVsOpen": 0.893,
+      "correlationVsClose": 0.8337,
+      "medianAbsDiffVsOpen": 0.115,
+      "medianAbsDiffVsClose": 0.14,
+      "maxAbsDiffVsOpen": 1.04,
+      "maxAbsDiffVsClose": 1.25
+    },
+    "proximityToPinnacle": {
+      "closerToOpeningCount": 244,
+      "closerToOpeningPct": 64.21,
+      "closerToClosingCount": 106,
+      "closerToClosingPct": 27.89,
+      "equidistantCount": 30,
+      "equidistantPct": 7.89
+    },
+    "outliersOutsideBand": [
+      {
+        "match": "Ipswich Town vs Liverpool (2024-08-17)",
+        "canonicalId": "ENG-PL|2024-2025|2024-08-17|ipswich|liverpool",
+        "footyOver": 1.58,
+        "pinnacleOpenOver": 1.41,
+        "pinnacleCloseOver": 1.37,
+        "diffVsOpen": 0.17,
+        "diffVsClose": 0.21
+      },
+      {
+        "match": "Newcastle United vs Southampton (2024-08-17)",
+        "canonicalId": "ENG-PL|2024-2025|2024-08-17|newcastle|southampton",
+        "footyOver": 1.68,
+        "pinnacleOpenOver": 1.4,
+        "pinnacleCloseOver": 1.46,
+        "diffVsOpen": 0.28,
+        "diffVsClose": 0.22
+      },
+      {
+        "match": "Nottingham Forest vs AFC Bournemouth (2024-08-17)",
+        "canonicalId": "ENG-PL|2024-2025|2024-08-17|nott-m-forest|bournemouth",
+        "footyOver": 1.61,
+        "pinnacleOpenOver": 1.79,
+        "pinnacleCloseOver": 1.89,
+        "diffVsOpen": 0.18,
+        "diffVsClose": 0.28
+      },
+      {
+        "match": "Chelsea vs Manchester City (2024-08-18)",
+        "canonicalId": "ENG-PL|2024-2025|2024-08-18|chelsea|man-city",
+        "footyOver": 1.77,
+        "pinnacleOpenOver": 1.52,
+        "pinnacleCloseOver": 1.58,
+        "diffVsOpen": 0.25,
+        "diffVsClose": 0.19
+      },
+      {
+        "match": "Brentford vs Southampton (2024-08-31)",
+        "canonicalId": "ENG-PL|2024-2025|2024-08-31|brentford|southampton",
+        "footyOver": 1.62,
+        "pinnacleOpenOver": 1.74,
+        "pinnacleCloseOver": 1.82,
+        "diffVsOpen": 0.12,
+        "diffVsClose": 0.2
+      },
+      {
+        "match": "Ipswich Town vs Fulham (2024-08-31)",
+        "canonicalId": "ENG-PL|2024-2025|2024-08-31|ipswich|fulham",
+        "footyOver": 1.68,
+        "pinnacleOpenOver": 1.83,
+        "pinnacleCloseOver": 1.93,
+        "diffVsOpen": 0.15,
+        "diffVsClose": 0.25
+      },
+      {
+        "match": "Brighton & Hove Albion vs Nottingham Forest (2024-09-22)",
+        "canonicalId": "ENG-PL|2024-2025|2024-09-22|brighton|nott-m-forest",
+        "footyOver": 1.62,
+        "pinnacleOpenOver": 1.85,
+        "pinnacleCloseOver": 1.83,
+        "diffVsOpen": 0.23,
+        "diffVsClose": 0.21
+      },
+      {
+        "match": "Manchester City vs Arsenal (2024-09-22)",
+        "canonicalId": "ENG-PL|2024-2025|2024-09-22|man-city|arsenal",
+        "footyOver": 1.89,
+        "pinnacleOpenOver": 2.05,
+        "pinnacleCloseOver": 2.03,
+        "diffVsOpen": 0.16,
+        "diffVsClose": 0.14
+      },
+      {
+        "match": "Chelsea vs Brighton & Hove Albion (2024-09-28)",
+        "canonicalId": "ENG-PL|2024-2025|2024-09-28|chelsea|brighton",
+        "footyOver": 1.63,
+        "pinnacleOpenOver": 1.51,
+        "pinnacleCloseOver": 1.48,
+        "diffVsOpen": 0.12,
+        "diffVsClose": 0.15
+      },
+      {
+        "match": "Ipswich Town vs Aston Villa (2024-09-29)",
+        "canonicalId": "ENG-PL|2024-2025|2024-09-29|ipswich|aston-villa",
+        "footyOver": 1.6,
+        "pinnacleOpenOver": 1.74,
+        "pinnacleCloseOver": 1.85,
+        "diffVsOpen": 0.14,
+        "diffVsClose": 0.25
+      },
+      {
+        "match": "Nottingham Forest vs Fulham (2024-09-28)",
+        "canonicalId": "ENG-PL|2024-2025|2024-09-28|nott-m-forest|fulham",
+        "footyOver": 1.85,
+        "pinnacleOpenOver": 2.01,
+        "pinnacleCloseOver": 2.29,
+        "diffVsOpen": 0.16,
+        "diffVsClose": 0.44
+      },
+      {
+        "match": "Brighton & Hove Albion vs Tottenham Hotspur (2024-10-06)",
+        "canonicalId": "ENG-PL|2024-2025|2024-10-06|brighton|tottenham",
+        "footyOver": 1.55,
+        "pinnacleOpenOver": 1.42,
+        "pinnacleCloseOver": 1.42,
+        "diffVsOpen": 0.13,
+        "diffVsClose": 0.13
+      },
+      {
+        "match": "Everton vs Newcastle United (2024-10-05)",
+        "canonicalId": "ENG-PL|2024-2025|2024-10-05|everton|newcastle",
+        "footyOver": 1.6,
+        "pinnacleOpenOver": 1.73,
+        "pinnacleCloseOver": 1.72,
+        "diffVsOpen": 0.13,
+        "diffVsClose": 0.12
+      },
+      {
+        "match": "AFC Bournemouth vs Arsenal (2024-10-19)",
+        "canonicalId": "ENG-PL|2024-2025|2024-10-19|bournemouth|arsenal",
+        "footyOver": 1.61,
+        "pinnacleOpenOver": 1.74,
+        "pinnacleCloseOver": 1.96,
+        "diffVsOpen": 0.13,
+        "diffVsClose": 0.35
+      },
+      {
+        "match": "Liverpool vs Chelsea (2024-10-20)",
+        "canonicalId": "ENG-PL|2024-2025|2024-10-20|liverpool|chelsea",
+        "footyOver": 1.64,
+        "pinnacleOpenOver": 1.41,
+        "pinnacleCloseOver": 1.41,
+        "diffVsOpen": 0.23,
+        "diffVsClose": 0.23
+      },
+      {
+        "match": "Nottingham Forest vs Crystal Palace (2024-10-21)",
+        "canonicalId": "ENG-PL|2024-2025|2024-10-21|nott-m-forest|crystal-palace",
+        "footyOver": 1.95,
+        "pinnacleOpenOver": 2.17,
+        "pinnacleCloseOver": 2.36,
+        "diffVsOpen": 0.22,
+        "diffVsClose": 0.41
+      },
+      {
+        "match": "Tottenham Hotspur vs West Ham United (2024-10-19)",
+        "canonicalId": "ENG-PL|2024-2025|2024-10-19|tottenham|west-ham",
+        "footyOver": 1.55,
+        "pinnacleOpenOver": 1.38,
+        "pinnacleCloseOver": 1.35,
+        "diffVsOpen": 0.17,
+        "diffVsClose": 0.2
+      },
+      {
+        "match": "Leicester City vs Nottingham Forest (2024-10-25)",
+        "canonicalId": "ENG-PL|2024-2025|2024-10-25|leicester|nott-m-forest",
+        "footyOver": 1.85,
+        "pinnacleOpenOver": 2.12,
+        "pinnacleCloseOver": 2.03,
+        "diffVsOpen": 0.27,
+        "diffVsClose": 0.18
+      },
+      {
+        "match": "Wolverhampton Wanderers vs Crystal Palace (2024-11-02)",
+        "canonicalId": "ENG-PL|2024-2025|2024-11-02|wolves|crystal-palace",
+        "footyOver": 1.62,
+        "pinnacleOpenOver": 1.92,
+        "pinnacleCloseOver": 2,
+        "diffVsOpen": 0.3,
+        "diffVsClose": 0.38
+      },
+      {
+        "match": "Brentford vs AFC Bournemouth (2024-11-09)",
+        "canonicalId": "ENG-PL|2024-2025|2024-11-09|brentford|bournemouth",
+        "footyOver": 1.52,
+        "pinnacleOpenOver": 1.63,
+        "pinnacleCloseOver": 1.71,
+        "diffVsOpen": 0.11,
+        "diffVsClose": 0.19
+      },
+      {
+        "match": "Aston Villa vs Crystal Palace (2024-11-23)",
+        "canonicalId": "ENG-PL|2024-2025|2024-11-23|aston-villa|crystal-palace",
+        "footyOver": 1.65,
+        "pinnacleOpenOver": 1.78,
+        "pinnacleCloseOver": 1.89,
+        "diffVsOpen": 0.13,
+        "diffVsClose": 0.24
+      },
+      {
+        "match": "Brighton & Hove Albion vs Southampton (2024-11-29)",
+        "canonicalId": "ENG-PL|2024-2025|2024-11-29|brighton|southampton",
+        "footyOver": 1.56,
+        "pinnacleOpenOver": 1.43,
+        "pinnacleCloseOver": 1.36,
+        "diffVsOpen": 0.13,
+        "diffVsClose": 0.2
+      },
+      {
+        "match": "Manchester United vs Everton (2024-12-01)",
+        "canonicalId": "ENG-PL|2024-2025|2024-12-01|man-united|everton",
+        "footyOver": 1.65,
+        "pinnacleOpenOver": 1.78,
+        "pinnacleCloseOver": 1.85,
+        "diffVsOpen": 0.13,
+        "diffVsClose": 0.2
+      },
+      {
+        "match": "AFC Bournemouth vs Tottenham Hotspur (2024-12-05)",
+        "canonicalId": "ENG-PL|2024-2025|2024-12-05|bournemouth|tottenham",
+        "footyOver": 1.6,
+        "pinnacleOpenOver": 1.43,
+        "pinnacleCloseOver": 1.45,
+        "diffVsOpen": 0.17,
+        "diffVsClose": 0.15
+      },
+      {
+        "match": "Everton vs Wolverhampton Wanderers (2024-12-04)",
+        "canonicalId": "ENG-PL|2024-2025|2024-12-04|everton|wolves",
+        "footyOver": 1.85,
+        "pinnacleOpenOver": 2.04,
+        "pinnacleCloseOver": 2.09,
+        "diffVsOpen": 0.19,
+        "diffVsClose": 0.24
+      },
+      {
+        "match": "Fulham vs Brighton & Hove Albion (2024-12-05)",
+        "canonicalId": "ENG-PL|2024-2025|2024-12-05|fulham|brighton",
+        "footyOver": 1.9,
+        "pinnacleOpenOver": 1.63,
+        "pinnacleCloseOver": 1.69,
+        "diffVsOpen": 0.27,
+        "diffVsClose": 0.21
+      },
+      {
+        "match": "Newcastle United vs Liverpool (2024-12-04)",
+        "canonicalId": "ENG-PL|2024-2025|2024-12-04|newcastle|liverpool",
+        "footyOver": 1.76,
+        "pinnacleOpenOver": 1.62,
+        "pinnacleCloseOver": 1.65,
+        "diffVsOpen": 0.14,
+        "diffVsClose": 0.11
+      },
+      {
+        "match": "Southampton vs Chelsea (2024-12-04)",
+        "canonicalId": "ENG-PL|2024-2025|2024-12-04|southampton|chelsea",
+        "footyOver": 1.55,
+        "pinnacleOpenOver": 1.43,
+        "pinnacleCloseOver": 1.37,
+        "diffVsOpen": 0.12,
+        "diffVsClose": 0.18
+      },
+      {
+        "match": "Fulham vs Arsenal (2024-12-08)",
+        "canonicalId": "ENG-PL|2024-2025|2024-12-08|fulham|arsenal",
+        "footyOver": 1.67,
+        "pinnacleOpenOver": 1.82,
+        "pinnacleCloseOver": 1.79,
+        "diffVsOpen": 0.15,
+        "diffVsClose": 0.12
+      },
+      {
+        "match": "Nottingham Forest vs Aston Villa (2024-12-14)",
+        "canonicalId": "ENG-PL|2024-2025|2024-12-14|nott-m-forest|aston-villa",
+        "footyOver": 1.77,
+        "pinnacleOpenOver": 1.88,
+        "pinnacleCloseOver": 2.12,
+        "diffVsOpen": 0.11,
+        "diffVsClose": 0.35
+      },
+      {
+        "match": "Manchester City vs West Ham United (2025-01-04)",
+        "canonicalId": "ENG-PL|2024-2025|2025-01-04|man-city|west-ham",
+        "footyOver": 1.6,
+        "pinnacleOpenOver": 1.35,
+        "pinnacleCloseOver": 1.32,
+        "diffVsOpen": 0.25,
+        "diffVsClose": 0.28
+      },
+      {
+        "match": "Wolverhampton Wanderers vs Nottingham Forest (2025-01-06)",
+        "canonicalId": "ENG-PL|2024-2025|2025-01-06|wolves|nott-m-forest",
+        "footyOver": 1.58,
+        "pinnacleOpenOver": 2.09,
+        "pinnacleCloseOver": 1.87,
+        "diffVsOpen": 0.51,
+        "diffVsClose": 0.29
+      },
+      {
+        "match": "Everton vs Aston Villa (2025-01-15)",
+        "canonicalId": "ENG-PL|2024-2025|2025-01-15|everton|aston-villa",
+        "footyOver": 1.95,
+        "pinnacleOpenOver": 2.09,
+        "pinnacleCloseOver": 2.35,
+        "diffVsOpen": 0.14,
+        "diffVsClose": 0.4
+      },
+      {
+        "match": "West Ham United vs Fulham (2025-01-14)",
+        "canonicalId": "ENG-PL|2024-2025|2025-01-14|west-ham|fulham",
+        "footyOver": 1.66,
+        "pinnacleOpenOver": 1.86,
+        "pinnacleCloseOver": 1.96,
+        "diffVsOpen": 0.2,
+        "diffVsClose": 0.3
+      },
+      {
+        "match": "Chelsea vs AFC Bournemouth (2025-01-14)",
+        "canonicalId": "ENG-PL|2024-2025|2025-01-14|chelsea|bournemouth",
+        "footyOver": 1.58,
+        "pinnacleOpenOver": 1.44,
+        "pinnacleCloseOver": 1.44,
+        "diffVsOpen": 0.14,
+        "diffVsClose": 0.14
+      },
+      {
+        "match": "Manchester United vs Southampton (2025-01-16)",
+        "canonicalId": "ENG-PL|2024-2025|2025-01-16|man-united|southampton",
+        "footyOver": 1.74,
+        "pinnacleOpenOver": 1.55,
+        "pinnacleCloseOver": 1.58,
+        "diffVsOpen": 0.19,
+        "diffVsClose": 0.16
+      },
+      {
+        "match": "Everton vs Tottenham Hotspur (2025-01-19)",
+        "canonicalId": "ENG-PL|2024-2025|2025-01-19|everton|tottenham",
+        "footyOver": 1.62,
+        "pinnacleOpenOver": 1.74,
+        "pinnacleCloseOver": 1.88,
+        "diffVsOpen": 0.12,
+        "diffVsClose": 0.26
+      },
+      {
+        "match": "Brighton & Hove Albion vs Everton (2025-01-25)",
+        "canonicalId": "ENG-PL|2024-2025|2025-01-25|brighton|everton",
+        "footyOver": 1.8,
+        "pinnacleOpenOver": 1.96,
+        "pinnacleCloseOver": 2.05,
+        "diffVsOpen": 0.16,
+        "diffVsClose": 0.25
+      },
+      {
+        "match": "Arsenal vs Manchester City (2025-02-02)",
+        "canonicalId": "ENG-PL|2024-2025|2025-02-02|arsenal|man-city",
+        "footyOver": 1.85,
+        "pinnacleOpenOver": 1.74,
+        "pinnacleCloseOver": 1.6,
+        "diffVsOpen": 0.11,
+        "diffVsClose": 0.25
+      },
+      {
+        "match": "Chelsea vs West Ham United (2025-02-03)",
+        "canonicalId": "ENG-PL|2024-2025|2025-02-03|chelsea|west-ham",
+        "footyOver": 1.55,
+        "pinnacleOpenOver": 1.38,
+        "pinnacleCloseOver": 1.34,
+        "diffVsOpen": 0.17,
+        "diffVsClose": 0.21
+      },
+      {
+        "match": "Everton vs Leicester City (2025-02-01)",
+        "canonicalId": "ENG-PL|2024-2025|2025-02-01|everton|leicester",
+        "footyOver": 1.95,
+        "pinnacleOpenOver": 2.06,
+        "pinnacleCloseOver": 2.34,
+        "diffVsOpen": 0.11,
+        "diffVsClose": 0.39
+      },
+      {
+        "match": "Wolverhampton Wanderers vs Aston Villa (2025-02-01)",
+        "canonicalId": "ENG-PL|2024-2025|2025-02-01|wolves|aston-villa",
+        "footyOver": 1.6,
+        "pinnacleOpenOver": 1.74,
+        "pinnacleCloseOver": 1.88,
+        "diffVsOpen": 0.14,
+        "diffVsClose": 0.28
+      },
+      {
+        "match": "Aston Villa vs Ipswich Town (2025-02-15)",
+        "canonicalId": "ENG-PL|2024-2025|2025-02-15|aston-villa|ipswich",
+        "footyOver": 1.74,
+        "pinnacleOpenOver": 1.58,
+        "pinnacleCloseOver": 1.56,
+        "diffVsOpen": 0.16,
+        "diffVsClose": 0.18
+      },
+      {
+        "match": "Brighton & Hove Albion vs Chelsea (2025-02-14)",
+        "canonicalId": "ENG-PL|2024-2025|2025-02-14|brighton|chelsea",
+        "footyOver": 1.74,
+        "pinnacleOpenOver": 1.61,
+        "pinnacleCloseOver": 1.6,
+        "diffVsOpen": 0.13,
+        "diffVsClose": 0.14
+      },
+      {
+        "match": "Crystal Palace vs Everton (2025-02-15)",
+        "canonicalId": "ENG-PL|2024-2025|2025-02-15|crystal-palace|everton",
+        "footyOver": 2.05,
+        "pinnacleOpenOver": 2.27,
+        "pinnacleCloseOver": 2.62,
+        "diffVsOpen": 0.22,
+        "diffVsClose": 0.57
+      },
+      {
+        "match": "Manchester City vs Newcastle United (2025-02-15)",
+        "canonicalId": "ENG-PL|2024-2025|2025-02-15|man-city|newcastle",
+        "footyOver": 1.67,
+        "pinnacleOpenOver": 1.47,
+        "pinnacleCloseOver": 1.38,
+        "diffVsOpen": 0.2,
+        "diffVsClose": 0.29
+      },
+      {
+        "match": "Arsenal vs West Ham United (2025-02-22)",
+        "canonicalId": "ENG-PL|2024-2025|2025-02-22|arsenal|west-ham",
+        "footyOver": 1.58,
+        "pinnacleOpenOver": 1.69,
+        "pinnacleCloseOver": 1.85,
+        "diffVsOpen": 0.11,
+        "diffVsClose": 0.27
+      },
+      {
+        "match": "Everton vs Manchester United (2025-02-22)",
+        "canonicalId": "ENG-PL|2024-2025|2025-02-22|everton|man-united",
+        "footyOver": 2,
+        "pinnacleOpenOver": 2.23,
+        "pinnacleCloseOver": 2.29,
+        "diffVsOpen": 0.23,
+        "diffVsClose": 0.29
+      },
+      {
+        "match": "Nottingham Forest vs Arsenal (2025-02-26)",
+        "canonicalId": "ENG-PL|2024-2025|2025-02-26|nott-m-forest|arsenal",
+        "footyOver": 1.95,
+        "pinnacleOpenOver": 2.23,
+        "pinnacleCloseOver": 2.3,
+        "diffVsOpen": 0.28,
+        "diffVsClose": 0.35
+      },
+      {
+        "match": "Wolverhampton Wanderers vs Fulham (2025-02-25)",
+        "canonicalId": "ENG-PL|2024-2025|2025-02-25|wolves|fulham",
+        "footyOver": 1.85,
+        "pinnacleOpenOver": 2.07,
+        "pinnacleCloseOver": 2.19,
+        "diffVsOpen": 0.22,
+        "diffVsClose": 0.34
+      },
+      {
+        "match": "Manchester United vs Arsenal (2025-03-09)",
+        "canonicalId": "ENG-PL|2024-2025|2025-03-09|man-united|arsenal",
+        "footyOver": 1.7,
+        "pinnacleOpenOver": 2.21,
+        "pinnacleCloseOver": 2.09,
+        "diffVsOpen": 0.51,
+        "diffVsClose": 0.39
+      },
+      {
+        "match": "West Ham United vs Newcastle United (2025-03-10)",
+        "canonicalId": "ENG-PL|2024-2025|2025-03-10|west-ham|newcastle",
+        "footyOver": 1.57,
+        "pinnacleOpenOver": 1.71,
+        "pinnacleCloseOver": 1.9,
+        "diffVsOpen": 0.14,
+        "diffVsClose": 0.33
+      },
+      {
+        "match": "Wolverhampton Wanderers vs Everton (2025-03-08)",
+        "canonicalId": "ENG-PL|2024-2025|2025-03-08|wolves|everton",
+        "footyOver": 1.7,
+        "pinnacleOpenOver": 2.34,
+        "pinnacleCloseOver": 2.59,
+        "diffVsOpen": 0.64,
+        "diffVsClose": 0.89
+      },
+      {
+        "match": "Arsenal vs Chelsea (2025-03-16)",
+        "canonicalId": "ENG-PL|2024-2025|2025-03-16|arsenal|chelsea",
+        "footyOver": 1.75,
+        "pinnacleOpenOver": 1.92,
+        "pinnacleCloseOver": 2.12,
+        "diffVsOpen": 0.17,
+        "diffVsClose": 0.37
+      },
+      {
+        "match": "Everton vs West Ham United (2025-03-15)",
+        "canonicalId": "ENG-PL|2024-2025|2025-03-15|everton|west-ham",
+        "footyOver": 1.7,
+        "pinnacleOpenOver": 2.34,
+        "pinnacleCloseOver": 2.37,
+        "diffVsOpen": 0.64,
+        "diffVsClose": 0.67
+      },
+      {
+        "match": "Ipswich Town vs Nottingham Forest (2025-03-15)",
+        "canonicalId": "ENG-PL|2024-2025|2025-03-15|ipswich|nott-m-forest",
+        "footyOver": 1.7,
+        "pinnacleOpenOver": 1.85,
+        "pinnacleCloseOver": 1.94,
+        "diffVsOpen": 0.15,
+        "diffVsClose": 0.24
+      },
+      {
+        "match": "Leicester City vs Manchester United (2025-03-16)",
+        "canonicalId": "ENG-PL|2024-2025|2025-03-16|leicester|man-united",
+        "footyOver": 1.7,
+        "pinnacleOpenOver": 1.81,
+        "pinnacleCloseOver": 1.95,
+        "diffVsOpen": 0.11,
+        "diffVsClose": 0.25
+      },
+      {
+        "match": "Arsenal vs Fulham (2025-04-01)",
+        "canonicalId": "ENG-PL|2024-2025|2025-04-01|arsenal|fulham",
+        "footyOver": 1.91,
+        "pinnacleOpenOver": 2.17,
+        "pinnacleCloseOver": 2.08,
+        "diffVsOpen": 0.26,
+        "diffVsClose": 0.17
+      },
+      {
+        "match": "Wolverhampton Wanderers vs West Ham United (2025-04-01)",
+        "canonicalId": "ENG-PL|2024-2025|2025-04-01|wolves|west-ham",
+        "footyOver": 1.95,
+        "pinnacleOpenOver": 2.25,
+        "pinnacleCloseOver": 2.36,
+        "diffVsOpen": 0.3,
+        "diffVsClose": 0.41
+      },
+      {
+        "match": "Southampton vs Crystal Palace (2025-04-02)",
+        "canonicalId": "ENG-PL|2024-2025|2025-04-02|southampton|crystal-palace",
+        "footyOver": 1.65,
+        "pinnacleOpenOver": 1.79,
+        "pinnacleCloseOver": 1.78,
+        "diffVsOpen": 0.14,
+        "diffVsClose": 0.13
+      },
+      {
+        "match": "Liverpool vs Everton (2025-04-02)",
+        "canonicalId": "ENG-PL|2024-2025|2025-04-02|liverpool|everton",
+        "footyOver": 1.61,
+        "pinnacleOpenOver": 1.78,
+        "pinnacleCloseOver": 1.85,
+        "diffVsOpen": 0.17,
+        "diffVsClose": 0.24
+      },
+      {
+        "match": "Crystal Palace vs Brighton & Hove Albion (2025-04-05)",
+        "canonicalId": "ENG-PL|2024-2025|2025-04-05|crystal-palace|brighton",
+        "footyOver": 1.7,
+        "pinnacleOpenOver": 1.82,
+        "pinnacleCloseOver": 1.89,
+        "diffVsOpen": 0.12,
+        "diffVsClose": 0.19
+      },
+      {
+        "match": "Everton vs Arsenal (2025-04-05)",
+        "canonicalId": "ENG-PL|2024-2025|2025-04-05|everton|arsenal",
+        "footyOver": 2.2,
+        "pinnacleOpenOver": 2.44,
+        "pinnacleCloseOver": 2.49,
+        "diffVsOpen": 0.24,
+        "diffVsClose": 0.29
+      },
+      {
+        "match": "Ipswich Town vs Wolverhampton Wanderers (2025-04-05)",
+        "canonicalId": "ENG-PL|2024-2025|2025-04-05|ipswich|wolves",
+        "footyOver": 2,
+        "pinnacleOpenOver": 2.12,
+        "pinnacleCloseOver": 2.31,
+        "diffVsOpen": 0.12,
+        "diffVsClose": 0.31
+      },
+      {
+        "match": "West Ham United vs AFC Bournemouth (2025-04-05)",
+        "canonicalId": "ENG-PL|2024-2025|2025-04-05|west-ham|bournemouth",
+        "footyOver": 1.7,
+        "pinnacleOpenOver": 1.83,
+        "pinnacleCloseOver": 1.87,
+        "diffVsOpen": 0.13,
+        "diffVsClose": 0.17
+      },
+      {
+        "match": "Arsenal vs Brentford (2025-04-12)",
+        "canonicalId": "ENG-PL|2024-2025|2025-04-12|arsenal|brentford",
+        "footyOver": 1.61,
+        "pinnacleOpenOver": 1.81,
+        "pinnacleCloseOver": 1.75,
+        "diffVsOpen": 0.2,
+        "diffVsClose": 0.14
+      },
+      {
+        "match": "Everton vs Manchester City (2025-04-19)",
+        "canonicalId": "ENG-PL|2024-2025|2025-04-19|everton|man-city",
+        "footyOver": 1.65,
+        "pinnacleOpenOver": 1.86,
+        "pinnacleCloseOver": 1.85,
+        "diffVsOpen": 0.21,
+        "diffVsClose": 0.2
+      },
+      {
+        "match": "Newcastle United vs Ipswich Town (2025-04-26)",
+        "canonicalId": "ENG-PL|2024-2025|2025-04-26|newcastle|ipswich",
+        "footyOver": 1.55,
+        "pinnacleOpenOver": 1.35,
+        "pinnacleCloseOver": 1.34,
+        "diffVsOpen": 0.2,
+        "diffVsClose": 0.21
+      },
+      {
+        "match": "Southampton vs Fulham (2025-04-26)",
+        "canonicalId": "ENG-PL|2024-2025|2025-04-26|southampton|fulham",
+        "footyOver": 1.57,
+        "pinnacleOpenOver": 1.73,
+        "pinnacleCloseOver": 1.7,
+        "diffVsOpen": 0.16,
+        "diffVsClose": 0.13
+      },
+      {
+        "match": "Wolverhampton Wanderers vs Leicester City (2025-04-26)",
+        "canonicalId": "ENG-PL|2024-2025|2025-04-26|wolves|leicester",
+        "footyOver": 1.6,
+        "pinnacleOpenOver": 1.76,
+        "pinnacleCloseOver": 1.76,
+        "diffVsOpen": 0.16,
+        "diffVsClose": 0.16
+      },
+      {
+        "match": "Liverpool vs Arsenal (2025-05-11)",
+        "canonicalId": "ENG-PL|2024-2025|2025-05-11|liverpool|arsenal",
+        "footyOver": 1.85,
+        "pinnacleOpenOver": 1.73,
+        "pinnacleCloseOver": 1.66,
+        "diffVsOpen": 0.12,
+        "diffVsClose": 0.19
+      },
+      {
+        "match": "AFC Bournemouth vs Liverpool (2025-02-01)",
+        "canonicalId": "ENG-PL|2024-2025|2025-02-01|bournemouth|liverpool",
+        "footyOver": 1.6,
+        "pinnacleOpenOver": 1.48,
+        "pinnacleCloseOver": 1.47,
+        "diffVsOpen": 0.12,
+        "diffVsClose": 0.13
+      }
+    ]
+  },
+  "ml1x2Comparison": {
+    "home": {
+      "sampleSize": 380,
+      "correlationVsOpen": 0.9318,
+      "correlationVsClose": 0.9246,
+      "medianAbsDiffVsOpen": 0.13,
+      "medianAbsDiffVsClose": 0.17,
+      "maxAbsDiffVsOpen": 6.82,
+      "maxAbsDiffVsClose": 6.97
+    },
+    "draw": {
+      "sampleSize": 380,
+      "correlationVsOpen": 0.7522,
+      "correlationVsClose": 0.7449,
+      "medianAbsDiffVsOpen": 0.18,
+      "medianAbsDiffVsClose": 0.2,
+      "maxAbsDiffVsOpen": 9.34,
+      "maxAbsDiffVsClose": 9.02
+    },
+    "away": {
+      "sampleSize": 380,
+      "correlationVsOpen": 0.9414,
+      "correlationVsClose": 0.9246,
+      "medianAbsDiffVsOpen": 0.22,
+      "medianAbsDiffVsClose": 0.34,
+      "maxAbsDiffVsOpen": 10.04,
+      "maxAbsDiffVsClose": 13.49
+    }
+  },
+  "inferredSnapshotEra": "PREMATCH_OPENING_PROXIMITY",
+  "methodologyText": "Comparison against gold Pinnacle opening and closing quotes. Overround measured as sum(1/odds) - 1. Proximity evaluated as absolute distance min(|fs - pin_open|, |fs - pin_close|). This serves strictly as a consistency and plausibility audit; FootyStats provides no odds timestamp and quotes cannot be verified as exact pre-kickoff captures."
+}
