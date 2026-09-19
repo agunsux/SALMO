@@ -5,7 +5,7 @@ import { useI18n } from '@/i18n/context';
 
 export type MarketFilter = 'ALL' | 'AH' | 'BTTS' | 'OU';
 export type QualityFilter = 'ALL' | 'VALUE_ONLY' | 'HIGH_CONFIDENCE';
-export type TimeHorizonFilter = '7_DAYS' | 'TODAY' | 'TOMORROW' | 'WEEKEND';
+export type TimeHorizonFilter = '7_DAYS' | 'TODAY' | 'TOMORROW' | 'PLUS_3_DAYS' | 'WEEKEND';
 
 interface FilterBarProps {
   timeHorizonFilter?: TimeHorizonFilter;
@@ -36,10 +36,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#8A93A0] mr-1">Horizon:</span>
           {(
             [
-              { id: '7_DAYS', label: 'All 7 Days' },
-              { id: 'TODAY', label: 'Today (T-6h)' },
-              { id: 'TOMORROW', label: 'Tomorrow (T-24h)' },
-              { id: 'WEEKEND', label: 'Weekend (T-48h+)' },
+              { id: 'TODAY', label: 'Today' },
+              { id: 'TOMORROW', label: 'Tomorrow' },
+              { id: 'PLUS_3_DAYS', label: '+3 Days' },
+              { id: '7_DAYS', label: '7 Days' },
             ] as const
           ).map(tab => (
             <button

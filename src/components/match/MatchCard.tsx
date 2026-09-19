@@ -82,9 +82,12 @@ export const MatchCard: React.FC<MatchCardProps> = ({
         ? 'text-[#E6E9EE] font-medium'
         : 'text-[#8A93A0]';
 
+    const tierLabel =
+      market.confidence === 'HIGH' ? t.confidence.high : market.confidence === 'MEDIUM' ? t.confidence.medium : t.confidence.low;
+
     return (
       <span className={`text-[11px] font-tabular ${color}`}>
-        {market.confidence === 'HIGH' ? t.confidence.high : market.confidence === 'MEDIUM' ? t.confidence.medium : t.confidence.low}
+        {tierLabel} ({market.confidenceScore}/100)
       </span>
     );
   };

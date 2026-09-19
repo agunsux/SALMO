@@ -68,6 +68,10 @@ export interface MarketView {
     lossPct: number;
   };
   reason: string;
+  verdict?: 'LAYAK' | 'PANTAU' | 'LEWATI';
+  rejectionReason?: string | null;
+  bestAvailableOdds?: number | null;
+  bestBookmaker?: string | null;
   provenance: DecisionProvenance;
 }
 
@@ -147,6 +151,11 @@ export interface ActivePredictionMarket {
   signalState: string;
   bookmaker: string;
   oddsCapturedAt: string;
+  confidence?: number;
+  verdict?: 'LAYAK' | 'PANTAU' | 'LEWATI';
+  rejectionReason?: string | null;
+  bestAvailableOdds?: number;
+  bestBookmaker?: string;
 }
 
 export interface ActiveMatchPrediction {

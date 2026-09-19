@@ -27,15 +27,24 @@ export const Header: React.FC = () => {
           </Link>
 
           {/* Nav links */}
-          <nav className="hidden md:flex items-center gap-5 text-sm font-medium text-[#8A93A0] dark:text-[#8A93A0] light:text-[#5A6270]">
-            <Link href="/" className="text-white dark:text-white light:text-[#14171C] transition-colors">
-              {t.nav.matches}
+          <nav className="hidden md:flex items-center gap-4 text-xs font-medium text-[#8A93A0] dark:text-[#8A93A0] light:text-[#5A6270]">
+            <Link href="/matches" className="hover:text-white dark:hover:text-white light:hover:text-[#14171C] transition-colors">
+              Matches
+            </Link>
+            <Link href="/daily-picks" className="text-emerald-400 font-semibold hover:text-emerald-300 transition-colors">
+              Daily Picks
+            </Link>
+            <Link href="/asian-handicap" className="hover:text-white dark:hover:text-white light:hover:text-[#14171C] transition-colors">
+              AH
+            </Link>
+            <Link href="/over-under" className="hover:text-white dark:hover:text-white light:hover:text-[#14171C] transition-colors">
+              Over/Under
+            </Link>
+            <Link href="/btts" className="hover:text-white dark:hover:text-white light:hover:text-[#14171C] transition-colors">
+              BTTS
             </Link>
             <Link href="/research" className="hover:text-white dark:hover:text-white light:hover:text-[#14171C] transition-colors">
-              {t.nav.research}
-            </Link>
-            <Link href="/pricing" className="hover:text-white dark:hover:text-white light:hover:text-[#14171C] transition-colors">
-              {t.nav.pricing}
+              Research
             </Link>
           </nav>
         </div>
