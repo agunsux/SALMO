@@ -24,8 +24,12 @@ export function getDbClient(): SupabaseClient {
     return supabaseInstance;
   }
 
-  const supabaseUrl = env.database.supabaseUrl || process.env.SUPABASE_URL;
-  const supabaseKey = env.database.supabaseAnonKey || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = env.database.supabaseUrl || process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey =
+    env.database.supabaseAnonKey ||
+    process.env.SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     throw new Error('Database is not configured: SUPABASE_URL or SUPABASE_ANON_KEY is missing.');
@@ -47,8 +51,12 @@ export function getDbClient(): SupabaseClient {
  */
 export async function testDbConnection(): Promise<DbConnectionHealth> {
   const start = Date.now();
-  const supabaseUrl = env.database.supabaseUrl || process.env.SUPABASE_URL;
-  const supabaseKey = env.database.supabaseAnonKey || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = env.database.supabaseUrl || process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey =
+    env.database.supabaseAnonKey ||
+    process.env.SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     return {

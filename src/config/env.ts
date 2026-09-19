@@ -57,7 +57,7 @@ class EnvironmentValidator {
     let handicapLabAdapter = process.env.HANDICAPLAB_ADAPTER as 'local' | 'http' | 'database';
     if (!handicapLabAdapter) {
       if (nodeEnv === 'production') {
-        handicapLabAdapter = (process.env.SUPABASE_URL || process.env.DATABASE_URL) ? 'database' : 'http';
+        handicapLabAdapter = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.DATABASE_URL) ? 'database' : 'http';
       } else {
         handicapLabAdapter = 'local';
       }
@@ -73,8 +73,8 @@ class EnvironmentValidator {
     }
 
     const databaseUrl = process.env.DATABASE_URL;
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     const dbConfigured = Boolean(databaseUrl || (supabaseUrl && supabaseAnonKey));
 
     const apiFootballKey = process.env.API_FOOTBALL_KEY || process.env.APIFOOTBALL_KEY;
