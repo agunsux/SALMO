@@ -118,6 +118,11 @@ export function mapRawPicksToActivePredictions(picks: Array<any>): ActiveMatchPr
     const bttsPick = fixturePicks.find(p => p.marketType === 'BTTS' || p.market === 'BTTS' || p.market_type === 'BTTS');
 
     const kickoffUtc = sample.kickoffUtc || sample.kickoff_utc || sample.kickoffTimestamp || '';
+    const kickMs = new Date(kickoffUtc).getTime();
+    if (!isNaN(kickMs) && kickMs <= Date.now()) {
+      // Stale Data Kill Switch: kicked-off matches must NEVER appear in active Daily Picks feed
+      continue;
+    }
     const kickoffDate = kickoffUtc ? kickoffUtc.split('T')[0] : '';
     const homeTeam = sample.homeTeam || sample.home_team || 'Home';
     const awayTeam = sample.awayTeam || sample.away_team || 'Away';
@@ -461,7 +466,15 @@ export class LocalHandicapLabAdapter implements IHandicapLabAdapter {
           const content = fs.readFileSync(p, 'utf8');
           const parsed = JSON.parse(content);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed;
+            const nowMs = Date.now();
+            const upcomingOnly = parsed.filter((item: any) => {
+              const k = item.kickoffUtc || item.kickoff_utc || item.kickoffTimestamp;
+              const ms = new Date(k).getTime();
+              return !isNaN(ms) && ms > nowMs;
+            });
+            if (upcomingOnly.length > 0) {
+              return upcomingOnly;
+            }
           }
         } catch (err) {
           Logger.warn(`[LocalHandicapLabAdapter] Failed to parse active predictions from ${p}:`, { error: String(err) });
@@ -751,9 +764,7 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
       if (syncRes && syncRes.dailyPicks && syncRes.dailyPicks.length > 0) {
         return mapRawPicksToActivePredictions(syncRes.dailyPicks);
       }
-      if (syncRes && syncRes.predictions && syncRes.predictions.length > 0) {
-        return mapRawPicksToActivePredictions(syncRes.predictions);
-      }
+      // Never fall back to syncRes.predictions (historical settled archive)!
     } catch (err) {
       Logger.warn('[HttpHandicapLabAdapter] Sync feed fallback to legacy endpoint:', { error: String(err) });
     }
@@ -775,7 +786,13 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
 
       if (res.ok) {
         const json = await res.json();
-        return json.data || [];
+        const raw = json.data || [];
+        const nowMs = Date.now();
+        return raw.filter((item: any) => {
+          const k = item.kickoffUtc || item.kickoff_utc || item.kickoffTimestamp;
+          const ms = new Date(k).getTime();
+          return !isNaN(ms) && ms > nowMs;
+        });
       }
     } catch (err) {
       Logger.error('[HttpHandicapLabAdapter] Failed to fetch predictions from legacy endpoint:', { error: String(err) });
