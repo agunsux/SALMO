@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 import { ShieldCheck, CheckCircle2, AlertTriangle, XCircle, ArrowUpRight, Filter, Info, Database } from 'lucide-react';
 import Link from 'next/link';
 
@@ -279,6 +280,7 @@ export default function DailyPicksPage() {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 import { FilterBar, MarketFilter, QualityFilter, TimeHorizonFilter } from '@/components/layout/FilterBar';
 import { MatchCard } from '@/components/match/MatchCard';
 import { EvidenceDrawer } from '@/components/evidence/EvidenceDrawer';
@@ -229,21 +230,8 @@ export default function HomePage() {
         onClose={() => setTraceOpen(false)}
       />
 
-      {/* Global Minimal Footer */}
-      <footer className="border-t border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] bg-[#0B0D10] dark:bg-[#0B0D10] light:bg-[#FFFFFF] py-6 px-4 sm:px-6 mt-12 transition-colors">
-        <div className="mx-auto flex max-w-7xl flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#8A93A0]">
-          <div>
-            <span className="font-bold text-white dark:text-white light:text-[#14171C]">SALMO.DEV</span>
-            <span className="mx-2">•</span>
-            <span>{t.brand.tagline}</span>
-          </div>
-          <div className="flex items-center gap-4 text-[11px]">
-            <span>{t.brand.subtitle}</span>
-            <span>•</span>
-            <span className="text-emerald-400 font-medium">Zero Fabrication Policy</span>
-          </div>
-        </div>
-      </footer>
+      {/* Global Enriched Footer with SEO & YMYL Disclaimer */}
+      <Footer />
     </div>
   );
 }

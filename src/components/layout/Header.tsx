@@ -46,6 +46,12 @@ export const Header: React.FC = () => {
             <Link href="/research" className="hover:text-white dark:hover:text-white light:hover:text-[#14171C] transition-colors">
               Research
             </Link>
+            <Link href="/blog" className="hover:text-white dark:hover:text-white light:hover:text-[#14171C] transition-colors">
+              Blog
+            </Link>
+            <Link href="/faq" className="hover:text-white dark:hover:text-white light:hover:text-[#14171C] transition-colors">
+              FAQ
+            </Link>
           </nav>
         </div>
 

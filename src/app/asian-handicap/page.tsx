@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 import { MatchCard } from '@/components/match/MatchCard';
 import { EvidenceDrawer } from '@/components/evidence/EvidenceDrawer';
 import { TraceModal } from '@/components/trace/TraceModal';
@@ -145,6 +146,8 @@ export default function AsianHandicapPage() {
         market={traceMarket}
         matchTitle={traceTitle}
       />
+
+      <Footer />
     </div>
   );
 }
