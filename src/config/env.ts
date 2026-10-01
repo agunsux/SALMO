@@ -53,23 +53,27 @@ class EnvironmentValidator {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const salmoApiUrl = process.env.SALMO_API_URL || `${appUrl}/api`;
 
-    // In production, default to 'http' or 'database' (if configured), never 'local'
+    // In production, default to 'http', never 'local' and never silent database downgrade
     let handicapLabAdapter = process.env.HANDICAPLAB_ADAPTER as 'local' | 'http' | 'database';
     if (!handicapLabAdapter) {
       if (nodeEnv === 'production') {
-        handicapLabAdapter = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.DATABASE_URL) ? 'database' : 'http';
+        handicapLabAdapter = 'http';
       } else {
         handicapLabAdapter = 'local';
       }
     }
 
     const handicapLabDataPath = process.env.HANDICAPLAB_DATA_PATH || '../HandicapLab/data/bronze/football_data';
-    const handicapLabApiUrl = process.env.HANDICAPLAB_API_URL;
+    const handicapLabApiUrl = process.env.HANDICAPLAB_API_URL || (nodeEnv === 'production' ? 'https://handicaplab.dev' : undefined);
     const handicapLabApiKey = process.env.HANDICAPLAB_API_KEY;
 
     // In production with HTTP adapter, apiUrl must be defined
-    if (nodeEnv === 'production' && handicapLabAdapter === 'http' && !handicapLabApiUrl) {
-      console.warn('[Env] HANDICAPLAB_API_URL is missing in production with HTTP adapter.');
+    if (handicapLabAdapter === 'http' && !handicapLabApiUrl) {
+      if (nodeEnv === 'production') {
+        throw new Error('[FAIL CLOSED] HANDICAPLAB_API_URL is missing in production with HTTP adapter. Silent fallback is forbidden.');
+      } else {
+        console.warn('[Env] HANDICAPLAB_API_URL is missing with HTTP adapter.');
+      }
     }
 
     const databaseUrl = process.env.DATABASE_URL;

@@ -40,7 +40,7 @@ export interface SalmoSyncResponse {
   success: boolean;
   timestampUtc: string;
   syncChecksum: string;
-  dataState: 'REAL' | 'CACHED' | 'NO_FIXTURES' | 'NO_QUALIFIED_PICKS' | 'DATA_UNAVAILABLE';
+  dataState: 'REAL' | 'CACHED' | 'NO_FIXTURES' | 'NO_QUALIFIED_PICKS' | 'DATA_UNAVAILABLE' | 'DATA_TEMPORARILY_UNAVAILABLE';
   counts: {
     totalArchived: number;
     dailyPicks: number;
@@ -71,9 +71,10 @@ export interface SalmoSyncResponse {
     modelQualityGrade: string;
     modelVersion: string;
     sourceBookmaker: string;
-    oddsCapturedAt: string;
+    oddsCapturedAt?: string;
+    syncTimestampUtc?: string;
     provenanceHash: string;
-    status: string;
+    status?: string;
   }>;
   predictions: Array<any>;
   performance: any;
@@ -760,7 +761,7 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
 
     // 1. Prefer canonical incremental sync feed (/api/v1/salmo/sync)
     try {
-      const syncRes = await this.getSalmoSync({ horizon: 'NEXT_7_DAYS', view: 'all' });
+      const syncRes = await this.getSalmoSync({ horizon: 'ALL', view: 'all' });
       if (syncRes && syncRes.dailyPicks && syncRes.dailyPicks.length > 0) {
         return mapRawPicksToActivePredictions(syncRes.dailyPicks);
       }
@@ -1076,10 +1077,13 @@ export class DatabaseHandicapLabAdapter implements IHandicapLabAdapter {
     try {
       const { getDbClient } = await import('../lib/db');
       const client = getDbClient();
+      const nowIso = new Date().toISOString();
+      const nowMs = Date.now();
 
       const { data: picks, error } = await client
         .from('daily_picks')
         .select('*')
+        .gt('kickoff_utc', nowIso)
         .order('kickoff_utc', { ascending: true });
 
       if (error) {
@@ -1093,6 +1097,10 @@ export class DatabaseHandicapLabAdapter implements IHandicapLabAdapter {
       // Group by fixture
       const byFixture = new Map<string, any[]>();
       for (const pick of picks) {
+        const kickMs = new Date(pick.kickoff_utc).getTime();
+        if (isNaN(kickMs) || kickMs <= nowMs) {
+          continue; // Stale data kill switch: matches must be strictly in the future
+        }
         const key = pick.fixture_id || `${pick.home_team}_${pick.away_team}_${pick.kickoff_utc}`;
         if (!byFixture.has(key)) {
           byFixture.set(key, []);
@@ -1104,6 +1112,10 @@ export class DatabaseHandicapLabAdapter implements IHandicapLabAdapter {
 
       for (const [, fixturePicks] of byFixture.entries()) {
         const sample = fixturePicks[0];
+        const kickMs = new Date(sample.kickoff_utc).getTime();
+        if (isNaN(kickMs) || kickMs <= nowMs) {
+          continue;
+        }
         const ahPick = fixturePicks.find(p => p.market_type === 'ASIAN_HANDICAP');
         const ouPick = fixturePicks.find(p => p.market_type === 'OVER_UNDER');
         const bttsPick = fixturePicks.find(p => p.market_type === 'BTTS');
