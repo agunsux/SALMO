@@ -74,7 +74,7 @@ export default function DailyPicksPage() {
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
               <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>CANONICAL PRODUCTION PICKS • REALTIME MARKET INTELLIGENCE</span>
+              <span>CANONICAL PRODUCTION PICKS • GAMEWEEK 5</span>
             </div>
             <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
               Daily Qualified Picks
