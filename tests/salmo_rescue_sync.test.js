@@ -90,3 +90,21 @@ test('HandicapLab -> SALMO HTTP Contract URL Formatting', async (t) => {
     'https://handicaplab.vercel.app/api/v1/salmo/sync?view=all&horizon=NEXT_7_DAYS&market=AH&modelVersion=poisson_v1_rescue'
   );
 });
+
+test('HandicapLab -> SALMO HttpHandicapLabAdapter Health Probe uses /api/health', async (t) => {
+  const adapterSource = fs.readFileSync(path.resolve(__dirname, '..', 'src', 'contracts', 'handicapLabAdapter.ts'), 'utf8');
+  const httpAdapterStart = adapterSource.indexOf('class HttpHandicapLabAdapter');
+  const getHealthMethod = adapterSource.slice(
+    adapterSource.indexOf('public async getHealth(): Promise<AdapterHealth> {', httpAdapterStart),
+    adapterSource.indexOf('class DatabaseHandicapLabAdapter')
+  );
+
+  assert.ok(
+    getHealthMethod.includes('${this.baseUrl}/api/health'),
+    'HttpHandicapLabAdapter.getHealth must query ${this.baseUrl}/api/health'
+  );
+  assert.ok(
+    !getHealthMethod.includes('${this.baseUrl}/summary'),
+    'HttpHandicapLabAdapter.getHealth must NOT query legacy /summary endpoint'
+  );
+});

@@ -913,12 +913,32 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
     }
 
     try {
-      const summary = await this.getDatasetSummary();
+      const headers: Record<string, string> = {
+        'Accept': 'application/json',
+        'User-Agent': 'SALMO-Production-Client/1.0',
+      };
+      if (this.apiKey) {
+        headers['Authorization'] = `Bearer ${this.apiKey}`;
+      }
+
+      const res = await fetch(`${this.baseUrl}/api/health`, {
+        headers,
+        next: { revalidate: 60 },
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+
+      const json = await res.json();
+      const isHealthy = json.status === 'healthy' || json.status === 'ok';
+      const recordCount = json.services?.market?.details?.totalMatches || json.recordCount || 0;
+
       return {
-        status: 'HEALTHY',
+        status: isHealthy ? 'HEALTHY' : 'DEGRADED',
         mode: 'http',
-        recordCount: summary.verifiedMatchCount,
-        lastChecked: new Date().toISOString(),
+        recordCount,
+        lastChecked: json.timestamp || new Date().toISOString(),
       };
     } catch (err) {
       return {
