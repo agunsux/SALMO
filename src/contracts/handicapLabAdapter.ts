@@ -729,6 +729,7 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
       if (query?.view) url.searchParams.set('view', query.view);
       if (query?.horizon) url.searchParams.set('horizon', query.horizon);
       if (query?.market) url.searchParams.set('market', query.market);
+      if (query?.modelVersion) url.searchParams.set('modelVersion', query.modelVersion);
 
       const headers: Record<string, string> = {
         'Accept': 'application/json',
@@ -1305,9 +1306,6 @@ export class DatabaseHandicapLabAdapter implements IHandicapLabAdapter {
   }
 
   public async getSalmoSync(query?: SalmoSyncQueryParams): Promise<SalmoSyncResponse | null> {
-    const local = new LocalHandicapLabAdapter();
-    const localRes = await local.getSalmoSync(query);
-    if (localRes) return localRes;
     if (env.handicapLab.apiUrl) {
       const http = new HttpHandicapLabAdapter(env.handicapLab.apiUrl, env.handicapLab.apiKey);
       return http.getSalmoSync(query);
