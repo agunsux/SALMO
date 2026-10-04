@@ -167,9 +167,9 @@ export default function DailyPicksPage() {
             <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#171B20] text-[#8A93A0] mb-3">
               <ShieldCheck className="h-5 w-5" />
             </div>
-            <h3 className="text-sm font-semibold text-[#E6E9EE]">NO_QUALIFIED_PICKS</h3>
+            <h3 className="text-sm font-semibold text-[#E6E9EE]">No Qualified Picks Today</h3>
             <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
-              No picks currently match the selected criteria under HandicapLab's strict value gating rules.
+              The model analyzed today&apos;s available markets, but no candidate met all qualification criteria.
             </p>
           </div>
         ) : (

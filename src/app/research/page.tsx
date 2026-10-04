@@ -58,6 +58,8 @@ export default function ResearchPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Filters
+  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const [selectedDate, setSelectedDate] = useState<string>('TODAY');
   const [selectedMarket, setSelectedMarket] = useState<string>('ALL');
   const [selectedTier, setSelectedTier] = useState<string>('ALL');
   const [selectedLeague, setSelectedLeague] = useState<string>('ALL');
@@ -89,23 +91,47 @@ export default function ResearchPage() {
     return Array.from(new Set(predictions.map((p) => p.competition))).filter(Boolean);
   }, [predictions]);
 
+  // Unique dates for filter dropdown
+  const availableDates = useMemo(() => {
+    return Array.from(
+      new Set(
+        predictions
+          .map((p) => (p.kickoff_utc ? p.kickoff_utc.split('T')[0] : ''))
+          .filter(Boolean)
+      )
+    ).sort();
+  }, [predictions]);
+
   // Filtered dataset
   const filteredPredictions = useMemo(() => {
     return predictions.filter((p) => {
+      // Date filter (defaults to today)
+      const pDate = p.kickoff_utc ? p.kickoff_utc.split('T')[0] : '';
+      if (selectedDate === 'TODAY') {
+        if (pDate !== todayStr) return false;
+      } else if (selectedDate !== 'ALL') {
+        if (pDate !== selectedDate) return false;
+      }
+
       // Market filter
       if (selectedMarket !== 'ALL' && p.market !== selectedMarket) {
         return false;
       }
       // Tier filter
       if (selectedTier !== 'ALL') {
-        if (selectedTier === 'RESEARCH_ONLY' && p.confidence_tier !== 'RESEARCH_ONLY' && p.market !== 'BTTS') {
-          return false;
-        } else if (selectedTier === 'PASS' && p.confidence_tier !== 'PASS') {
-          return false;
-        } else if (selectedTier === 'WATCH' && p.confidence_tier !== 'WATCH') {
-          return false;
-        } else if (selectedTier === 'VALUE_HIGH' && p.confidence_tier !== 'VALUE_HIGH') {
-          return false;
+        if (selectedTier === 'RESEARCH_ONLY') {
+          if (p.confidence_tier !== 'RESEARCH_ONLY' && p.market !== 'BTTS') return false;
+        } else if (selectedTier === 'HIGH') {
+          if (p.confidence_tier !== 'VALUE_HIGH' && p.confidence_tier !== 'HIGH') return false;
+        } else if (selectedTier === 'MEDIUM') {
+          if (p.confidence_tier !== 'WATCH' && p.confidence_tier !== 'MEDIUM') return false;
+        } else if (selectedTier === 'LOW') {
+          if (
+            p.confidence_tier !== 'LOW' &&
+            p.confidence_tier !== 'PASS' &&
+            p.confidence_tier !== 'UNVERIFIED'
+          )
+            return false;
         }
       }
       // League filter
@@ -120,7 +146,7 @@ export default function ResearchPage() {
       }
       return true;
     });
-  }, [predictions, selectedMarket, selectedTier, selectedLeague, searchQuery]);
+  }, [predictions, selectedDate, todayStr, selectedMarket, selectedTier, selectedLeague, searchQuery]);
 
   // Counts
   const countsByMarket = useMemo(() => {
@@ -149,17 +175,24 @@ export default function ResearchPage() {
             Displays full model probability distributions, quarter-line ladders, and raw research tiers without promotion to picks.
           </p>
 
-          {/* Mandatory Transparency Banner */}
+          {/* Mandatory Transparency & Distinction Banner */}
           <div className="mt-4 flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-200">
             <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400 mt-0.5" />
-            <div>
-              <span className="font-bold uppercase tracking-wider">Model Research Output — Not Financial Advice.</span>{' '}
-              This console displays pure model probabilities and research classifications (LOW, MEDIUM, HIGH, RESEARCH_ONLY).
-              Every prediction is preserved in the immutable ledger. Actionable betting signals with verified Pinnacle closing line edge appear exclusively on{' '}
-              <a href="/daily-picks" className="underline font-semibold hover:text-white">
-                /daily-picks
-              </a>
-              .
+            <div className="space-y-1">
+              <div className="font-bold text-amber-300 text-xs sm:text-sm tracking-wide">
+                CONFIDENCE ≠ PICK
+              </div>
+              <p>
+                Confidence indicates model qualification level, not certainty of outcome. Research outputs are not picks and are not financial advice.
+              </p>
+              <p className="text-[11px] text-amber-300/80">
+                This console displays raw Poisson V1 probability distributions and research confidence tiers (🟢 HIGH CONFIDENCE, 🟡 MEDIUM CONFIDENCE, 🔴 LOW CONFIDENCE, 🟣 RESEARCH ONLY).
+                Actionable betting recommendations passing strict ConfidenceGate criteria appear exclusively on{' '}
+                <a href="/daily-picks" className="underline font-semibold hover:text-white">
+                  /daily-picks
+                </a>
+                .
+              </p>
             </div>
           </div>
         </div>
@@ -237,7 +270,7 @@ export default function ResearchPage() {
           </div>
 
           {/* Secondary filter selectors */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
             {/* Search Input */}
             <div className="relative">
               <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#8A93A0]" />
@@ -248,6 +281,23 @@ export default function ResearchPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full rounded-lg border border-[#232830] bg-[#171B20] pl-9 pr-3 py-1.5 text-xs text-[#E6E9EE] placeholder-[#8A93A0] focus:border-emerald-500/50 focus:outline-none"
               />
+            </div>
+
+            {/* Date Dropdown */}
+            <div>
+              <select
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="w-full rounded-lg border border-[#232830] bg-[#171B20] px-3 py-1.5 text-xs text-[#E6E9EE] focus:border-emerald-500/50 focus:outline-none"
+              >
+                <option value="TODAY">Today ({todayStr})</option>
+                <option value="ALL">All Dates ({predictions.length} rows)</option>
+                {availableDates.map((d) => (
+                  <option key={d} value={d}>
+                    {d} ({predictions.filter((p) => p.kickoff_utc?.startsWith(d)).length} rows)
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* League Dropdown */}
@@ -273,11 +323,11 @@ export default function ResearchPage() {
                 onChange={(e) => setSelectedTier(e.target.value)}
                 className="w-full rounded-lg border border-[#232830] bg-[#171B20] px-3 py-1.5 text-xs text-[#E6E9EE] focus:border-emerald-500/50 focus:outline-none"
               >
-                <option value="ALL">All Research Tiers</option>
-                <option value="VALUE_HIGH">HIGH (Qualified)</option>
-                <option value="WATCH">MEDIUM (Watchlist)</option>
-                <option value="PASS">LOW / PASS</option>
-                <option value="RESEARCH_ONLY">RESEARCH ONLY (BTTS)</option>
+                <option value="ALL">All Confidence Tiers</option>
+                <option value="HIGH">🟢 HIGH CONFIDENCE</option>
+                <option value="MEDIUM">🟡 MEDIUM CONFIDENCE</option>
+                <option value="LOW">🔴 LOW CONFIDENCE</option>
+                <option value="RESEARCH_ONLY">🟣 RESEARCH ONLY</option>
               </select>
             </div>
           </div>
@@ -297,23 +347,37 @@ export default function ResearchPage() {
             </div>
           ) : filteredPredictions.length === 0 ? (
             <div className="p-12 text-center text-xs text-[#8A93A0]">
-              No predictions matching the selected filter criteria.
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#171B20] text-[#8A93A0] mb-3">
+                <Calendar className="h-5 w-5" />
+              </div>
+              <h3 className="text-sm font-semibold text-[#E6E9EE]">No model output for this date</h3>
+              <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
+                No model output for this date matching the selected filter criteria. Select another date or view all recorded ledger entries.
+              </p>
+              {selectedDate === 'TODAY' && availableDates.length > 0 && (
+                <button
+                  onClick={() => setSelectedDate('ALL')}
+                  className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold hover:bg-emerald-500/30 transition-colors"
+                >
+                  View All Archived Output ({predictions.length})
+                </button>
+              )}
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="border-b border-[#232830] bg-[#171B20]/60 text-[11px] font-semibold uppercase tracking-wider text-[#8A93A0]">
-                    <th className="px-4 py-3">Match & League</th>
-                    <th className="px-4 py-3">Kickoff</th>
+                    <th className="px-4 py-3">Match</th>
+                    <th className="px-4 py-3">Date / Kickoff</th>
                     <th className="px-3 py-3">Market</th>
                     <th className="px-3 py-3">Line</th>
                     <th className="px-4 py-3">Direction</th>
-                    <th className="px-3 py-3 text-right">Model Prob</th>
-                    <th className="px-3 py-3 text-right">Fair Odds</th>
-                    <th className="px-4 py-3 text-right">Market Odds</th>
-                    <th className="px-4 py-3 text-center">Research Tier</th>
-                    <th className="px-4 py-3">Model</th>
+                    <th className="px-3 py-3 text-right">Model Probability</th>
+                    <th className="px-4 py-3 text-center">Confidence</th>
+                    <th className="px-3 py-3 text-right">EV</th>
+                    <th className="px-4 py-3 text-right">Odds</th>
+                    <th className="px-4 py-3">Source / Model Version</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#232830]/50 font-mono">
@@ -322,27 +386,27 @@ export default function ResearchPage() {
                     const kickDate = row.kickoff_utc ? row.kickoff_utc.replace('T', ' ').slice(0, 16) : '—';
 
                     let tierBadge = (
-                      <span className="rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-semibold text-zinc-300">
-                        PASS (LOW)
+                      <span className="rounded bg-rose-950/80 border border-rose-500/30 px-2 py-0.5 text-[10px] font-semibold text-rose-300">
+                        🔴 LOW CONFIDENCE
                       </span>
                     );
 
                     if (row.market === 'BTTS' || row.confidence_tier === 'RESEARCH_ONLY') {
                       tierBadge = (
                         <span className="rounded bg-purple-950/80 border border-purple-500/30 px-2 py-0.5 text-[10px] font-semibold text-purple-300">
-                          RESEARCH ONLY
+                          🟣 RESEARCH ONLY
                         </span>
                       );
-                    } else if (row.confidence_tier === 'VALUE_HIGH') {
+                    } else if (row.confidence_tier === 'VALUE_HIGH' || row.confidence_tier === 'HIGH') {
                       tierBadge = (
                         <span className="rounded bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
-                          HIGH (VALUE)
+                          🟢 HIGH CONFIDENCE
                         </span>
                       );
-                    } else if (row.confidence_tier === 'WATCH') {
+                    } else if (row.confidence_tier === 'WATCH' || row.confidence_tier === 'MEDIUM') {
                       tierBadge = (
                         <span className="rounded bg-amber-950/80 border border-amber-500/30 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
-                          MEDIUM (WATCH)
+                          🟡 MEDIUM CONFIDENCE
                         </span>
                       );
                     }
@@ -378,25 +442,26 @@ export default function ResearchPage() {
                         <td className="px-3 py-2.5 text-right font-semibold text-emerald-400">
                           {probPct}%
                         </td>
-                        <td className="px-3 py-2.5 text-right text-zinc-400">
-                          {row.fair_odds ? row.fair_odds.toFixed(2) : '—'}
+                        <td className="px-4 py-2.5 text-center whitespace-nowrap">
+                          {tierBadge}
+                        </td>
+                        <td className="px-3 py-2.5 text-right font-mono font-medium">
+                          {row.expected_value !== null ? (
+                            <span className={row.expected_value > 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                              {row.expected_value > 0 ? '+' : ''}{(row.expected_value * 100).toFixed(1)}%
+                            </span>
+                          ) : (
+                            <span className="text-zinc-500">—</span>
+                          )}
                         </td>
                         <td className="px-4 py-2.5 text-right whitespace-nowrap">
                           {row.market_odds ? (
                             <span className="text-zinc-200">
-                              @{row.market_odds.toFixed(2)}{' '}
-                              {row.expected_value !== null && row.expected_value < 0 && (
-                                <span className="text-[10px] text-rose-400 block font-sans">
-                                  EV: {(row.expected_value * 100).toFixed(1)}%
-                                </span>
-                              )}
+                              @{row.market_odds.toFixed(2)}
                             </span>
                           ) : (
-                            <span className="text-[10px] text-zinc-500 font-sans">NO MARKET ODDS</span>
+                            <span className="text-[10px] text-zinc-500 font-sans">NO ODDS</span>
                           )}
-                        </td>
-                        <td className="px-4 py-2.5 text-center whitespace-nowrap">
-                          {tierBadge}
                         </td>
                         <td className="px-4 py-2.5 text-[10px] text-[#8A93A0] whitespace-nowrap">
                           {row.model_version}
