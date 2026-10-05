@@ -107,10 +107,17 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="hover:text-emerald-400 transition-colors">
-                  Pricing & Access
+                <Link href="/performance" className="hover:text-emerald-400 transition-colors">
+                  Model Calibration & Performance
                 </Link>
               </li>
+              {process.env.NEXT_PUBLIC_MONETIZATION_ENABLED === 'true' && (
+                <li>
+                  <Link href="/pricing" className="hover:text-emerald-400 transition-colors">
+                    Pricing & Access
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link href="/blog/salmo-vs-oddsjam" className="hover:text-emerald-400 transition-colors">
                   SALMO vs. OddsJam

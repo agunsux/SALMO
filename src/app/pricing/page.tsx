@@ -1,11 +1,17 @@
 'use client';
 
 import React from 'react';
+import { notFound } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { Check, ShieldCheck, Zap } from 'lucide-react';
 import { useI18n } from '@/i18n/context';
+import { MONETIZATION_ENABLED } from '@/config/entitlements';
 
 export default function PricingPage() {
+  if (!MONETIZATION_ENABLED) {
+    notFound();
+  }
+
   const { t } = useI18n();
 
   return (
@@ -51,7 +57,7 @@ export default function PricingPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-emerald-400" />
-                  <span>Zero fabrication verified real odds</span>
+                  <span>Benchmark market odds without fabrication</span>
                 </li>
               </ul>
             </div>

@@ -144,7 +144,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({
           {match.venue && <span className="block text-[11px] text-[#5B6370]">{match.venue}</span>}
           <div className="flex items-center sm:justify-end gap-2 mt-1">
             <span className="inline-block rounded px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 font-medium text-[10px] border border-emerald-500/20">
-              REAL PINNACLE SHARP
+              BENCHMARK SHARP
             </span>
             {match.marketStateTimestamp && (
               <span className="text-[10px] text-[#5B6370]">

@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { BLOG_POSTS } from '@/data/blogPosts';
+import { MONETIZATION_ENABLED } from '@/config/entitlements';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://salmo.dev';
@@ -48,12 +49,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
-    {
-      url: `${baseUrl}/pricing`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
+    ...(MONETIZATION_ENABLED
+      ? [
+          {
+            url: `${baseUrl}/pricing`,
+            lastModified: new Date(),
+            changeFrequency: 'monthly' as const,
+            priority: 0.7,
+          },
+        ]
+      : []),
     {
       url: `${baseUrl}/faq`,
       lastModified: new Date(),

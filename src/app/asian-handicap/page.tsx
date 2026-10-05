@@ -70,7 +70,7 @@ export default function AsianHandicapPage() {
             Asian Handicap (AH)
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-[#8A93A0]">
-            Quarter-line split settlement methodology. Sharp Pinnacle reference quotes vs Dixon-Coles expected outcome.
+            Quarter-line split settlement methodology. Sharp benchmark quotes vs calibrated goal expectation.
           </p>
 
           <div className="mt-3 flex items-center gap-2 text-xs">

@@ -106,7 +106,7 @@ export default function HomePage() {
               {t.header.title}
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-[#8A93A0]">
-              Real Pinnacle sharp lines & Dixon-Coles goal model. Strictly AH, BTTS & Over/Under. Zero fabrication.
+              Benchmark market odds & mathematical goal model. Strictly AH, BTTS & Over/Under.
             </p>
           </div>
 
@@ -117,7 +117,7 @@ export default function HomePage() {
             </div>
             <div className="flex items-center gap-1.5 rounded border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-emerald-400">
               <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>Pinnacle Sharp Real Odds</span>
+              <span>Benchmark Market Odds</span>
             </div>
           </div>
         </div>
@@ -184,21 +184,33 @@ export default function HomePage() {
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
             <p className="mt-4 text-xs font-medium text-[#8A93A0]">
-              Loading verified market intelligence...
+              Loading market intelligence...
             </p>
           </div>
         ) : filteredMatches.length === 0 ? (
-          <div className="rounded-xl border border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] bg-[#111418] p-12 text-center">
-            <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#171B20] text-[#8A93A0] mb-3">
-              <ShieldCheck className="h-5 w-5" />
+          matches.length > 0 && matches.every(m => !m.markets.asianHandicap.odds && !m.markets.btts.odds && !m.markets.overUnder.odds) ? (
+            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-12 text-center">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10 text-amber-400 mb-3">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <h3 className="text-sm font-semibold text-amber-400 uppercase tracking-wider">ODDS NOT YET AVAILABLE</h3>
+              <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
+                Upcoming fixtures detected, but market odds are not yet posted or synchronized. Assessments will populate when lines open.
+              </p>
             </div>
-            <h3 className="text-sm font-semibold text-[#E6E9EE] dark:text-[#E6E9EE] light:text-[#14171C]">
-              {t.states.noFixtures}
-            </h3>
-            <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
-              Try switching your horizon to "All 7 Days" or reset quality filters to see all available matchday assessments.
-            </p>
-          </div>
+          ) : (
+            <div className="rounded-xl border border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] bg-[#111418] p-12 text-center">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#171B20] text-[#8A93A0] mb-3">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <h3 className="text-sm font-semibold text-[#E6E9EE] dark:text-[#E6E9EE] light:text-[#14171C]">
+                NO QUALIFIED PICKS
+              </h3>
+              <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
+                No matchday opportunities meet all calibration and edge criteria under the selected horizon.
+              </p>
+            </div>
+          )
         ) : (
           <div className="space-y-4">
             {filteredMatches.map(match => (

@@ -124,7 +124,7 @@ export const TraceModal: React.FC<TraceModalProps> = ({
               <ShieldCheck className="h-4 w-4 text-emerald-500" />
               <span>Gate Status: {trace.validationStage}</span>
             </div>
-            <span className="text-[11px] text-[#8A93A0]">Provenance Verified</span>
+            <span className="text-[11px] text-[#8A93A0]">Provenance Recorded</span>
           </div>
         </div>
       </div>

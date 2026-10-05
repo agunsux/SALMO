@@ -7,7 +7,7 @@ import { MatchCard } from '@/components/match/MatchCard';
 import { EvidenceDrawer } from '@/components/evidence/EvidenceDrawer';
 import { TraceModal } from '@/components/trace/TraceModal';
 import { MatchIntelligence, MarketView } from '@/types';
-import { ArrowLeft, Calendar, ShieldCheck, Database, Layers, CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowLeft, Calendar, ShieldCheck, Database, Layers, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function MatchDetailPage() {
@@ -134,10 +134,17 @@ export default function MatchDetailPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <div className="rounded border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-400 font-semibold flex items-center gap-1.5">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span>Pinnacle Sharp Validated</span>
-                  </div>
+                  {match.markets?.asianHandicap?.bookmaker ? (
+                    <div className="rounded border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-400 font-semibold flex items-center gap-1.5">
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span>{match.markets.asianHandicap.bookmaker} Validated ({match.markets.asianHandicap.oddsCapturedAt ? match.markets.asianHandicap.oddsCapturedAt.slice(11, 16) : 'Live'} UTC)</span>
+                    </div>
+                  ) : (
+                    <div className="rounded border border-amber-500/20 bg-amber-500/10 px-3 py-1.5 text-xs text-amber-400 font-semibold flex items-center gap-1.5">
+                      <AlertTriangle className="h-4 w-4" />
+                      <span>PROVENANCE NOT AVAILABLE</span>
+                    </div>
+                  )}
                 </div>
               </div>
 

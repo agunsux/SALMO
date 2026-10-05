@@ -70,7 +70,7 @@ export default function BttsPage() {
             Both Teams To Score (BTTS)
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-[#8A93A0]">
-            Binary goal distribution derived directly from Dixon-Coles bivariate score grid (1 - P(0,*) - P(*,0) + P(0,0)).
+            Binary goal distribution derived directly from bivariate score grid (1 - P(0,*) - P(*,0) + P(0,0)).
           </p>
 
           <div className="mt-3 flex items-center gap-2 text-xs">

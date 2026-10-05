@@ -103,7 +103,7 @@ export default function MatchesPage() {
               Canonical Matches & Market Views
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-[#8A93A0]">
-              Direct consumer feed from HandicapLab canonical engine. Real Pinnacle lines, Dixon-Coles model probabilities.
+              Direct consumer feed from canonical engine. Benchmark market lines, model probabilities.
             </p>
           </div>
 
@@ -114,7 +114,7 @@ export default function MatchesPage() {
             </div>
             <div className="flex items-center gap-1.5 rounded border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-emerald-400">
               <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>Fail-Closed Verified</span>
+              <span>Fail-Closed Monitored</span>
             </div>
           </div>
         </div>

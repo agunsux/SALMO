@@ -141,7 +141,7 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({
           </div>
 
           {loading ? (
-            <div className="py-8 text-center text-xs text-[#8A93A0]">Loading verified observations...</div>
+            <div className="py-8 text-center text-xs text-[#8A93A0]">Loading match observations...</div>
           ) : (
             <div className="space-y-2">
               {observations.map((obs) => {

@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ShieldCheck, CheckCircle2, AlertTriangle, XCircle, ArrowUpRight, Filter, Info, Database } from 'lucide-react';
 import Link from 'next/link';
+import { isPublicPickEligible } from '@/lib/eligibility';
 
 interface DailyPickDTO {
   id: string;
@@ -24,6 +25,7 @@ interface DailyPickDTO {
   expectedValuePct: number | null;
   confidence: number;
   verdict: 'LAYAK' | 'PANTAU' | 'LEWATI';
+  modelVersion?: string | null;
   reasoning: string;
   rejectionReason?: string | null;
   status: string;
@@ -55,13 +57,14 @@ export default function DailyPicksPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const filteredPicks = picks.filter(p => {
+  const eligiblePicks = picks.filter(p => isPublicPickEligible(p));
+  const filteredPicks = eligiblePicks.filter(p => {
     if (verdictFilter !== 'ALL' && p.verdict !== verdictFilter) return false;
     if (marketFilter !== 'ALL' && p.marketType !== marketFilter) return false;
     return true;
   });
 
-  const layakCount = picks.filter(p => p.verdict === 'LAYAK').length;
+  const layakCount = eligiblePicks.filter(p => p.verdict === 'LAYAK').length;
   const pantauCount = picks.filter(p => p.verdict === 'PANTAU').length;
   const lewatiCount = picks.filter(p => p.verdict === 'LEWATI').length;
 
@@ -74,7 +77,7 @@ export default function DailyPicksPage() {
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
               <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>CANONICAL PRODUCTION PICKS • GAMEWEEK 5</span>
+              <span>CANONICAL PRODUCTION PICKS</span>
             </div>
             <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
               Daily Qualified Picks
@@ -163,15 +166,27 @@ export default function DailyPicksPage() {
             </p>
           </div>
         ) : status === 'NO_QUALIFIED_PICKS' || filteredPicks.length === 0 ? (
-          <div className="rounded-xl border border-[#232830] bg-[#111418] p-12 text-center">
-            <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#171B20] text-[#8A93A0] mb-3">
-              <ShieldCheck className="h-5 w-5" />
+          picks.length > 0 && picks.every(p => p.marketOdds === null || p.marketOdds === 0) ? (
+            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-12 text-center">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10 text-amber-400 mb-3">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <h3 className="text-sm font-semibold text-amber-400 uppercase tracking-wider">ODDS NOT YET AVAILABLE</h3>
+              <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
+                Model predictions are generated, but benchmark market odds are not yet posted or synchronized. Picks will qualify once liquid sharp lines open.
+              </p>
             </div>
-            <h3 className="text-sm font-semibold text-[#E6E9EE]">No Qualified Picks Today</h3>
-            <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
-              The model analyzed today&apos;s available markets, but no candidate met all qualification criteria.
-            </p>
-          </div>
+          ) : (
+            <div className="rounded-xl border border-[#232830] bg-[#111418] p-12 text-center">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#171B20] text-[#8A93A0] mb-3">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <h3 className="text-sm font-semibold text-[#E6E9EE]">No Qualified Picks Today</h3>
+              <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
+                The model analyzed today&apos;s available markets, but no candidate met all qualification criteria.
+              </p>
+            </div>
+          )
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredPicks.map(pick => {
@@ -239,7 +254,7 @@ export default function DailyPicksPage() {
                         </span>
                       </div>
                       <div className="rounded border border-[#232830] bg-[#0E1013] p-2">
-                        <span className="block text-[10px] uppercase text-[#8A93A0]">Pinnacle Ref</span>
+                        <span className="block text-[10px] uppercase text-[#8A93A0]">Benchmark Odds</span>
                         <span className="font-tabular font-bold text-emerald-300">
                           {pick.marketOdds !== null ? pick.marketOdds.toFixed(2) : 'N/A'}
                         </span>
@@ -265,7 +280,7 @@ export default function DailyPicksPage() {
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-[#232830] flex items-center justify-between text-[10px] text-zinc-500">
-                    <span>Source: {pick.marketBookmaker} Sharp</span>
+                    <span>Source: {pick.marketBookmaker || 'Benchmark'}</span>
                     <Link
                       href={`/match/${pick.fixtureId}`}
                       className="text-emerald-400 hover:text-emerald-300 flex items-center gap-1"

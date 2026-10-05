@@ -50,7 +50,7 @@ export const InlineWhy: React.FC<{ market: MarketView }> = ({ market }) => {
           <div className="mt-1 font-tabular text-sm font-semibold text-[#E6E9EE] dark:text-[#E6E9EE] light:text-[#14171C]">
             {market.sampleSize} matches
           </div>
-          <div className="mt-0.5 text-[10px] text-[#5B6370]">EPL verified closing</div>
+          <div className="mt-0.5 text-[10px] text-[#5B6370]">EPL closing lines</div>
         </div>
 
         {/* Probabilities */}

@@ -70,7 +70,7 @@ export default function OverUnderPage() {
             Over / Under 2.5 Goals
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-[#8A93A0]">
-            Bivariate Poisson / Dixon-Coles goal expectation matrix against Pinnacle benchmark sharp line.
+            Goal expectation matrix evaluated against benchmark sharp line.
           </p>
 
           <div className="mt-3 flex items-center gap-2 text-xs">
