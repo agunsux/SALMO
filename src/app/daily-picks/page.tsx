@@ -5,7 +5,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ShieldCheck, CheckCircle2, AlertTriangle, XCircle, ArrowUpRight, Filter, Info, Database } from 'lucide-react';
 import Link from 'next/link';
-import { isPublicPickEligible } from '@/lib/eligibility';
+import { isPublicPickEligible, classifyDailyPicksState } from '@/lib/eligibility';
 
 interface DailyPickDTO {
   id: string;
@@ -34,30 +34,49 @@ interface DailyPickDTO {
 export default function DailyPicksPage() {
   const [picks, setPicks] = useState<DailyPickDTO[]>([]);
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState<'LOADING' | 'AVAILABLE' | 'DATA_UNAVAILABLE' | 'NO_QUALIFIED_PICKS'>('LOADING');
+  const [apiStatus, setApiStatus] = useState<'LOADING' | 'AVAILABLE' | 'DATA_UNAVAILABLE' | 'NO_QUALIFIED_PICKS'>('LOADING');
+  const [referenceTimeMs, setReferenceTimeMs] = useState<number | null>(null);
 
   const [verdictFilter, setVerdictFilter] = useState<'ALL' | 'LAYAK' | 'PANTAU' | 'LEWATI'>('ALL');
   const [marketFilter, setMarketFilter] = useState<'ALL' | 'ASIAN_HANDICAP' | 'OVER_UNDER' | 'BTTS'>('ALL');
 
   useEffect(() => {
     fetch('/api/daily-picks')
-      .then(res => res.json())
-      .then(json => {
+      .then(async res => {
+        const dateHeader = res.headers.get('date');
+        const headerTimeMs = dateHeader ? new Date(dateHeader).getTime() : null;
+        const json = await res.json();
+        return { json, headerTimeMs };
+      })
+      .then(({ json, headerTimeMs }) => {
         if (json.success && json.data) {
           setPicks(json.data);
-          setStatus(json.status || (json.data.length > 0 ? 'AVAILABLE' : 'NO_QUALIFIED_PICKS'));
+          const payloadTime = json.timestampUtc || json.timestamp;
+          const refMs = payloadTime
+            ? new Date(payloadTime).getTime()
+            : (headerTimeMs && !isNaN(headerTimeMs)
+                ? headerTimeMs
+                : (json.data.length > 0 && json.data[0].createdAt
+                    ? new Date(json.data[0].createdAt).getTime()
+                    : Date.now()));
+          setReferenceTimeMs(refMs);
+          setApiStatus(json.status || (json.data.length > 0 ? 'AVAILABLE' : 'NO_QUALIFIED_PICKS'));
         } else {
-          setStatus('DATA_UNAVAILABLE');
+          setApiStatus('DATA_UNAVAILABLE');
         }
       })
       .catch(err => {
         console.error('Failed to load daily picks:', err);
-        setStatus('DATA_UNAVAILABLE');
+        setApiStatus('DATA_UNAVAILABLE');
       })
       .finally(() => setLoading(false));
   }, []);
 
-  const eligiblePicks = picks.filter(p => isPublicPickEligible(p));
+  const effectiveRefTime = referenceTimeMs ?? 0;
+  const classification = classifyDailyPicksState(picks, effectiveRefTime);
+  const eligiblePicks = (classification.eligiblePicks as DailyPickDTO[]);
+  const currentPicks = (classification.currentPicks as DailyPickDTO[]);
+
   const filteredPicks = eligiblePicks.filter(p => {
     if (verdictFilter !== 'ALL' && p.verdict !== verdictFilter) return false;
     if (marketFilter !== 'ALL' && p.marketType !== marketFilter) return false;
@@ -65,8 +84,8 @@ export default function DailyPicksPage() {
   });
 
   const layakCount = eligiblePicks.filter(p => p.verdict === 'LAYAK').length;
-  const pantauCount = picks.filter(p => p.verdict === 'PANTAU').length;
-  const lewatiCount = picks.filter(p => p.verdict === 'LEWATI').length;
+  const pantauCount = currentPicks.filter(p => p.verdict === 'PANTAU').length;
+  const lewatiCount = currentPicks.filter(p => p.verdict === 'LEWATI').length;
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0B0D10] text-[#E6E9EE]">
@@ -155,7 +174,7 @@ export default function DailyPicksPage() {
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
             <p className="mt-4 text-xs font-medium text-[#8A93A0]">Loading canonical daily picks...</p>
           </div>
-        ) : status === 'DATA_UNAVAILABLE' ? (
+        ) : apiStatus === 'DATA_UNAVAILABLE' ? (
           <div className="rounded-xl border border-rose-500/30 bg-rose-500/5 p-12 text-center">
             <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-rose-500/10 text-rose-400 mb-3">
               <XCircle className="h-5 w-5" />
@@ -165,8 +184,8 @@ export default function DailyPicksPage() {
               Canonical HandicapLab data service is currently unavailable. As a fail-closed consumer, SALMO does not generate synthetic picks.
             </p>
           </div>
-        ) : status === 'NO_QUALIFIED_PICKS' || filteredPicks.length === 0 ? (
-          picks.length > 0 && picks.every(p => p.marketOdds === null || p.marketOdds === 0) ? (
+        ) : apiStatus === 'NO_QUALIFIED_PICKS' || classification.state !== 'AVAILABLE' || filteredPicks.length === 0 ? (
+          classification.state === 'ODDS_NOT_YET_AVAILABLE' ? (
             <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-12 text-center">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10 text-amber-400 mb-3">
                 <ShieldCheck className="h-5 w-5" />
