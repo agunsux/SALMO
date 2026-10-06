@@ -49,16 +49,60 @@ export class QuarterLineSettler {
   }
 
   /**
+   * Settle Over/Under outcome for a given selection ('OVER' | 'UNDER'), line, and total score.
+   * @param selection 'OVER' or 'UNDER' (case-insensitive)
+   * @param line Over/Under line (e.g. 2.25, 2.5, 2.75, 3.0)
+   * @param totalGoals Total goals scored in the match
+   * @param voided Whether the match was voided/abandoned
+   */
+  public static settleOverUnder(
+    selection: 'OVER' | 'UNDER' | 'over' | 'under',
+    line: number,
+    totalGoals: number,
+    voided = false
+  ): SettlementOutcome {
+    if (voided || totalGoals < 0) return 'VOID';
+
+    const isOver = selection.toUpperCase() === 'OVER';
+
+    if (this.isQuarterLine(line)) {
+      const line1 = line - 0.25;
+      const line2 = line + 0.25;
+
+      const r1 = this.settleOverUnderSingle(isOver, line1, totalGoals);
+      const r2 = this.settleOverUnderSingle(isOver, line2, totalGoals);
+
+      if (r1 === r2) return r1;
+      const hasPush = r1 === 'PUSH' || r2 === 'PUSH';
+      if (!hasPush) return 'PUSH';
+      return (r1 === 'WIN' || r2 === 'WIN') ? 'HALF_WIN' : 'HALF_LOSS';
+    }
+
+    return this.settleOverUnderSingle(isOver, line, totalGoals);
+  }
+
+  private static settleOverUnderSingle(isOver: boolean, line: number, totalGoals: number): SettlementOutcome {
+    const diff = totalGoals - line;
+    if (Math.abs(diff) < 0.000001) return 'PUSH';
+    if (isOver) {
+      return diff > 0 ? 'WIN' : 'LOSS';
+    } else {
+      return diff < 0 ? 'WIN' : 'LOSS';
+    }
+  }
+
+  /**
    * Calculates profit for 1 unit stake based on outcome and decimal odds.
    */
   public static calculateProfit(outcome: SettlementOutcome, decimalOdds: number, stake = 1): number {
     switch (outcome) {
-      case 'WIN': return (decimalOdds - 1) * stake;
-      case 'HALF_WIN': return ((decimalOdds - 1) / 2) * stake;
+      case 'WIN': return Number(((decimalOdds - 1) * stake).toFixed(4));
+      case 'HALF_WIN': return Number((((decimalOdds - 1) / 2) * stake).toFixed(4));
       case 'PUSH': return 0;
-      case 'HALF_LOSS': return -0.5 * stake;
-      case 'LOSS': return -stake;
+      case 'HALF_LOSS': return Number((-0.5 * stake).toFixed(4));
+      case 'LOSS': return Number((-stake).toFixed(4));
       case 'VOID': return 0;
+      default: return 0;
     }
   }
 }

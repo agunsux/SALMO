@@ -38,6 +38,7 @@ export interface LiveOddsDTO {
   homeOdds: number;
   awayOdds: number;
   capturedAt: string;
+  isMainLine?: boolean;
 }
 
 export interface IFixtureProvider {

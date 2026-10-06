@@ -10,7 +10,7 @@
 // 6. Idempotent production persistence (daily_picks, predictions, prediction_ledger)
 
 import { buildScoreGrid, deriveExpectedGoalsFromGrid } from '../probability/scoreGrid';
-import { calculateAsianHandicapProbability, fairOdds as calcFairOdds } from '../ah/ahProbability';
+import { calculateAsianHandicapProbability, fairOdds as calcFairOdds, calculatePushAwareFairOdds } from '../ah/ahProbability';
 import { AsianTotalEngine, settleAsianTotalGoals } from '../ou/asianTotalEngine';
 import { calculateBttsFromGrid, BTTS_MODEL_VERSION } from '../btts/bttsEngine';
 import { ValueEngine, ValueEvaluationResult } from '../decision/valueEngine';
@@ -38,16 +38,34 @@ export interface FixtureInput {
   };
 }
 
+export interface PersistenceResult {
+  persistedPicksCount: number;
+  persistedLedgerCount: number;
+  persistedGreenCount: number;
+  duplicateCount: number;
+  excludedCount: number;
+  newLedgerPositions: any[];
+}
+
 export interface PredictionCycleResult {
   timestampUtc: string;
   activePredictions: ActiveMatchPrediction[];
   persistedPicksCount: number;
+  persistedLedgerCount: number;
+  persistedGreenCount: number;
+  duplicateCount: number;
+  excludedCount: number;
+  newLedgerPositions: any[];
   stats: {
     totalFixtures: number;
     reconciledWithOdds: number;
     layakCount: number;
     pantauCount: number;
     lewatiCount: number;
+    ledgerCount: number;
+    greenCount: number;
+    duplicateCount: number;
+    excludedCount: number;
   };
 }
 
@@ -125,8 +143,8 @@ export class ProductionPredictionEngine {
     const xgDerived = deriveExpectedGoalsFromGrid(scoreGrid);
 
     const evaluations: {
-      ah?: ValueEvaluationResult;
-      ou?: ValueEvaluationResult;
+      ah?: ValueEvaluationResult & { decomposition?: any };
+      ou?: ValueEvaluationResult & { probabilities?: any };
       btts?: ValueEvaluationResult;
     } = {};
 
@@ -166,7 +184,10 @@ export class ProductionPredictionEngine {
         modelStatus: isSufficient ? 'FIXTURE_SPECIFIC' : 'INSUFFICIENT_MODEL',
       });
 
-      evaluations.ah = ahEval;
+      evaluations.ah = {
+        ...ahEval,
+        decomposition: ahProb,
+      };
 
       ahMarket = {
         market: 'AH',
@@ -192,7 +213,7 @@ export class ProductionPredictionEngine {
         selection: `${homeTeam} ${ahLine > 0 ? '+' : ''}${ahLine}`,
         line: ahLine,
         modelProbabilityPct: Number((ahProb.cover * 100).toFixed(1)),
-        fairOdds: calcFairOdds(ahProb.cover),
+        fairOdds: calculatePushAwareFairOdds(ahProb),
         marketOdds: 0,
         marketImpliedProbPct: 0,
         devigProbPct: 0,
@@ -240,7 +261,10 @@ export class ProductionPredictionEngine {
         modelStatus: isSufficient ? 'FIXTURE_SPECIFIC' : 'INSUFFICIENT_MODEL',
       });
 
-      evaluations.ou = ouEval;
+      evaluations.ou = {
+        ...ouEval,
+        probabilities: ouResult,
+      };
 
       ouMarket = {
         market: 'OU',
@@ -426,19 +450,51 @@ export class ProductionPredictionEngine {
         btts?: ValueEvaluationResult;
       };
     }>
-  ): Promise<number> {
+  ): Promise<PersistenceResult> {
+    const result: PersistenceResult = {
+      persistedPicksCount: 0,
+      persistedLedgerCount: 0,
+      persistedGreenCount: 0,
+      duplicateCount: 0,
+      excludedCount: 0,
+      newLedgerPositions: [],
+    };
+
     try {
       const { getDbClient } = await import('../../lib/db');
       const client = getDbClient();
 
-      let persistedCount = 0;
-      const localLedgerEntries: any[] = [];
+      const fs = await import('fs');
+      const path = await import('path');
+      const targetDir = path.resolve(process.cwd(), 'data', 'verification');
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+      const liveLedgerPath = path.join(targetDir, 'live_prediction_ledger.jsonl');
+      const runLedgerPath = path.join(targetDir, 'production_run_ledger.jsonl');
+
+      // Load existing ledger position IDs from live_prediction_ledger.jsonl for file idempotency
+      const existingFilePosIds = new Set<string>();
+      if (fs.existsSync(liveLedgerPath)) {
+        try {
+          const lines = fs.readFileSync(liveLedgerPath, 'utf8').trim().split('\n').filter(Boolean);
+          for (const line of lines) {
+            try {
+              const parsed = JSON.parse(line);
+              if (parsed.ledgerPositionId) existingFilePosIds.add(parsed.ledgerPositionId);
+              else if (parsed.predictionId) existingFilePosIds.add(parsed.predictionId);
+            } catch {}
+          }
+        } catch {}
+      }
+
+      const localLedgerEntriesToAppend: any[] = [];
 
       for (const item of items) {
         const { prediction, evaluations } = item;
         const fixtureUuid = this.toUuid(prediction.fixtureId);
 
-        // Markets to persist
+        // Markets to evaluate for persistence
         const marketsToPersist: Array<{
           marketType: 'ASIAN_HANDICAP' | 'OVER_UNDER' | 'BTTS';
           shortMarket: 'AH' | 'OU' | 'BTTS';
@@ -458,14 +514,15 @@ export class ProductionPredictionEngine {
 
           const pickDeterministicId = this.deterministicUuid(`pick:${prediction.fixtureId}:${marketType}:live`);
           const predDeterministicId = this.deterministicUuid(`pred:${prediction.fixtureId}:${shortMarket}`);
-          const ledgerDeterministicId = this.deterministicUuid(`ledger:${prediction.fixtureId}:${shortMarket}`);
+          const ledgerPositionId = `${prediction.fixtureId}:${shortMarket}:${marketView.line}:${marketView.selection}`;
+          const ledgerDeterministicId = this.deterministicUuid(`pos:${ledgerPositionId}`);
 
           const provenanceHash = crypto
             .createHash('sha256')
             .update(`${prediction.canonicalMatchId}:${marketType}:${marketView.selection}:${marketView.fairOdds}:${marketView.marketOdds}:${this.MODEL_VERSION}:${prediction.predictionTimestamp}`)
             .digest('hex');
 
-          // 1. Persist to Supabase daily_picks table
+          // 1. Persist to Supabase daily_picks table (all evaluated market views for UI display)
           const dailyPickRow = {
             id: pickDeterministicId,
             fixture_id: fixtureUuid,
@@ -496,7 +553,7 @@ export class ProductionPredictionEngine {
             .upsert(dailyPickRow, { onConflict: 'fixture_id, market_type, source' });
 
           if (!pickErr) {
-            persistedCount++;
+            result.persistedPicksCount++;
           } else {
             Logger.warn('[ProductionPredictionEngine] Upsert error on daily_picks:', { error: pickErr.message });
           }
@@ -530,9 +587,92 @@ export class ProductionPredictionEngine {
             Logger.warn('[ProductionPredictionEngine] Upsert error on predictions:', { error: predErr.message });
           }
 
-          // 3. Persist to Supabase prediction_ledger table
+          // 3. STEP 1 & 1.1: Production Betting Ledger Qualification Rule
+          const isLayak = marketView.verdict === 'LAYAK';
+          const isAllowedMarket = shortMarket === 'AH' || shortMarket === 'OU';
+          const hasValidOdds = typeof marketView.marketOdds === 'number' && marketView.marketOdds > 1.0;
+          const isProvider = true;
+          const isActive = true;
+          const kickoffMs = new Date(prediction.kickoffUtc).getTime();
+          const writeTimeMs = Date.now();
+          const isPreKickoff = Number.isFinite(kickoffMs) ? writeTimeMs < kickoffMs : true;
+
+          const qualifiesForLedger =
+            isLayak &&
+            isAllowedMarket &&
+            hasValidOdds &&
+            isPreKickoff &&
+            isProvider &&
+            isActive;
+
+          if (!qualifiesForLedger) {
+            result.excludedCount++;
+            continue; // NEVER write PANTAU, LEWATI, BTTS, Moneyline, or invalid odds to prediction_ledger
+          }
+
+          // STEP 2: Canonical Position Identity & Idempotency Check
+          let alreadyExistsInDb = false;
+          try {
+            const { data: existingRow, error: chkErr } = await client
+              .from('prediction_ledger')
+              .select('id')
+              .eq('id', ledgerDeterministicId)
+              .maybeSingle();
+
+            if (!chkErr && existingRow) {
+              alreadyExistsInDb = true;
+            }
+          } catch (e) {
+            // DB probe error handled safely
+          }
+
+          if (alreadyExistsInDb || existingFilePosIds.has(ledgerPositionId)) {
+            result.duplicateCount++;
+            Logger.info(`[ProductionPredictionEngine] Position ${ledgerPositionId} already exists; preserving immutable first snapshot.`);
+            continue; // First qualifying snapshot wins; do not overwrite or duplicate!
+          }
+
+          // STEP 1.1: Green Cohort Tagging (strictly confidence > 70)
+          const isGreenCohort = (marketView.confidence || 0) > 70;
+
+          // STEP 3: Immutable Prediction Snapshot
+          const pWin = (evalObj as any)?.decomposition?.win ?? ((evalObj as any)?.probabilities?.pOver ?? ((marketView.modelProbabilityPct || 0) / 100));
+          const pPush = (evalObj as any)?.decomposition?.push ?? ((evalObj as any)?.probabilities?.pPush ?? 0);
+          const pLoss = (evalObj as any)?.decomposition?.loss ?? ((evalObj as any)?.probabilities?.pUnder ?? (1 - pWin - pPush));
+
+          const snapshotMeta = {
+            cohort: 'GREEN_V2',
+            green_cohort: isGreenCohort,
+            ledger_position_id: ledgerPositionId,
+            fixture_id: prediction.fixtureId,
+            canonical_match_id: prediction.canonicalMatchId,
+            market_type: shortMarket,
+            selection: marketView.selection,
+            line: marketView.line,
+            stake_units: 1.0,
+            market_odds: marketView.marketOdds,
+            fair_odds: marketView.fairOdds,
+            p_win: Number(pWin.toFixed(4)),
+            p_push: Number(pPush.toFixed(4)),
+            p_loss: Number(pLoss.toFixed(4)),
+            confidence: marketView.confidence || 0,
+            edge: marketView.edgePct,
+            expected_value_pct: marketView.expectedValuePct,
+            kickoff_utc: prediction.kickoffUtc,
+            odds_snapshot_ts: marketView.oddsCapturedAt,
+            model_version: this.MODEL_VERSION,
+            feature_artifact_version: this.FEATURE_VERSION,
+            calibration_version: 'calib-v1.0',
+            source_type: 'PROVIDER',
+            data_status: 'ACTIVE',
+            provider: marketView.bookmaker || 'Pinnacle',
+            provenance_hash: provenanceHash,
+            created_at: new Date().toISOString(),
+          };
+
           const ledgerRow = {
             id: ledgerDeterministicId,
+            doi_id: ledgerPositionId,
             match_id: fixtureUuid,
             competition_id: 39,
             market: shortMarket,
@@ -545,8 +685,8 @@ export class ProductionPredictionEngine {
             xg_away: prediction.scoreGridSummary?.awayXG || 1.20,
             dixon_coles_rho: prediction.scoreGridSummary?.rho || -0.06,
             sha256_hash: provenanceHash,
-            decision: marketView.verdict === 'LAYAK' ? 'BET' : marketView.verdict === 'PANTAU' ? 'WATCH' : 'SKIP',
-            decision_reason: marketView.rejectionReason || (marketView.verdict === 'LAYAK' ? 'VALUE_FOUND' : 'MARGINAL'),
+            decision: 'BET',
+            decision_reason: JSON.stringify(snapshotMeta),
             published_at: prediction.predictionTimestamp,
             result_status: 'pending',
             source_type: 'PROVIDER',
@@ -556,58 +696,35 @@ export class ProductionPredictionEngine {
 
           const { error: ledgerErr } = await client
             .from('prediction_ledger')
-            .upsert(ledgerRow, { onConflict: 'id' });
+            .insert(ledgerRow);
 
-          if (ledgerErr) {
-            Logger.warn('[ProductionPredictionEngine] Upsert error on prediction_ledger:', { error: ledgerErr.message });
+          if (!ledgerErr) {
+            result.persistedLedgerCount++;
+            if (isGreenCohort) result.persistedGreenCount++;
+            result.newLedgerPositions.push(snapshotMeta);
+            existingFilePosIds.add(ledgerPositionId);
+            localLedgerEntriesToAppend.push(snapshotMeta);
+          } else {
+            Logger.warn('[ProductionPredictionEngine] Insert error on prediction_ledger:', { error: ledgerErr.message });
           }
-
-          // 4. Record local verification ledger entry
-          localLedgerEntries.push({
-            predictionId: predDeterministicId,
-            ledgerId: ledgerDeterministicId,
-            canonicalMatchId: prediction.canonicalMatchId,
-            fixtureId: prediction.fixtureId,
-            market: shortMarket,
-            selection: marketView.selection,
-            line: marketView.line,
-            modelProbability: marketView.modelProbabilityPct ? marketView.modelProbabilityPct / 100 : null,
-            fairOdds: marketView.fairOdds,
-            marketOdds: marketView.marketOdds,
-            edge: marketView.edgePct,
-            expectedValue: marketView.expectedValuePct,
-            confidence: marketView.confidence,
-            verdict: marketView.verdict,
-            modelVersion: this.MODEL_VERSION,
-            featureVersion: this.FEATURE_VERSION,
-            predictionTimestamp: prediction.predictionTimestamp,
-            oddsTimestamp: marketView.oddsCapturedAt,
-            provenanceHash,
-          });
         }
       }
 
-      // Write to local verification ledger file
-      if (localLedgerEntries.length > 0) {
+      // Append new qualifying immutable ledger entries to local ledger files
+      if (localLedgerEntriesToAppend.length > 0) {
         try {
-          const fs = await import('fs');
-          const path = await import('path');
-          const targetDir = path.resolve(process.cwd(), 'data', 'verification');
-          if (!fs.existsSync(targetDir)) {
-            fs.mkdirSync(targetDir, { recursive: true });
-          }
-          const targetFile = path.join(targetDir, 'production_run_ledger.jsonl');
-          const lines = localLedgerEntries.map(e => JSON.stringify(e)).join('\n') + '\n';
-          fs.appendFileSync(targetFile, lines, 'utf8');
+          const lines = localLedgerEntriesToAppend.map(e => JSON.stringify(e)).join('\n') + '\n';
+          fs.appendFileSync(liveLedgerPath, lines, 'utf8');
+          fs.appendFileSync(runLedgerPath, lines, 'utf8');
         } catch (fsErr) {
-          Logger.warn('[ProductionPredictionEngine] Local ledger write error:', { error: String(fsErr) });
+          Logger.warn('[ProductionPredictionEngine] Local ledger append error:', { error: String(fsErr) });
         }
       }
 
-      return persistedCount;
+      return result;
     } catch (err) {
       Logger.warn('[ProductionPredictionEngine] Database persistence skipped or unavailable:', { error: String(err) });
-      return 0;
+      return result;
     }
   }
 
@@ -651,18 +768,27 @@ export class ProductionPredictionEngine {
     }
 
     // Persist idempotently to database if configured
-    const persistedPicksCount = await this.persistPredictionCycle(evaluatedItems);
+    const persistence = await this.persistPredictionCycle(evaluatedItems);
 
     return {
       timestampUtc,
       activePredictions: evaluatedItems.map(item => item.prediction),
-      persistedPicksCount,
+      persistedPicksCount: persistence.persistedPicksCount,
+      persistedLedgerCount: persistence.persistedLedgerCount,
+      persistedGreenCount: persistence.persistedGreenCount,
+      duplicateCount: persistence.duplicateCount,
+      excludedCount: persistence.excludedCount,
+      newLedgerPositions: persistence.newLedgerPositions,
       stats: {
         totalFixtures: fixtures.length,
         reconciledWithOdds: evaluatedItems.filter(i => i.prediction.markets.asianHandicap.marketOdds > 1.0).length,
         layakCount,
         pantauCount,
         lewatiCount,
+        ledgerCount: persistence.persistedLedgerCount,
+        greenCount: persistence.persistedGreenCount,
+        duplicateCount: persistence.duplicateCount,
+        excludedCount: persistence.excludedCount,
       },
     };
   }
@@ -711,9 +837,11 @@ export class ProductionPredictionEngine {
                 );
 
                 if (ahOdds.length > 0) {
-                  const mainAh = ahOdds.sort(
-                    (a, b) => Math.abs(a.homeOdds - 1.95) - Math.abs(b.homeOdds - 1.95)
-                  )[0];
+                  const mainAh =
+                    ahOdds.find(o => o.isMainLine) ||
+                    ahOdds.sort(
+                      (a, b) => Math.abs(a.homeOdds - 1.95) - Math.abs(b.homeOdds - 1.95)
+                    )[0];
                   ah = {
                     line: mainAh.line,
                     homeOdds: mainAh.homeOdds,
@@ -723,9 +851,11 @@ export class ProductionPredictionEngine {
                 }
 
                 if (ouOdds.length > 0) {
-                  const mainOu = ouOdds.sort(
-                    (a, b) => Math.abs(a.homeOdds - 1.95) - Math.abs(b.homeOdds - 1.95)
-                  )[0];
+                  const mainOu =
+                    ouOdds.find(o => o.isMainLine) ||
+                    ouOdds.sort(
+                      (a, b) => Math.abs(a.homeOdds - 1.95) - Math.abs(b.homeOdds - 1.95)
+                    )[0];
                   ou = {
                     line: mainOu.line,
                     overOdds: mainOu.homeOdds,

@@ -43,6 +43,8 @@ const {
 const {
   calculateAsianHandicapProbability,
   calculateAsianHandicapFromGrid,
+  calculatePushAwareFairOdds,
+  calculateEffectiveAhProbability,
   fairOdds,
 } = require('../src/engine/ah/ahProbability.ts');
 
@@ -465,3 +467,56 @@ test('Model Provenance 4: Team ratings artifact provenance & reproducible model 
   assert.strictEqual(uuid1, uuid2, 'Deterministic UUIDs must be reproducible');
   assert.strictEqual(uuid1.length, 36, 'Must be valid UUID string length');
 });
+
+test('Formula Parity 9: Push-aware Asian Handicap fair odds and EV exactness', () => {
+  // Case 1: DNB / AH 0.0 with p_win, p_push, p_loss
+  const dnbDecomp = {
+    win: 0.5728,
+    halfWin: 0,
+    push: 0.2191,
+    halfLoss: 0,
+    loss: 0.2082,
+    cover: 0.5728,
+  };
+
+  // Push-aware fair odds: 1 + p_loss / p_win
+  const expectedFairOdds = Number((1 + (dnbDecomp.loss / dnbDecomp.win)).toFixed(3)); // 1 + 0.2082 / 0.5728 = 1.363
+  const actualFairOdds = calculatePushAwareFairOdds(dnbDecomp);
+  assert.strictEqual(actualFairOdds, 1.363, 'AH 0 fair odds must be exactly 1 + p_loss/p_win');
+
+  // Push-aware EV: p_win * (odds - 1) - p_loss
+  const odds = 1.961;
+  const ev = ValueEngine.calculateAhExpectedValue(odds, dnbDecomp);
+  const expectedEv = dnbDecomp.win * (odds - 1) - dnbDecomp.loss;
+  assert.ok(Math.abs(ev - expectedEv) < 1e-4, 'EV must equal p_win * (odds - 1) - p_loss');
+  assert.strictEqual(Number((ev * 100).toFixed(1)), 34.2, 'EV must be +34.2%');
+
+  // Effective conditional probability: p_win / (p_win + p_loss)
+  const effProb = calculateEffectiveAhProbability(dnbDecomp);
+  const expectedEffProb = dnbDecomp.win / (dnbDecomp.win + dnbDecomp.loss);
+  assert.ok(Math.abs(effProb - expectedEffProb) < 1e-3, 'Effective prob must equal p_win / (p_win + p_loss)');
+
+  // Case 2: Half-line AH -0.5 (push = 0)
+  const halfLineDecomp = {
+    win: 0.5000,
+    halfWin: 0,
+    push: 0,
+    halfLoss: 0,
+    loss: 0.5000,
+    cover: 0.5000,
+  };
+  assert.strictEqual(calculatePushAwareFairOdds(halfLineDecomp), 2.000, 'Half-line fair odds must equal 1 / p_win = 2.000');
+
+  // Case 3: Quarter-line AH -0.25 (halfWin exists)
+  const quarterLineDecomp = {
+    win: 0.4000,
+    halfWin: 0.2000,
+    push: 0,
+    halfLoss: 0,
+    loss: 0.4000,
+    cover: 0.5000,
+  };
+  const expectedQuarterFair = 1 + (0.4000) / (0.4000 + 0.5 * 0.2000); // 1 + 0.4 / 0.5 = 1.800
+  assert.strictEqual(calculatePushAwareFairOdds(quarterLineDecomp), 1.800, 'Quarter-line fair odds exactness');
+});
+

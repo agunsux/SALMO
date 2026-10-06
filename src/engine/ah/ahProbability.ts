@@ -82,9 +82,32 @@ export function calculateAsianHandicapFromGrid(
 }
 
 /**
+ * Push-aware fair odds for Asian Handicap taking push / half-win / half-loss into account:
+ * fair_odds = 1 + (loss + 0.5 * halfLoss) / (win + 0.5 * halfWin)
+ * For DNB / AH 0: reduces exactly to 1 + p_loss / p_win.
+ * For half lines: reduces exactly to 1 / p_win.
+ */
+export function calculatePushAwareFairOdds(decomp: AsianHandicapProbabilities): number {
+  const denom = decomp.win + 0.5 * decomp.halfWin;
+  const num = decomp.loss + 0.5 * decomp.halfLoss;
+  if (denom <= 0 || !Number.isFinite(denom)) return Infinity;
+  return Number((1 + num / denom).toFixed(3));
+}
+
+/**
+ * Effective break-even conditional win probability for Asian Handicap.
+ */
+export function calculateEffectiveAhProbability(decomp: AsianHandicapProbabilities): number {
+  const denom = (decomp.win + 0.5 * decomp.halfWin) + (decomp.loss + 0.5 * decomp.halfLoss);
+  if (denom <= 0) return 0;
+  return Number(((decomp.win + 0.5 * decomp.halfWin) / denom).toFixed(4));
+}
+
+/**
  * Fair odds derived directly from coverage probability.
  */
 export function fairOdds(probability: number): number {
   if (probability <= 0 || !Number.isFinite(probability)) return Infinity;
   return Number((1 / probability).toFixed(3));
 }
+

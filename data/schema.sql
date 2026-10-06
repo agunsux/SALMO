@@ -213,3 +213,24 @@ CREATE TABLE IF NOT EXISTS prediction_ledger (
 
 CREATE INDEX IF NOT EXISTS idx_ledger_fixture ON prediction_ledger(fixture_id);
 CREATE INDEX IF NOT EXISTS idx_ledger_timestamp ON prediction_ledger(prediction_timestamp);
+
+
+-- 12. LEDGER SETTLEMENTS TABLE (APPEND-ONLY SEPARATED SETTLEMENT LIFECYCLE)
+CREATE TABLE IF NOT EXISTS ledger_settlements (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    ledger_position_id VARCHAR(255) NOT NULL,
+    settlement_status VARCHAR(30) NOT NULL DEFAULT 'PENDING', -- PENDING, SETTLED, VOID
+    result VARCHAR(30), -- WIN, HALF_WIN, PUSH, HALF_LOSS, LOSS, VOID
+    profit_units NUMERIC(8, 4) NOT NULL DEFAULT 0.0,
+    stake_units NUMERIC(4, 2) NOT NULL DEFAULT 1.0,
+    settled_at TIMESTAMPTZ,
+    closing_odds NUMERIC(6, 3),
+    closing_line NUMERIC(5, 2),
+    clv_pct NUMERIC(6, 2),
+    closing_snapshot_ts TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_settlement_position UNIQUE(ledger_position_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_settlements_pos ON ledger_settlements(ledger_position_id);
+CREATE INDEX IF NOT EXISTS idx_settlements_status ON ledger_settlements(settlement_status);

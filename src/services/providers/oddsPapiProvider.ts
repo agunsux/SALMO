@@ -91,6 +91,7 @@ export class OddsPapiProvider implements IOddsProvider {
             if (outcomeId.endsWith('/home')) homeOutcome = player0;
             if (outcomeId.endsWith('/away')) awayOutcome = player0;
           }
+          const isMainLine = mIdStr.startsWith('line/') && mIdStr.includes('/0/');
           if (homeOutcome && awayOutcome) {
             const lineStr = (homeOutcome.bookmakerOutcomeId || '').split('/')[0];
             const line = parseFloat(lineStr);
@@ -103,6 +104,7 @@ export class OddsPapiProvider implements IOddsProvider {
                 homeOdds: Number(homeOutcome.price),
                 awayOdds: Number(awayOutcome.price),
                 capturedAt: homeOutcome.changedAt || timestamp,
+                isMainLine,
               });
             }
           }
@@ -120,6 +122,7 @@ export class OddsPapiProvider implements IOddsProvider {
             if (outcomeId.endsWith('/over')) overOutcome = player0;
             if (outcomeId.endsWith('/under')) underOutcome = player0;
           }
+          const isMainLine = mIdStr.startsWith('line/') && mIdStr.includes('/0/');
           if (overOutcome && underOutcome) {
             const lineStr = (overOutcome.bookmakerOutcomeId || '').split('/')[0];
             const line = parseFloat(lineStr);
@@ -132,6 +135,7 @@ export class OddsPapiProvider implements IOddsProvider {
                 homeOdds: Number(overOutcome.price),
                 awayOdds: Number(underOutcome.price),
                 capturedAt: overOutcome.changedAt || timestamp,
+                isMainLine,
               });
             }
           }

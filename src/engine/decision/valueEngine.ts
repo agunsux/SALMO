@@ -282,7 +282,14 @@ export class ValueEngine {
 
     // GATE 5: EDGE_THRESHOLD
     const marketProb = devig.pA;
-    const rawEdge = input.modelProbability - marketProb;
+    let effectiveModelProb = input.modelProbability;
+    if (input.market === 'AH' && input.ahBreakdown) {
+      const denom = (input.ahBreakdown.win + 0.5 * input.ahBreakdown.halfWin) + (input.ahBreakdown.loss + 0.5 * input.ahBreakdown.halfLoss);
+      if (denom > 0) {
+        effectiveModelProb = (input.ahBreakdown.win + 0.5 * input.ahBreakdown.halfWin) / denom;
+      }
+    }
+    const rawEdge = effectiveModelProb - marketProb;
     const edge = modelValid ? Number(rawEdge.toFixed(4)) : 0;
     const edgeThreshold = modelValid && edge >= this.MIN_EDGE_THRESHOLD;
 
@@ -419,7 +426,14 @@ export class ValueEngine {
       }
     }
 
-    const fairOdds = input.modelProbability > 0 ? Number((1 / input.modelProbability).toFixed(3)) : 999.0;
+    let fairOdds = 999.0;
+    if (input.market === 'AH' && input.ahBreakdown && (input.ahBreakdown.win + 0.5 * input.ahBreakdown.halfWin) > 0) {
+      const denom = input.ahBreakdown.win + 0.5 * input.ahBreakdown.halfWin;
+      const num = input.ahBreakdown.loss + 0.5 * input.ahBreakdown.halfLoss;
+      fairOdds = Number((1 + num / denom).toFixed(3));
+    } else if (input.modelProbability > 0) {
+      fairOdds = Number((1 / input.modelProbability).toFixed(3));
+    }
 
     return {
       market: input.market,
