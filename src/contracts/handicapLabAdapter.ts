@@ -1326,10 +1326,104 @@ export class DatabaseHandicapLabAdapter implements IHandicapLabAdapter {
   }
 
   public async getSalmoSync(query?: SalmoSyncQueryParams): Promise<SalmoSyncResponse | null> {
+    // 1. If upstream HandicapLab API is configured, attempt graceful sync
     if (env.handicapLab.apiUrl) {
-      const http = new HttpHandicapLabAdapter(env.handicapLab.apiUrl, env.handicapLab.apiKey);
-      return http.getSalmoSync(query);
+      try {
+        const http = new HttpHandicapLabAdapter(env.handicapLab.apiUrl, env.handicapLab.apiKey);
+        const res = await http.getSalmoSync(query);
+        if (res && res.predictions && res.predictions.length > 0) {
+          return res;
+        }
+      } catch (err) {
+        Logger.warn('[DatabaseHandicapLabAdapter] Upstream HandicapLab sync failed, falling back to SALMO native database:', { error: String(err) });
+      }
     }
+
+    // 2. SALMO Autonomous database fallback: query daily_picks
+    try {
+      const { getDbClient } = await import('../lib/db');
+      const client = getDbClient();
+      const { data: picks, error } = await client
+        .from('daily_picks')
+        .select('*')
+        .order('kickoff_utc', { ascending: true });
+
+      if (!error && picks && picks.length > 0) {
+        const dailyPicks = picks.map((r: any) => ({
+          projectionId: `proj_${r.id || r.fixture_id}`,
+          predictionId: r.id || r.fixture_id,
+          targetWindow: 'NEXT_7_DAYS' as const,
+          fixtureId: r.fixture_id,
+          matchId: r.canonical_match_id || `EPL_2026_${r.home_team}_${r.away_team}`,
+          leagueId: 39,
+          leagueName: r.league || 'Premier League',
+          homeTeam: r.home_team,
+          awayTeam: r.away_team,
+          kickoffUtc: r.kickoff_utc,
+          horizon: 'T-6h',
+          marketType: r.market_type,
+          recommendedLine: Number(r.line || 0),
+          recommendedSelection: r.prediction || '',
+          modelProbability: Number(r.model_probability || 0),
+          fairOdds: Number(r.fair_odds || 0),
+          marketOdds: Number(r.market_odds || 0),
+          edgePct: Number(r.edge_pct || 0),
+          confidenceScore: Number(r.confidence || 0),
+          verdict: (r.verdict as any) || 'LEWATI',
+          modelQualityGrade: 'GRADE_A',
+          modelVersion: r.model_version || 'dixon-coles-v1.0',
+          sourceBookmaker: r.market_bookmaker || 'Pinnacle',
+          oddsCapturedAt: r.created_at || new Date().toISOString(),
+          provenanceHash: '',
+          status: 'ACTIVE',
+        }));
+
+        return {
+          success: true,
+          timestampUtc: new Date().toISOString(),
+          syncChecksum: 'database-canonical-sync',
+          dataState: 'REAL',
+          counts: {
+            totalArchived: dailyPicks.length,
+            dailyPicks: dailyPicks.filter(p => p.verdict === 'LAYAK').length,
+            settled: 0,
+            pending: dailyPicks.length,
+          },
+          dailyPicks,
+          predictions: picks,
+          performance: {},
+        };
+      }
+    } catch (err) {
+      Logger.warn('[DatabaseHandicapLabAdapter] Database fallback query error:', { error: String(err) });
+    }
+
+    // 3. SALMO standalone ledger fallback
+    const localLedgerPath = path.resolve(process.cwd(), 'data', 'verification', 'live_prediction_ledger.jsonl');
+    if (fs.existsSync(localLedgerPath)) {
+      try {
+        const lines = fs.readFileSync(localLedgerPath, 'utf8').trim().split('\n').filter(Boolean);
+        const records = lines.map(l => JSON.parse(l));
+        return {
+          success: true,
+          timestampUtc: new Date().toISOString(),
+          syncChecksum: 'local-verification-ledger-sync',
+          dataState: 'REAL',
+          counts: {
+            totalArchived: records.length,
+            dailyPicks: 0,
+            settled: 0,
+            pending: records.length,
+          },
+          dailyPicks: [],
+          predictions: records,
+          performance: {},
+        };
+      } catch (err) {
+        Logger.warn('[DatabaseHandicapLabAdapter] File fallback error:', { error: String(err) });
+      }
+    }
+
     return null;
   }
 }

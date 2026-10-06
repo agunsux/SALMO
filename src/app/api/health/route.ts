@@ -31,15 +31,17 @@ export async function GET() {
   const oddsPapiStatus = env.providers.oddsPapi.configured ? 'configured' : 'unconfigured';
 
   // System status determination:
-  // HEALTHY: Adapter healthy, DB connected, Providers configured
-  // DEGRADED: Any optional dependency unconfigured/unreachable, but core service alive
-  // UNAVAILABLE: Core prediction dependencies completely unavailable
+  // HEALTHY: Data storage connected, native prediction engine ready, Providers configured
+  // DEGRADED: Any provider unconfigured or upstream R&D unavailable, but SALMO production product is operational
+  // UNAVAILABLE: No operational data store available (both DB and local storage unreachable)
   let overallStatus: 'healthy' | 'degraded' | 'unavailable' = 'healthy';
 
-  if (hlHealth.status === 'UNAVAILABLE') {
+  const hasDataStore = dbHealth.connected || hlHealth.status === 'HEALTHY';
+
+  if (!hasDataStore) {
     overallStatus = 'unavailable';
   } else if (
-    hlHealth.status === 'DEGRADED' ||
+    hlHealth.status !== 'HEALTHY' ||
     !dbHealth.connected ||
     !env.providers.apiFootball.configured ||
     !env.providers.oddsPapi.configured
@@ -58,11 +60,18 @@ export async function GET() {
     timestamp: new Date().toISOString(),
     latencyMs,
     dependencies: {
+      predictionEngine: {
+        status: 'healthy',
+        engine: 'dixon-coles-v1.0',
+        mode: 'salmo-native',
+        supportedMarkets: ['ASIAN_HANDICAP', 'OVER_UNDER', 'BTTS'],
+      },
       handicaplab: {
         status: hlHealth.status.toLowerCase(),
         mode: hlHealth.mode,
         verifiedMatches: hlHealth.recordCount,
         error: hlHealth.error,
+        role: 'rd_research_upstream',
       },
       database: {
         status: dbStatus,

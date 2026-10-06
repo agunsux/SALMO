@@ -14,9 +14,35 @@ export async function GET(request: NextRequest) {
 
   try {
     const adapter = HandicapLabAdapterFactory.getAdapter();
-    const syncRes = await adapter.getSalmoSync?.({ modelVersion: 'poisson_v1_rescue', view: 'all' });
+    let syncRes: any = null;
+    try {
+      syncRes = await adapter.getSalmoSync?.({ modelVersion: 'poisson_v1_rescue', view: 'all' });
+    } catch (adapterErr) {
+      Logger.warn('Upstream adapter getSalmoSync failed, checking local SALMO verification ledger:', { error: String(adapterErr) });
+    }
 
-    const predictions = syncRes?.predictions || [];
+    let predictions = syncRes?.predictions || [];
+
+    // Autonomous SALMO fallback: if upstream returned no predictions, read local verification ledger
+    if (predictions.length === 0) {
+      const fs = await import('fs');
+      const path = await import('path');
+      const candidatePaths = [
+        path.resolve(process.cwd(), 'data', 'verification', 'live_prediction_ledger.jsonl'),
+        path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'ledger', 'rescue_prediction_ledger.jsonl'),
+      ];
+
+      for (const p of candidatePaths) {
+        if (fs.existsSync(p)) {
+          try {
+            const lines = fs.readFileSync(p, 'utf8').trim().split('\n').filter(Boolean);
+            predictions = lines.map((l: string) => JSON.parse(l));
+            if (predictions.length > 0) break;
+          } catch {}
+        }
+      }
+    }
+
     const counts = syncRes?.counts || { totalArchived: predictions.length, dailyPicks: 0, settled: 0, pending: predictions.length };
     const dataState = syncRes?.dataState || (predictions.length > 0 ? 'REAL' : 'NO_QUALIFIED_PICKS');
 

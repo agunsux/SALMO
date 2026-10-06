@@ -32,11 +32,10 @@ export class OddsPapiProvider implements IOddsProvider {
     try {
       const apiKey = env.providers.oddsPapi.apiKey!;
       const baseUrl = env.providers.oddsPapi.baseUrl;
-      const url = `${baseUrl}/fixtures/${fixtureId}/odds`;
+      const url = `${baseUrl}/odds?fixtureId=${fixtureId}&bookmaker=pinnacle&apiKey=${apiKey}`;
 
       const res = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
           'Accept': 'application/json',
         },
         next: { revalidate: 60 }, // 1-minute odds cache
@@ -71,17 +70,88 @@ export class OddsPapiProvider implements IOddsProvider {
       }
 
       const json = await res.json();
-      const rawOdds = json.odds || [];
+      const odds: LiveOddsDTO[] = [];
 
-      const odds: LiveOddsDTO[] = rawOdds.map((o: any) => ({
-        providerFixtureId: fixtureId,
-        bookmaker: o.bookmaker,
-        marketType: o.marketType,
-        line: Number(o.line),
-        homeOdds: Number(o.homeOdds),
-        awayOdds: Number(o.awayOdds),
-        capturedAt: o.updatedAt || timestamp,
-      }));
+      // 1. OddsPapi v4 schema: bookmakerOdds.pinnacle.markets
+      const markets = json.bookmakerOdds?.pinnacle?.markets || {};
+      for (const mId of Object.keys(markets)) {
+        const marketObj = markets[mId];
+        const mIdStr = marketObj.bookmakerMarketId || '';
+        if (!marketObj.marketActive) continue;
+
+        // Spreads (Asian Handicap)
+        if (mIdStr.endsWith('/spreads')) {
+          const outcomes = Object.values(marketObj.outcomes || {}) as any[];
+          let homeOutcome: any = null;
+          let awayOutcome: any = null;
+          for (const out of outcomes) {
+            const player0 = out.players?.['0'];
+            if (!player0 || !player0.active) continue;
+            const outcomeId = player0.bookmakerOutcomeId || '';
+            if (outcomeId.endsWith('/home')) homeOutcome = player0;
+            if (outcomeId.endsWith('/away')) awayOutcome = player0;
+          }
+          if (homeOutcome && awayOutcome) {
+            const lineStr = (homeOutcome.bookmakerOutcomeId || '').split('/')[0];
+            const line = parseFloat(lineStr);
+            if (!isNaN(line)) {
+              odds.push({
+                providerFixtureId: fixtureId,
+                bookmaker: 'Pinnacle',
+                marketType: 'ASIAN_HANDICAP',
+                line,
+                homeOdds: Number(homeOutcome.price),
+                awayOdds: Number(awayOutcome.price),
+                capturedAt: homeOutcome.changedAt || timestamp,
+              });
+            }
+          }
+        }
+
+        // Totals (Over / Under)
+        if (mIdStr.endsWith('/totals')) {
+          const outcomes = Object.values(marketObj.outcomes || {}) as any[];
+          let overOutcome: any = null;
+          let underOutcome: any = null;
+          for (const out of outcomes) {
+            const player0 = out.players?.['0'];
+            if (!player0 || !player0.active) continue;
+            const outcomeId = player0.bookmakerOutcomeId || '';
+            if (outcomeId.endsWith('/over')) overOutcome = player0;
+            if (outcomeId.endsWith('/under')) underOutcome = player0;
+          }
+          if (overOutcome && underOutcome) {
+            const lineStr = (overOutcome.bookmakerOutcomeId || '').split('/')[0];
+            const line = parseFloat(lineStr);
+            if (!isNaN(line)) {
+              odds.push({
+                providerFixtureId: fixtureId,
+                bookmaker: 'Pinnacle',
+                marketType: 'OVER_UNDER',
+                line,
+                homeOdds: Number(overOutcome.price),
+                awayOdds: Number(underOutcome.price),
+                capturedAt: overOutcome.changedAt || timestamp,
+              });
+            }
+          }
+        }
+      }
+
+      // 2. Fallback to legacy rawOdds array if present
+      if (odds.length === 0 && Array.isArray(json.odds)) {
+        for (const o of json.odds) {
+          odds.push({
+            providerFixtureId: fixtureId,
+            bookmaker: o.bookmaker,
+            marketType: o.marketType,
+            line: Number(o.line),
+            homeOdds: Number(o.homeOdds),
+            awayOdds: Number(o.awayOdds),
+            capturedAt: o.updatedAt || timestamp,
+          });
+        }
+      }
 
       return {
         status: 'AVAILABLE',

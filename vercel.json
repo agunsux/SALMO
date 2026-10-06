@@ -46,6 +46,12 @@
         }
       ]
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/predict",
+      "schedule": "0 6,12 * * *"
+    }
   ]
 }
 

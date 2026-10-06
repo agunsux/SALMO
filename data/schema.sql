@@ -125,3 +125,91 @@ CREATE TABLE IF NOT EXISTS entitlements (
 
 CREATE INDEX IF NOT EXISTS idx_entitlements_user ON entitlements(user_id);
 
+-- 9. DAILY PICKS TABLE (CANONICAL PRODUCTION PICKS)
+CREATE TABLE IF NOT EXISTS daily_picks (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    fixture_id VARCHAR(100) NOT NULL,
+    league VARCHAR(100) NOT NULL DEFAULT 'Premier League',
+    home_team VARCHAR(100) NOT NULL,
+    away_team VARCHAR(100) NOT NULL,
+    kickoff_utc TIMESTAMPTZ NOT NULL,
+    market_type VARCHAR(50) NOT NULL, -- ASIAN_HANDICAP, OVER_UNDER, BTTS
+    prediction VARCHAR(100) NOT NULL,
+    line NUMERIC(5, 2),
+    model_probability NUMERIC(6, 4),
+    fair_odds NUMERIC(6, 3),
+    market_odds NUMERIC(6, 3),
+    market_bookmaker VARCHAR(50) NOT NULL DEFAULT 'Pinnacle',
+    edge_pct NUMERIC(6, 2),
+    expected_value NUMERIC(6, 4),
+    confidence INT NOT NULL DEFAULT 0,
+    verdict VARCHAR(20) NOT NULL DEFAULT 'LEWATI', -- LAYAK, PANTAU, LEWATI
+    model_version VARCHAR(50) NOT NULL DEFAULT 'dixon-coles-v1.0',
+    reasoning TEXT,
+    rejection_reason TEXT,
+    status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE', -- ACTIVE, SETTLED, VOID, PENDING
+    source VARCHAR(50) NOT NULL DEFAULT 'live',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_daily_picks_fixture_market_source UNIQUE(fixture_id, market_type, source)
+);
+
+CREATE INDEX IF NOT EXISTS idx_daily_picks_kickoff ON daily_picks(kickoff_utc);
+CREATE INDEX IF NOT EXISTS idx_daily_picks_verdict ON daily_picks(verdict);
+CREATE INDEX IF NOT EXISTS idx_daily_picks_market ON daily_picks(market_type);
+
+-- 10. PREDICTIONS TABLE (FULL POINT-IN-TIME SNAPSHOTS)
+CREATE TABLE IF NOT EXISTS predictions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    match_id VARCHAR(100) NOT NULL,
+    canonical_match_id VARCHAR(255),
+    market_type VARCHAR(50) NOT NULL, -- AH, OU, BTTS
+    home_team VARCHAR(100) NOT NULL,
+    away_team VARCHAR(100) NOT NULL,
+    selection VARCHAR(100) NOT NULL,
+    line NUMERIC(5, 2),
+    model_probability NUMERIC(6, 4),
+    fair_odds NUMERIC(6, 3),
+    market_odds NUMERIC(6, 3),
+    edge_pct NUMERIC(6, 2),
+    expected_value NUMERIC(6, 4),
+    confidence NUMERIC(5, 2),
+    model_version VARCHAR(50) NOT NULL DEFAULT 'dixon-coles-v1.0',
+    feature_version VARCHAR(50) NOT NULL DEFAULT 'dynamic-ratings-v1.0',
+    prediction_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    source_type VARCHAR(50) NOT NULL DEFAULT 'live',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_predictions_match_market UNIQUE(match_id, market_type)
+);
+
+CREATE INDEX IF NOT EXISTS idx_predictions_match ON predictions(match_id);
+
+-- 11. PREDICTION LEDGER TABLE (IMMUTABLE HASH-CHAINED AUDIT LEDGER)
+CREATE TABLE IF NOT EXISTS prediction_ledger (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    prediction_id VARCHAR(255) NOT NULL,
+    canonical_match_id VARCHAR(255) NOT NULL,
+    fixture_id VARCHAR(100) NOT NULL,
+    market VARCHAR(50) NOT NULL,
+    selection VARCHAR(100) NOT NULL,
+    line NUMERIC(5, 2),
+    model_probability NUMERIC(6, 4),
+    fair_odds NUMERIC(6, 3),
+    market_odds NUMERIC(6, 3),
+    edge NUMERIC(6, 4),
+    ev NUMERIC(6, 4),
+    model_version VARCHAR(50) NOT NULL,
+    feature_version VARCHAR(50) NOT NULL,
+    prediction_timestamp TIMESTAMPTZ NOT NULL,
+    odds_timestamp TIMESTAMPTZ NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'PENDING',
+    settlement VARCHAR(30) DEFAULT 'PENDING',
+    profit_loss NUMERIC(8, 4),
+    provenance_hash VARCHAR(64) NOT NULL,
+    prior_hash VARCHAR(64),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_ledger_prediction_id UNIQUE(prediction_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_ledger_fixture ON prediction_ledger(fixture_id);
+CREATE INDEX IF NOT EXISTS idx_ledger_timestamp ON prediction_ledger(prediction_timestamp);
