@@ -671,24 +671,106 @@ export class ProductionPredictionEngine {
    * Discovers upcoming fixtures with real Pinnacle odds or baseline schedule.
    */
   public static async discoverUpcomingFixturesWithOdds(): Promise<FixtureInput[]> {
-    const apiFootball = new ApiFootballProvider();
+    const oddsPapi = new OddsPapiProvider();
     const fixtures: FixtureInput[] = [];
 
-    // Attempt provider lookup if configured
-    if (apiFootball.isConfigured()) {
-      const res = await apiFootball.getUpcomingFixtures('39');
-      if (res.status === 'AVAILABLE' && res.data && res.data.length > 0) {
-        for (const f of res.data) {
-          fixtures.push({
-            fixtureId: f.providerFixtureId,
-            providerFixtureId: f.providerFixtureId,
-            homeTeam: f.homeTeam,
-            awayTeam: f.awayTeam,
-            league: f.league,
-            kickoffUtc: f.kickoffTime,
-            season: f.season,
-            venue: f.venue,
-          });
+    // 1. Attempt OddsPapi provider lookup for live Pinnacle spreads and totals
+    if (oddsPapi.isConfigured()) {
+      try {
+        const { env } = await import('../../config/env');
+        const apiKey = env.providers.oddsPapi.apiKey;
+        const from = new Date().toISOString();
+        const to = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
+        const url = `https://api.oddspapi.io/v4/fixtures?sportId=10&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&apiKey=${apiKey}`;
+
+        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        if (res.ok) {
+          const rawFixtures = await res.json();
+          if (Array.isArray(rawFixtures)) {
+            const eplFixtures = rawFixtures.filter(
+              (f: any) => f.categorySlug === 'england' && f.tournamentSlug === 'premier-league'
+            );
+
+            for (let i = 0; i < eplFixtures.length; i++) {
+              const f = eplFixtures[i];
+              if (i > 0) {
+                // Rate limit spacing for OddsPapi tier
+                await new Promise(r => setTimeout(r, 1100));
+              }
+
+              let ah: { line: number; homeOdds: number; awayOdds: number; timestampUtc?: string } | undefined;
+              let ou: { line: number; overOdds: number; underOdds: number; timestampUtc?: string } | undefined;
+
+              const oddsRes = await oddsPapi.getMarketOdds(f.fixtureId);
+              if (oddsRes.data && oddsRes.data.length > 0) {
+                const ahOdds = oddsRes.data.filter(
+                  o => o.marketType === 'ASIAN_HANDICAP' && Math.abs(o.line) <= 3.5
+                );
+                const ouOdds = oddsRes.data.filter(
+                  o => o.marketType === 'OVER_UNDER' && o.line >= 0.5 && o.line <= 5.5
+                );
+
+                if (ahOdds.length > 0) {
+                  const mainAh = ahOdds.sort(
+                    (a, b) => Math.abs(a.homeOdds - 1.95) - Math.abs(b.homeOdds - 1.95)
+                  )[0];
+                  ah = {
+                    line: mainAh.line,
+                    homeOdds: mainAh.homeOdds,
+                    awayOdds: mainAh.awayOdds,
+                    timestampUtc: mainAh.capturedAt,
+                  };
+                }
+
+                if (ouOdds.length > 0) {
+                  const mainOu = ouOdds.sort(
+                    (a, b) => Math.abs(a.homeOdds - 1.95) - Math.abs(b.homeOdds - 1.95)
+                  )[0];
+                  ou = {
+                    line: mainOu.line,
+                    overOdds: mainOu.homeOdds,
+                    underOdds: mainOu.awayOdds,
+                    timestampUtc: mainOu.capturedAt,
+                  };
+                }
+              }
+
+              fixtures.push({
+                fixtureId: f.fixtureId,
+                providerFixtureId: f.fixtureId,
+                homeTeam: f.participant1Name,
+                awayTeam: f.participant2Name,
+                league: 'Premier League',
+                kickoffUtc: f.startTime,
+                season: '2026',
+                pinnacleOdds: { ah, ou },
+              });
+            }
+          }
+        }
+      } catch (opErr) {
+        Logger.warn('[ProductionPredictionEngine] OddsPapi fixture discovery failed:', { error: String(opErr) });
+      }
+    }
+
+    // 2. Fallback to API-Football provider lookup if OddsPapi produced 0 fixtures
+    if (fixtures.length === 0) {
+      const apiFootball = new ApiFootballProvider();
+      if (apiFootball.isConfigured()) {
+        const res = await apiFootball.getUpcomingFixtures('39');
+        if (res.status === 'AVAILABLE' && res.data && res.data.length > 0) {
+          for (const f of res.data) {
+            fixtures.push({
+              fixtureId: f.providerFixtureId,
+              providerFixtureId: f.providerFixtureId,
+              homeTeam: f.homeTeam,
+              awayTeam: f.awayTeam,
+              league: f.league,
+              kickoffUtc: f.kickoffTime,
+              season: f.season,
+              venue: f.venue,
+            });
+          }
         }
       }
     }
