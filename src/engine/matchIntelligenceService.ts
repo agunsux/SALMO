@@ -43,6 +43,20 @@ export class MatchIntelligenceService {
       });
     }
 
+    // 2. Autonomous SALMO fallback: load from native database adapter
+    try {
+      const { DatabaseHandicapLabAdapter } = await import('../contracts/handicapLabAdapter');
+      const dbAdapter = new DatabaseHandicapLabAdapter();
+      const dbPredictions = await dbAdapter.getActive7DayPredictions();
+      if (dbPredictions && dbPredictions.length > 0) {
+        return dbPredictions.map(p => this.mapActiveMatchToIntelligence(p, null));
+      }
+    } catch (dbErr) {
+      Logger.warn('[MatchIntelligenceService] Database fallback could not load predictions:', {
+        error: String(dbErr),
+      });
+    }
+
     // Fail closed: Never generate synthetic fixtures or use empirical counting in production
     return [];
   }
