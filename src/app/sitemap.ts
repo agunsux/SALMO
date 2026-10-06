@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next';
-import { BLOG_POSTS } from '@/data/blogPosts';
+import { BLOG_POSTS, isBlogPostPublished, getBlogPostPublishTimestamp } from '@/data/blogPosts';
 import { MONETIZATION_ENABLED } from '@/config/entitlements';
+
+export const revalidate = 3600;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://salmo.dev';
@@ -73,10 +75,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // 10 blog post routes
-  const blogRoutes: MetadataRoute.Sitemap = BLOG_POSTS.map((post) => ({
+  // Blog routes: only include published blog posts in the public sitemap (Section 6)
+  const publishedPosts = BLOG_POSTS.filter((post) => isBlogPostPublished(post.publishDate));
+  const blogRoutes: MetadataRoute.Sitemap = publishedPosts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(post.publishDate),
+    lastModified: new Date(getBlogPostPublishTimestamp(post.publishDate)),
     changeFrequency: 'weekly',
     priority: post.slug === 'salmo-faq' ? 0.85 : 0.8,
   }));

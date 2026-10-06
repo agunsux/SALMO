@@ -189,14 +189,14 @@ describe('SALMO SEO Content Engine & Publishing System', () => {
     });
   });
 
-  test('7. Sitemap & Robots.txt include all 10 articles and valid configuration', () => {
+  test('7. Sitemap & Robots.txt include published articles and valid configuration', () => {
     assert.ok(fs.existsSync(sitemapPath), 'src/app/sitemap.ts must exist');
     assert.ok(fs.existsSync(robotsPath), 'src/app/robots.ts must exist');
 
     const sitemapContent = fs.readFileSync(sitemapPath, 'utf-8');
     const robotsContent = fs.readFileSync(robotsPath, 'utf-8');
 
-    assert.ok(sitemapContent.includes('BLOG_POSTS.map'), 'Sitemap must dynamically map BLOG_POSTS');
+    assert.ok(sitemapContent.includes('isBlogPostPublished'), 'Sitemap must filter by publication status');
     assert.ok(sitemapContent.includes('/daily-picks'), 'Sitemap must include /daily-picks');
     assert.ok(sitemapContent.includes('/faq'), 'Sitemap must include /faq');
     assert.ok(sitemapContent.includes('/blog'), 'Sitemap must include /blog');

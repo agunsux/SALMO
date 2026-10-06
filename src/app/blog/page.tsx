@@ -4,7 +4,13 @@ import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { BLOG_POSTS, BlogPost } from '@/data/blogPosts';
+import { 
+  BLOG_POSTS, 
+  BlogPost, 
+  getPublishedBlogPosts, 
+  getUpcomingBlogPosts, 
+  formatBlogPublishDate 
+} from '@/data/blogPosts';
 import { 
   Search, 
   Calendar, 
@@ -15,7 +21,8 @@ import {
   ShieldCheck, 
   Tag, 
   Filter,
-  CheckCircle2
+  CheckCircle2,
+  CalendarClock
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -32,16 +39,18 @@ export default function BlogIndexPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Sort newest first by publishDate descending
-  const sortedPosts = useMemo(() => {
-    return [...BLOG_POSTS].sort((a, b) => {
-      return new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime();
-    });
+  // Partition published and upcoming posts using canonical Asia/Jakarta publication rule (publishedAt <= now)
+  const publishedPosts = useMemo(() => {
+    return getPublishedBlogPosts();
   }, []);
 
-  // Filter posts based on category and search query
+  const upcomingPosts = useMemo(() => {
+    return getUpcomingBlogPosts();
+  }, []);
+
+  // Filter published posts based on category and search query
   const filteredPosts = useMemo(() => {
-    return sortedPosts.filter((post) => {
+    return publishedPosts.filter((post) => {
       const matchesCategory =
         selectedCategory === 'All' || post.category === selectedCategory;
       const q = searchQuery.toLowerCase().trim();
@@ -54,9 +63,9 @@ export default function BlogIndexPage() {
 
       return matchesCategory && matchesSearch;
     });
-  }, [sortedPosts, selectedCategory, searchQuery]);
+  }, [publishedPosts, selectedCategory, searchQuery]);
 
-  const featuredPost = sortedPosts[0];
+  const featuredPost = publishedPosts[0];
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0B0D10] text-[#E6E9EE] dark:bg-[#0B0D10] dark:text-[#E6E9EE] light:bg-[#F6F7F9] light:text-[#14171C]">
@@ -138,7 +147,7 @@ export default function BlogIndexPage() {
                 <div className="flex items-center gap-4 text-xs text-[#8A93A0]">
                   <span className="flex items-center gap-1.5">
                     <Calendar className="h-3.5 w-3.5 text-emerald-400" />
-                    Published {new Date(featuredPost.publishDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    Published {formatBlogPublishDate(featuredPost.publishDate, { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                   <span>•</span>
                   <span>Primary: <strong className="text-[#E6E9EE]">{featuredPost.primaryKeyword}</strong></span>
@@ -159,17 +168,17 @@ export default function BlogIndexPage() {
           <div className="flex items-center justify-between border-b border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] pb-4 mb-6">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#8A93A0]">
               <BookOpen className="h-4 w-4 text-emerald-400" />
-              <span>Showing {filteredPosts.length} of {BLOG_POSTS.length} Articles (Ordered Newest First)</span>
+              <span>Showing {filteredPosts.length} of {publishedPosts.length} Published Articles (Ordered Newest First)</span>
             </div>
             <span className="text-xs text-[#8A93A0]">
-              Tuesday & Friday Publishing Cadence
+              Tuesday & Friday Publishing Cadence (Asia/Jakarta)
             </span>
           </div>
 
           {filteredPosts.length === 0 ? (
             <div className="rounded-xl border border-[#232830] bg-[#111418] p-12 text-center">
               <p className="text-sm text-[#8A93A0]">
-                No articles match your search criteria. Try resetting your filter or search keywords.
+                No published articles match your search criteria. Try resetting your filter or search keywords.
               </p>
               <button
                 onClick={() => {
@@ -184,7 +193,7 @@ export default function BlogIndexPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredPosts.map((post) => {
-                const formattedDate = new Date(post.publishDate).toLocaleDateString('en-US', {
+                const formattedDate = formatBlogPublishDate(post.publishDate, {
                   weekday: 'short',
                   month: 'short',
                   day: 'numeric',
@@ -231,7 +240,7 @@ export default function BlogIndexPage() {
                     <div className="mt-5 flex items-center justify-between border-t border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] pt-3.5 text-xs">
                       <span className="flex items-center gap-1 text-[11px] text-[#8A93A0]">
                         <Calendar className="h-3 w-3 text-[#8A93A0]" />
-                        {formattedDate}
+                        Published {formattedDate}
                       </span>
                       <Link
                         href={`/blog/${post.slug}`}
@@ -246,6 +255,91 @@ export default function BlogIndexPage() {
             </div>
           )}
         </section>
+
+        {/* Upcoming Releases Section (Explicit Scheduled Status) */}
+        {upcomingPosts.length > 0 && selectedCategory === 'All' && !searchQuery && (
+          <section className="mx-auto max-w-7xl px-4 pt-4 pb-14 sm:px-6">
+            <div className="border-t border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] pt-10">
+              <div className="flex items-center justify-between pb-4 mb-6">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
+                    <CalendarClock className="h-4 w-4" />
+                    <span>Upcoming Releases ({upcomingPosts.length} Articles Scheduled)</span>
+                  </div>
+                  <p className="mt-1 text-xs text-[#8A93A0]">
+                    Upcoming quantitative guides scheduled across our 5-week publication cadence.
+                  </p>
+                </div>
+                <span className="text-xs text-[#8A93A0]">
+                  Asia/Jakarta (WIB) Schedule
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {upcomingPosts.map((post) => {
+                  const scheduledDate = formatBlogPublishDate(post.publishDate, {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  });
+
+                  return (
+                    <article
+                      key={post.slug}
+                      className="flex flex-col justify-between rounded-xl border border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] bg-[#111418]/60 p-5 hover:border-amber-500/30 transition-all duration-200"
+                    >
+                      <div>
+                        {/* Meta badge strip */}
+                        <div className="flex items-center justify-between gap-2 text-[11px] mb-3">
+                          <span className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 font-semibold text-amber-400">
+                            Scheduled • {post.category}
+                          </span>
+                          <span className="flex items-center gap-1 text-[#8A93A0]">
+                            <Clock className="h-3 w-3" />
+                            {post.readTimeMinutes} min
+                          </span>
+                        </div>
+
+                        {/* Title */}
+                        <h3 className="text-base font-bold tracking-tight text-[#E6E9EE] dark:text-[#E6E9EE] light:text-[#14171C] leading-snug">
+                          <Link href={`/blog/${post.slug}`}>
+                            {post.title}
+                          </Link>
+                        </h3>
+
+                        {/* Summary */}
+                        <p className="mt-2.5 text-xs text-[#8A93A0] leading-relaxed line-clamp-3">
+                          {post.summary}
+                        </p>
+
+                        {/* Primary keyword pill */}
+                        <div className="mt-3 flex items-center gap-1.5 text-[11px] text-[#8A93A0]">
+                          <Tag className="h-3 w-3 text-amber-400/70" />
+                          <span className="font-mono text-[#8A93A0]">{post.primaryKeyword}</span>
+                        </div>
+                      </div>
+
+                      {/* Bottom Scheduled Date and Action */}
+                      <div className="mt-5 flex items-center justify-between border-t border-[#232830] pt-3.5 text-xs">
+                        <span className="flex items-center gap-1 text-[11px] text-amber-400/80">
+                          <Calendar className="h-3 w-3 text-amber-400" />
+                          Scheduled: {scheduledDate}
+                        </span>
+                        <Link
+                          href={`/blog/${post.slug}`}
+                          className="inline-flex items-center gap-1 font-semibold text-amber-400 hover:text-amber-300 transition-colors"
+                        >
+                          Preview <ArrowRight className="h-3 w-3" />
+                        </Link>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        )}
       </main>
 
       <Footer />

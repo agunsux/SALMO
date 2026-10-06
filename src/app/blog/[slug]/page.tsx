@@ -3,7 +3,13 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { BLOG_POSTS, BlogPost } from '@/data/blogPosts';
+import { 
+  BLOG_POSTS, 
+  BlogPost, 
+  isBlogPostPublished, 
+  getBlogPostPublishTimestamp, 
+  formatBlogPublishDate 
+} from '@/data/blogPosts';
 import { FAQ_DATA } from '@/data/faqData';
 import { 
   Calendar, 
@@ -17,7 +23,8 @@ import {
   Info, 
   ChevronRight,
   Calculator,
-  Share2
+  Share2,
+  CalendarClock
 } from 'lucide-react';
 
 interface PageProps {
@@ -26,7 +33,9 @@ interface PageProps {
   }>;
 }
 
-// Generate static params for all 10 articles
+export const revalidate = 3600;
+
+// Generate static params for all articles
 export async function generateStaticParams() {
   return BLOG_POSTS.map((post) => ({
     slug: post.slug,
@@ -44,12 +53,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
+  const published = isBlogPostPublished(post.publishDate);
   const canonicalUrl = `https://salmo.dev/blog/${post.slug}`;
+  const publishTimestamp = getBlogPostPublishTimestamp(post.publishDate);
+  const isoPublishDate = new Date(publishTimestamp).toISOString();
+
+  // Non-indexable scheduled content for upcoming articles (Section 6)
+  const robotsConfig = published
+    ? { index: true, follow: true }
+    : { index: false, follow: true, nocache: true };
 
   return {
-    title: `${post.metaTitle} | SALMO`,
+    title: published ? `${post.metaTitle} | SALMO` : `[Scheduled] ${post.metaTitle} | SALMO`,
     description: post.metaDescription,
     keywords: [post.primaryKeyword, ...post.secondaryKeywords],
+    robots: robotsConfig,
     alternates: {
       canonical: canonicalUrl,
     },
@@ -58,10 +76,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: post.metaDescription,
       url: canonicalUrl,
       siteName: 'SALMO.DEV — Football Intelligence Platform',
-      type: 'article',
-      publishedTime: `${post.publishDate}T00:00:00Z`,
-      authors: [post.author.name],
-      tags: [post.primaryKeyword, ...post.secondaryKeywords],
+      type: published ? 'article' : 'website',
+      ...(published
+        ? {
+            publishedTime: isoPublishDate,
+            authors: [post.author.name],
+            tags: [post.primaryKeyword, ...post.secondaryKeywords],
+          }
+        : {}),
     },
     twitter: {
       card: 'summary_large_image',
@@ -79,8 +101,9 @@ export default async function BlogPostPage({ params }: PageProps) {
     notFound();
   }
 
+  const published = isBlogPostPublished(post.publishDate);
   const canonicalUrl = `https://salmo.dev/blog/${post.slug}`;
-  const formattedDate = new Date(post.publishDate).toLocaleDateString('en-US', {
+  const formattedDate = formatBlogPublishDate(post.publishDate, {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
@@ -92,32 +115,34 @@ export default async function BlogPostPage({ params }: PageProps) {
   const prevPost = currentIndex > 0 ? BLOG_POSTS[currentIndex - 1] : null;
   const nextPost = currentIndex < BLOG_POSTS.length - 1 ? BLOG_POSTS[currentIndex + 1] : null;
 
-  // JSON-LD Article Schema
-  const articleSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'TechArticle',
-    headline: post.title,
-    description: post.metaDescription,
-    author: {
-      '@type': 'Organization',
-      name: post.author.name,
-      url: 'https://salmo.dev',
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'SALMO.DEV',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://salmo.dev/logo.png',
-      },
-    },
-    datePublished: `${post.publishDate}T00:00:00Z`,
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': canonicalUrl,
-    },
-    keywords: [post.primaryKeyword, ...post.secondaryKeywords].join(', '),
-  };
+  // JSON-LD Article Schema (Only generated for legitimately published articles per Section 6)
+  const articleSchema = published
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'TechArticle',
+        headline: post.title,
+        description: post.metaDescription,
+        author: {
+          '@type': 'Organization',
+          name: post.author.name,
+          url: 'https://salmo.dev',
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'SALMO.DEV',
+          logo: {
+            '@type': 'ImageObject',
+            url: 'https://salmo.dev/logo.png',
+          },
+        },
+        datePublished: new Date(getBlogPostPublishTimestamp(post.publishDate)).toISOString(),
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': canonicalUrl,
+        },
+        keywords: [post.primaryKeyword, ...post.secondaryKeywords].join(', '),
+      }
+    : null;
 
   // Breadcrumb Schema
   const breadcrumbSchema = {
@@ -167,10 +192,12 @@ export default async function BlogPostPage({ params }: PageProps) {
   return (
     <div className="min-h-screen flex flex-col bg-[#0B0D10] text-[#E6E9EE] dark:bg-[#0B0D10] dark:text-[#E6E9EE] light:bg-[#F6F7F9] light:text-[#14171C]">
       {/* Structured Data injection */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
-      />
+      {articleSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+        />
+      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
@@ -183,6 +210,17 @@ export default async function BlogPostPage({ params }: PageProps) {
       )}
 
       <Header />
+
+      {!published && (
+        <div className="border-b border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs text-amber-300">
+          <div className="mx-auto max-w-4xl flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" />
+            <span>
+              <strong>Scheduled Publication Preview:</strong> This article is scheduled for release on {formattedDate} (Asia/Jakarta / WIB). It is currently unlisted from search indexing.
+            </span>
+          </div>
+        </div>
+      )}
 
       <main className="flex-1">
         {/* Breadcrumb Navigation */}
@@ -206,12 +244,25 @@ export default async function BlogPostPage({ params }: PageProps) {
         <header className="border-b border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] bg-gradient-to-b from-[#111418] to-[#0B0D10] py-12 px-4 sm:px-6">
           <div className="mx-auto max-w-4xl">
             <div className="flex flex-wrap items-center gap-3 text-xs">
-              <span className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 font-semibold text-emerald-400">
-                {post.category}
+              <span className={`rounded-md border px-2.5 py-1 font-semibold ${
+                published
+                  ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+                  : 'border-amber-500/30 bg-amber-500/10 text-amber-400'
+              }`}>
+                {published ? post.category : `Scheduled • ${post.category}`}
               </span>
-              <span className="flex items-center gap-1.5 text-[#8A93A0]">
-                <Calendar className="h-3.5 w-3.5 text-emerald-400" />
-                {formattedDate}
+              <span className={`flex items-center gap-1.5 ${published ? 'text-[#8A93A0]' : 'text-amber-400 font-medium'}`}>
+                {published ? (
+                  <>
+                    <Calendar className="h-3.5 w-3.5 text-emerald-400" />
+                    Published {formattedDate}
+                  </>
+                ) : (
+                  <>
+                    <CalendarClock className="h-3.5 w-3.5 text-amber-400" />
+                    Scheduled: {formattedDate} (WIB)
+                  </>
+                )}
               </span>
               <span className="text-[#8A93A0]">•</span>
               <span className="flex items-center gap-1.5 text-[#8A93A0]">

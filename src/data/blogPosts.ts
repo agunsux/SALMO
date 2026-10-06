@@ -1075,3 +1075,73 @@ export const BLOG_POSTS: BlogPost[] = [
 ];
 
 export const TOTAL_BLOG_POSTS_COUNT = BLOG_POSTS.length;
+
+/**
+ * Asia/Jakarta (WIB) is UTC+7 (420 minutes offset).
+ */
+export const ASIA_JAKARTA_TIMEZONE = 'Asia/Jakarta';
+export const ASIA_JAKARTA_OFFSET_HOURS = 7;
+
+/**
+ * Converts a publication date string to a millisecond timestamp.
+ * If the string is date-only (YYYY-MM-DD), it represents midnight 00:00:00 in Asia/Jakarta (WIB).
+ * Example: '2026-10-07' -> 2026-10-07 00:00:00 WIB = 2026-10-06 17:00:00.000 UTC.
+ * If the string contains an explicit timestamp/timezone, parses it directly.
+ */
+export function getBlogPostPublishTimestamp(publishDate: string): number {
+  if (publishDate.includes('T')) {
+    return new Date(publishDate).getTime();
+  }
+  const parts = publishDate.split('-').map(Number);
+  if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+    const [year, month, day] = parts;
+    // Midnight in UTC minus 7 hours offset = midnight 00:00:00 WIB
+    return Date.UTC(year, month - 1, day, 0, 0, 0) - (ASIA_JAKARTA_OFFSET_HOURS * 3600 * 1000);
+  }
+  return new Date(publishDate).getTime();
+}
+
+/**
+ * Determines if an article is published based on a reference timestamp.
+ * Defaults to current system time (Date.now()).
+ * Rule: publishTimestamp <= nowTimestamp -> true (Published).
+ */
+export function isBlogPostPublished(publishDate: string, nowTimestamp: number = Date.now()): boolean {
+  return getBlogPostPublishTimestamp(publishDate) <= nowTimestamp;
+}
+
+/**
+ * Returns all published blog posts, sorted by publishDate descending (newest first).
+ */
+export function getPublishedBlogPosts(nowTimestamp: number = Date.now()): BlogPost[] {
+  return BLOG_POSTS
+    .filter((post) => isBlogPostPublished(post.publishDate, nowTimestamp))
+    .sort((a, b) => getBlogPostPublishTimestamp(b.publishDate) - getBlogPostPublishTimestamp(a.publishDate));
+}
+
+/**
+ * Returns all upcoming (scheduled) blog posts, sorted by publishDate ascending (chronological).
+ */
+export function getUpcomingBlogPosts(nowTimestamp: number = Date.now()): BlogPost[] {
+  return BLOG_POSTS
+    .filter((post) => !isBlogPostPublished(post.publishDate, nowTimestamp))
+    .sort((a, b) => getBlogPostPublishTimestamp(a.publishDate) - getBlogPostPublishTimestamp(b.publishDate));
+}
+
+/**
+ * Formats a blog publication date in Asia/Jakarta timezone.
+ */
+export function formatBlogPublishDate(
+  publishDate: string,
+  options?: Intl.DateTimeFormatOptions
+): string {
+  const timestamp = getBlogPostPublishTimestamp(publishDate);
+  const defaultOptions: Intl.DateTimeFormatOptions = {
+    timeZone: ASIA_JAKARTA_TIMEZONE,
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    ...options,
+  };
+  return new Intl.DateTimeFormat('en-US', defaultOptions).format(new Date(timestamp));
+}
