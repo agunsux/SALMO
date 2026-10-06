@@ -114,7 +114,7 @@ export default function AsianHandicapPage() {
             </h3>
             <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
               {status === 'DATA_UNAVAILABLE'
-                ? 'Canonical HandicapLab Asian Handicap feed is currently unavailable.'
+                ? 'SALMO Asian Handicap feed is currently unavailable.'
                 : 'No Asian Handicap fixtures match the selected horizon.'}
             </p>
           </div>

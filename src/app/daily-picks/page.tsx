@@ -181,7 +181,7 @@ export default function DailyPicksPage() {
             </div>
             <h3 className="text-sm font-semibold text-rose-300">DATA_UNAVAILABLE</h3>
             <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
-              Canonical HandicapLab data service is currently unavailable. As a fail-closed consumer, SALMO does not generate synthetic picks.
+              SALMO canonical data service is currently unavailable. As a fail-closed consumer, SALMO does not generate synthetic picks.
             </p>
           </div>
         ) : apiStatus === 'NO_QUALIFIED_PICKS' || classification.state !== 'AVAILABLE' || filteredPicks.length === 0 ? (

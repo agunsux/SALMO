@@ -16,7 +16,7 @@ export default function MatchesPage() {
   const [matches, setMatches] = useState<MatchIntelligence[]>([]);
   const [validation, setValidation] = useState<LiveValidationSummary | null>(null);
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState<'LOADING' | 'AVAILABLE' | 'DATA_UNAVAILABLE'>('LOADING');
+  const [status, setStatus] = useState<'LOADING' | 'AVAILABLE' | 'DATA_TEMPORARILY_UNAVAILABLE' | 'NO_FIXTURES'>('LOADING');
 
   const [timeHorizon, setTimeHorizon] = useState<TimeHorizonFilter>('7_DAYS');
   const [marketFilter, setMarketFilter] = useState<MarketFilter>('ALL');
@@ -37,14 +37,14 @@ export default function MatchesPage() {
         if (data.success && data.data?.matches) {
           setMatches(data.data.matches);
           if (data.data.validation) setValidation(data.data.validation);
-          setStatus(data.data.matches.length > 0 ? 'AVAILABLE' : 'DATA_UNAVAILABLE');
+          setStatus(data.data.matches.length > 0 ? 'AVAILABLE' : 'NO_FIXTURES');
         } else {
-          setStatus('DATA_UNAVAILABLE');
+          setStatus('DATA_TEMPORARILY_UNAVAILABLE');
         }
       })
       .catch(err => {
         console.error('Failed to load matches:', err);
-        setStatus('DATA_UNAVAILABLE');
+        setStatus('DATA_TEMPORARILY_UNAVAILABLE');
       })
       .finally(() => setLoading(false));
   }, []);
@@ -110,7 +110,7 @@ export default function MatchesPage() {
           <div className="flex flex-wrap items-center gap-2 text-xs text-[#8A93A0]">
             <div className="flex items-center gap-1.5 rounded border border-[#232830] bg-[#111418] px-2.5 py-1">
               <Database className="h-3.5 w-3.5 text-blue-400" />
-              <span>HandicapLab Pipeline</span>
+              <span>SALMO Native Intelligence</span>
             </div>
             <div className="flex items-center gap-1.5 rounded border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-emerald-400">
               <CheckCircle2 className="h-3.5 w-3.5" />
@@ -136,18 +136,28 @@ export default function MatchesPage() {
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
             <p className="mt-4 text-xs font-medium text-[#8A93A0]">Loading canonical match intelligence...</p>
           </div>
-        ) : status === 'DATA_UNAVAILABLE' || filteredMatches.length === 0 ? (
+        ) : status === 'DATA_TEMPORARILY_UNAVAILABLE' ? (
           <div className="rounded-xl border border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] bg-[#111418] p-12 text-center">
             <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#171B20] text-[#8A93A0] mb-3">
               <ShieldCheck className="h-5 w-5" />
             </div>
             <h3 className="text-sm font-semibold text-[#E6E9EE]">
-              {status === 'DATA_UNAVAILABLE' ? 'DATA_UNAVAILABLE' : t.states.noFixtures}
+              DATA_TEMPORARILY_UNAVAILABLE
             </h3>
             <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
-              {status === 'DATA_UNAVAILABLE'
-                ? 'Canonical HandicapLab data is currently unavailable. No synthetic fixtures are generated.'
-                : 'No fixtures match the selected horizon and quality filters.'}
+              SALMO fixture intelligence service is temporarily unavailable. Reconnecting to native feed... No synthetic fixtures are generated.
+            </p>
+          </div>
+        ) : filteredMatches.length === 0 ? (
+          <div className="rounded-xl border border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] bg-[#111418] p-12 text-center">
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#171B20] text-[#8A93A0] mb-3">
+              <Calendar className="h-5 w-5" />
+            </div>
+            <h3 className="text-sm font-semibold text-[#E6E9EE]">
+              {t.states.noFixtures}
+            </h3>
+            <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
+              No Premier League fixtures scheduled for the selected time horizon and quality filters.
             </p>
           </div>
         ) : (

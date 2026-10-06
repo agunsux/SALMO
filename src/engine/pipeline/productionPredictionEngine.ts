@@ -22,6 +22,22 @@ import { ActiveMatchPrediction, ActivePredictionMarket } from '../../types/index
 import { Logger } from '../../lib/logger';
 import crypto from 'crypto';
 
+/**
+ * Checks whether a prediction kickoff falls within the active betting execution window.
+ * Default: within 24 hours before kickoff.
+ * Picks further out (>24h) remain preview in daily_picks but are excluded from prediction_ledger.
+ */
+export function isWithinLedgerExecutionWindow(
+  kickoffIso: string,
+  referenceTimeMs: number = Date.now(),
+  maxHoursBeforeKickoff: number = Number(process.env.LEDGER_MAX_HOURS_BEFORE_KICKOFF || 24)
+): boolean {
+  const kickoffMs = new Date(kickoffIso).getTime();
+  if (!Number.isFinite(kickoffMs)) return false;
+  const diffMs = kickoffMs - referenceTimeMs;
+  return diffMs > 0 && diffMs <= maxHoursBeforeKickoff * 60 * 60 * 1000;
+}
+
 export interface FixtureInput {
   fixtureId: string;
   providerFixtureId?: string;
@@ -596,18 +612,20 @@ export class ProductionPredictionEngine {
           const kickoffMs = new Date(prediction.kickoffUtc).getTime();
           const writeTimeMs = Date.now();
           const isPreKickoff = Number.isFinite(kickoffMs) ? writeTimeMs < kickoffMs : true;
+          const isWithinWindow = isWithinLedgerExecutionWindow(prediction.kickoffUtc, writeTimeMs);
 
           const qualifiesForLedger =
             isLayak &&
             isAllowedMarket &&
             hasValidOdds &&
             isPreKickoff &&
+            isWithinWindow &&
             isProvider &&
             isActive;
 
           if (!qualifiesForLedger) {
             result.excludedCount++;
-            continue; // NEVER write PANTAU, LEWATI, BTTS, Moneyline, or invalid odds to prediction_ledger
+            continue; // NEVER write PANTAU, LEWATI, BTTS, Moneyline, invalid odds, or picks outside execution window to prediction_ledger
           }
 
           // STEP 2: Canonical Position Identity & Idempotency Check

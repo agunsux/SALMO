@@ -38,6 +38,9 @@ export interface EnvironmentConfig {
     authSecretConfigured: boolean;
     cronSecretConfigured: boolean;
   };
+  ledger: {
+    maxHoursBeforeKickoff: number;
+  };
   logLevel: 'debug' | 'info' | 'warn' | 'error';
 }
 
@@ -89,6 +92,8 @@ class EnvironmentValidator {
     const authSecret = process.env.AUTH_SECRET;
     const cronSecret = process.env.CRON_SECRET;
 
+    const maxHoursBeforeKickoff = Number(process.env.LEDGER_MAX_HOURS_BEFORE_KICKOFF) || 24;
+
     const logLevel = (process.env.LOG_LEVEL as any) || (nodeEnv === 'production' ? 'info' : 'debug');
 
     this.cachedConfig = {
@@ -127,6 +132,9 @@ class EnvironmentValidator {
       security: {
         authSecretConfigured: Boolean(authSecret && authSecret.trim().length > 0),
         cronSecretConfigured: Boolean(cronSecret && cronSecret.trim().length > 0),
+      },
+      ledger: {
+        maxHoursBeforeKickoff,
       },
       logLevel,
     };

@@ -114,7 +114,7 @@ export default function OverUnderPage() {
             </h3>
             <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
               {status === 'DATA_UNAVAILABLE'
-                ? 'Canonical HandicapLab Over/Under feed is currently unavailable.'
+                ? 'SALMO Over/Under feed is currently unavailable.'
                 : 'No Over/Under fixtures match the selected horizon.'}
             </p>
           </div>

@@ -18,47 +18,215 @@ import {
 } from '../types/index';
 import { Logger } from '../lib/logger';
 
+function normalizeTeamKey(teamName: string): string {
+  return teamName
+    .toLowerCase()
+    .replace(/\b(fc|afc|cf|united|city|town|hotspur|albion|rovers|wanderers)\b/gi, '')
+    .replace(/[^a-z0-9]/g, '');
+}
+
 export class MatchIntelligenceService {
   private static apiFootball = new ApiFootballProvider();
   private static oddsPapi = new OddsPapiProvider();
+
   /**
-   * Main production entry point: returns intelligence feeds for upcoming matches.
-   * Exclusively consumes authoritative verified predictions from canonical HandicapLab pipeline.
-   * Fail-closed: Zero synthetic fixtures, zero empirical fallback.
-   * If canonical predictions are unavailable, returns empty array (DATA_UNAVAILABLE / NO_QUALIFIED_PICKS).
+   * Main production fixture intelligence entry point:
+   * Returns real scheduled fixtures decoupled from prediction presence.
+   * 1. Retrieves real upcoming fixtures from provider (API-Football) or native database.
+   * 2. Overlays active predictions (AH, OU, BTTS) where available.
+   * 3. For fixtures lacking odds or model coverage, preserves the fixture with honest ODDS_UNAVAILABLE state.
+   * 4. Stale kickoffs (kickoff <= now) are strictly excluded.
+   * 5. Zero synthetic fixtures, zero fabricated numbers.
    */
-  public static async getTodaysMatches(): Promise<MatchIntelligence[]> {
-    const adapter = HandicapLabAdapterFactory.getAdapter();
+  public static async getUpcomingFixturesWithIntelligence(filter?: {
+    horizon?: string;
+    market?: 'ALL' | 'AH' | 'BTTS' | 'OU';
+  }): Promise<MatchIntelligence[]> {
+    const nowMs = Date.now();
+    const scheduledFixtures: Array<{
+      providerFixtureId: string;
+      homeTeam: string;
+      awayTeam: string;
+      league: string;
+      season: string;
+      kickoffUtc: string;
+      venue?: string;
+    }> = [];
 
+    // 1. Primary: Discover upcoming fixtures from API-Football provider
     try {
-      const activePredictions = await adapter.getActive7DayPredictions();
-      const validationSummary = await adapter.getLiveValidationSummary();
-
-      if (activePredictions && activePredictions.length > 0) {
-        return activePredictions.map(p => this.mapActiveMatchToIntelligence(p, validationSummary));
+      if (this.apiFootball.isConfigured()) {
+        const res = await this.apiFootball.getUpcomingFixtures('39');
+        if (res.status === 'AVAILABLE' && res.data && res.data.length > 0) {
+          for (const f of res.data) {
+            const kMs = new Date(f.kickoffTime).getTime();
+            if (!isNaN(kMs) && kMs > nowMs) {
+              scheduledFixtures.push({
+                providerFixtureId: f.providerFixtureId,
+                homeTeam: f.homeTeam,
+                awayTeam: f.awayTeam,
+                league: f.league,
+                season: f.season,
+                kickoffUtc: f.kickoffTime,
+                venue: f.venue,
+              });
+            }
+          }
+        }
       }
     } catch (err) {
-      Logger.warn('[MatchIntelligenceService] Could not load active predictions from canonical adapter:', {
-        error: String(err),
-      });
+      Logger.warn('[MatchIntelligenceService] ApiFootball fixture lookup failed:', { error: String(err) });
     }
 
-    // 2. Autonomous SALMO fallback: load from native database adapter
+    // 2. Secondary: If provider returned 0 fixtures, discover from native database daily_picks
+    if (scheduledFixtures.length === 0) {
+      try {
+        const { getDbClient } = await import('../lib/db');
+        const client = getDbClient();
+        const nowIso = new Date().toISOString();
+        const { data: dbPicks } = await client
+          .from('daily_picks')
+          .select('fixture_id, home_team, away_team, league, kickoff_utc')
+          .gt('kickoff_utc', nowIso)
+          .order('kickoff_utc', { ascending: true });
+
+        if (dbPicks && dbPicks.length > 0) {
+          const seen = new Set<string>();
+          for (const p of dbPicks) {
+            const key = `${p.home_team}_${p.away_team}_${p.kickoff_utc}`;
+            if (!seen.has(key)) {
+              seen.add(key);
+              scheduledFixtures.push({
+                providerFixtureId: p.fixture_id,
+                homeTeam: p.home_team,
+                awayTeam: p.away_team,
+                league: p.league || 'Premier League',
+                season: '2026',
+                kickoffUtc: p.kickoff_utc,
+              });
+            }
+          }
+        }
+      } catch (dbErr) {
+        Logger.warn('[MatchIntelligenceService] Database fixture discovery failed:', { error: String(dbErr) });
+      }
+    }
+
+    // 3. Load active predictions overlay from native database adapter
+    const predictionsMap = new Map<string, ActiveMatchPrediction>();
+    let validationSummary: LiveValidationSummary | null = null;
     try {
       const { DatabaseHandicapLabAdapter } = await import('../contracts/handicapLabAdapter');
       const dbAdapter = new DatabaseHandicapLabAdapter();
       const dbPredictions = await dbAdapter.getActive7DayPredictions();
-      if (dbPredictions && dbPredictions.length > 0) {
-        return dbPredictions.map(p => this.mapActiveMatchToIntelligence(p, null));
+      validationSummary = await dbAdapter.getLiveValidationSummary();
+
+      for (const p of dbPredictions || []) {
+        predictionsMap.set(p.canonicalMatchId, p);
+        if (p.fixtureId) predictionsMap.set(p.fixtureId, p);
+        const normKey = `${normalizeTeamKey(p.homeTeam)}_${normalizeTeamKey(p.awayTeam)}`;
+        predictionsMap.set(normKey, p);
       }
-    } catch (dbErr) {
-      Logger.warn('[MatchIntelligenceService] Database fallback could not load predictions:', {
-        error: String(dbErr),
-      });
+    } catch (pErr) {
+      Logger.warn('[MatchIntelligenceService] Could not load active predictions overlay:', { error: String(pErr) });
     }
 
-    // Fail closed: Never generate synthetic fixtures or use empirical counting in production
-    return [];
+    // Fail-closed invariant: return empty array when no predictions or fixtures available
+    if (scheduledFixtures.length === 0 && predictionsMap.size === 0) {
+      return [];
+    }
+
+    // 4. Assemble MatchIntelligence items: fixtures with optional predictions overlay
+    const results: MatchIntelligence[] = [];
+    const processedKeys = new Set<string>();
+
+    for (const f of scheduledFixtures) {
+      const kickoffMs = new Date(f.kickoffUtc).getTime();
+      if (isNaN(kickoffMs) || kickoffMs <= nowMs) {
+        continue; // Stale kickoff exclusion
+      }
+
+      const kickoffDate = f.kickoffUtc.split('T')[0];
+      const kickoffTime = f.kickoffUtc.split('T')[1]?.slice(0, 5) || '15:00';
+      const homeSlug = f.homeTeam.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const awaySlug = f.awayTeam.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const canonicalMatchId = `EPL_2026_${homeSlug}_${awaySlug}_${kickoffDate}`;
+      const normKey = `${normalizeTeamKey(f.homeTeam)}_${normalizeTeamKey(f.awayTeam)}`;
+
+      processedKeys.add(canonicalMatchId);
+      processedKeys.add(normKey);
+      if (f.providerFixtureId) processedKeys.add(f.providerFixtureId);
+
+      // Check for active prediction overlay
+      const pred = predictionsMap.get(canonicalMatchId) || predictionsMap.get(normKey) || (f.providerFixtureId ? predictionsMap.get(f.providerFixtureId) : undefined);
+
+      if (pred) {
+        // Prediction exists: overlay active markets
+        results.push(this.mapActiveMatchToIntelligence(pred, validationSummary));
+      } else {
+        // No prediction: display scheduled fixture with honest unavailable markets
+        const ahMarket = this.buildUnavailableMarket('ASIAN_HANDICAP', '—', null);
+        const bttsMarket = this.buildUnavailableMarket('BTTS', 'YES', null);
+        const ouMarket = this.buildUnavailableMarket('OVER_UNDER', '2.5', null);
+
+        results.push({
+          id: canonicalMatchId,
+          fixtureId: f.providerFixtureId,
+          canonicalMatchId,
+          homeTeam: f.homeTeam,
+          awayTeam: f.awayTeam,
+          league: f.league,
+          season: f.season,
+          kickoffIso: f.kickoffUtc,
+          kickoffDisplay: `${kickoffDate} • ${kickoffTime} UTC`,
+          venue: f.venue,
+          isUpcoming: true,
+          horizon: 'NEXT_7_DAYS',
+          predictionTimestamp: new Date().toISOString(),
+          footballStateTimestamp: new Date().toISOString(),
+          marketStateTimestamp: new Date().toISOString(),
+          markets: {
+            asianHandicap: ahMarket,
+            btts: bttsMarket,
+            overUnder: ouMarket,
+          },
+        });
+      }
+    }
+
+    // 5. Also include any remaining predictions not matched by top provider fixtures
+    for (const [key, pred] of predictionsMap.entries()) {
+      if (key !== pred.canonicalMatchId) continue; // Only process primary keys
+      const kickMs = new Date(pred.kickoffUtc).getTime();
+      if (isNaN(kickMs) || kickMs <= nowMs) continue; // Stale kickoff exclusion
+
+      const normKey = `${normalizeTeamKey(pred.homeTeam)}_${normalizeTeamKey(pred.awayTeam)}`;
+      if (!processedKeys.has(pred.canonicalMatchId) && !processedKeys.has(normKey) && (!pred.fixtureId || !processedKeys.has(pred.fixtureId))) {
+        processedKeys.add(pred.canonicalMatchId);
+        results.push(this.mapActiveMatchToIntelligence(pred, validationSummary));
+      }
+    }
+
+    // 6. Apply dynamic horizon filtering if requested
+    let filteredResults = results;
+    if (filter?.horizon && filter.horizon !== 'ALL') {
+      const { matchesDynamicHorizon } = await import('../lib/horizon');
+      filteredResults = results.filter(m => matchesDynamicHorizon(m.kickoffIso, filter.horizon as any));
+    }
+
+    // 7. Sort chronologically
+    return filteredResults.sort((a, b) => new Date(a.kickoffIso).getTime() - new Date(b.kickoffIso).getTime());
+  }
+
+  public static async getTodaysMatches(): Promise<MatchIntelligence[]> {
+    return this.getUpcomingFixturesWithIntelligence({ horizon: '7_DAYS' });
+  }
+
+  public static async getForward7DayMatches(filter?: {
+    horizon?: string;
+    market?: 'ALL' | 'AH' | 'BTTS' | 'OU';
+  }): Promise<MatchIntelligence[]> {
+    return this.getUpcomingFixturesWithIntelligence(filter);
   }
 
   /**
@@ -90,8 +258,8 @@ export class MatchIntelligenceService {
       validationStage: 'UNAVAILABLE',
       reason: 'Real bookmaker market odds are not currently published for this fixture.',
       provenance: {
-        source: 'HandicapLab Registry',
-        datasetVersion: summary?.version || 'v0.32.0',
+        source: 'SALMO Native Intelligence',
+        datasetVersion: summary?.version || 'v1.0.0-salmo-native',
         dateRange: 'Real-time',
         league: 'Premier League',
         market: marketType,
@@ -104,24 +272,54 @@ export class MatchIntelligenceService {
     };
   }
 
-  public static async getForward7DayMatches(filter?: {
-    horizon?: string;
-    market?: 'ALL' | 'AH' | 'BTTS' | 'OU';
-  }): Promise<MatchIntelligence[]> {
-    const matches = await this.getTodaysMatches();
-    if (!filter) return matches;
-
-    return matches.filter(m => {
-      if (filter.horizon && filter.horizon !== 'ALL') {
-        if (m.horizon && m.horizon !== filter.horizon) return false;
-      }
-      return true;
-    });
+  /**
+   * Explicit unmodeled representation for Moneyline (1X2).
+   * Zero odds, zero probability, zero recommendation.
+   */
+  public static buildUnmodeledMoneylineMarket(summary?: any): MarketView {
+    return {
+      marketType: 'ASIAN_HANDICAP' as any, // fallback type for contract safety
+      lineLabel: '1X2',
+      selection: 'none',
+      available: false,
+      odds: null,
+      bookmaker: null,
+      badge: 'GREY',
+      status: 'MARKET_UNAVAILABLE',
+      statusLabel: 'NOT MODELED YET',
+      confidence: 'NONE',
+      confidenceScore: 0,
+      modelProbabilityPct: null,
+      marketImpliedProbabilityPct: null,
+      edgePercentagePoints: null,
+      expectedValuePct: null,
+      sampleSize: 0,
+      dataQuality: 'NONE',
+      validationStage: 'UNAVAILABLE',
+      reason: 'Moneyline (1X2) is intentionally not modeled by SALMO. Research is strictly limited to AH, OU, and BTTS.',
+      provenance: {
+        source: 'SALMO Scope Governance',
+        datasetVersion: summary?.version || 'v1.0.0-salmo-native',
+        dateRange: 'Real-time',
+        league: 'Premier League',
+        market: 'Moneyline (1X2)',
+        line: '1X2',
+        sampleSize: 0,
+        settlementMethodology: 'Unmodeled',
+        validationStatus: 'NOT_MODELED',
+        lastUpdate: new Date().toISOString(),
+      },
+    };
   }
 
   public static async getValidationSummary(): Promise<LiveValidationSummary | null> {
-    const adapter = HandicapLabAdapterFactory.getAdapter();
-    return adapter.getLiveValidationSummary();
+    try {
+      const { DatabaseHandicapLabAdapter } = await import('../contracts/handicapLabAdapter');
+      const dbAdapter = new DatabaseHandicapLabAdapter();
+      return await dbAdapter.getLiveValidationSummary();
+    } catch {
+      return null;
+    }
   }
 
   private static mapActiveMatchToIntelligence(

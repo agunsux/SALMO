@@ -96,7 +96,7 @@ export default function MatchDetailPage() {
             </div>
             <h3 className="text-sm font-semibold text-rose-300">DATA_UNAVAILABLE</h3>
             <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
-              Canonical HandicapLab data is currently unavailable. No synthetic match details are fabricated.
+              SALMO match intelligence service is currently unavailable. No synthetic match details are fabricated.
             </p>
           </div>
         ) : !match || status === 'NOT_FOUND' ? (

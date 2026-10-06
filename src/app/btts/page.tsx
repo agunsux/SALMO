@@ -114,7 +114,7 @@ export default function BttsPage() {
             </h3>
             <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
               {status === 'DATA_UNAVAILABLE'
-                ? 'Canonical HandicapLab BTTS feed is currently unavailable.'
+                ? 'SALMO BTTS feed is currently unavailable.'
                 : 'No BTTS fixtures match the selected horizon.'}
             </p>
           </div>
