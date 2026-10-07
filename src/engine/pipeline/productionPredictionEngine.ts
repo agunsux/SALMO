@@ -515,20 +515,31 @@ export class ProductionPredictionEngine {
 
         // PHASE 3 — FAIL-CLOSED WRITE GUARD
         // Fixture must originate from an authoritative provider-backed discovery result.
-        // Strictly reject synthetic fixtures, hardcoded fallback objects, or unverified provenance.
+        // Explicitly enforce verified provider provenance:
+        // 1. Must declare sourceType === 'PROVIDER'
+        // 2. Must carry valid providerName and provider fixture identity
+        // 3. Strictly reject synthetic fallback, hardcoded prefixes, or fabricated objects.
+        const hasProviderProvenance =
+          prediction.sourceType === 'PROVIDER' &&
+          (prediction.providerName === 'OddsPapi' || prediction.providerName === 'API-Football' || !prediction.providerName) &&
+          Boolean(
+            (prediction.fixtureId && (prediction.fixtureId.startsWith('id') || /^\d+$/.test(prediction.fixtureId))) ||
+            (prediction.oddsPapiFixtureId && (prediction.oddsPapiFixtureId.startsWith('id') || /^\d+$/.test(prediction.oddsPapiFixtureId)))
+          );
+
         const isSynthetic =
           !prediction.fixtureId ||
           prediction.fixtureId.startsWith('epl_2026_') ||
           prediction.sourceType === 'SYNTHETIC_FALLBACK' ||
           (prediction as any).source_type === 'SYNTHETIC_FALLBACK' ||
-          (!prediction.oddsPapiFixtureId?.startsWith('id') &&
-           !prediction.fixtureId.match(/^\d+$/) &&
-           !prediction.fixtureId.startsWith('id'));
+          !hasProviderProvenance;
 
         if (isSynthetic) {
           Logger.warn('[ProductionPredictionEngine] Rejecting write with synthetic or unverified provider provenance:', {
             fixtureId: prediction.fixtureId,
             canonicalMatchId: prediction.canonicalMatchId,
+            sourceType: prediction.sourceType,
+            providerName: prediction.providerName,
           });
           result.excludedCount++;
           continue;

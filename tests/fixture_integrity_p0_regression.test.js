@@ -244,3 +244,59 @@ test('Test 7: Synthetic provenance rejection guard', async () => {
   assert.strictEqual(fakeIdResult.persistedPicksCount, 0, 'Zero daily picks must be persisted for fake ID item');
   assert.strictEqual(fakeIdResult.persistedLedgerCount, 0, 'Zero ledger rows must be persisted for fake ID item');
 });
+
+test('Test 8: MatchIntelligenceService fails closed on empty/429 provider and NEVER reconstructs schedule from daily_picks', async () => {
+  // 1. Static codebase verification: MatchIntelligenceService must NOT query daily_picks for fixture discovery
+  const serviceCode = fs.readFileSync(path.resolve('src/engine/matchIntelligenceService.ts'), 'utf8');
+  assert.ok(
+    !serviceCode.includes(".from('daily_picks')"),
+    'MatchIntelligenceService must NOT contain query to daily_picks for fixture discovery'
+  );
+  assert.ok(
+    !serviceCode.includes('discover from native database daily_picks'),
+    'MatchIntelligenceService must eliminate secondary daily_picks fallback comment and logic'
+  );
+
+  // 2. Dynamic behavior: When provider discovery returns [] (e.g. 429 / quota / timeout)
+  // Even if database daily_picks has valid rows, forward schedule must return []
+  const originalGetUpcoming = MatchIntelligenceService.apiFootball.getUpcomingFixtures;
+  try {
+    // Simulate provider failure / quota 429 / empty result
+    MatchIntelligenceService.apiFootball.getUpcomingFixtures = async () => ({
+      status: 'RATE_LIMITED',
+      error: 'HTTP 429: Daily request limit reached',
+      data: [],
+    });
+
+    const matchesUnder429 = await MatchIntelligenceService.getForward7DayMatches();
+    assert.strictEqual(
+      matchesUnder429.length,
+      0,
+      'When provider returns 0 fixtures, forward fixture schedule must fail closed to [] (never reconstruct from DB daily_picks)'
+    );
+
+    // Also test completely empty / error result
+    MatchIntelligenceService.apiFootball.getUpcomingFixtures = async () => ({
+      status: 'AVAILABLE',
+      data: [],
+    });
+
+    const matchesUnderEmpty = await MatchIntelligenceService.getForward7DayMatches();
+    assert.strictEqual(
+      matchesUnderEmpty.length,
+      0,
+      'When provider returns empty array, forward fixture schedule must fail closed to []'
+    );
+  } finally {
+    // Restore original provider method
+    MatchIntelligenceService.apiFootball.getUpcomingFixtures = originalGetUpcoming;
+  }
+
+  // 3. Normal provider behavior: Returns legitimate fixtures unchanged
+  const normalMatches = await MatchIntelligenceService.getForward7DayMatches();
+  assert.strictEqual(
+    normalMatches.length,
+    10,
+    `Under normal provider discovery, expected exactly 10 EPL fixtures, got ${normalMatches.length}`
+  );
+});

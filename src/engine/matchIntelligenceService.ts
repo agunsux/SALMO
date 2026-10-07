@@ -17,7 +17,6 @@ import {
   LiveValidationSummary,
 } from '../types/index';
 import { Logger } from '../lib/logger';
-import { getDbClient } from '../lib/db';
 import { matchesDynamicHorizon } from '../lib/horizon';
 
 import { normalizeTeamKey } from './features/teamRatings';
@@ -76,37 +75,13 @@ export class MatchIntelligenceService {
       Logger.warn('[MatchIntelligenceService] ApiFootball fixture lookup failed:', { error: String(err) });
     }
 
-    // 2. Secondary: If provider returned 0 fixtures, discover from native database daily_picks
+    // Fail-closed invariant: NO PROVIDER DATA = NO FIXTURE = NO PREDICTION = NO PICK
+    // When authoritative provider discovery returns zero fixtures (due to provider failure,
+    // HTTP 429, quota exhaustion, timeout, or unavailable upstream data), strictly fail closed.
+    // NEVER fall back to daily_picks to fabricate or reconstruct the fixture schedule.
     if (scheduledFixtures.length === 0) {
-      try {
-        const client = getDbClient();
-        const nowIso = new Date().toISOString();
-        const { data: dbPicks } = await client
-          .from('daily_picks')
-          .select('fixture_id, home_team, away_team, league, kickoff_utc')
-          .gt('kickoff_utc', nowIso)
-          .order('kickoff_utc', { ascending: true });
-
-        if (dbPicks && dbPicks.length > 0) {
-          const seen = new Set<string>();
-          for (const p of dbPicks) {
-            const key = `${p.home_team}_${p.away_team}_${p.kickoff_utc}`;
-            if (!seen.has(key)) {
-              seen.add(key);
-              scheduledFixtures.push({
-                providerFixtureId: p.fixture_id,
-                homeTeam: p.home_team,
-                awayTeam: p.away_team,
-                league: p.league || 'Premier League',
-                season: '2026',
-                kickoffUtc: p.kickoff_utc,
-              });
-            }
-          }
-        }
-      } catch (dbErr) {
-        Logger.warn('[MatchIntelligenceService] Database fixture discovery failed:', { error: String(dbErr) });
-      }
+      Logger.warn('[MatchIntelligenceService] No upcoming fixtures discovered from authoritative provider; failing closed (0 fixtures returned).');
+      return [];
     }
 
     // 3. Load active predictions overlay from native database adapter
@@ -203,20 +178,7 @@ export class MatchIntelligenceService {
       }
     }
 
-    // 5. Also include any remaining predictions not matched by top provider fixtures
-    for (const [key, pred] of predictionsMap.entries()) {
-      if (key !== pred.canonicalMatchId) continue; // Only process primary keys
-      const kickMs = new Date(pred.kickoffUtc).getTime();
-      if (isNaN(kickMs) || kickMs <= nowMs) continue; // Stale kickoff exclusion
-
-      const normKey = `${normalizeTeamKey(pred.homeTeam)}_${normalizeTeamKey(pred.awayTeam)}`;
-      if (!processedKeys.has(pred.canonicalMatchId) && !processedKeys.has(normKey) && (!pred.fixtureId || !processedKeys.has(pred.fixtureId))) {
-        processedKeys.add(pred.canonicalMatchId);
-        results.push(this.mapActiveMatchToIntelligence(pred, validationSummary));
-      }
-    }
-
-    // 6. Apply dynamic horizon filtering if requested
+    // 5. Apply dynamic horizon filtering if requested
     let filteredResults = results;
     if (filter?.horizon && filter.horizon !== 'ALL') {
       filteredResults = results.filter(m => matchesDynamicHorizon(m.kickoffIso, filter.horizon as any));
