@@ -31,8 +31,8 @@ export async function GET() {
   const oddsPapiStatus = env.providers.oddsPapi.configured ? 'configured' : 'unconfigured';
 
   // System status determination:
-  // HEALTHY: Data storage connected, native prediction engine ready, Providers configured
-  // DEGRADED: Any provider unconfigured or upstream R&D unavailable, but SALMO production product is operational
+  // HEALTHY: Data storage connected, native prediction engine ready, OddsPapi configured
+  // DEGRADED: OddsPapi unconfigured or upstream R&D unavailable, but SALMO production product is operational
   // UNAVAILABLE: No operational data store available (both DB and local storage unreachable)
   let overallStatus: 'healthy' | 'degraded' | 'unavailable' = 'healthy';
 
@@ -43,7 +43,6 @@ export async function GET() {
   } else if (
     hlHealth.status !== 'HEALTHY' ||
     !dbHealth.connected ||
-    !env.providers.apiFootball.configured ||
     !env.providers.oddsPapi.configured
   ) {
     overallStatus = 'degraded';
@@ -78,14 +77,17 @@ export async function GET() {
         latencyMs: dbHealth.latencyMs,
         error: dbHealth.error,
       },
-      apiFootball: {
-        status: apiFootballStatus,
-        provider: 'API-Football',
-      },
       oddsPapi: {
         status: oddsPapiStatus,
         provider: 'OddsPapi',
+        role: 'authoritative_live_market',
+        bookmakers: ['pinnacle', 'bet365'],
         supportedMarkets: ['ASIAN_HANDICAP', 'OVER_UNDER', 'BTTS'],
+      },
+      apiFootball: {
+        status: apiFootballStatus,
+        provider: 'API-Football',
+        role: 'legacy_historical_archive',
       },
     },
   };

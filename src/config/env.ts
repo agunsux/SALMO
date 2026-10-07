@@ -27,6 +27,7 @@ export interface EnvironmentConfig {
       configured: boolean;
       apiKey?: string;
       baseUrl: string;
+      activeBookmakers: string[];
     };
     footyStats: {
       configured: boolean;
@@ -122,6 +123,10 @@ class EnvironmentValidator {
           configured: Boolean(oddsPapiKey && oddsPapiKey.trim().length > 0),
           apiKey: oddsPapiKey,
           baseUrl: oddsPapiBaseUrl,
+          activeBookmakers: (process.env.ODDSPAPI_ACTIVE_BOOKMAKERS || process.env.ACTIVE_BOOKMAKERS || 'pinnacle,bet365')
+            .split(',')
+            .map(b => b.trim().toLowerCase())
+            .filter(Boolean),
         },
         footyStats: {
           configured: Boolean(footyStatsKey && footyStatsKey.trim().length > 0),

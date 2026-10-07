@@ -19,6 +19,21 @@ export interface ProviderResult<T> {
   timestamp: string;
 }
 
+export const CONSUMED_BOOKMAKERS = [
+  'pinnacle',
+  'bet365',
+] as const;
+
+export const EXTENSIBLE_SUPPORTED_BOOKMAKERS = [
+  'pinnacle',
+  'bet365',
+  '1xbet',
+  'sbobet',
+  'singbet',
+] as const;
+
+export type ConsumedBookmaker = typeof CONSUMED_BOOKMAKERS[number];
+
 export interface LiveFixtureDTO {
   providerFixtureId: string;
   league: string;
@@ -28,15 +43,17 @@ export interface LiveFixtureDTO {
   awayTeam: string;
   venue?: string;
   status: 'SCHEDULED' | 'LIVE' | 'FINISHED' | 'POSTPONED';
+  oddspapiTournamentId?: number;
 }
 
 export interface LiveOddsDTO {
   providerFixtureId: string;
   bookmaker: string;
-  marketType: 'ASIAN_HANDICAP' | 'OVER_UNDER' | 'BTTS';
+  marketType: 'ASIAN_HANDICAP' | 'OVER_UNDER' | 'BTTS' | 'AH' | 'OU' | 'DNB' | 'DOUBLE_CHANCE' | string;
   line: number;
   homeOdds: number;
   awayOdds: number;
+  drawOdds?: number;
   capturedAt: string;
   isMainLine?: boolean;
 }
@@ -44,13 +61,15 @@ export interface LiveOddsDTO {
 export interface IFixtureProvider {
   readonly providerName: string;
   isConfigured(): boolean;
-  getUpcomingFixtures(leagueId?: string): Promise<ProviderResult<LiveFixtureDTO[]>>;
+  getUpcomingFixtures(leagueIdOrTournamentIds?: string | number[]): Promise<ProviderResult<LiveFixtureDTO[]>>;
   getFixtureById(id: string): Promise<ProviderResult<LiveFixtureDTO | null>>;
 }
 
 export interface IOddsProvider {
   readonly providerName: string;
   isConfigured(): boolean;
-  getMarketOdds(fixtureId: string): Promise<ProviderResult<LiveOddsDTO[]>>;
+  getMarketOdds(fixtureId: string, bookmakers?: string[]): Promise<ProviderResult<LiveOddsDTO[]>>;
+  getTournamentOdds?(tournamentIds: number[], bookmaker?: string): Promise<ProviderResult<LiveOddsDTO[]>>;
+  getBatchTournamentOdds?(tournamentIds: number[], bookmaker?: string): Promise<ProviderResult<LiveOddsDTO[]>>;
 }
 

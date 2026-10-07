@@ -44,6 +44,15 @@ async function handleCron(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  if (process.env.ENABLE_PRODUCTION_CRON !== 'true') {
+    Logger.info('[Cron:predict] Prediction cron is disabled (ENABLE_PRODUCTION_CRON !== true)', { requestId });
+    return NextResponse.json({
+      success: false,
+      status: 'OFF',
+      message: 'Production prediction cron is explicitly disabled pending paid OddsPAPI key configuration.',
+    }, { status: 200 });
+  }
+
   try {
     Logger.info('[Cron:predict] Starting automated production prediction cycle...', { requestId });
 

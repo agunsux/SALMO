@@ -2,7 +2,217 @@
 // Clean contracts representing the Three Core Markets (AH, BTTS, O/U),
 // Decisions, Provenance, and Traceability.
 
-export type MarketType = 'ASIAN_HANDICAP' | 'BTTS' | 'OVER_UNDER';
+export type CoreMarketType = 'ASIAN_HANDICAP' | 'BTTS' | 'OVER_UNDER';
+
+export type MarketType =
+  | 'ASIAN_HANDICAP' | 'BTTS' | 'OVER_UNDER'
+  | 'AH'
+  | 'OU'
+  | 'DNB'
+  | 'DOUBLE_CHANCE'
+  | 'CORNERS'
+  | 'YELLOW_CARDS'
+  | 'ALT_AH'
+  | 'ALT_OU'
+  | 'TEAM_TOTALS'
+  | '1H_AH'
+  | '1H_OU';
+
+export type MarketStatus =
+  | 'ACTIVE'
+  | 'READY'
+  | 'RESEARCH_ONLY'
+  | 'DISABLED';
+
+export interface MarketDefinition {
+  key: MarketType;
+  canonicalKey: 'AH' | 'OU' | 'BTTS' | 'DNB' | 'DOUBLE_CHANCE' | 'CORNERS' | 'YELLOW_CARDS' | 'ALT_AH' | 'ALT_OU' | 'TEAM_TOTALS' | '1H_AH' | '1H_OU';
+  displayName: string;
+  category: 'CORE' | 'DERIVED' | 'EXPANSION' | 'FUTURE';
+  status: MarketStatus;
+  period: 'FT' | '1H';
+  isDerived: boolean;
+  derivedFrom?: MarketType;
+  modelEngine: string;
+}
+
+export const MARKET_REGISTRY: Record<string, MarketDefinition> = {
+  AH: {
+    key: 'AH',
+    canonicalKey: 'AH',
+    displayName: 'Asian Handicap',
+    category: 'CORE',
+    status: 'ACTIVE',
+    period: 'FT',
+    isDerived: false,
+    modelEngine: 'dixon-coles-v1.0',
+  },
+  ASIAN_HANDICAP: {
+    key: 'ASIAN_HANDICAP',
+    canonicalKey: 'AH',
+    displayName: 'Asian Handicap',
+    category: 'CORE',
+    status: 'ACTIVE',
+    period: 'FT',
+    isDerived: false,
+    modelEngine: 'dixon-coles-v1.0',
+  },
+  OU: {
+    key: 'OU',
+    canonicalKey: 'OU',
+    displayName: 'Over / Under',
+    category: 'CORE',
+    status: 'ACTIVE',
+    period: 'FT',
+    isDerived: false,
+    modelEngine: 'ASIAN-TOTAL-jointscore-v1.0.0',
+  },
+  OVER_UNDER: {
+    key: 'OVER_UNDER',
+    canonicalKey: 'OU',
+    displayName: 'Over / Under',
+    category: 'CORE',
+    status: 'ACTIVE',
+    period: 'FT',
+    isDerived: false,
+    modelEngine: 'ASIAN-TOTAL-jointscore-v1.0.0',
+  },
+  BTTS: {
+    key: 'BTTS',
+    canonicalKey: 'BTTS',
+    displayName: 'Both Teams To Score',
+    category: 'CORE',
+    status: 'ACTIVE',
+    period: 'FT',
+    isDerived: false,
+    modelEngine: 'BTTS-jointscore-v1.0.0',
+  },
+  DNB: {
+    key: 'DNB',
+    canonicalKey: 'DNB',
+    displayName: 'Draw No Bet (AH 0.0)',
+    category: 'DERIVED',
+    status: 'READY',
+    period: 'FT',
+    isDerived: true,
+    derivedFrom: 'AH',
+    modelEngine: 'dixon-coles-v1.0 (AH 0.0 Alias)',
+  },
+  DOUBLE_CHANCE: {
+    key: 'DOUBLE_CHANCE',
+    canonicalKey: 'DOUBLE_CHANCE',
+    displayName: 'Double Chance (1X, X2, 12)',
+    category: 'DERIVED',
+    status: 'READY',
+    period: 'FT',
+    isDerived: true,
+    derivedFrom: 'AH',
+    modelEngine: 'Bivariate Score Matrix Outcome Aggregation',
+  },
+  CORNERS: {
+    key: 'CORNERS',
+    canonicalKey: 'CORNERS',
+    displayName: 'Corner Markets',
+    category: 'EXPANSION',
+    status: 'READY',
+    period: 'FT',
+    isDerived: false,
+    modelEngine: 'UNVALIDATED_FUTURE_MODEL',
+  },
+  YELLOW_CARDS: {
+    key: 'YELLOW_CARDS',
+    canonicalKey: 'YELLOW_CARDS',
+    displayName: 'Yellow Card Markets',
+    category: 'EXPANSION',
+    status: 'READY',
+    period: 'FT',
+    isDerived: false,
+    modelEngine: 'UNVALIDATED_FUTURE_MODEL',
+  },
+  ALT_AH: {
+    key: 'ALT_AH',
+    canonicalKey: 'ALT_AH',
+    displayName: 'Alternate Asian Handicap',
+    category: 'EXPANSION',
+    status: 'READY',
+    period: 'FT',
+    isDerived: true,
+    derivedFrom: 'AH',
+    modelEngine: 'dixon-coles-v1.0',
+  },
+  ALT_OU: {
+    key: 'ALT_OU',
+    canonicalKey: 'ALT_OU',
+    displayName: 'Alternate Over / Under',
+    category: 'EXPANSION',
+    status: 'READY',
+    period: 'FT',
+    isDerived: true,
+    derivedFrom: 'OU',
+    modelEngine: 'ASIAN-TOTAL-jointscore-v1.0.0',
+  },
+  TEAM_TOTALS: {
+    key: 'TEAM_TOTALS',
+    canonicalKey: 'TEAM_TOTALS',
+    displayName: 'Team Total Goals',
+    category: 'EXPANSION',
+    status: 'READY',
+    period: 'FT',
+    isDerived: false,
+    modelEngine: 'Single-Team Marginal Poisson',
+  },
+  '1H_AH': {
+    key: '1H_AH',
+    canonicalKey: '1H_AH',
+    displayName: '1st Half Asian Handicap',
+    category: 'EXPANSION',
+    status: 'READY',
+    period: '1H',
+    isDerived: false,
+    modelEngine: '1H-Dixon-Coles',
+  },
+  '1H_OU': {
+    key: '1H_OU',
+    canonicalKey: '1H_OU',
+    displayName: '1st Half Over / Under',
+    category: 'EXPANSION',
+    status: 'READY',
+    period: '1H',
+    isDerived: false,
+    modelEngine: '1H-Total-Goals',
+  },
+};
+
+export function isMarketActive(marketKey: string): boolean {
+  const def = MARKET_REGISTRY[marketKey];
+  return def ? def.status === 'ACTIVE' : false;
+}
+
+export function getActiveMarkets(): MarketDefinition[] {
+  const seen = new Set<string>();
+  const active: MarketDefinition[] = [];
+  for (const def of Object.values(MARKET_REGISTRY)) {
+    if (def.status === 'ACTIVE' && !seen.has(def.canonicalKey)) {
+      seen.add(def.canonicalKey);
+      active.push(def);
+    }
+  }
+  return active;
+}
+
+export interface CanonicalMarket {
+  provider: string;
+  provider_market_id: string;
+  provider_fixture_id: string;
+  bookmaker: string;
+  market_type: MarketType;
+  period: 'FT' | '1H';
+  line?: number;
+  selection: string;
+  odds: number;
+  timestamp: string;
+  observed_at?: string;
+}
 
 export type DecisionBadge = 'GREEN' | 'YELLOW' | 'RED' | 'GREY';
 

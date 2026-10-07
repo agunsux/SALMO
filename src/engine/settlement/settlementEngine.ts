@@ -5,13 +5,16 @@
 
 import { SettlementOutcome } from '../../types/index';
 import { QuarterLineSettler } from '../ah/quarterLineSettler';
+import { settleBttsMatch } from '../btts/bttsEngine';
+import { settleDnbMatch } from '../dnb/dnbEngine';
+import { settleDoubleChanceMatch } from '../dc/doubleChanceEngine';
 
 export type SettlementStatus = 'PENDING' | 'SETTLED' | 'VOID';
 
 export interface SettlementInput {
   ledgerPositionId: string;
-  marketType: 'AH' | 'OU';
-  selection: string; // e.g. "Aston Villa 0", "home", "away", "OVER 2.75", "under"
+  marketType: 'AH' | 'OU' | 'BTTS' | 'DNB' | 'DOUBLE_CHANCE' | string;
+  selection: string; // e.g. "Aston Villa 0", "home", "away", "OVER 2.75", "under", "1X", "HOME_DNB"
   line: number;      // e.g. 0, -0.25, -0.75, 2.25, 2.75, 3.0
   oddsTaken: number;
   homeGoals: number | null;
@@ -76,7 +79,9 @@ export class SettlementEngine {
     const aGoals = input.awayGoals;
     let outcome: SettlementOutcome;
 
-    if (input.marketType === 'AH') {
+    const mType = String(input.marketType).toUpperCase();
+
+    if (mType === 'AH' || mType === 'ASIAN_HANDICAP') {
       // Determine side from selection
       const sel = input.selection.toLowerCase();
       // If selection indicates away team or 'away', treat as away
@@ -84,7 +89,7 @@ export class SettlementEngine {
       const side: 'home' | 'away' = isAway ? 'away' : 'home';
 
       outcome = QuarterLineSettler.settle(side, input.line, hGoals, aGoals, false);
-    } else if (input.marketType === 'OU') {
+    } else if (mType === 'OU' || mType === 'OVER_UNDER') {
       const sel = input.selection.toUpperCase();
       const isOver = sel.includes('OVER');
       const totalGoals = hGoals + aGoals;
@@ -95,6 +100,13 @@ export class SettlementEngine {
         totalGoals,
         false
       );
+    } else if (mType === 'DNB') {
+      outcome = settleDnbMatch(input.selection, hGoals, aGoals, false);
+    } else if (mType === 'DOUBLE_CHANCE') {
+      outcome = settleDoubleChanceMatch(input.selection, hGoals, aGoals, false);
+    } else if (mType === 'BTTS') {
+      const sel = input.selection.toUpperCase().includes('NO') ? 'NO' : 'YES';
+      outcome = settleBttsMatch(sel, hGoals, aGoals);
     } else {
       return {
         ledgerPositionId: input.ledgerPositionId,

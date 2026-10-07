@@ -18,6 +18,9 @@ import { CompetitionProfileEngine } from '../features/competitionProfile';
 import { resolveTeamRating, TeamRating, normalizeTeamKey } from '../features/teamRatings';
 import { ApiFootballProvider } from '../../services/providers/apiFootballProvider';
 import { OddsPapiProvider } from '../../services/providers/oddsPapiProvider';
+import { LiveOddsDTO } from '../../services/providers/types';
+import { CANONICAL_15_LEAGUES, getTournamentBatches } from '../../config/multiLeagueRegistry';
+import { env } from '../../config/env';
 import { ActiveMatchPrediction, ActivePredictionMarket } from '../../types/index';
 import { Logger } from '../../lib/logger';
 import crypto from 'crypto';
@@ -849,90 +852,121 @@ export class ProductionPredictionEngine {
   }
 
   /**
-   * Discovers upcoming fixtures with real Pinnacle odds or baseline schedule.
+   * Discovers upcoming fixtures across canonical worldwide leagues with real Pinnacle/benchmark odds.
    */
   public static async discoverUpcomingFixturesWithOdds(): Promise<FixtureInput[]> {
     const oddsPapi = new OddsPapiProvider();
     const fixtures: FixtureInput[] = [];
 
-    // 1. Attempt OddsPapi provider lookup for live Pinnacle spreads and totals
+    // 1. Authoritative OddsPapi multi-league fixture discovery
     if (oddsPapi.isConfigured()) {
       try {
-        const { env } = await import('../../config/env');
-        const apiKey = env.providers.oddsPapi.apiKey;
-        const from = new Date().toISOString();
-        const to = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
-        const url = `https://api.oddspapi.io/v4/fixtures?sportId=10&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&apiKey=${apiKey}`;
+        const fixtureRes = await oddsPapi.getUpcomingFixtures();
+        if (fixtureRes.status === 'AVAILABLE' && fixtureRes.data && fixtureRes.data.length > 0) {
+          // Invariant: batch tournament odds ingestion across 15 canonical leagues
+          // 3 tournament batches x 2 active bookmakers (pinnacle, bet365) = exactly 6 odds requests
+          const tournamentBatches = getTournamentBatches(CANONICAL_15_LEAGUES);
+          const oddsByFixtureId = new Map<string, LiveOddsDTO[]>();
+          const consumedBooks = (
+            env.providers.oddsPapi.activeBookmakers && env.providers.oddsPapi.activeBookmakers.length > 0
+              ? env.providers.oddsPapi.activeBookmakers
+              : ['pinnacle', 'bet365']
+          );
 
-        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-        if (res.ok) {
-          const rawFixtures = await res.json();
-          if (Array.isArray(rawFixtures)) {
-            const eplFixtures = rawFixtures.filter(
-              (f: any) => f.categorySlug === 'england' && f.tournamentSlug === 'premier-league'
-            );
-
-            for (let i = 0; i < eplFixtures.length; i++) {
-              const f = eplFixtures[i];
-              if (i > 0) {
-                // Rate limit spacing for OddsPapi tier
-                await new Promise(r => setTimeout(r, 1100));
-              }
-
-              let ah: { line: number; homeOdds: number; awayOdds: number; timestampUtc?: string } | undefined;
-              let ou: { line: number; overOdds: number; underOdds: number; timestampUtc?: string } | undefined;
-
-              const oddsRes = await oddsPapi.getMarketOdds(f.fixtureId);
-              if (oddsRes.data && oddsRes.data.length > 0) {
-                const ahOdds = oddsRes.data.filter(
-                  o => o.marketType === 'ASIAN_HANDICAP' && Math.abs(o.line) <= 3.5
-                );
-                const ouOdds = oddsRes.data.filter(
-                  o => o.marketType === 'OVER_UNDER' && o.line >= 0.5 && o.line <= 5.5
-                );
-
-                if (ahOdds.length > 0) {
-                  const mainAh =
-                    ahOdds.find(o => o.isMainLine) ||
-                    ahOdds.sort(
-                      (a, b) => Math.abs(a.homeOdds - 1.95) - Math.abs(b.homeOdds - 1.95)
-                    )[0];
-                  ah = {
-                    line: mainAh.line,
-                    homeOdds: mainAh.homeOdds,
-                    awayOdds: mainAh.awayOdds,
-                    timestampUtc: mainAh.capturedAt,
-                  };
+          for (const batch of tournamentBatches) {
+            for (const bookmaker of consumedBooks) {
+              const oddsRes = await oddsPapi.getTournamentOdds(batch, bookmaker);
+              if (oddsRes.status === 'AVAILABLE' && oddsRes.data && oddsRes.data.length > 0) {
+                for (const o of oddsRes.data) {
+                  const list = oddsByFixtureId.get(o.providerFixtureId) || [];
+                  list.push(o);
+                  oddsByFixtureId.set(o.providerFixtureId, list);
                 }
-
-                if (ouOdds.length > 0) {
-                  const mainOu =
-                    ouOdds.find(o => o.isMainLine) ||
-                    ouOdds.sort(
-                      (a, b) => Math.abs(a.homeOdds - 1.95) - Math.abs(b.homeOdds - 1.95)
-                    )[0];
-                  ou = {
-                    line: mainOu.line,
-                    overOdds: mainOu.homeOdds,
-                    underOdds: mainOu.awayOdds,
-                    timestampUtc: mainOu.capturedAt,
-                  };
-                }
+              } else if (oddsRes.status !== 'AVAILABLE') {
+                Logger.warn(`[ProductionPredictionEngine] Tournament batch odds unavailable for ${bookmaker}:`, {
+                  status: oddsRes.status,
+                  error: oddsRes.error,
+                  batch,
+                });
+                // Fail-closed invariant: NO PER-FIXTURE FALLBACK to getMarketOdds
               }
-
-              fixtures.push({
-                fixtureId: f.fixtureId,
-                providerFixtureId: f.fixtureId,
-                providerName: 'OddsPapi',
-                sourceType: 'PROVIDER',
-                homeTeam: f.participant1Name,
-                awayTeam: f.participant2Name,
-                league: 'Premier League',
-                kickoffUtc: f.startTime,
-                season: '2026',
-                pinnacleOdds: { ah, ou },
-              });
             }
+          }
+
+          // Map batched odds back to discovered fixtures
+          for (const f of fixtureRes.data) {
+            let ah: { line: number; homeOdds: number; awayOdds: number; timestampUtc?: string } | undefined;
+            let ou: { line: number; overOdds: number; underOdds: number; timestampUtc?: string } | undefined;
+            let btts: { yesOdds: number; noOdds: number; timestampUtc?: string } | undefined;
+
+            const fixtureOdds = oddsByFixtureId.get(f.providerFixtureId) || [];
+            if (fixtureOdds.length > 0) {
+              const ahOdds = fixtureOdds.filter(
+                o => (o.marketType === 'ASIAN_HANDICAP' || o.marketType === 'AH') && Math.abs(o.line) <= 3.5
+              );
+              const ouOdds = fixtureOdds.filter(
+                o => (o.marketType === 'OVER_UNDER' || o.marketType === 'OU') && o.line >= 0.5 && o.line <= 5.5
+              );
+              const bttsOdds = fixtureOdds.filter(
+                o => o.marketType === 'BTTS'
+              );
+
+              if (ahOdds.length > 0) {
+                // Prefer Pinnacle sharp line, then fallback to first available
+                const pinnacleAh = ahOdds.filter(o => o.bookmaker.toLowerCase() === 'pinnacle');
+                const pool = pinnacleAh.length > 0 ? pinnacleAh : ahOdds;
+                const mainAh =
+                  pool.find(o => o.isMainLine) ||
+                  pool.sort((a, b) => Math.abs(a.homeOdds - 1.95) - Math.abs(b.homeOdds - 1.95))[0];
+
+                ah = {
+                  line: mainAh.line,
+                  homeOdds: mainAh.homeOdds,
+                  awayOdds: mainAh.awayOdds,
+                  timestampUtc: mainAh.capturedAt,
+                };
+              }
+
+              if (ouOdds.length > 0) {
+                const pinnacleOu = ouOdds.filter(o => o.bookmaker.toLowerCase() === 'pinnacle');
+                const pool = pinnacleOu.length > 0 ? pinnacleOu : ouOdds;
+                const mainOu =
+                  pool.find(o => o.isMainLine) ||
+                  pool.sort((a, b) => Math.abs(a.homeOdds - 1.95) - Math.abs(b.homeOdds - 1.95))[0];
+
+                ou = {
+                  line: mainOu.line,
+                  overOdds: mainOu.homeOdds,
+                  underOdds: mainOu.awayOdds,
+                  timestampUtc: mainOu.capturedAt,
+                };
+              }
+
+              if (bttsOdds.length > 0) {
+                const pinnacleBtts = bttsOdds.filter(o => o.bookmaker.toLowerCase() === 'pinnacle');
+                const pool = pinnacleBtts.length > 0 ? pinnacleBtts : bttsOdds;
+                const mainBtts = pool[0];
+                btts = {
+                  yesOdds: mainBtts.homeOdds,
+                  noOdds: mainBtts.awayOdds,
+                  timestampUtc: mainBtts.capturedAt,
+                };
+              }
+            }
+
+            fixtures.push({
+              fixtureId: f.providerFixtureId,
+              providerFixtureId: f.providerFixtureId,
+              providerName: 'OddsPapi',
+              sourceType: 'PROVIDER',
+              homeTeam: f.homeTeam,
+              awayTeam: f.awayTeam,
+              league: f.league,
+              kickoffUtc: f.kickoffTime,
+              season: f.season || '2026',
+              venue: f.venue,
+              pinnacleOdds: { ah, ou, btts },
+            });
           }
         }
       } catch (opErr) {
@@ -940,11 +974,11 @@ export class ProductionPredictionEngine {
       }
     }
 
-    // 2. Fallback to API-Football provider lookup if OddsPapi produced 0 fixtures
+    // 2. Legacy / Test Fallback to API-Football provider lookup if OddsPapi produced 0 fixtures
     if (fixtures.length === 0) {
       const apiFootball = new ApiFootballProvider();
       if (apiFootball.isConfigured()) {
-        const res = await apiFootball.getUpcomingFixtures('39');
+        const res = await apiFootball.getUpcomingFixtures();
         if (res.status === 'AVAILABLE' && res.data && res.data.length > 0) {
           for (const f of res.data) {
             fixtures.push({

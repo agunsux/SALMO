@@ -2,7 +2,7 @@
 // Formal DTO specifications for /api/v1/* endpoints.
 // Strictly enforces null / explicit unavailable states. Zero fabrication.
 
-import { DecisionBadge, DecisionStatus, ConfidenceTier, LifecycleStage } from './index';
+import { DecisionBadge, DecisionStatus, ConfidenceTier, LifecycleStage, MarketType } from './index';
 import { CanonicalProvenanceDTO } from './provenance';
 
 export interface ApiResponseEnvelope<T> {
@@ -22,7 +22,7 @@ export interface ApiResponseEnvelope<T> {
 }
 
 export interface MarketIntelligenceV1DTO {
-  marketType: 'ASIAN_HANDICAP' | 'OVER_UNDER' | 'BTTS';
+  marketType: MarketType;
   lineLabel: string;
   numericLine: number | null;
   selection: string;

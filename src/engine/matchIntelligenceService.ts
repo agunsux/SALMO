@@ -50,10 +50,10 @@ export class MatchIntelligenceService {
       venue?: string;
     }> = [];
 
-    // 1. Primary: Discover upcoming fixtures from API-Football provider
+    // 1. Primary: Discover upcoming fixtures from authoritative OddsPapi provider (15 leagues batch discovery)
     try {
-      if (this.apiFootball.isConfigured()) {
-        const res = await this.apiFootball.getUpcomingFixtures('39');
+      if (this.oddsPapi.isConfigured()) {
+        const res = await this.oddsPapi.getUpcomingFixtures();
         if (res.status === 'AVAILABLE' && res.data && res.data.length > 0) {
           for (const f of res.data) {
             const kMs = new Date(f.kickoffTime).getTime();
@@ -72,7 +72,34 @@ export class MatchIntelligenceService {
         }
       }
     } catch (err) {
-      Logger.warn('[MatchIntelligenceService] ApiFootball fixture lookup failed:', { error: String(err) });
+      Logger.warn('[MatchIntelligenceService] OddsPapi fixture lookup failed:', { error: String(err) });
+    }
+
+    // 2. Legacy / Test Fallback: If OddsPapi not configured or returned 0, check ApiFootball if configured
+    if (scheduledFixtures.length === 0) {
+      try {
+        if (this.apiFootball.isConfigured()) {
+          const res = await this.apiFootball.getUpcomingFixtures();
+          if (res.status === 'AVAILABLE' && res.data && res.data.length > 0) {
+            for (const f of res.data) {
+              const kMs = new Date(f.kickoffTime).getTime();
+              if (!isNaN(kMs) && kMs > nowMs) {
+                scheduledFixtures.push({
+                  providerFixtureId: f.providerFixtureId,
+                  homeTeam: f.homeTeam,
+                  awayTeam: f.awayTeam,
+                  league: f.league,
+                  season: f.season,
+                  kickoffUtc: f.kickoffTime,
+                  venue: f.venue,
+                });
+              }
+            }
+          }
+        }
+      } catch (err) {
+        Logger.warn('[MatchIntelligenceService] ApiFootball fixture lookup failed:', { error: String(err) });
+      }
     }
 
     // Fail-closed invariant: NO PROVIDER DATA = NO FIXTURE = NO PREDICTION = NO PICK
