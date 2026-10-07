@@ -180,6 +180,8 @@ export interface ActiveMatchPrediction {
     overUnder: ActivePredictionMarket;
     btts: ActivePredictionMarket;
   };
+  sourceType?: 'PROVIDER' | 'SYNTHETIC_FALLBACK';
+  providerName?: string;
   scoreGridSummary: {
     homeXG: number;
     awayXG: number;

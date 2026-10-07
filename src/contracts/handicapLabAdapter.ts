@@ -11,6 +11,7 @@ import { MatchObservation, SettlementOutcome, ActiveMatchPrediction, ActivePredi
 import { QuarterLineSettler } from '../engine/ah/quarterLineSettler';
 import { env } from '../config/env';
 import { Logger } from '../lib/logger';
+import { normalizeTeamKey } from '../engine/features/teamRatings';
 
 export interface HistoricalObservationFilter {
   line?: number;
@@ -1145,9 +1146,9 @@ export class DatabaseHandicapLabAdapter implements IHandicapLabAdapter {
         const bttsPick = fixturePicks.find(p => p.market_type === 'BTTS');
 
         const kickoffDate = kickoffUtc ? kickoffUtc.split('T')[0] : '';
-        const homeSlug = sample.home_team.toUpperCase().replace(/[^A-Z0-9]/g, '');
-        const awaySlug = sample.away_team.toUpperCase().replace(/[^A-Z0-9]/g, '');
-        const canonicalMatchId = `EPL_2026_${homeSlug}_${awaySlug}_${kickoffDate}`;
+        const homeNorm = normalizeTeamKey(sample.home_team).toUpperCase();
+        const awayNorm = normalizeTeamKey(sample.away_team).toUpperCase();
+        const canonicalMatchId = `EPL_2026_${homeNorm}_${awayNorm}_${kickoffDate}`;
 
         const mapMarket = (pick: any, type: 'AH' | 'OU' | 'BTTS', defaultLine: number, defaultSel: string): ActivePredictionMarket => {
           if (!pick) {

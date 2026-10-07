@@ -5,7 +5,7 @@
 // 3. Both Teams To Score (BTTS: Yes/No)
 // ZERO MONEYLINE / 1X2. Zero synthetic fixtures. Zero empirical fallback. Zero fabrication.
 
-import { HandicapLabAdapterFactory } from '../contracts/handicapLabAdapter';
+import { HandicapLabAdapterFactory, DatabaseHandicapLabAdapter } from '../contracts/handicapLabAdapter';
 import { ApiFootballProvider } from '../services/providers/apiFootballProvider';
 import { OddsPapiProvider } from '../services/providers/oddsPapiProvider';
 import {
@@ -17,13 +17,11 @@ import {
   LiveValidationSummary,
 } from '../types/index';
 import { Logger } from '../lib/logger';
+import { getDbClient } from '../lib/db';
+import { matchesDynamicHorizon } from '../lib/horizon';
 
-function normalizeTeamKey(teamName: string): string {
-  return teamName
-    .toLowerCase()
-    .replace(/\b(fc|afc|cf|united|city|town|hotspur|albion|rovers|wanderers)\b/gi, '')
-    .replace(/[^a-z0-9]/g, '');
-}
+import { normalizeTeamKey } from './features/teamRatings';
+export { normalizeTeamKey };
 
 export class MatchIntelligenceService {
   private static apiFootball = new ApiFootballProvider();
@@ -81,7 +79,6 @@ export class MatchIntelligenceService {
     // 2. Secondary: If provider returned 0 fixtures, discover from native database daily_picks
     if (scheduledFixtures.length === 0) {
       try {
-        const { getDbClient } = await import('../lib/db');
         const client = getDbClient();
         const nowIso = new Date().toISOString();
         const { data: dbPicks } = await client
@@ -116,7 +113,6 @@ export class MatchIntelligenceService {
     const predictionsMap = new Map<string, ActiveMatchPrediction>();
     let validationSummary: LiveValidationSummary | null = null;
     try {
-      const { DatabaseHandicapLabAdapter } = await import('../contracts/handicapLabAdapter');
       const dbAdapter = new DatabaseHandicapLabAdapter();
       const dbPredictions = await dbAdapter.getActive7DayPredictions();
       validationSummary = await dbAdapter.getLiveValidationSummary();
@@ -148,17 +144,30 @@ export class MatchIntelligenceService {
 
       const kickoffDate = f.kickoffUtc.split('T')[0];
       const kickoffTime = f.kickoffUtc.split('T')[1]?.slice(0, 5) || '15:00';
-      const homeSlug = f.homeTeam.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      const awaySlug = f.awayTeam.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      const canonicalMatchId = `EPL_2026_${homeSlug}_${awaySlug}_${kickoffDate}`;
+      const homeNorm = normalizeTeamKey(f.homeTeam).toUpperCase();
+      const awayNorm = normalizeTeamKey(f.awayTeam).toUpperCase();
+      const canonicalMatchId = `EPL_2026_${homeNorm}_${awayNorm}_${kickoffDate}`;
+      const legacyHomeSlug = f.homeTeam.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const legacyAwaySlug = f.awayTeam.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const legacyCanonicalId = `EPL_2026_${legacyHomeSlug}_${legacyAwaySlug}_${kickoffDate}`;
       const normKey = `${normalizeTeamKey(f.homeTeam)}_${normalizeTeamKey(f.awayTeam)}`;
 
+      if (
+        processedKeys.has(canonicalMatchId) ||
+        processedKeys.has(legacyCanonicalId) ||
+        processedKeys.has(normKey) ||
+        (f.providerFixtureId && processedKeys.has(f.providerFixtureId))
+      ) {
+        continue; // Prevent duplicate provider fixtures from creating duplicate display cards
+      }
+
       processedKeys.add(canonicalMatchId);
+      processedKeys.add(legacyCanonicalId);
       processedKeys.add(normKey);
       if (f.providerFixtureId) processedKeys.add(f.providerFixtureId);
 
       // Check for active prediction overlay
-      const pred = predictionsMap.get(canonicalMatchId) || predictionsMap.get(normKey) || (f.providerFixtureId ? predictionsMap.get(f.providerFixtureId) : undefined);
+      const pred = predictionsMap.get(canonicalMatchId) || predictionsMap.get(legacyCanonicalId) || predictionsMap.get(normKey) || (f.providerFixtureId ? predictionsMap.get(f.providerFixtureId) : undefined);
 
       if (pred) {
         // Prediction exists: overlay active markets
@@ -210,7 +219,6 @@ export class MatchIntelligenceService {
     // 6. Apply dynamic horizon filtering if requested
     let filteredResults = results;
     if (filter?.horizon && filter.horizon !== 'ALL') {
-      const { matchesDynamicHorizon } = await import('../lib/horizon');
       filteredResults = results.filter(m => matchesDynamicHorizon(m.kickoffIso, filter.horizon as any));
     }
 

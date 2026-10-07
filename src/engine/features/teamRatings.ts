@@ -33,6 +33,46 @@ export function isTeamMatch(name1: string, name2: string): boolean {
 }
 
 /**
+ * Deterministically normalizes English Premier League club names across provider alias variants.
+ * Collapses variants such as 'Brighton & Hove Albion' / 'Brighton' -> 'brighton',
+ * 'Sunderland AFC' / 'Sunderland' -> 'sunderland',
+ * and disambiguates 'Manchester City' ('mancity') vs 'Manchester United' ('manunited').
+ */
+export function normalizeTeamKey(teamName: string): string {
+  const lower = (teamName || '').toLowerCase().trim();
+
+  // Explicit disambiguation for EPL clubs with distinct identities or rich aliases
+  if (lower.includes('manchester city') || lower.includes('man city')) return 'mancity';
+  if (lower.includes('manchester united') || lower.includes('man utd') || lower.includes('man united')) return 'manunited';
+  if (lower.includes('nottingham') || lower.includes('nottm')) return 'nottinghamforest';
+  if (lower.includes('brighton')) return 'brighton';
+  if (lower.includes('sunderland')) return 'sunderland';
+  if (lower.includes('tottenham') || lower.includes('spurs')) return 'tottenham';
+  if (lower.includes('wolverhampton') || lower === 'wolves') return 'wolves';
+  if (lower.includes('bournemouth')) return 'bournemouth';
+  if (lower.includes('west ham')) return 'westham';
+  if (lower.includes('newcastle')) return 'newcastle';
+  if (lower.includes('aston villa')) return 'astonvilla';
+  if (lower.includes('crystal palace')) return 'crystalpalace';
+  if (lower.includes('ipswich')) return 'ipswich';
+  if (lower.includes('leicester')) return 'leicester';
+  if (lower.includes('southampton')) return 'southampton';
+  if (lower.includes('brentford')) return 'brentford';
+  if (lower.includes('fulham')) return 'fulham';
+  if (lower.includes('everton')) return 'everton';
+  if (lower.includes('arsenal')) return 'arsenal';
+  if (lower.includes('liverpool')) return 'liverpool';
+  if (lower.includes('chelsea')) return 'chelsea';
+  if (lower.includes('leeds')) return 'leeds';
+  if (lower.includes('coventry')) return 'coventry';
+  if (lower.includes('hull')) return 'hull';
+
+  return lower
+    .replace(/\b(fc|afc|cf|united|city|town|hotspur|albion|rovers|wanderers|hove|and)\b/gi, '')
+    .replace(/[^a-z0-9]/g, '');
+}
+
+/**
  * Calibrated baseline Premier League team ratings (2025/2026 season walk-forward baseline).
  * Serves as compact production parameters ensuring immediate cold-start availability.
  */

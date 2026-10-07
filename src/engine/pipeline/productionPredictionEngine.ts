@@ -15,7 +15,7 @@ import { AsianTotalEngine, settleAsianTotalGoals } from '../ou/asianTotalEngine'
 import { calculateBttsFromGrid, BTTS_MODEL_VERSION } from '../btts/bttsEngine';
 import { ValueEngine, ValueEvaluationResult } from '../decision/valueEngine';
 import { CompetitionProfileEngine } from '../features/competitionProfile';
-import { resolveTeamRating, TeamRating } from '../features/teamRatings';
+import { resolveTeamRating, TeamRating, normalizeTeamKey } from '../features/teamRatings';
 import { ApiFootballProvider } from '../../services/providers/apiFootballProvider';
 import { OddsPapiProvider } from '../../services/providers/oddsPapiProvider';
 import { ActiveMatchPrediction, ActivePredictionMarket } from '../../types/index';
@@ -41,6 +41,8 @@ export function isWithinLedgerExecutionWindow(
 export interface FixtureInput {
   fixtureId: string;
   providerFixtureId?: string;
+  providerName?: string;
+  sourceType?: 'PROVIDER' | 'SYNTHETIC_FALLBACK';
   homeTeam: string;
   awayTeam: string;
   league: string;
@@ -90,7 +92,7 @@ export class ProductionPredictionEngine {
   public static readonly FEATURE_VERSION = 'dynamic-ratings-v1.0';
 
   /**
-   * Generates deterministic canonical match ID.
+   * Generates deterministic canonical match ID using normalized team keys.
    */
   public static generateCanonicalMatchId(
     season: string | number,
@@ -98,8 +100,8 @@ export class ProductionPredictionEngine {
     awayTeam: string,
     kickoffUtc: string
   ): string {
-    const h = homeTeam.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-    const a = awayTeam.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    const h = normalizeTeamKey(homeTeam).toUpperCase();
+    const a = normalizeTeamKey(awayTeam).toUpperCase();
     const date = kickoffUtc ? kickoffUtc.slice(0, 10) : '';
     return `EPL_${season}_${h}_${a}_${date}`;
   }
@@ -416,6 +418,8 @@ export class ProductionPredictionEngine {
         overUnder: ouMarket,
         btts: bttsMarket,
       },
+      sourceType: fixture.sourceType || 'PROVIDER',
+      providerName: fixture.providerName || (fixture.fixtureId?.startsWith('id') ? 'OddsPapi' : 'API-Football'),
       scoreGridSummary: {
         homeXG: xgDerived.xgHome,
         awayXG: xgDerived.xgAway,
@@ -508,6 +512,28 @@ export class ProductionPredictionEngine {
 
       for (const item of items) {
         const { prediction, evaluations } = item;
+
+        // PHASE 3 — FAIL-CLOSED WRITE GUARD
+        // Fixture must originate from an authoritative provider-backed discovery result.
+        // Strictly reject synthetic fixtures, hardcoded fallback objects, or unverified provenance.
+        const isSynthetic =
+          !prediction.fixtureId ||
+          prediction.fixtureId.startsWith('epl_2026_') ||
+          prediction.sourceType === 'SYNTHETIC_FALLBACK' ||
+          (prediction as any).source_type === 'SYNTHETIC_FALLBACK' ||
+          (!prediction.oddsPapiFixtureId?.startsWith('id') &&
+           !prediction.fixtureId.match(/^\d+$/) &&
+           !prediction.fixtureId.startsWith('id'));
+
+        if (isSynthetic) {
+          Logger.warn('[ProductionPredictionEngine] Rejecting write with synthetic or unverified provider provenance:', {
+            fixtureId: prediction.fixtureId,
+            canonicalMatchId: prediction.canonicalMatchId,
+          });
+          result.excludedCount++;
+          continue;
+        }
+
         const fixtureUuid = this.toUuid(prediction.fixtureId);
 
         // Markets to evaluate for persistence
@@ -886,6 +912,8 @@ export class ProductionPredictionEngine {
               fixtures.push({
                 fixtureId: f.fixtureId,
                 providerFixtureId: f.fixtureId,
+                providerName: 'OddsPapi',
+                sourceType: 'PROVIDER',
                 homeTeam: f.participant1Name,
                 awayTeam: f.participant2Name,
                 league: 'Premier League',
@@ -911,6 +939,8 @@ export class ProductionPredictionEngine {
             fixtures.push({
               fixtureId: f.providerFixtureId,
               providerFixtureId: f.providerFixtureId,
+              providerName: 'API-Football',
+              sourceType: 'PROVIDER',
               homeTeam: f.homeTeam,
               awayTeam: f.awayTeam,
               league: f.league,
@@ -923,61 +953,10 @@ export class ProductionPredictionEngine {
       }
     }
 
-    // If fixtures list is empty, build canonical upcoming Premier League fixtures
+    // Fail-closed invariant: NO PROVIDER DATA = NO FIXTURES = NO PREDICTIONS = NO PICKS
     if (fixtures.length === 0) {
-      const now = Date.now();
-      const nextSaturday = new Date(now + 2 * 24 * 3600 * 1000);
-      nextSaturday.setUTCHours(15, 0, 0, 0);
-
-      const nextSunday = new Date(now + 3 * 24 * 3600 * 1000);
-      nextSunday.setUTCHours(16, 30, 0, 0);
-
-      const canonicalUpcoming = [
-        {
-          fixtureId: 'epl_2026_mancity_arsenal',
-          homeTeam: 'Manchester City',
-          awayTeam: 'Arsenal',
-          league: 'Premier League',
-          kickoffUtc: nextSaturday.toISOString(),
-          season: '2026',
-          venue: 'Etihad Stadium',
-          pinnacleOdds: {
-            ah: { line: -0.25, homeOdds: 1.95, awayOdds: 1.95 },
-            ou: { line: 2.5, overOdds: 1.92, underOdds: 1.98 },
-            btts: { yesOdds: 1.80, noOdds: 2.10 },
-          },
-        },
-        {
-          fixtureId: 'epl_2026_liverpool_chelsea',
-          homeTeam: 'Liverpool',
-          awayTeam: 'Chelsea',
-          league: 'Premier League',
-          kickoffUtc: nextSaturday.toISOString(),
-          season: '2026',
-          venue: 'Anfield',
-          pinnacleOdds: {
-            ah: { line: -0.75, homeOdds: 1.98, awayOdds: 1.92 },
-            ou: { line: 2.75, overOdds: 1.90, underOdds: 2.00 },
-            btts: { yesOdds: 1.75, noOdds: 2.15 },
-          },
-        },
-        {
-          fixtureId: 'epl_2026_tottenham_astonvilla',
-          homeTeam: 'Tottenham',
-          awayTeam: 'Aston Villa',
-          league: 'Premier League',
-          kickoffUtc: nextSunday.toISOString(),
-          season: '2026',
-          venue: 'Tottenham Hotspur Stadium',
-          pinnacleOdds: {
-            ah: { line: -0.25, homeOdds: 2.05, awayOdds: 1.85 },
-            ou: { line: 3.0, overOdds: 1.95, underOdds: 1.95 },
-            btts: { yesOdds: 1.65, noOdds: 2.30 },
-          },
-        },
-      ];
-
-      return canonicalUpcoming;
+      Logger.warn('[ProductionPredictionEngine] No upcoming fixtures discovered from providers; failing closed (0 fixtures returned).');
+      return [];
     }
 
     return fixtures;
