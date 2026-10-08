@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/theme/context';
 import { I18nProvider } from '@/i18n/context';
+import { AuthProvider } from '@/lib/auth/AuthContext';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
@@ -21,7 +22,9 @@ export default function RootLayout({
       <body className={`${inter.className} bg-salmo-dark-bg text-salmo-dark-textPrimary antialiased transition-colors duration-200`}>
         <ThemeProvider>
           <I18nProvider>
-            {children}
+            <AuthProvider>
+              {children}
+            </AuthProvider>
           </I18nProvider>
         </ThemeProvider>
       </body>
