@@ -21,6 +21,9 @@ export interface SettlementInput {
   awayGoals: number | null;
   matchStatus?: 'SCHEDULED' | 'LIVE' | 'FINISHED' | 'POSTPONED' | 'CANCELLED';
   voided?: boolean;
+  side?: 'home' | 'away';
+  homeTeam?: string;
+  awayTeam?: string;
 }
 
 export interface SettlementResult {
@@ -84,8 +87,14 @@ export class SettlementEngine {
     if (mType === 'AH' || mType === 'ASIAN_HANDICAP') {
       // Determine side from selection
       const sel = input.selection.toLowerCase();
-      // If selection indicates away team or 'away', treat as away
-      const isAway = sel.includes('away') || sel.startsWith('away');
+      let isAway = sel.includes('away') || sel.startsWith('away');
+      if (input.side) {
+        isAway = input.side === 'away';
+      } else if (input.awayTeam && sel.includes(input.awayTeam.toLowerCase())) {
+        isAway = true;
+      } else if (input.homeTeam && sel.includes(input.homeTeam.toLowerCase())) {
+        isAway = false;
+      }
       const side: 'home' | 'away' = isAway ? 'away' : 'home';
 
       outcome = QuarterLineSettler.settle(side, input.line, hGoals, aGoals, false);

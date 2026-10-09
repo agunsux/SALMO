@@ -1393,47 +1393,53 @@ export class DatabaseHandicapLabAdapter implements IHandicapLabAdapter {
           status: 'ACTIVE',
         }));
 
-        return {
-          success: true,
-          timestampUtc: new Date().toISOString(),
-          syncChecksum: 'database-canonical-sync',
-          dataState: 'REAL',
-          counts: {
-            totalArchived: dailyPicks.length,
-            dailyPicks: dailyPicks.filter(p => p.verdict === 'LAYAK').length,
-            settled: 0,
-            pending: dailyPicks.length,
-          },
-          dailyPicks,
-          predictions: picks,
-          performance: {},
-        };
-      }
-    } catch (err) {
-      Logger.warn('[DatabaseHandicapLabAdapter] Database fallback query error:', { error: String(err) });
-    }
+          const dbSettledCount = picks.filter((r: any) => r.status === 'WON' || r.status === 'LOST' || r.status === 'PUSH' || r.status === 'SETTLED').length;
+          const dbPendingCount = picks.filter((r: any) => r.status === 'PENDING').length;
 
-    // 3. SALMO standalone ledger fallback
-    const localLedgerPath = path.resolve(process.cwd(), 'data', 'verification', 'live_prediction_ledger.jsonl');
-    if (fs.existsSync(localLedgerPath)) {
-      try {
-        const lines = fs.readFileSync(localLedgerPath, 'utf8').trim().split('\n').filter(Boolean);
-        const records = lines.map(l => JSON.parse(l));
-        return {
-          success: true,
-          timestampUtc: new Date().toISOString(),
-          syncChecksum: 'local-verification-ledger-sync',
-          dataState: 'REAL',
-          counts: {
-            totalArchived: records.length,
-            dailyPicks: 0,
-            settled: 0,
-            pending: records.length,
-          },
-          dailyPicks: [],
-          predictions: records,
-          performance: {},
-        };
+          return {
+            success: true,
+            timestampUtc: new Date().toISOString(),
+            syncChecksum: 'database-canonical-sync',
+            dataState: 'REAL',
+            counts: {
+              totalArchived: dailyPicks.length,
+              dailyPicks: dailyPicks.filter(p => p.verdict === 'LAYAK').length,
+              settled: dbSettledCount,
+              pending: dbPendingCount,
+            },
+            dailyPicks,
+            predictions: picks,
+            performance: {},
+          };
+        }
+      } catch (err) {
+        Logger.warn('[DatabaseHandicapLabAdapter] Database fallback query error:', { error: String(err) });
+      }
+
+      // 3. SALMO standalone ledger fallback
+      const localLedgerPath = path.resolve(process.cwd(), 'data', 'verification', 'live_prediction_ledger.jsonl');
+      if (fs.existsSync(localLedgerPath)) {
+        try {
+          const lines = fs.readFileSync(localLedgerPath, 'utf8').trim().split('\n').filter(Boolean);
+          const records = lines.map(l => JSON.parse(l));
+          const fileSettledCount = records.filter((r: any) => r.settlement === 'SETTLED' || r.settlementStatus === 'SETTLED' || r.status === 'SETTLED').length;
+          const filePendingCount = records.filter((r: any) => r.settlement === 'PENDING' || r.settlementStatus === 'PENDING' || r.status === 'PENDING').length;
+
+          return {
+            success: true,
+            timestampUtc: new Date().toISOString(),
+            syncChecksum: 'local-verification-ledger-sync',
+            dataState: 'REAL',
+            counts: {
+              totalArchived: records.length,
+              dailyPicks: records.filter((r: any) => r.verdict === 'LAYAK').length,
+              settled: fileSettledCount,
+              pending: filePendingCount,
+            },
+            dailyPicks: [],
+            predictions: records,
+            performance: {},
+          };
       } catch (err) {
         Logger.warn('[DatabaseHandicapLabAdapter] File fallback error:', { error: String(err) });
       }

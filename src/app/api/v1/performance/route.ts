@@ -26,10 +26,13 @@ export async function GET(request: NextRequest) {
         for (const line of lines) {
           try {
             const row = JSON.parse(line);
+            const mType = (row.marketType || row.market)?.toUpperCase();
+            if (mType !== 'AH' && mType !== 'OU') continue;
+
             positions.push({
               ledgerPositionId: row.ledgerPositionId || row.predictionId,
               fixtureId: row.fixtureId,
-              marketType: (row.marketType || row.market) === 'OU' ? 'OU' : 'AH',
+              marketType: mType as 'AH' | 'OU',
               selection: row.selection,
               line: Number(row.line ?? 0),
               stakeUnits: 1.0,

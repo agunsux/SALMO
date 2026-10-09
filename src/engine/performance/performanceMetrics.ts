@@ -203,8 +203,8 @@ export class PerformanceMetricsEngine {
     const headlineGreenCohort = this.aggregateMetrics(greenPositions);
     const controlFullCohort = this.aggregateMetrics(allPositions);
 
-    // Breakdowns on green cohort (headline universe)
-    const targetCohort = greenPositions;
+    // Breakdowns on green cohort (headline universe), fallback to allPositions if green cohort empty
+    const targetCohort = greenPositions.length > 0 ? greenPositions : allPositions;
 
     const byMarket = {
       AH: this.aggregateMetrics(targetCohort.filter(p => p.marketType === 'AH')),

@@ -69,6 +69,7 @@ export async function GET(request: NextRequest) {
       expectedValuePct: p.expected_value !== null && p.expected_value !== undefined ? Number((p.expected_value * 100).toFixed(1)) : null,
       confidence: Number(p.confidence) || 0,
       verdict: p.verdict as 'LAYAK' | 'PANTAU' | 'LEWATI',
+      modelVersion: p.model_version || (typeof p.reasoning === 'string' && p.reasoning.includes('Model: ') ? p.reasoning.split('Model: ')[1]?.replace(/\.$/, '').trim() : 'dixon-coles-v1.0'),
       reasoning: p.reasoning,
       rejectionReason: p.rejection_reason || null,
       status: p.status,

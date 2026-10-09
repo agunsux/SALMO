@@ -43,7 +43,16 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const counts = syncRes?.counts || { totalArchived: predictions.length, dailyPicks: 0, settled: 0, pending: predictions.length };
+    const settledCount = predictions.filter((p: any) => p.settlement === 'SETTLED' || p.settlementStatus === 'SETTLED' || p.status === 'SETTLED').length;
+    const pendingCount = predictions.filter((p: any) => p.settlement === 'PENDING' || p.settlementStatus === 'PENDING' || p.status === 'PENDING' || (!p.settlement && !p.settlementStatus)).length;
+    const dailyPicksCount = predictions.filter((p: any) => p.verdict === 'LAYAK' || p.isDailyPick).length;
+
+    const counts = syncRes?.counts || {
+      totalArchived: predictions.length,
+      dailyPicks: dailyPicksCount,
+      settled: settledCount,
+      pending: pendingCount,
+    };
     const dataState = syncRes?.dataState || (predictions.length > 0 ? 'REAL' : 'NO_QUALIFIED_PICKS');
 
     const latencyMs = Date.now() - start;

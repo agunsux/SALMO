@@ -50,7 +50,7 @@ export function isPublicPickEligible(
   const hasProvenance = Boolean(
     pick.modelVersion ||
     pick.model_version ||
-    (typeof pick.reasoning === 'string' && pick.reasoning.includes('modelVersion'))
+    (typeof pick.reasoning === 'string' && (pick.reasoning.includes('modelVersion') || pick.reasoning.includes('Model:')))
   );
   if (!hasProvenance) {
     return false;
@@ -94,7 +94,7 @@ export function isCandidateQualifiedWithoutOdds(
   const hasProvenance = Boolean(
     pick.modelVersion ||
     pick.model_version ||
-    (typeof pick.reasoning === 'string' && pick.reasoning.includes('modelVersion'))
+    (typeof pick.reasoning === 'string' && (pick.reasoning.includes('modelVersion') || pick.reasoning.includes('Model:')))
   );
   if (!hasProvenance) {
     return false;
