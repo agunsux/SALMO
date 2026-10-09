@@ -56,9 +56,7 @@ export default function DailyPicksPage() {
             ? new Date(payloadTime).getTime()
             : (headerTimeMs && !isNaN(headerTimeMs)
                 ? headerTimeMs
-                : (json.data.length > 0 && json.data[0].createdAt
-                    ? new Date(json.data[0].createdAt).getTime()
-                    : Date.now()));
+                : Date.now());
           setReferenceTimeMs(refMs);
           setApiStatus(json.status || (json.data.length > 0 ? 'AVAILABLE' : 'NO_QUALIFIED_PICKS'));
         } else {

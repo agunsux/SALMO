@@ -81,6 +81,7 @@ export async function GET(request: NextRequest) {
       status: 'AVAILABLE',
       count: formatted.length,
       totalCanonicalPicks: picks.length,
+      timestampUtc: new Date().toISOString(),
       data: formatted,
     });
   } catch (err) {
