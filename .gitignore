@@ -34,5 +34,6 @@ next-env.d.ts
 
 # scratch
 scratch/
+/data/backup/
 
 .vercel

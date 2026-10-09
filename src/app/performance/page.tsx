@@ -99,7 +99,7 @@ export default function PerformancePage() {
               Authoritative research ledger is temporarily unreachable. SALMO strictly refuses to fabricate fallback metrics.
             </p>
           </div>
-        ) : settledCount < 30 ? (
+        ) : ((perfReport?.controlFullCohort?.settled ?? settledCount) < 30 || perfReport?.controlFullCohort?.sampleStatus === 'INSUFFICIENT SAMPLE' || settledCount < 30) ? (
           /* Minimum sample size rule: Zero frontend CLV or ROI calculation when sample < 30 */
           <div className="space-y-6">
             <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-12 text-center">
@@ -110,7 +110,7 @@ export default function PerformancePage() {
                 INSUFFICIENT SAMPLE
               </h2>
               <p className="mt-2 text-sm text-[#8A93A0] max-w-md mx-auto">
-                Track record is still being established.
+                Track record is still being established. Live fixtures remain pending ahead of kickoff.
               </p>
 
               <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto text-left">
@@ -120,11 +120,11 @@ export default function PerformancePage() {
                 </div>
                 <div className="rounded-lg border border-[#232830] bg-[#111418] p-3">
                   <span className="block text-[10px] uppercase text-[#8A93A0]">Settled Samples</span>
-                  <span className="font-tabular font-bold text-white text-sm">{settledCount} <span className="text-zinc-500 text-xs font-normal">/ 30 min</span></span>
+                  <span className="font-tabular font-bold text-white text-sm">{perfReport?.controlFullCohort?.settled ?? settledCount} <span className="text-zinc-500 text-xs font-normal">/ 30 min</span></span>
                 </div>
                 <div className="rounded-lg border border-[#232830] bg-[#111418] p-3">
                   <span className="block text-[10px] uppercase text-[#8A93A0]">Pending Settlement</span>
-                  <span className="font-tabular font-bold text-amber-400 text-sm">{pendingCount}</span>
+                  <span className="font-tabular font-bold text-amber-400 text-sm">{perfReport?.controlFullCohort?.pending ?? pendingCount}</span>
                 </div>
                 <div className="rounded-lg border border-[#232830] bg-[#111418] p-3">
                   <span className="block text-[10px] uppercase text-[#8A93A0]">Total Ingested</span>
@@ -159,12 +159,12 @@ export default function PerformancePage() {
                     Realized Production Performance
                   </h2>
                   <p className="mt-1 text-xs text-[#8A93A0]">
-                    Canonical settlement record from Matchweek 5 finished fixtures. All bets audited at 1.0 unit flat stake.
+                    Canonical settlement record from verified finished fixtures. All bets audited at 1.0 unit flat stake.
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="rounded border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-emerald-400 font-bold text-sm">
-                    {perfReport?.controlFullCohort?.displayStatus || '+39.20% ROI'}
+                    {perfReport?.controlFullCohort?.displayStatus || 'INSUFFICIENT SAMPLE'}
                   </span>
                 </div>
               </div>
