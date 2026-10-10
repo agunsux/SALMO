@@ -97,7 +97,7 @@ export default function MatchesPage() {
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
               <Calendar className="h-3.5 w-3.5" />
-              <span>PREMIER LEAGUE • FIXTURE INTELLIGENCE</span>
+              <span>GLOBAL FOOTBALL • FIXTURE INTELLIGENCE</span>
             </div>
             <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-white dark:text-white light:text-[#14171C]">
               Canonical Matches & Market Views
@@ -157,7 +157,7 @@ export default function MatchesPage() {
               {t.states.noFixtures}
             </h3>
             <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
-              No Premier League fixtures scheduled for the selected time horizon and quality filters.
+              No fixtures scheduled for the selected time horizon and quality filters.
             </p>
           </div>
         ) : (

@@ -44,6 +44,7 @@ export interface LiveFixtureDTO {
   venue?: string;
   status: 'SCHEDULED' | 'LIVE' | 'FINISHED' | 'POSTPONED';
   oddspapiTournamentId?: number;
+  kickoffTimeConfirmed?: boolean;
 }
 
 export interface LiveOddsDTO {
