@@ -5,6 +5,7 @@
 
 import { LiveFixtureDTO } from './providers/types';
 import { OpenFootballProvider } from './providers/openFootballProvider';
+import { TheSportsDbProvider } from './providers/theSportsDbProvider';
 import { FixtureIntegrityGuard } from '../lib/fixtureIntegrity';
 import { normalizeTeamKey } from '../engine/features/teamRatings';
 import { getDbClient } from '../lib/db';
@@ -63,6 +64,7 @@ export interface IngestionRunReport {
 
 export class FixtureIngestionService {
   private openFootball = new OpenFootballProvider();
+  private theSportsDb = new TheSportsDbProvider();
 
   public static generateDeterministicUuid(seed: string): string {
     const hash = crypto.createHash('md5').update(`SALMO_FIXTURE_${seed}`).digest('hex');
@@ -76,6 +78,9 @@ export class FixtureIngestionService {
     const timestamp = new Date().toISOString();
     const rawObservations: RawObservation[] = [];
     const sourcesQueried: string[] = ['OpenFootball'];
+    if (this.theSportsDb.isConfigured()) {
+      sourcesQueried.push('TheSportsDB');
+    }
 
     // 1. Fetch from OpenFootball
     for (const lid of leagueIds) {
@@ -100,6 +105,35 @@ export class FixtureIngestionService {
         }
       } catch (err) {
         Logger.warn('[FixtureIngestionService] OpenFootball fetch failed for league:', { lid, error: String(err) });
+      }
+    }
+
+    // 2. Fetch from TheSportsDB (strictly guarded: default OFF)
+    if (this.theSportsDb.isConfigured()) {
+      for (const lid of leagueIds) {
+        try {
+          const res = await this.theSportsDb.getUpcomingFixtures(lid);
+          if (res.status === 'AVAILABLE' && res.data) {
+            for (const f of res.data) {
+              rawObservations.push({
+                source: 'TheSportsDB',
+                sourceFixtureId: f.providerFixtureId,
+                league: f.league,
+                season: f.season,
+                homeTeam: f.homeTeam,
+                awayTeam: f.awayTeam,
+                kickoffTime: f.kickoffTime,
+                kickoffTimeConfirmed: f.kickoffTimeConfirmed ?? false,
+                venue: f.venue,
+                status: f.status,
+                retrievedAt: timestamp,
+                crossIds: f.oddspapiTournamentId ? { apiFootballId: f.oddspapiTournamentId } : undefined,
+              });
+            }
+          }
+        } catch (err) {
+          Logger.warn('[FixtureIngestionService] TheSportsDB fetch failed for league:', { lid, error: String(err) });
+        }
       }
     }
 

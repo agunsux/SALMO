@@ -31,6 +31,7 @@ require.extensions['.ts'] = function (module, filename) {
 };
 
 const { OpenFootballProvider } = require('../src/services/providers/openFootballProvider.ts');
+const { TheSportsDbProvider } = require('../src/services/providers/theSportsDbProvider.ts');
 const { FixtureIngestionService } = require('../src/services/fixtureIngestionService.ts');
 const { FixtureIntegrityGuard } = require('../src/lib/fixtureIntegrity.ts');
 const { MatchIntelligenceService } = require('../src/engine/matchIntelligenceService.ts');
@@ -148,23 +149,49 @@ test('Test 1: OpenFootball adapter normalizes competition, season, date, timezon
   }
 });
 
-test('Test 2: OpenFootball adapter handles HTTP failure gracefully with DATA_UNAVAILABLE', async () => {
+test('Test 2: TheSportsDB adapter defaults to OFF, requires ENABLE_THESPORTSDB=true, and preserves cross-provider ID', async () => {
   const originalFetch = global.fetch;
+  const originalEnv = process.env.ENABLE_THESPORTSDB;
   try {
+    delete process.env.ENABLE_THESPORTSDB;
+
     global.fetch = async () => ({
-      ok: false,
-      status: 503,
-      json: async () => null,
+      ok: true,
+      status: 200,
+      json: async () => MOCK_THESPORTSDB_EPL,
     });
 
-    const provider = new OpenFootballProvider('https://mock.openfootball.org');
+    const provider = new TheSportsDbProvider('https://mock.thesportsdb.org');
+
+    // Gate 1: When disabled (default OFF), must return isConfigured=false and status=UNCONFIGURED
+    assert.strictEqual(provider.isConfigured(), false, 'TheSportsDB must be default OFF');
+    const disabledResult = await provider.getUpcomingFixtures('39');
+    assert.strictEqual(disabledResult.status, 'UNCONFIGURED');
+    assert.strictEqual(disabledResult.data, null);
+
+    // Gate 1: When explicitly enabled via ENABLE_THESPORTSDB=true
+    process.env.ENABLE_THESPORTSDB = 'true';
+    assert.strictEqual(provider.isConfigured(), true, 'TheSportsDB enabled when ENABLE_THESPORTSDB=true');
     const result = await provider.getUpcomingFixtures('39');
 
-    assert.strictEqual(result.status, 'DATA_UNAVAILABLE');
-    assert.strictEqual(result.provider, 'OpenFootball');
-    assert.strictEqual(result.data, null);
+    assert.strictEqual(result.status, 'AVAILABLE');
+    assert.strictEqual(result.provider, 'TheSportsDB');
+    assert.ok(result.data && result.data.length === 3, 'Expected 3 parsed events');
+
+    const m = result.data[0];
+    assert.strictEqual(m.providerFixtureId, 'TSDB_1001');
+    assert.strictEqual(m.oddspapiTournamentId, 1557417, 'Cross-provider ID must be preserved');
+    assert.strictEqual(m.homeTeam, 'Arsenal');
+    assert.strictEqual(m.awayTeam, 'Leeds United');
+    assert.strictEqual(m.kickoffTime, '2026-10-10T12:30:00Z');
+    assert.strictEqual(m.kickoffTimeConfirmed, true);
   } finally {
     global.fetch = originalFetch;
+    if (originalEnv !== undefined) {
+      process.env.ENABLE_THESPORTSDB = originalEnv;
+    } else {
+      delete process.env.ENABLE_THESPORTSDB;
+    }
   }
 });
 
