@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isPublicPickEligible, classifyDailyPicksState } from '@/lib/eligibility';
+import { isLeagueMarketProductionEnabled } from '@/config/multiLeagueRegistry';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,8 +41,20 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Filter strictly based on canonical criteria
-    const filtered = picks.filter((pick: any) => {
+    const nowMs = Date.now();
+
+    // Enforce strict production boundary: only ASIAN_HANDICAP / OVER_UNDER on production-enabled leagues
+    const productionScoped = picks.filter((pick: any) => {
+      if (pick.market_type !== 'ASIAN_HANDICAP' && pick.market_type !== 'OVER_UNDER') {
+        return false;
+      }
+      const mktKey = pick.market_type === 'ASIAN_HANDICAP' ? 'AH' : 'OU';
+      if (!isLeagueMarketProductionEnabled(pick.league || 'Premier League', mktKey)) {
+        return false;
+      }
+      if (!isPublicPickEligible(pick, nowMs)) {
+        return false;
+      }
       if (verdictParam !== 'ALL' && pick.verdict !== verdictParam) {
         return false;
       }
@@ -50,7 +64,22 @@ export async function GET(request: NextRequest) {
       return true;
     });
 
-    const formatted = filtered.map((p: any) => ({
+    if (productionScoped.length === 0) {
+      const classification = classifyDailyPicksState(
+        picks.filter((p: any) => p.market_type === 'ASIAN_HANDICAP' || p.market_type === 'OVER_UNDER'),
+        nowMs
+      );
+      return NextResponse.json({
+        success: true,
+        status: classification.state === 'AVAILABLE' ? 'NO_QUALIFIED_PICKS' : classification.state,
+        count: 0,
+        totalCanonicalPicks: picks.length,
+        timestampUtc: new Date(nowMs).toISOString(),
+        data: [],
+      });
+    }
+
+    const formatted = productionScoped.map((p: any) => ({
       id: p.id,
       fixtureId: p.fixture_id,
       match: `${p.home_team} vs ${p.away_team}`,
@@ -81,7 +110,7 @@ export async function GET(request: NextRequest) {
       status: 'AVAILABLE',
       count: formatted.length,
       totalCanonicalPicks: picks.length,
-      timestampUtc: new Date().toISOString(),
+      timestampUtc: new Date(nowMs).toISOString(),
       data: formatted,
     });
   } catch (err) {
