@@ -41,6 +41,15 @@ export interface ValueEngineSelectionInput {
     halfLoss: number;
     loss: number;
   };
+  ouBreakdown?: {
+    fullWin?: number;
+    halfWin?: number;
+    push?: number;
+    halfLoss?: number;
+    fullLoss?: number;
+    win?: number;
+    loss?: number;
+  };
   pinnacleOdds: {
     sideOdds: number;
     oppositeOdds: number;
@@ -87,15 +96,12 @@ export interface ValueEvaluationResult {
   actionable: boolean;
 }
 
+import { isLeagueMarketProductionEnabled, getLeagueMarketBlocker } from '../../config/multiLeagueRegistry';
+
 export const WHITELIST_LEAGUES: readonly string[] = [
   'premier league',
   'english premier league',
   'epl',
-  'championship',
-  'serie a',
-  'bundesliga',
-  'la liga',
-  'ligue 1',
 ];
 
 export class ValueEngine {
@@ -297,19 +303,29 @@ export class ValueEngine {
     let rawEv = 0;
     if (input.market === 'AH' && input.ahBreakdown) {
       rawEv = this.calculateAhExpectedValue(input.pinnacleOdds.sideOdds, input.ahBreakdown);
+    } else if (input.market === 'OU' && input.ouBreakdown) {
+      rawEv = this.calculateAhExpectedValue(input.pinnacleOdds.sideOdds, {
+        win: input.ouBreakdown.fullWin ?? input.ouBreakdown.win ?? 0,
+        halfWin: input.ouBreakdown.halfWin ?? 0,
+        push: input.ouBreakdown.push ?? 0,
+        halfLoss: input.ouBreakdown.halfLoss ?? 0,
+        loss: input.ouBreakdown.fullLoss ?? input.ouBreakdown.loss ?? 0,
+      });
     } else {
       rawEv = input.modelProbability * input.pinnacleOdds.sideOdds - 1.0;
     }
 
-    const expectedValue = modelValid ? Number(rawEv.toFixed(4)) : 0;
+    const expectedValue = Number(rawEv.toFixed(4));
     const evThreshold = modelValid && expectedValue >= this.MIN_EV_THRESHOLD;
 
-    // GATE 7: DATA_COMPLETENESS
+    // GATE 7: DATA_COMPLETENESS (Per-League & Per-Market Eligibility)
     const leagueLower = (input.league || '').toLowerCase().trim();
-    const isWhitelistedLeague =
+    const isEplLegacy =
       WHITELIST_LEAGUES.some((l) => leagueLower.includes(l)) ||
       leagueLower.startsWith('epl') ||
       leagueLower.startsWith('premier');
+    const isRegistryMarketEnabled = isLeagueMarketProductionEnabled(input.league, input.market);
+    const isWhitelistedLeague = isEplLegacy || isRegistryMarketEnabled;
 
     const hasTeamIdentity =
       Boolean(input.homeTeam) &&
@@ -410,7 +426,10 @@ export class ValueEngine {
       } else if (!dataCompleteness) {
         verdict = 'LEWATI';
         validationStatus = 'INCOMPLETE_METADATA';
-        rejectionReason = `INCOMPLETE_METADATA: League '${input.league}' not whitelisted or invalid entity identifier`;
+        const marketBlocker = getLeagueMarketBlocker(input.league, input.market);
+        rejectionReason = marketBlocker
+          ? `INCOMPLETE_METADATA: League '${input.league}' (${input.market}) not whitelisted — ${marketBlocker}`
+          : `INCOMPLETE_METADATA: League '${input.league}' not whitelisted or invalid entity identifier`;
       } else if (!edgeThreshold) {
         verdict = edge > 0 ? 'PANTAU' : 'LEWATI';
         validationStatus = 'NO_EDGE';

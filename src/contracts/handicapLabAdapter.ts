@@ -12,6 +12,8 @@ import { QuarterLineSettler } from '../engine/ah/quarterLineSettler';
 import { env } from '../config/env';
 import { Logger } from '../lib/logger';
 import { normalizeTeamKey } from '../engine/features/teamRatings';
+import { FixtureIntegrityGuard } from '../lib/fixtureIntegrity';
+import { getLeagueByNameOrSlug } from '../config/multiLeagueRegistry';
 
 export interface HistoricalObservationFilter {
   line?: number;
@@ -128,9 +130,16 @@ export function mapRawPicksToActivePredictions(picks: Array<any>): ActiveMatchPr
     const kickoffDate = kickoffUtc ? kickoffUtc.split('T')[0] : '';
     const homeTeam = sample.homeTeam || sample.home_team || 'Home';
     const awayTeam = sample.awayTeam || sample.away_team || 'Away';
-    const homeSlug = homeTeam.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    const awaySlug = awayTeam.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    const canonicalMatchId = sample.canonicalMatchId || sample.canonical_match_id || `EPL_2026_${homeSlug}_${awaySlug}_${kickoffDate}`;
+    const league = sample.league || sample.leagueName || 'Premier League';
+    const season = sample.season || '2026';
+    const isEpl = (league || '').toLowerCase().includes('premier league') || (league || '').toLowerCase() === 'epl';
+    const legacyHomeSlug = homeTeam.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const legacyAwaySlug = awayTeam.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const canonicalMatchId = sample.canonicalMatchId || sample.canonical_match_id || (
+      isEpl
+        ? `EPL_${season}_${legacyHomeSlug}_${legacyAwaySlug}_${kickoffDate}`
+        : FixtureIntegrityGuard.buildCanonicalMatchId(league, season, homeTeam, awayTeam, kickoffUtc)
+    );
 
     const mapMarket = (pick: any, type: 'AH' | 'OU' | 'BTTS', defaultLine: number, defaultSel: string): ActivePredictionMarket => {
       if (!pick) {
@@ -1146,9 +1155,12 @@ export class DatabaseHandicapLabAdapter implements IHandicapLabAdapter {
         const bttsPick = fixturePicks.find(p => p.market_type === 'BTTS');
 
         const kickoffDate = kickoffUtc ? kickoffUtc.split('T')[0] : '';
-        const homeNorm = normalizeTeamKey(sample.home_team).toUpperCase();
-        const awayNorm = normalizeTeamKey(sample.away_team).toUpperCase();
-        const canonicalMatchId = `EPL_2026_${homeNorm}_${awayNorm}_${kickoffDate}`;
+        const homeTeam = sample.home_team || sample.homeTeam || 'Home';
+        const awayTeam = sample.away_team || sample.awayTeam || 'Away';
+        const league = sample.league || sample.leagueName || 'Premier League';
+        const season = sample.season || '2026';
+        const canonicalMatchId = sample.canonical_match_id || sample.canonicalMatchId ||
+          FixtureIntegrityGuard.buildCanonicalMatchId(league, season, homeTeam, awayTeam, kickoffUtc);
 
         const mapMarket = (pick: any, type: 'AH' | 'OU' | 'BTTS', defaultLine: number, defaultSel: string): ActivePredictionMarket => {
           if (!pick) {
@@ -1369,9 +1381,9 @@ export class DatabaseHandicapLabAdapter implements IHandicapLabAdapter {
           predictionId: r.id || r.fixture_id,
           targetWindow: 'NEXT_7_DAYS' as const,
           fixtureId: r.fixture_id,
-          matchId: r.canonical_match_id || `EPL_2026_${r.home_team}_${r.away_team}`,
-          leagueId: 39,
-          leagueName: r.league || 'Premier League',
+          matchId: r.canonical_match_id || FixtureIntegrityGuard.buildCanonicalMatchId(r.league || 'UNKNOWN_LEAGUE', r.season || '2026', r.home_team, r.away_team, r.kickoff_utc),
+          leagueId: r.league_id || (r.league ? (getLeagueByNameOrSlug(r.league)?.provider_league_id ?? 0) : 0),
+          leagueName: r.league || 'UNKNOWN_LEAGUE',
           homeTeam: r.home_team,
           awayTeam: r.away_team,
           kickoffUtc: r.kickoff_utc,

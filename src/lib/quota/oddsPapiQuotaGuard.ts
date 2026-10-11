@@ -1,12 +1,39 @@
-// SALMO.DEV — Persistent OddsPAPI Quota Guard & 90% Hard-Stop Protection
+// SALMO.DEV — Persistent OddsPAPI Quota Guard, Reservation & Circuit-Breaker Protection
 // Ensures quota tracking persists across serverless cold starts and container restarts.
 // Reads from and writes to Supabase PostgreSQL table: public.quota_state.
-// Optionally syncs with unmetered OddsPAPI /v4/account endpoint.
-// Strictly enforces 90% hard-stop threshold against the monthly request limit.
+// Syncs with unmetered OddsPAPI /v4/account endpoint before batches with cooldown guard.
+// Strictly enforces hard-stop at (limit - reserve), atomic pre-reservation,
+// and circuit-breaker tripping on HTTP 429 / 401 (never counted against usage, never retried).
 
 import { getDbClient } from '../db';
 import { env } from '../../config/env';
 import { Logger } from '../logger';
+
+export type QuotaResetState =
+  | 'QUOTA_EXHAUSTED'
+  | 'RESET_UNVERIFIED'
+  | 'QUOTA_AVAILABLE'
+  | 'ACTIVATION_IN_PROGRESS';
+
+export interface QuotaResetDetectionResult {
+  state: QuotaResetState;
+  checkedAtUtc: string;
+  providerStatus: 'VERIFIED_LIVE' | 'UNVERIFIED_OFFLINE' | 'CIRCUIT_OPEN';
+  isActive: boolean;
+  plan: string;
+  requestCount: number;
+  requestLimit: number;
+  mandatoryReserve: number;
+  operationalCeiling: number;
+  remainingTotal: number;
+  remainingOperationalBudget: number;
+  hasPinnacle: boolean;
+  pinnacleLiveOdds: boolean;
+  supportsFootball: boolean;
+  validFrom: string | null;
+  idempotencyCycleKey: string;
+  reason: string;
+}
 
 export interface QuotaGuardStatus {
   allowed: boolean;
@@ -15,19 +42,448 @@ export interface QuotaGuardStatus {
   limit: number;
   hardStopThreshold: number;
   remaining: number;
+  reserve: number;
   source: 'SUPABASE' | 'ODDSPAPI_ACCOUNT_SYNC' | 'FALLBACK';
+}
+
+export interface QuotaReservation {
+  reservationId: string;
+  cost: number;
+  reservedAt: string;
+  confirmed: boolean;
+}
+
+export interface QuotaAuditLogEntry {
+  timestamp: string;
+  endpoint: string;
+  params: Record<string, any>;
+  outcome: 'SUCCESS' | 'REJECTED' | 'RATE_LIMITED' | 'UNAUTHORIZED' | 'ERROR';
+  countBefore: number;
+  countAfter: number;
+  statusCode?: number;
+  reservationId?: string;
+  reason?: string;
+  [key: string]: any;
 }
 
 export class OddsPapiQuotaGuard {
   public static readonly HARD_STOP_RATIO = 0.90; // 90% hard stop threshold
   public static readonly DEFAULT_MONTHLY_LIMIT = 250;
+  public static readonly DEFAULT_RESERVE = 25; // 25 calls global hard-stop reserve (10% of 250)
+  public static readonly MANDATORY_MULTI_LEAGUE_RESERVE = 50; // 50 calls mandatory reserve for EPL, retries, and kickoff updates
+  public static readonly ACCOUNT_SYNC_COOLDOWN_MS = 1000; // 1s cooldown for unmetered account calls
+
+  private static lastAccountSyncTime = 0;
+  private static cachedAccountData: any = null;
+  private static circuitTripped = false;
+  private static circuitBreakerReason: string | null = null;
+  private static activeReservations = new Map<string, QuotaReservation>();
+  private static auditLogs: QuotaAuditLogEntry[] = [];
+
+  private static activationLock: {
+    inProgress: boolean;
+    lockId: string | null;
+    cycleKey: string | null;
+    acquiredAtMs: number;
+    ttlMs: number;
+  } = {
+    inProgress: false,
+    lockId: null,
+    cycleKey: null,
+    acquiredAtMs: 0,
+    ttlMs: 120_000,
+  };
+
+  private static completedActivationCycles = new Set<string>();
 
   /**
-   * Evaluates persistent OddsPapi quota and enforces 90% hard-stop.
-   * Persists state in Supabase public.quota_state.
+   * Acquires an in-memory + TTL concurrency lock for multi-league activation.
    */
-  public static async checkQuota(requiredCost = 1): Promise<QuotaGuardStatus> {
+  public static acquireActivationLock(
+    cycleKey: string,
+    ttlMs = 120_000
+  ): { acquired: boolean; lockId?: string; reason?: string } {
+    const now = Date.now();
+    if (this.activationLock.inProgress && (now - this.activationLock.acquiredAtMs) < this.activationLock.ttlMs) {
+      return {
+        acquired: false,
+        reason: `Activation lock already held by ${this.activationLock.lockId} (cycle=${this.activationLock.cycleKey})`,
+      };
+    }
+
+    const lockId = `act_lock_${now}_${Math.random().toString(36).slice(2, 7)}`;
+    this.activationLock = {
+      inProgress: true,
+      lockId,
+      cycleKey,
+      acquiredAtMs: now,
+      ttlMs,
+    };
+    return { acquired: true, lockId };
+  }
+
+  /**
+   * Releases the multi-league activation concurrency lock.
+   */
+  public static releaseActivationLock(lockId?: string, markCycleCompleted = false): void {
+    if (!lockId || this.activationLock.lockId === lockId) {
+      if (markCycleCompleted && this.activationLock.cycleKey) {
+        this.completedActivationCycles.add(this.activationLock.cycleKey);
+      }
+      this.activationLock = {
+        inProgress: false,
+        lockId: null,
+        cycleKey: null,
+        acquiredAtMs: 0,
+        ttlMs: 120_000,
+      };
+    }
+  }
+
+  public static isActivationInProgress(): boolean {
+    const now = Date.now();
+    if (this.activationLock.inProgress && (now - this.activationLock.acquiredAtMs) >= this.activationLock.ttlMs) {
+      this.releaseActivationLock();
+      return false;
+    }
+    return this.activationLock.inProgress;
+  }
+
+  public static isCycleCompleted(cycleKey: string): boolean {
+    return this.completedActivationCycles.has(cycleKey);
+  }
+
+  /**
+   * Injects mock account payload for deterministic offline unit tests.
+   */
+  public static setMockAccountDataForTest(accountData: any | null): void {
+    this.cachedAccountData = accountData;
+    this.lastAccountSyncTime = accountData ? Date.now() : 0;
+  }
+
+  /**
+   * Checks whether the circuit breaker is currently open (blocking calls).
+   */
+  public static isCircuitTripped(): boolean {
+    return this.circuitTripped;
+  }
+
+  public static getCircuitBreakerReason(): string | null {
+    return this.circuitBreakerReason;
+  }
+
+  /**
+   * Trips circuit breaker on critical auth / rate-limit failures (429 / 401).
+   */
+  public static tripCircuitBreaker(statusCode: number, reason: string): void {
+    this.circuitTripped = true;
+    this.circuitBreakerReason = `Circuit tripped by HTTP ${statusCode}: ${reason}. All further calls blocked.`;
+    Logger.error(`[OddsPapiQuotaGuard] ${this.circuitBreakerReason}`);
+  }
+
+  /**
+   * Resets circuit breaker and locks (primarily for test environments).
+   */
+  public static resetCircuitBreaker(): void {
+    this.circuitTripped = false;
+    this.circuitBreakerReason = null;
+    this.activeReservations.clear();
+    this.releaseActivationLock();
+    this.completedActivationCycles.clear();
+  }
+
+  /**
+   * Non-billable Quota-Reset Detector (Phase B).
+   * Never guesses quota reset by calendar date; strictly inspects /v4/account state.
+   * Enforces mandatory 50-request reserve for EPL, controlled retries, and near-kickoff updates.
+   */
+  public static async detectQuotaReset(
+    minRequiredOperationalCalls = 3,
+    forceSync = false,
+    injectedAccountData?: any
+  ): Promise<QuotaResetDetectionResult> {
+    const checkedAtUtc = new Date().toISOString();
+    const mandatoryReserve = Number(
+      process.env.ODDSPAPI_MULTI_LEAGUE_RESERVE || this.MANDATORY_MULTI_LEAGUE_RESERVE
+    );
+
+    if (this.isActivationInProgress()) {
+      const sub = this.cachedAccountData?.subscriptions?.[0];
+      const limit = Number(sub?.request_limit ?? this.DEFAULT_MONTHLY_LIMIT);
+      const count = Number(sub?.request_count ?? limit);
+      const ceiling = Math.max(0, limit - mandatoryReserve);
+      return {
+        state: 'ACTIVATION_IN_PROGRESS',
+        checkedAtUtc,
+        providerStatus: 'VERIFIED_LIVE',
+        isActive: Boolean(sub?.is_active),
+        plan: String(sub?.plan || 'unknown'),
+        requestCount: count,
+        requestLimit: limit,
+        mandatoryReserve,
+        operationalCeiling: ceiling,
+        remainingTotal: Math.max(0, limit - count),
+        remainingOperationalBudget: Math.max(0, ceiling - count),
+        hasPinnacle: Boolean(sub?.bookmakers?.pinnacle),
+        pinnacleLiveOdds: Boolean(sub?.bookmakers?.pinnacle?.has_live_odds),
+        supportsFootball: Array.isArray(sub?.sport_ids) && sub.sport_ids.includes(10),
+        validFrom: sub?.valid_from || null,
+        idempotencyCycleKey: this.activationLock.cycleKey || `cycle_${checkedAtUtc.slice(0, 10)}`,
+        reason: `Multi-league activation is already in progress (lock=${this.activationLock.lockId}).`,
+      };
+    }
+
+    if (this.circuitTripped) {
+      return {
+        state: 'QUOTA_EXHAUSTED',
+        checkedAtUtc,
+        providerStatus: 'CIRCUIT_OPEN',
+        isActive: false,
+        plan: 'unknown',
+        requestCount: this.DEFAULT_MONTHLY_LIMIT,
+        requestLimit: this.DEFAULT_MONTHLY_LIMIT,
+        mandatoryReserve,
+        operationalCeiling: this.DEFAULT_MONTHLY_LIMIT - mandatoryReserve,
+        remainingTotal: 0,
+        remainingOperationalBudget: 0,
+        hasPinnacle: false,
+        pinnacleLiveOdds: false,
+        supportsFootball: false,
+        validFrom: null,
+        idempotencyCycleKey: `circuit_open_${checkedAtUtc.slice(0, 13)}`,
+        reason: this.circuitBreakerReason || 'Circuit breaker is open due to HTTP 429/401.',
+      };
+    }
+
+    const accountData = injectedAccountData !== undefined
+      ? injectedAccountData
+      : await this.syncAccount(forceSync);
+
+    const sub = accountData?.subscriptions?.[0];
+    if (!sub || typeof sub.request_count !== 'number' || typeof sub.request_limit !== 'number') {
+      return {
+        state: 'RESET_UNVERIFIED',
+        checkedAtUtc,
+        providerStatus: 'UNVERIFIED_OFFLINE',
+        isActive: false,
+        plan: 'unknown',
+        requestCount: 0,
+        requestLimit: this.DEFAULT_MONTHLY_LIMIT,
+        mandatoryReserve,
+        operationalCeiling: this.DEFAULT_MONTHLY_LIMIT - mandatoryReserve,
+        remainingTotal: 0,
+        remainingOperationalBudget: 0,
+        hasPinnacle: false,
+        pinnacleLiveOdds: false,
+        supportsFootball: false,
+        validFrom: null,
+        idempotencyCycleKey: `unverified_${checkedAtUtc.slice(0, 13)}`,
+        reason: 'Could not verify /v4/account state from provider; calendar-based reset assumptions are forbidden.',
+      };
+    }
+
+    const requestLimit = Number(sub.request_limit);
+    const requestCount = Number(sub.request_count);
+    const isActive = sub.is_active === true;
+    const plan = String(sub.plan || 'free');
+    const hasPinnacle = Boolean(sub.bookmakers?.pinnacle);
+    const pinnacleLiveOdds = Boolean(sub.bookmakers?.pinnacle?.has_live_odds);
+    const supportsFootball = Array.isArray(sub.sport_ids) && sub.sport_ids.includes(10);
+    const validFrom = sub.valid_from || null;
+    const operationalCeiling = Math.max(0, requestLimit - mandatoryReserve);
+    const activeReservedCost = Array.from(this.activeReservations.values()).reduce((sum, r) => sum + r.cost, 0);
+    const effectiveCommitted = requestCount + activeReservedCost;
+    const remainingTotal = Math.max(0, requestLimit - effectiveCommitted);
+    const remainingOperationalBudget = Math.max(0, operationalCeiling - effectiveCommitted);
+    const idempotencyCycleKey = `cycle_${validFrom || 'default'}_c${requestCount}_${checkedAtUtc.slice(0, 10)}`;
+
+    // Sync reset count downward or upward to persistent database if needed
+    await this.syncCountToDatabaseIfChanged(requestCount, requestLimit);
+
+    if (!isActive) {
+      return {
+        state: 'QUOTA_EXHAUSTED',
+        checkedAtUtc,
+        providerStatus: 'VERIFIED_LIVE',
+        isActive,
+        plan,
+        requestCount: effectiveCommitted,
+        requestLimit,
+        mandatoryReserve,
+        operationalCeiling,
+        remainingTotal,
+        remainingOperationalBudget,
+        hasPinnacle,
+        pinnacleLiveOdds,
+        supportsFootball,
+        validFrom,
+        idempotencyCycleKey,
+        reason: `OddsPAPI subscription is inactive (is_active=false).`,
+      };
+    }
+
+    if (!hasPinnacle || !supportsFootball) {
+      return {
+        state: 'RESET_UNVERIFIED',
+        checkedAtUtc,
+        providerStatus: 'VERIFIED_LIVE',
+        isActive,
+        plan,
+        requestCount: effectiveCommitted,
+        requestLimit,
+        mandatoryReserve,
+        operationalCeiling,
+        remainingTotal,
+        remainingOperationalBudget,
+        hasPinnacle,
+        pinnacleLiveOdds,
+        supportsFootball,
+        validFrom,
+        idempotencyCycleKey,
+        reason: `OddsPAPI account missing required capabilities (hasPinnacle=${hasPinnacle}, supportsFootball=${supportsFootball}).`,
+      };
+    }
+
+    if (remainingOperationalBudget < minRequiredOperationalCalls) {
+      return {
+        state: 'QUOTA_EXHAUSTED',
+        checkedAtUtc,
+        providerStatus: 'VERIFIED_LIVE',
+        isActive,
+        plan,
+        requestCount: effectiveCommitted,
+        requestLimit,
+        mandatoryReserve,
+        operationalCeiling,
+        remainingTotal,
+        remainingOperationalBudget,
+        hasPinnacle,
+        pinnacleLiveOdds,
+        supportsFootball,
+        validFrom,
+        idempotencyCycleKey,
+        reason: `Quota exhausted or within mandatory ${mandatoryReserve}-request reserve: ${effectiveCommitted}/${requestLimit} used (operational ceiling=${operationalCeiling}, remainingOperationalBudget=${remainingOperationalBudget}, required=${minRequiredOperationalCalls}).`,
+      };
+    }
+
+    return {
+      state: 'QUOTA_AVAILABLE',
+      checkedAtUtc,
+      providerStatus: 'VERIFIED_LIVE',
+      isActive,
+      plan,
+      requestCount: effectiveCommitted,
+      requestLimit,
+      mandatoryReserve,
+      operationalCeiling,
+      remainingTotal,
+      remainingOperationalBudget,
+      hasPinnacle,
+      pinnacleLiveOdds,
+      supportsFootball,
+      validFrom,
+      idempotencyCycleKey,
+      reason: `Quota verified available: ${effectiveCommitted}/${requestLimit} used, ${remainingOperationalBudget} operational requests available above ${mandatoryReserve}-request reserve.`,
+    };
+  }
+
+  private static async syncCountToDatabaseIfChanged(providerCount: number, providerLimit: number): Promise<void> {
+    try {
+      const client = getDbClient();
+      const { data: dbRow, error } = await client
+        .from('quota_state')
+        .select('id, consumed, limit_value, safe_limit, safety_reserve_pct')
+        .eq('provider', 'oddspapi')
+        .eq('quota_type', 'MONTHLY')
+        .order('period_start', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && dbRow) {
+        const dbConsumed = Number(dbRow.consumed || 0);
+        const dbLimit = Number(dbRow.limit_value || this.DEFAULT_MONTHLY_LIMIT);
+        const targetSafeLimit = Math.max(0, providerLimit - this.MANDATORY_MULTI_LEAGUE_RESERVE);
+        const targetReservePct = providerLimit > 0 ? Math.round((this.MANDATORY_MULTI_LEAGUE_RESERVE / providerLimit) * 100) : 20;
+        const dbSafeLimit = Number(dbRow.safe_limit ?? providerLimit);
+        const dbReservePct = Number(dbRow.safety_reserve_pct ?? 0);
+
+        if (
+          dbConsumed !== providerCount ||
+          dbLimit !== providerLimit ||
+          dbSafeLimit !== targetSafeLimit ||
+          dbReservePct !== targetReservePct
+        ) {
+          await client
+            .from('quota_state')
+            .update({
+              consumed: providerCount,
+              limit_value: providerLimit,
+              safe_limit: targetSafeLimit,
+              safety_reserve_pct: targetReservePct,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', dbRow.id);
+        }
+      }
+    } catch {
+      // Ignore offline/test DB sync failure
+    }
+  }
+
+  /**
+   * Synchronizes quota directly from unmetered OddsPAPI /v4/account endpoint.
+   * Adheres strictly to the 1s cooldown.
+   */
+  public static async syncAccount(force = false): Promise<any | null> {
     const apiKey = env.providers.oddsPapi.apiKey || process.env.ODDS_PAPI_KEY || '';
+    if (!apiKey) return this.cachedAccountData;
+
+    const now = Date.now();
+    if (!force && this.cachedAccountData && (now - this.lastAccountSyncTime < this.ACCOUNT_SYNC_COOLDOWN_MS)) {
+      return this.cachedAccountData;
+    }
+
+    try {
+      const baseUrl = env.providers.oddsPapi.baseUrl || 'https://api.oddspapi.io/v4';
+      const res = await fetch(`${baseUrl}/account?apiKey=${apiKey}`, {
+        headers: { Accept: 'application/json' },
+        next: { revalidate: 60 },
+      });
+
+      if (res.ok) {
+        const accountData: any = await res.json();
+        this.lastAccountSyncTime = Date.now();
+        this.cachedAccountData = accountData;
+        return accountData;
+      } else if (res.status === 401 || res.status === 429) {
+        this.tripCircuitBreaker(res.status, `Account sync returned HTTP ${res.status}`);
+      }
+    } catch (err) {
+      Logger.warn('[OddsPapiQuotaGuard] Unmetered account sync request failed:', { error: String(err) });
+    }
+    return this.cachedAccountData;
+  }
+
+  /**
+   * Evaluates persistent OddsPapi quota and enforces hard-stop.
+   * Persists state in Supabase public.quota_state and checks account sync.
+   */
+  public static async checkQuota(requiredCost = 1, customReserve?: number): Promise<QuotaGuardStatus> {
+    const reserve = customReserve ?? Number(process.env.ODDSPAPI_QUOTA_RESERVE || this.DEFAULT_RESERVE);
+
+    if (this.circuitTripped) {
+      return {
+        allowed: false,
+        reason: this.circuitBreakerReason || 'Circuit breaker is open due to previous 429/401 response.',
+        consumed: this.cachedAccountData?.subscriptions?.[0]?.request_count || 0,
+        limit: this.DEFAULT_MONTHLY_LIMIT,
+        hardStopThreshold: this.DEFAULT_MONTHLY_LIMIT - reserve,
+        remaining: 0,
+        reserve,
+        source: 'FALLBACK',
+      };
+    }
+
     let consumed = 0;
     let limit = this.DEFAULT_MONTHLY_LIMIT;
     let source: QuotaGuardStatus['source'] = 'SUPABASE';
@@ -55,76 +511,159 @@ export class OddsPapiQuotaGuard {
       Logger.warn('[OddsPapiQuotaGuard] Database query failed, checking unmetered account:', { error: String(dbErr) });
     }
 
-    // 2. Unmetered live synchronization with OddsPapi /v4/account (if key configured)
-    if (apiKey) {
-      try {
-        const baseUrl = env.providers.oddsPapi.baseUrl || 'https://api.oddspapi.io/v4';
-        const res = await fetch(`${baseUrl}/account?apiKey=${apiKey}`, {
-          headers: { Accept: 'application/json' },
-          next: { revalidate: 60 },
-        });
+    // 2. Sync from /v4/account (unmetered) — handles both upward usage and downward monthly quota reset
+    const accountData = await this.syncAccount();
+    const sub = (accountData?.subscriptions ?? [])[0];
+    if (sub && typeof sub.request_count === 'number') {
+      const providerLimit = Number(sub.request_limit ?? limit);
+      const providerCount = Number(sub.request_count);
 
-        if (res.ok) {
-          const accountData: any = await res.json();
-          const sub = (accountData?.subscriptions ?? [])[0];
-          if (sub) {
-            const providerLimit = Number(sub.request_limit ?? limit);
-            const providerCount = Number(sub.request_count ?? consumed);
+      if (providerCount !== consumed || providerLimit !== limit) {
+        consumed = providerCount;
+        limit = providerLimit;
+        source = 'ODDSPAPI_ACCOUNT_SYNC';
 
-            // Sync persistent DB if provider count is higher or updated
-            if (providerCount > consumed || providerLimit !== limit) {
-              consumed = providerCount;
-              limit = providerLimit;
-              source = 'ODDSPAPI_ACCOUNT_SYNC';
-
-              if (client && dbRecordId) {
-                try {
-                  await client
-                    .from('quota_state')
-                    .update({
-                      consumed: providerCount,
-                      limit_value: providerLimit,
-                      updated_at: new Date().toISOString(),
-                    })
-                    .eq('id', dbRecordId);
-                } catch (syncErr) {
-                  Logger.warn('[OddsPapiQuotaGuard] Failed to sync account count to quota_state:', { error: String(syncErr) });
-                }
-              }
-            }
+        if (client && dbRecordId) {
+          try {
+            await client
+              .from('quota_state')
+              .update({
+                consumed: providerCount,
+                limit_value: providerLimit,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', dbRecordId);
+          } catch (syncErr) {
+            Logger.warn('[OddsPapiQuotaGuard] Failed to sync account count to quota_state:', { error: String(syncErr) });
           }
         }
-      } catch (accErr) {
-        // Unmetered probe network error handled gracefully
       }
     }
 
-    const hardStopThreshold = Math.floor(limit * this.HARD_STOP_RATIO);
-    const remaining = Math.max(0, limit - consumed);
+    // Hard stop calculation: minimum of (limit * 0.90) and (limit - reserve)
+    const hardStopThreshold = Math.min(
+      Math.floor(limit * this.HARD_STOP_RATIO),
+      Math.max(0, limit - reserve)
+    );
+    const activeReservedCost = Array.from(this.activeReservations.values()).reduce((sum, r) => sum + r.cost, 0);
+    const totalCommitted = consumed + activeReservedCost;
+    const remaining = Math.max(0, limit - totalCommitted);
 
-    // Enforce 90% Hard-Stop Threshold
-    if (consumed >= hardStopThreshold || (consumed + requiredCost) > hardStopThreshold) {
-      const reason = `OddsPAPI persistent quota hard-stop: ${consumed}/${limit} consumed (exceeds ${Math.round(this.HARD_STOP_RATIO * 100)}% threshold of ${hardStopThreshold}).`;
+    // Enforce Hard-Stop Threshold
+    if (totalCommitted >= hardStopThreshold || (totalCommitted + requiredCost) > hardStopThreshold) {
+      const reason = `OddsPAPI persistent quota hard-stop: ${totalCommitted}/${limit} consumed (exceeds hard-stop threshold of ${hardStopThreshold}; reserve=${reserve}).`;
       Logger.warn(`[OddsPapiQuotaGuard] ${reason}`);
       return {
         allowed: false,
         reason,
-        consumed,
+        consumed: totalCommitted,
         limit,
         hardStopThreshold,
         remaining,
+        reserve,
         source,
       };
     }
 
     return {
       allowed: true,
-      consumed,
+      consumed: totalCommitted,
       limit,
       hardStopThreshold,
       remaining,
+      reserve,
       source,
     };
+  }
+
+  /**
+   * Reserves quota units before executing a paid request.
+   */
+  public static async reserveQuota(cost = 1): Promise<{ allowed: boolean; reservationId?: string; reason?: string }> {
+    const status = await this.checkQuota(cost);
+    if (!status.allowed) {
+      return { allowed: false, reason: status.reason };
+    }
+
+    const reservationId = `res_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    this.activeReservations.set(reservationId, {
+      reservationId,
+      cost,
+      reservedAt: new Date().toISOString(),
+      confirmed: false,
+    });
+
+    return { allowed: true, reservationId };
+  }
+
+  /**
+   * Confirms quota usage after a successful API call.
+   */
+  public static async confirmQuota(
+    reservationId: string,
+    details: { endpoint: string; params: Record<string, any>; countBefore?: number; countAfter?: number }
+  ): Promise<void> {
+    const reservation = this.activeReservations.get(reservationId);
+    const cost = reservation?.cost || 1;
+    this.activeReservations.delete(reservationId);
+
+    const countBefore = details.countBefore ?? (this.cachedAccountData?.subscriptions?.[0]?.request_count || 0);
+    const countAfter = details.countAfter ?? (countBefore + cost);
+
+    await this.recordUsage(cost);
+
+    this.logAudit({
+      timestamp: new Date().toISOString(),
+      endpoint: details.endpoint,
+      params: details.params,
+      outcome: 'SUCCESS',
+      countBefore,
+      countAfter,
+      reservationId,
+    });
+  }
+
+  /**
+   * Releases reserved quota when an error or network drop occurs.
+   * Ensures 429 and 401 are NEVER counted against quota.
+   */
+  public static releaseQuota(
+    reservationId: string,
+    details: { endpoint: string; params: Record<string, any>; statusCode?: number; error?: string }
+  ): void {
+    this.activeReservations.delete(reservationId);
+
+    const is429 = details.statusCode === 429;
+    const is401 = details.statusCode === 401;
+
+    if (is429 || is401) {
+      this.tripCircuitBreaker(details.statusCode!, details.error || (is429 ? 'Rate limit exceeded' : 'Unauthorized'));
+    }
+
+    const count = this.cachedAccountData?.subscriptions?.[0]?.request_count || 0;
+    this.logAudit({
+      timestamp: new Date().toISOString(),
+      endpoint: details.endpoint,
+      params: details.params,
+      outcome: is429 ? 'RATE_LIMITED' : is401 ? 'UNAUTHORIZED' : 'ERROR',
+      countBefore: count,
+      countAfter: count, // Count is NOT incremented
+      statusCode: details.statusCode,
+      reservationId,
+      reason: details.error,
+    });
+  }
+
+  /**
+   * Logs structured audit entry.
+   */
+  public static logAudit(entry: QuotaAuditLogEntry): void {
+    this.auditLogs.push(entry);
+    Logger.info(`[OddsPapiQuotaGuard Audit] ${entry.endpoint} -> ${entry.outcome} (Count: ${entry.countBefore} -> ${entry.countAfter})`, entry);
+  }
+
+  public static getAuditLogs(): QuotaAuditLogEntry[] {
+    return [...this.auditLogs];
   }
 
   /**

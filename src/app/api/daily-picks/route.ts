@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
       match: `${p.home_team} vs ${p.away_team}`,
       homeTeam: p.home_team,
       awayTeam: p.away_team,
-      league: p.league || 'Premier League',
+      league: p.league || 'UNKNOWN_LEAGUE',
       kickoffUtc: p.kickoff_utc,
       marketType: p.market_type,
       selection: p.prediction,

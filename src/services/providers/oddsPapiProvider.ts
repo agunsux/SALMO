@@ -180,6 +180,136 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
   }
 
   /**
+   * Single-batch ingestion for all configured tournaments in ONE request.
+   * Conforms to OddsPAPI singular bookmaker contract and quota minimization.
+   */
+  public async getSingleBatchTournamentOdds(
+    allTournamentIds: number[],
+    bookmaker = 'pinnacle'
+  ): Promise<ProviderResult<LiveOddsDTO[]>> {
+    const start = Date.now();
+    const timestamp = new Date().toISOString();
+
+    if (!this.isConfigured()) {
+      return {
+        status: 'UNCONFIGURED',
+        provider: this.providerName,
+        data: null,
+        error: 'ODDS_PAPI_KEY is not configured.',
+        latencyMs: 0,
+        cached: false,
+        timestamp,
+      };
+    }
+
+    if (OddsPapiQuotaGuard.isCircuitTripped()) {
+      return {
+        status: 'RATE_LIMITED',
+        provider: this.providerName,
+        data: null,
+        error: OddsPapiQuotaGuard.getCircuitBreakerReason() || 'Circuit breaker is open.',
+        latencyMs: 0,
+        cached: false,
+        timestamp,
+      };
+    }
+
+    const reservation = await OddsPapiQuotaGuard.reserveQuota(1);
+    if (!reservation.allowed) {
+      Logger.warn(`[OddsPapiProvider] Single-batch tournament odds halted by quota guard: ${reservation.reason}`);
+      return {
+        status: 'RATE_LIMITED',
+        provider: this.providerName,
+        data: null,
+        error: reservation.reason,
+        latencyMs: Date.now() - start,
+        cached: false,
+        timestamp,
+      };
+    }
+
+    try {
+      const apiKey = env.providers.oddsPapi.apiKey!;
+      const baseUrl = env.providers.oddsPapi.baseUrl;
+      const tournParam = allTournamentIds.join(',');
+      const url = `${baseUrl}/odds-by-tournaments?tournaments=${encodeURIComponent(tournParam)}&bookmaker=${encodeURIComponent(bookmaker)}&oddsFormat=decimal&apiKey=${apiKey}`;
+
+      const res = await fetch(url, {
+        headers: { 'Accept': 'application/json' },
+        next: { revalidate: 60 },
+      });
+
+      if (res.status === 429 || res.status === 401) {
+        OddsPapiQuotaGuard.releaseQuota(reservation.reservationId!, {
+          endpoint: 'odds-by-tournaments',
+          params: { allTournamentIds, bookmaker },
+          statusCode: res.status,
+          error: `HTTP ${res.status}`,
+        });
+        return {
+          status: res.status === 429 ? 'RATE_LIMITED' : 'UNCONFIGURED',
+          provider: this.providerName,
+          data: null,
+          error: `OddsPapi returned HTTP ${res.status}`,
+          latencyMs: Date.now() - start,
+          cached: false,
+          timestamp,
+        };
+      }
+
+      if (!res.ok) {
+        OddsPapiQuotaGuard.releaseQuota(reservation.reservationId!, {
+          endpoint: 'odds-by-tournaments',
+          params: { allTournamentIds, bookmaker },
+          statusCode: res.status,
+          error: `HTTP ${res.status}`,
+        });
+        return {
+          status: 'DATA_UNAVAILABLE',
+          provider: this.providerName,
+          data: null,
+          error: `OddsPapi single-batch returned HTTP ${res.status}`,
+          latencyMs: Date.now() - start,
+          cached: false,
+          timestamp,
+        };
+      }
+
+      await OddsPapiQuotaGuard.confirmQuota(reservation.reservationId!, {
+        endpoint: 'odds-by-tournaments',
+        params: { allTournamentIds, bookmaker },
+      });
+
+      const json = await res.json();
+      const oddsList: LiveOddsDTO[] = this.parseOddsApiResponse(json, bookmaker, timestamp);
+
+      return {
+        status: 'AVAILABLE',
+        provider: this.providerName,
+        data: oddsList,
+        latencyMs: Date.now() - start,
+        cached: false,
+        timestamp,
+      };
+    } catch (err) {
+      OddsPapiQuotaGuard.releaseQuota(reservation.reservationId!, {
+        endpoint: 'odds-by-tournaments',
+        params: { allTournamentIds, bookmaker },
+        error: String(err),
+      });
+      return {
+        status: 'DATA_UNAVAILABLE',
+        provider: this.providerName,
+        data: null,
+        error: `Single batch tournament odds failure: ${String(err)}`,
+        latencyMs: Date.now() - start,
+        cached: false,
+        timestamp,
+      };
+    }
+  }
+
+  /**
    * Fetches batch tournament odds for a single bookmaker (conforming to OddsPAPI singular bookmaker contract).
    */
   public async getBatchTournamentOdds(
@@ -201,22 +331,33 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
       };
     }
 
-    try {
-      // Pre-flight Persistent Quota & 90% Hard-Stop Guard
-      const quotaCheck = await OddsPapiQuotaGuard.checkQuota(1);
-      if (!quotaCheck.allowed) {
-        Logger.warn(`[OddsPapiProvider] Batch tournament odds halted by quota guard: ${quotaCheck.reason}`);
-        return {
-          status: 'RATE_LIMITED',
-          provider: this.providerName,
-          data: null,
-          error: quotaCheck.reason,
-          latencyMs: Date.now() - start,
-          cached: false,
-          timestamp,
-        };
-      }
+    if (OddsPapiQuotaGuard.isCircuitTripped()) {
+      return {
+        status: 'RATE_LIMITED',
+        provider: this.providerName,
+        data: null,
+        error: OddsPapiQuotaGuard.getCircuitBreakerReason() || 'Circuit breaker is open.',
+        latencyMs: 0,
+        cached: false,
+        timestamp,
+      };
+    }
 
+    const reservation = await OddsPapiQuotaGuard.reserveQuota(1);
+    if (!reservation.allowed) {
+      Logger.warn(`[OddsPapiProvider] Batch tournament odds halted by quota guard: ${reservation.reason}`);
+      return {
+        status: 'RATE_LIMITED',
+        provider: this.providerName,
+        data: null,
+        error: reservation.reason,
+        latencyMs: Date.now() - start,
+        cached: false,
+        timestamp,
+      };
+    }
+
+    try {
       const apiKey = env.providers.oddsPapi.apiKey!;
       const baseUrl = env.providers.oddsPapi.baseUrl;
       const tournBatch = tournamentIds.slice(0, MAX_TOURNAMENTS_PER_BATCH_REQUEST).join(',');
@@ -227,9 +368,15 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
         next: { revalidate: 60 },
       });
 
-      if (res.status === 429) {
+      if (res.status === 429 || res.status === 401) {
+        OddsPapiQuotaGuard.releaseQuota(reservation.reservationId!, {
+          endpoint: 'odds-by-tournaments',
+          params: { tournamentIds, bookmaker },
+          statusCode: res.status,
+          error: `HTTP ${res.status}`,
+        });
         return {
-          status: 'RATE_LIMITED',
+          status: res.status === 429 ? 'RATE_LIMITED' : 'UNCONFIGURED',
           provider: this.providerName,
           data: null,
           error: `Rate limit on OddsPapi for bookmaker ${bookmaker}.`,
@@ -240,6 +387,12 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
       }
 
       if (!res.ok) {
+        OddsPapiQuotaGuard.releaseQuota(reservation.reservationId!, {
+          endpoint: 'odds-by-tournaments',
+          params: { tournamentIds, bookmaker },
+          statusCode: res.status,
+          error: `HTTP ${res.status}`,
+        });
         return {
           status: 'DATA_UNAVAILABLE',
           provider: this.providerName,
@@ -250,6 +403,11 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
           timestamp,
         };
       }
+
+      await OddsPapiQuotaGuard.confirmQuota(reservation.reservationId!, {
+        endpoint: 'odds-by-tournaments',
+        params: { tournamentIds, bookmaker },
+      });
 
       const json = await res.json();
       const oddsList: LiveOddsDTO[] = this.parseOddsApiResponse(json, bookmaker, timestamp);
@@ -263,6 +421,11 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
         timestamp,
       };
     } catch (err) {
+      OddsPapiQuotaGuard.releaseQuota(reservation.reservationId!, {
+        endpoint: 'odds-by-tournaments',
+        params: { tournamentIds, bookmaker },
+        error: String(err),
+      });
       return {
         status: 'DATA_UNAVAILABLE',
         provider: this.providerName,
@@ -276,87 +439,23 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
   }
 
   /**
-   * Retrieves market odds for a single fixture across target bookmaker pair (Pinnacle, Bet365).
+   * Per-fixture /odds endpoint is blocked to prevent billable quota exhaustion.
+   * Odds are ingested strictly via single-batch /odds-by-tournaments.
    */
   public async getMarketOdds(
     fixtureId: string,
     bookmakers: string[] = ['pinnacle', 'bet365']
   ): Promise<ProviderResult<LiveOddsDTO[]>> {
-    const start = Date.now();
     const timestamp = new Date().toISOString();
-
-    if (!this.isConfigured()) {
-      return {
-        status: 'UNCONFIGURED',
-        provider: this.providerName,
-        data: null,
-        error: 'ODDS_PAPI_KEY is not configured in environment.',
-        latencyMs: 0,
-        cached: false,
-        timestamp,
-      };
-    }
-
-    try {
-      const apiKey = env.providers.oddsPapi.apiKey!;
-      const baseUrl = env.providers.oddsPapi.baseUrl;
-
-      const odds: LiveOddsDTO[] = [];
-
-      // Query target bookmakers sequentially with rate-limit respect
-      for (const b of bookmakers) {
-        const bookSlug = b.toLowerCase().trim();
-        const url = `${baseUrl}/odds?fixtureId=${encodeURIComponent(fixtureId)}&bookmaker=${encodeURIComponent(bookSlug)}&apiKey=${apiKey}`;
-
-        const res = await fetch(url, {
-          headers: { 'Accept': 'application/json' },
-          next: { revalidate: 60 },
-        });
-
-        if (res.status === 429) {
-          Logger.warn(`[OddsPapiProvider] Rate limit encountered on ${bookSlug} (429)`);
-          if (odds.length > 0) break; // Return what we have gathered so far
-          return {
-            status: 'RATE_LIMITED',
-            provider: this.providerName,
-            data: null,
-            error: 'Rate limit exceeded on OddsPapi subscription tier.',
-            latencyMs: Date.now() - start,
-            cached: false,
-            timestamp,
-          };
-        }
-
-        if (!res.ok) {
-          continue;
-        }
-
-        const json = await res.json();
-        const parsedOdds = this.parseOddsApiResponse(json, bookSlug, timestamp, fixtureId);
-        odds.push(...parsedOdds);
-      }
-
-      return {
-        status: odds.length > 0 ? 'AVAILABLE' : 'DATA_UNAVAILABLE',
-        provider: this.providerName,
-        data: odds,
-        latencyMs: Date.now() - start,
-        cached: false,
-        timestamp,
-      };
-    } catch (err) {
-      const latencyMs = Date.now() - start;
-      Logger.error('[OddsPapiProvider] Network failure:', { error: String(err), latencyMs });
-      return {
-        status: 'DATA_UNAVAILABLE',
-        provider: this.providerName,
-        data: null,
-        error: `Network failure connecting to OddsPapi: ${String(err)}`,
-        latencyMs,
-        cached: false,
-        timestamp,
-      };
-    }
+    return {
+      status: 'DATA_UNAVAILABLE',
+      provider: this.providerName,
+      data: null,
+      error: 'Per-fixture /odds endpoint is disabled to prevent quota exhaustion. Fixtures are ingested via API-Football and odds via single-batch /odds-by-tournaments.',
+      latencyMs: 0,
+      cached: false,
+      timestamp,
+    };
   }
 
   /**

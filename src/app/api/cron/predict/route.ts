@@ -1,9 +1,12 @@
-// SALMO.DEV — Production Prediction Cron Route
-// Scheduled automated prediction orchestrator.
-// Authenticates via CRON_SECRET and invokes native ProductionPredictionEngine.
+// SALMO.DEV — Production Prediction & Multi-League Auto-Unlock Cron Route
+// Scheduled automated prediction & quota-reset activation orchestrator.
+// Authenticates via CRON_SECRET, runs non-billable Quota-Reset Detector first,
+// and executes MultiLeagueAutoActivator + ProductionPredictionEngine when quota is available.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { ProductionPredictionEngine } from '@/engine/pipeline/productionPredictionEngine';
+import { MultiLeagueAutoActivator } from '@/engine/activation/multiLeagueAutoActivator';
+import { OddsPapiQuotaGuard } from '@/lib/quota/oddsPapiQuotaGuard';
 import { Logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
@@ -44,24 +47,68 @@ async function handleCron(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  if (process.env.ENABLE_PRODUCTION_CRON !== 'true') {
-    Logger.info('[Cron:predict] Prediction cron is disabled (ENABLE_PRODUCTION_CRON !== true)', { requestId });
+  // Always run non-billable quota-reset detector first (0 billable requests)
+  const quotaDetection = await OddsPapiQuotaGuard.detectQuotaReset(3);
+
+  // Explicit opt-out kill switch only when ENABLE_PRODUCTION_CRON === 'false'
+  if (process.env.ENABLE_PRODUCTION_CRON === 'false') {
+    Logger.info('[Cron:predict] Prediction cron is explicitly paused via kill-switch (ENABLE_PRODUCTION_CRON === false)', {
+      requestId,
+      quotaState: quotaDetection.state,
+    });
     return NextResponse.json({
       success: false,
       status: 'OFF',
-      message: 'Production prediction cron is explicitly disabled pending paid OddsPAPI key configuration.',
+      quotaState: quotaDetection.state,
+      quotaDetection,
+      message: 'Production prediction cron is explicitly paused via ENABLE_PRODUCTION_CRON=false.',
+    }, { status: 200 });
+  }
+
+  // Fail-closed if quota is still exhausted or unverified (0 billable requests made)
+  if (quotaDetection.state !== 'QUOTA_AVAILABLE') {
+    const autoUnlockState = await MultiLeagueAutoActivator.runAutoUnlockCycle({
+      mode: 'LIVE',
+      persistToDatabase: true,
+    });
+    const latencyMs = Date.now() - start;
+    Logger.info('[Cron:predict] Quota reset not yet available; holding multi-league gate closed with 0 billable requests.', {
+      requestId,
+      quotaState: quotaDetection.state,
+      reason: quotaDetection.reason,
+      latencyMs,
+    });
+    return NextResponse.json({
+      success: true,
+      status: quotaDetection.state,
+      billableRequestsMade: 0,
+      quotaDetection,
+      activeLeagues: autoUnlockState.activeLeaguesAfterRun,
+      shadowLeaguesCount: autoUnlockState.shadowLeaguesAfterRun.length,
+      latencyMs,
     }, { status: 200 });
   }
 
   try {
-    Logger.info('[Cron:predict] Starting automated production prediction cycle...', { requestId });
+    Logger.info('[Cron:predict] Quota reset verified! Running MultiLeagueAutoActivator & ProductionPredictionEngine...', {
+      requestId,
+      remainingOperationalBudget: quotaDetection.remainingOperationalBudget,
+    });
 
-    const result = await ProductionPredictionEngine.runPredictionCycle();
+    const autoUnlockResult = await MultiLeagueAutoActivator.runAutoUnlockCycle({
+      mode: 'LIVE',
+      persistToDatabase: true,
+    });
+    const result = await ProductionPredictionEngine.runPredictionCycle(
+      autoUnlockResult.evaluatedFixtures
+    );
     const latencyMs = Date.now() - start;
 
-    Logger.info('[Cron:predict] Production prediction cycle completed successfully', {
+    Logger.info('[Cron:predict] Production prediction & auto-unlock cycle completed successfully', {
       requestId,
       latencyMs,
+      leaguesPromoted: autoUnlockResult.leaguesPromoted,
+      billableRequestsMade: autoUnlockResult.billableRequestsMade,
       totalFixtures: result.stats.totalFixtures,
       persistedCount: result.persistedPicksCount,
       layakCount: result.stats.layakCount,
@@ -73,6 +120,10 @@ async function handleCron(request: NextRequest) {
       success: true,
       timestamp: result.timestampUtc,
       latencyMs,
+      quotaState: autoUnlockResult.quotaDetection.state,
+      billableRequestsMade: autoUnlockResult.billableRequestsMade,
+      leaguesPromoted: autoUnlockResult.leaguesPromoted,
+      activeLeagues: autoUnlockResult.activeLeaguesAfterRun,
       stats: result.stats,
       persistedPicksCount: result.persistedPicksCount,
     });

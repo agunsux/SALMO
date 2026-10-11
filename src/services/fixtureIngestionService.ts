@@ -10,6 +10,7 @@ import { FixtureIntegrityGuard } from '../lib/fixtureIntegrity';
 import { normalizeTeamKey } from '../engine/features/teamRatings';
 import { getDbClient } from '../lib/db';
 import { Logger } from '../lib/logger';
+import { CANONICAL_15_LEAGUES } from '../config/multiLeagueRegistry';
 import crypto from 'crypto';
 
 export interface RawObservation {
@@ -74,7 +75,7 @@ export class FixtureIngestionService {
   /**
    * Performs multi-source ingestion for candidate leagues.
    */
-  public async ingestLeagues(leagueIds: string[] = ['39']): Promise<IngestionRunReport> {
+  public async ingestLeagues(leagueIds: string[] = CANONICAL_15_LEAGUES.map(l => String(l.provider_league_id))): Promise<IngestionRunReport> {
     const timestamp = new Date().toISOString();
     const rawObservations: RawObservation[] = [];
     const sourcesQueried: string[] = ['OpenFootball'];

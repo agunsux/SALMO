@@ -47,6 +47,14 @@
       ]
     }
   ],
-  "crons": []
+  "crons": [
+    {
+      "path": "/api/cron/predict",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/settle",
+      "schedule": "0 22 * * *"
+    }
+  ]
 }
-

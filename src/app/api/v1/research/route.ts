@@ -28,6 +28,8 @@ export async function GET(request: NextRequest) {
       const fs = await import('fs');
       const path = await import('path');
       const candidatePaths = [
+        path.resolve(process.cwd(), 'data', 'verification', 'all_leagues_research_ledger.jsonl'),
+        path.resolve(process.cwd(), 'data', 'verification', 'staging_research_only_ledger.jsonl'),
         path.resolve(process.cwd(), 'data', 'verification', 'live_prediction_ledger.jsonl'),
         path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'ledger', 'rescue_prediction_ledger.jsonl'),
       ];
@@ -43,28 +45,49 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const settledCount = predictions.filter((p: any) => p.settlement === 'SETTLED' || p.settlementStatus === 'SETTLED' || p.status === 'SETTLED').length;
-    const pendingCount = predictions.filter((p: any) => p.settlement === 'PENDING' || p.settlementStatus === 'PENDING' || p.status === 'PENDING' || (!p.settlement && !p.settlementStatus)).length;
-    const dailyPicksCount = predictions.filter((p: any) => p.verdict === 'LAYAK' || p.isDailyPick).length;
+    const tierParam = (request.nextUrl?.searchParams?.get('tier') || 'ALL').toUpperCase();
+
+    const productionRows = predictions.filter((p: any) => (p.ledgerTier || 'PRODUCTION') === 'PRODUCTION');
+    const shadowRows = predictions.filter((p: any) => p.ledgerTier === 'SHADOW');
+    const unsupportedRows = predictions.filter((p: any) => p.ledgerTier === 'NONE');
+
+    const settledCount = productionRows.filter((p: any) => p.settlement === 'SETTLED' || p.settlementStatus === 'SETTLED' || p.status === 'SETTLED').length;
+    const pendingCount = productionRows.filter((p: any) => p.settlement === 'PENDING' || p.settlementStatus === 'PENDING' || p.status === 'PENDING' || (!p.settlement && !p.settlementStatus)).length;
+    const dailyPicksCount = productionRows.filter((p: any) => p.verdict === 'LAYAK' || p.isDailyPick).length;
+
+    const filteredPredictions =
+      tierParam === 'PRODUCTION' ? productionRows :
+      tierParam === 'SHADOW' ? shadowRows :
+      tierParam === 'NONE' ? unsupportedRows :
+      predictions;
 
     const counts = syncRes?.counts || {
       totalArchived: predictions.length,
+      productionRows: productionRows.length,
+      shadowRows: shadowRows.length,
+      unsupportedRows: unsupportedRows.length,
       dailyPicks: dailyPicksCount,
       settled: settledCount,
       pending: pendingCount,
+      byLedgerTier: {
+        PRODUCTION: productionRows.length,
+        SHADOW: shadowRows.length,
+        NONE: unsupportedRows.length,
+      },
     };
     const dataState = syncRes?.dataState || (predictions.length > 0 ? 'REAL' : 'NO_QUALIFIED_PICKS');
 
     const latencyMs = Date.now() - start;
-    Logger.info('GET /api/v1/research success', { requestId, totalPredictions: predictions.length, latencyMs });
+    Logger.info('GET /api/v1/research success', { requestId, totalPredictions: filteredPredictions.length, tier: tierParam, latencyMs });
 
     return NextResponse.json({
       success: true,
       version: 'v1',
       modelVersion: 'poisson_v1_rescue',
+      tierFilter: tierParam,
       dataState,
       counts,
-      predictions,
+      predictions: filteredPredictions,
       timestampUtc: syncRes?.timestampUtc || new Date().toISOString(),
       meta: {
         requestId,

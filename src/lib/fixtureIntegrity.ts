@@ -31,21 +31,21 @@ export class FixtureIntegrityGuard {
    */
   public static resolveLeaguePrefix(leagueName: string): string {
     const norm = (leagueName || '').toLowerCase().trim();
-    if (norm.includes('premier league') || norm === 'epl') return 'EPL';
-    if (norm.includes('la liga') || norm.includes('laliga')) return 'LALIGA';
-    if (norm.includes('serie a')) return 'SERIEA';
-    if (norm.includes('bundesliga')) return 'BUNDESLIGA';
-    if (norm.includes('ligue 1')) return 'LIGUE1';
-    if (norm.includes('eredivisie')) return 'EREDIVISIE';
-    if (norm.includes('primeira')) return 'PRIMEIRA';
-    if (norm.includes('pro league')) return 'BELPRO';
-    if (norm.includes('premiership')) return 'SCOPREM';
-    if (norm.includes('championship')) return 'ENGCHAMP';
-    if (norm.includes('mls')) return 'MLS';
-    if (norm.includes('saudi')) return 'SAUPRO';
-    if (norm.includes('j1') || norm.includes('jleague')) return 'J1';
-    if (norm.includes('k league') || norm.includes('k1')) return 'K1';
-    if (norm.includes('liga 1') || norm.includes('indonesia')) return 'IDNL1';
+    if (norm.includes('premier league') || norm === 'epl' || norm === 'eng-pl') return 'EPL';
+    if (norm.includes('la liga') || norm.includes('laliga') || norm === 'esp-laliga') return 'LALIGA';
+    if (norm.includes('serie a') || norm === 'ita-seriea') return 'SERIEA';
+    if (norm.includes('bundesliga') || norm === 'deu-bundesliga') return 'BUNDESLIGA';
+    if (norm.includes('ligue 1') || norm === 'fra-ligue1') return 'LIGUE1';
+    if (norm.includes('eredivisie') || norm === 'ned-ere') return 'EREDIVISIE';
+    if (norm.includes('primeira') || norm === 'por-primeira') return 'PRIMEIRA';
+    if (norm.includes('jupiler') || (norm.includes('pro league') && norm.includes('belg')) || norm === 'bel-pro') return 'BELPRO';
+    if (norm.includes('premiership') || norm === 'sco-prem') return 'SCOPREM';
+    if (norm.includes('championship') || norm === 'eng-champ') return 'ENGCHAMP';
+    if (norm.includes('major league soccer') || norm.includes('mls') || norm === 'usa-mls') return 'MLS';
+    if (norm.includes('saudi') || (norm.includes('pro league') && !norm.includes('jupiler')) || norm === 'sau-pro') return 'SAUPRO';
+    if (norm.includes('j1') || norm.includes('jleague') || norm === 'jpn-j1') return 'J1';
+    if (norm.includes('k league') || norm.includes('k1') || norm === 'kor-k1') return 'K1';
+    if (norm.includes('liga 1') || norm.includes('indonesia') || norm === 'idn-l1') return 'IDNL1';
     return norm.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) || 'LEAGUE';
   }
 

@@ -1,7 +1,7 @@
 // SALMO.DEV — Dynamic Team Ratings & Strength Engine
 // Computes attack and defense strengths using time-weighted exponential decay.
-// Provides calibrated Premier League baselines and dynamic updating.
-// Migrated from HandicapLab validated engine.
+// Provides calibrated Premier League baselines and empirical multi-league ratings.
+// Strictly prevents cross-league EPL rating leakage when leagueContext is non-EPL.
 
 export interface MatchData {
   home_team: string;
@@ -19,26 +19,50 @@ export interface TeamRating {
   attack_strength: number;
   defense_strength: number;
   matches_played: number;
+  cold_start?: boolean;
 }
 
 export function cleanTeamName(name: string): string {
-  return (name || '').toLowerCase().replace(/[\s-_.]/g, '');
+  return (name || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\b(fc|afc|cf|sc|ac|as|sv|vfb|vfl|bsc|tsg|fsv|rc|rcd|ud|cd|sd|ca|fk|sk|bk|if|ik|nk|hsk)\b/g, '')
+    .replace(/[\s-_.']/g, '');
 }
 
 export function isTeamMatch(name1: string, name2: string): boolean {
   const n1 = cleanTeamName(name1);
   const n2 = cleanTeamName(name2);
   if (!n1 || !n2) return false;
-  return n1.includes(n2) || n2.includes(n1);
+  return n1 === n2 || n1.includes(n2) || n2.includes(n1);
 }
 
+import { resolveTeam } from '../../config/teamAliasRegistry';
+import { getLeagueByNameOrSlug } from '../../config/multiLeagueRegistry';
+import { FixtureIntegrityGuard } from '../../lib/fixtureIntegrity';
+import multiLeagueArtifact from '../../../data/artifacts/multi_league_team_ratings_v1.0.json';
+
+export const CANONICAL_MULTI_LEAGUE_RATINGS: Record<string, Record<string, TeamRating>> =
+  (multiLeagueArtifact as any).leagues || {};
+
+export const MULTI_LEAGUE_BACKTEST_SUMMARY: Record<string, any> =
+  (multiLeagueArtifact as any).backtestSummary || {};
+
+export const MULTI_LEAGUE_PROFILES: Record<string, any> =
+  (multiLeagueArtifact as any).leagueProfiles || {};
+
 /**
- * Deterministically normalizes English Premier League club names across provider alias variants.
- * Collapses variants such as 'Brighton & Hove Albion' / 'Brighton' -> 'brighton',
- * 'Sunderland AFC' / 'Sunderland' -> 'sunderland',
- * and disambiguates 'Manchester City' ('mancity') vs 'Manchester United' ('manunited').
+ * Deterministically normalizes club names across provider alias variants.
+ * When leaguePrefix is provided, strictly validates against the league registry or returns UNMAPPED_TEAM.
  */
-export function normalizeTeamKey(teamName: string): string {
+export function normalizeTeamKey(teamName: string, leaguePrefix?: string): string {
+  if (leaguePrefix) {
+    const res = resolveTeam(teamName, leaguePrefix);
+    if (res.isMapped) return res.slug;
+    return 'UNMAPPED_TEAM';
+  }
+
   const lower = (teamName || '').toLowerCase().trim();
 
   // Explicit disambiguation for EPL clubs with distinct identities or rich aliases
@@ -74,7 +98,7 @@ export function normalizeTeamKey(teamName: string): string {
 
 /**
  * Calibrated baseline Premier League team ratings (2025/2026 season walk-forward baseline).
- * Serves as compact production parameters ensuring immediate cold-start availability.
+ * Serves as compact production parameters ensuring immediate cold-start availability for EPL ONLY.
  */
 export const CANONICAL_EPL_RATINGS: Record<string, TeamRating> = {
   'Manchester City': { team_id: 'mancity', team_name: 'Manchester City', league_id: 'EPL', attack_strength: 1.48, defense_strength: 0.72, matches_played: 38 },
@@ -140,6 +164,7 @@ export function calculateTeamRatings(recentMatches: MatchData[]): Record<string,
       attack_strength: 1.0,
       defense_strength: 1.0,
       matches_played: teamMatchesMap[team].length,
+      cold_start: teamMatchesMap[team].length < 10,
     };
   });
 
@@ -192,16 +217,78 @@ export function calculateTeamRatings(recentMatches: MatchData[]): Record<string,
 
 /**
  * Resolves team rating from memory or baseline by team name.
+ * Strictly isolates EPL ratings from non-EPL leagues when leagueContext is provided.
+ * If allowNeutralFallback is true and no rating is found, returns a neutral rating (1.0 attack / 1.0 defense).
  */
-export function resolveTeamRating(teamName: string, dynamicRatings?: Record<string, TeamRating>): TeamRating | null {
+export function resolveTeamRating(
+  teamName: string,
+  dynamicRatings?: Record<string, TeamRating>,
+  allowNeutralFallback: boolean = false,
+  leagueContext?: string
+): TeamRating | null {
   if (dynamicRatings) {
     for (const [name, rating] of Object.entries(dynamicRatings)) {
       if (isTeamMatch(name, teamName)) return rating;
     }
   }
 
-  for (const [name, rating] of Object.entries(CANONICAL_EPL_RATINGS)) {
-    if (isTeamMatch(name, teamName)) return rating;
+  if (leagueContext) {
+    const leagueEntry = getLeagueByNameOrSlug(leagueContext);
+    const internalId = leagueEntry ? leagueEntry.internal_league_id : leagueContext;
+    const isEplContext =
+      internalId === 'ENG-PL' ||
+      leagueContext.toUpperCase() === 'EPL' ||
+      leagueContext.toLowerCase().includes('premier league');
+
+    if (isEplContext) {
+      for (const [name, rating] of Object.entries(CANONICAL_EPL_RATINGS)) {
+        if (isTeamMatch(name, teamName)) return rating;
+      }
+    }
+
+    const leagueRatings =
+      CANONICAL_MULTI_LEAGUE_RATINGS[internalId] ||
+      CANONICAL_MULTI_LEAGUE_RATINGS[leagueContext];
+
+    if (leagueRatings) {
+      // 1. Direct or cleaned substring match
+      for (const [name, rating] of Object.entries(leagueRatings)) {
+        if (isTeamMatch(name, teamName)) return rating;
+      }
+      // 2. Canonical alias registry match within the same league prefix
+      const prefix = FixtureIntegrityGuard.resolveLeaguePrefix(leagueContext);
+      const targetRes = resolveTeam(teamName, prefix);
+      if (targetRes.isMapped) {
+        for (const [name, rating] of Object.entries(leagueRatings)) {
+          const candRes = resolveTeam(name, prefix);
+          if (candRes.isMapped && candRes.slug === targetRes.slug) {
+            return rating;
+          }
+        }
+      }
+    }
+  } else {
+    // Legacy fallback when no leagueContext is passed
+    for (const [name, rating] of Object.entries(CANONICAL_EPL_RATINGS)) {
+      if (isTeamMatch(name, teamName)) return rating;
+    }
+    for (const [, leagueRatings] of Object.entries(CANONICAL_MULTI_LEAGUE_RATINGS)) {
+      for (const [name, rating] of Object.entries(leagueRatings)) {
+        if (isTeamMatch(name, teamName)) return rating;
+      }
+    }
+  }
+
+  if (allowNeutralFallback) {
+    return {
+      team_id: cleanTeamName(teamName),
+      team_name: teamName,
+      league_id: 'TRANSFER_BASELINE',
+      attack_strength: 1.0,
+      defense_strength: 1.0,
+      matches_played: 0,
+      cold_start: true,
+    };
   }
 
   return null;

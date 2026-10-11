@@ -1,0 +1,3713 @@
+{
+  "provenance": {
+    "source": "Dribble360 (2023-2026) + API-Football Pro Verified Archive (2024-2025)",
+    "version": "multi-league-ratings-v2.0",
+    "generationMethod": "6-iteration normalized Dixon-Coles convergence (league mean = 1.0000, decay = 0.90, Bayesian shrinkage k = 6)",
+    "date": "2026-10-11",
+    "leaguesCovered": [
+      "ENG-PL",
+      "ESP-LALIGA",
+      "ITA-SERIEA",
+      "DEU-BUNDESLIGA",
+      "FRA-LIGUE1",
+      "NED-ERE",
+      "POR-PRIMEIRA",
+      "BEL-PRO",
+      "SCO-PREM",
+      "ENG-CHAMP",
+      "USA-MLS",
+      "SAU-PRO",
+      "JPN-J1",
+      "KOR-K1"
+    ]
+  },
+  "leagueProfiles": {
+    "ENG-PL": {
+      "leagueId": "ENG-PL",
+      "sampleMatches": 1329,
+      "minDate": "2023-03-04",
+      "maxDate": "2026-09-20",
+      "goalEnvironment": 2.9955,
+      "homeAdvantage": 0.5421,
+      "defaultRho": -0.13,
+      "dispersionRatio": 0.9239,
+      "teamsCount": 27,
+      "modelVersion": "dixon-coles-eng-pl-2026-10-11"
+    },
+    "ESP-LALIGA": {
+      "leagueId": "ESP-LALIGA",
+      "sampleMatches": 1359,
+      "minDate": "2023-03-03",
+      "maxDate": "2026-09-20",
+      "goalEnvironment": 2.6689,
+      "homeAdvantage": 0.5699,
+      "defaultRho": -0.04,
+      "dispersionRatio": 1.0226,
+      "teamsCount": 29,
+      "modelVersion": "dixon-coles-esp-laliga-2026-10-11"
+    },
+    "ITA-SERIEA": {
+      "leagueId": "ITA-SERIEA",
+      "sampleMatches": 1331,
+      "minDate": "2023-03-03",
+      "maxDate": "2026-09-20",
+      "goalEnvironment": 2.5522,
+      "homeAdvantage": 0.5334,
+      "defaultRho": 0.04,
+      "dispersionRatio": 0.9388,
+      "teamsCount": 27,
+      "modelVersion": "dixon-coles-ita-seriea-2026-10-11"
+    },
+    "DEU-BUNDESLIGA": {
+      "leagueId": "DEU-BUNDESLIGA",
+      "sampleMatches": 1061,
+      "minDate": "2023-03-03",
+      "maxDate": "2026-09-20",
+      "goalEnvironment": 3.2111,
+      "homeAdvantage": 0.5521,
+      "defaultRho": -0.06,
+      "dispersionRatio": 0.9782,
+      "teamsCount": 25,
+      "modelVersion": "dixon-coles-deu-bundesliga-2026-10-11"
+    },
+    "FRA-LIGUE1": {
+      "leagueId": "FRA-LIGUE1",
+      "sampleMatches": 1091,
+      "minDate": "2023-03-03",
+      "maxDate": "2026-09-20",
+      "goalEnvironment": 2.8213,
+      "homeAdvantage": 0.5448,
+      "defaultRho": -0.03,
+      "dispersionRatio": 1.0306,
+      "teamsCount": 25,
+      "modelVersion": "dixon-coles-fra-ligue1-2026-10-11"
+    },
+    "NED-ERE": {
+      "leagueId": "NED-ERE",
+      "sampleMatches": 1095,
+      "minDate": "2023-03-03",
+      "maxDate": "2026-09-20",
+      "goalEnvironment": 3.1945,
+      "homeAdvantage": 0.5543,
+      "defaultRho": -0.11,
+      "dispersionRatio": 0.9318,
+      "teamsCount": 25,
+      "modelVersion": "dixon-coles-ned-ere-2026-10-11"
+    },
+    "POR-PRIMEIRA": {
+      "leagueId": "POR-PRIMEIRA",
+      "sampleMatches": 1088,
+      "minDate": "2023-03-03",
+      "maxDate": "2026-09-20",
+      "goalEnvironment": 2.6939,
+      "homeAdvantage": 0.5486,
+      "defaultRho": -0.06,
+      "dispersionRatio": 0.9461,
+      "teamsCount": 26,
+      "modelVersion": "dixon-coles-por-primeira-2026-10-11"
+    },
+    "BEL-PRO": {
+      "leagueId": "BEL-PRO",
+      "sampleMatches": 1087,
+      "minDate": "2023-03-03",
+      "maxDate": "2026-09-20",
+      "goalEnvironment": 2.8086,
+      "homeAdvantage": 0.5578,
+      "defaultRho": -0.06,
+      "dispersionRatio": 1.0332,
+      "teamsCount": 24,
+      "modelVersion": "dixon-coles-bel-pro-2026-10-11"
+    },
+    "SCO-PREM": {
+      "leagueId": "SCO-PREM",
+      "sampleMatches": 468,
+      "minDate": "2024-08-03",
+      "maxDate": "2026-05-25",
+      "goalEnvironment": 2.8483,
+      "homeAdvantage": 0.5694,
+      "defaultRho": -0.01,
+      "dispersionRatio": 0.9259,
+      "teamsCount": 18,
+      "modelVersion": "dixon-coles-sco-prem-2026-10-11"
+    },
+    "ENG-CHAMP": {
+      "leagueId": "ENG-CHAMP",
+      "sampleMatches": 1114,
+      "minDate": "2024-08-09",
+      "maxDate": "2026-05-23",
+      "goalEnvironment": 2.5233,
+      "homeAdvantage": 0.5599,
+      "defaultRho": -0.14,
+      "dispersionRatio": 0.915,
+      "teamsCount": 30,
+      "modelVersion": "dixon-coles-eng-champ-2026-10-11"
+    },
+    "USA-MLS": {
+      "leagueId": "USA-MLS",
+      "sampleMatches": 1975,
+      "minDate": "2023-03-04",
+      "maxDate": "2026-10-07",
+      "goalEnvironment": 3.1023,
+      "homeAdvantage": 0.569,
+      "defaultRho": -0.02,
+      "dispersionRatio": 1.2253,
+      "teamsCount": 30,
+      "modelVersion": "dixon-coles-usa-mls-2026-10-11"
+    },
+    "SAU-PRO": {
+      "leagueId": "SAU-PRO",
+      "sampleMatches": 1076,
+      "minDate": "2023-03-03",
+      "maxDate": "2026-09-13",
+      "goalEnvironment": 2.9526,
+      "homeAdvantage": 0.5266,
+      "defaultRho": -0.14,
+      "dispersionRatio": 1.0118,
+      "teamsCount": 27,
+      "modelVersion": "dixon-coles-sau-pro-2026-10-11"
+    },
+    "JPN-J1": {
+      "leagueId": "JPN-J1",
+      "sampleMatches": 760,
+      "minDate": "2024-02-23",
+      "maxDate": "2025-12-06",
+      "goalEnvironment": 2.5316,
+      "homeAdvantage": 0.5411,
+      "defaultRho": 0.04,
+      "dispersionRatio": 1.1264,
+      "teamsCount": 23,
+      "modelVersion": "dixon-coles-jpn-j1-2026-10-11"
+    },
+    "KOR-K1": {
+      "leagueId": "KOR-K1",
+      "sampleMatches": 464,
+      "minDate": "2024-03-01",
+      "maxDate": "2025-12-08",
+      "goalEnvironment": 2.5862,
+      "homeAdvantage": 0.5467,
+      "defaultRho": 0.04,
+      "dispersionRatio": 1.0121,
+      "teamsCount": 17,
+      "modelVersion": "dixon-coles-kor-k1-2026-10-11"
+    },
+    "IDN-L1": {
+      "leagueId": "IDN-L1",
+      "sampleMatches": 0,
+      "minDate": null,
+      "maxDate": null,
+      "goalEnvironment": null,
+      "homeAdvantage": null,
+      "defaultRho": null,
+      "dispersionRatio": null,
+      "teamsCount": 0,
+      "modelVersion": null
+    }
+  },
+  "backtestSummary": {
+    "ENG-PL": {
+      "nTrainInitial": 1029,
+      "nEval": 300,
+      "ou25": {
+        "brier": 0.2606,
+        "logLoss": 0.7158,
+        "calibrationSlope": -0.3235,
+        "calibrationIntercept": 0.713
+      },
+      "ahHomeMinus05": {
+        "brier": 0.2188,
+        "logLoss": 0.625,
+        "calibrationSlope": 0.8707,
+        "calibrationIntercept": 0.01
+      }
+    },
+    "ESP-LALIGA": {
+      "nTrainInitial": 1059,
+      "nEval": 300,
+      "ou25": {
+        "brier": 0.2481,
+        "logLoss": 0.6895,
+        "calibrationSlope": 0.6252,
+        "calibrationIntercept": 0.2311
+      },
+      "ahHomeMinus05": {
+        "brier": 0.2288,
+        "logLoss": 0.6506,
+        "calibrationSlope": 0.8948,
+        "calibrationIntercept": 0.0871
+      }
+    },
+    "ITA-SERIEA": {
+      "nTrainInitial": 1031,
+      "nEval": 300,
+      "ou25": {
+        "brier": 0.2577,
+        "logLoss": 0.7101,
+        "calibrationSlope": 0.1719,
+        "calibrationIntercept": 0.4077
+      },
+      "ahHomeMinus05": {
+        "brier": 0.2116,
+        "logLoss": 0.6112,
+        "calibrationSlope": 0.9301,
+        "calibrationIntercept": 0.0267
+      }
+    },
+    "DEU-BUNDESLIGA": {
+      "nTrainInitial": 761,
+      "nEval": 300,
+      "ou25": {
+        "brier": 0.2306,
+        "logLoss": 0.6517,
+        "calibrationSlope": 0.5545,
+        "calibrationIntercept": 0.321
+      },
+      "ahHomeMinus05": {
+        "brier": 0.2016,
+        "logLoss": 0.5912,
+        "calibrationSlope": 1.1721,
+        "calibrationIntercept": -0.0604
+      }
+    },
+    "FRA-LIGUE1": {
+      "nTrainInitial": 791,
+      "nEval": 300,
+      "ou25": {
+        "brier": 0.2436,
+        "logLoss": 0.6806,
+        "calibrationSlope": 0.7251,
+        "calibrationIntercept": 0.1478
+      },
+      "ahHomeMinus05": {
+        "brier": 0.2258,
+        "logLoss": 0.6423,
+        "calibrationSlope": 0.8476,
+        "calibrationIntercept": 0.0547
+      }
+    },
+    "NED-ERE": {
+      "nTrainInitial": 795,
+      "nEval": 300,
+      "ou25": {
+        "brier": 0.228,
+        "logLoss": 0.6449,
+        "calibrationSlope": 0.7448,
+        "calibrationIntercept": 0.1757
+      },
+      "ahHomeMinus05": {
+        "brier": 0.213,
+        "logLoss": 0.6155,
+        "calibrationSlope": 0.9737,
+        "calibrationIntercept": -0.0421
+      }
+    },
+    "POR-PRIMEIRA": {
+      "nTrainInitial": 788,
+      "nEval": 300,
+      "ou25": {
+        "brier": 0.2425,
+        "logLoss": 0.6777,
+        "calibrationSlope": 0.7888,
+        "calibrationIntercept": 0.1592
+      },
+      "ahHomeMinus05": {
+        "brier": 0.1863,
+        "logLoss": 0.5533,
+        "calibrationSlope": 1.0861,
+        "calibrationIntercept": -0.0566
+      }
+    },
+    "BEL-PRO": {
+      "nTrainInitial": 787,
+      "nEval": 300,
+      "ou25": {
+        "brier": 0.2631,
+        "logLoss": 0.7214,
+        "calibrationSlope": 0.0206,
+        "calibrationIntercept": 0.5232
+      },
+      "ahHomeMinus05": {
+        "brier": 0.2197,
+        "logLoss": 0.6279,
+        "calibrationSlope": 1.0526,
+        "calibrationIntercept": -0.0275
+      }
+    },
+    "SCO-PREM": {
+      "nTrainInitial": 258,
+      "nEval": 210,
+      "ou25": {
+        "brier": 0.2434,
+        "logLoss": 0.6798,
+        "calibrationSlope": 0.8641,
+        "calibrationIntercept": 0.064
+      },
+      "ahHomeMinus05": {
+        "brier": 0.2199,
+        "logLoss": 0.6309,
+        "calibrationSlope": 1.0332,
+        "calibrationIntercept": 0.0031
+      }
+    },
+    "ENG-CHAMP": {
+      "nTrainInitial": 814,
+      "nEval": 300,
+      "ou25": {
+        "brier": 0.2534,
+        "logLoss": 0.7011,
+        "calibrationSlope": 0.3368,
+        "calibrationIntercept": 0.3386
+      },
+      "ahHomeMinus05": {
+        "brier": 0.2239,
+        "logLoss": 0.6388,
+        "calibrationSlope": 1.0891,
+        "calibrationIntercept": -0.0768
+      }
+    },
+    "USA-MLS": {
+      "nTrainInitial": 1675,
+      "nEval": 300,
+      "ou25": {
+        "brier": 0.238,
+        "logLoss": 0.6686,
+        "calibrationSlope": 0.3222,
+        "calibrationIntercept": 0.441
+      },
+      "ahHomeMinus05": {
+        "brier": 0.2499,
+        "logLoss": 0.6943,
+        "calibrationSlope": 0.4393,
+        "calibrationIntercept": 0.2318
+      }
+    },
+    "SAU-PRO": {
+      "nTrainInitial": 776,
+      "nEval": 300,
+      "ou25": {
+        "brier": 0.2547,
+        "logLoss": 0.7024,
+        "calibrationSlope": 0.179,
+        "calibrationIntercept": 0.4543
+      },
+      "ahHomeMinus05": {
+        "brier": 0.1956,
+        "logLoss": 0.5691,
+        "calibrationSlope": 1.049,
+        "calibrationIntercept": 0.0065
+      }
+    },
+    "JPN-J1": {
+      "nTrainInitial": 460,
+      "nEval": 300,
+      "ou25": {
+        "brier": 0.2431,
+        "logLoss": 0.6798,
+        "calibrationSlope": 0.8381,
+        "calibrationIntercept": 0.113
+      },
+      "ahHomeMinus05": {
+        "brier": 0.2315,
+        "logLoss": 0.6536,
+        "calibrationSlope": 1.1886,
+        "calibrationIntercept": -0.0403
+      }
+    },
+    "KOR-K1": {
+      "nTrainInitial": 256,
+      "nEval": 208,
+      "ou25": {
+        "brier": 0.2484,
+        "logLoss": 0.6908,
+        "calibrationSlope": 0.5819,
+        "calibrationIntercept": 0.2064
+      },
+      "ahHomeMinus05": {
+        "brier": 0.2365,
+        "logLoss": 0.6649,
+        "calibrationSlope": 0.9236,
+        "calibrationIntercept": 0.0198
+      }
+    },
+    "IDN-L1": null
+  },
+  "leagues": {
+    "ENG-PL": {
+      "Manchester City": {
+        "team_id": "Manchester City",
+        "team_name": "Manchester City",
+        "league_id": "ENG-PL",
+        "attack_strength": 1.5752,
+        "defense_strength": 0.6626,
+        "matches_played": 132,
+        "cold_start": false
+      },
+      "Newcastle United": {
+        "team_id": "Newcastle United",
+        "team_name": "Newcastle United",
+        "league_id": "ENG-PL",
+        "attack_strength": 1.1767,
+        "defense_strength": 1.0034,
+        "matches_played": 134,
+        "cold_start": false
+      },
+      "Chelsea": {
+        "team_id": "Chelsea",
+        "team_name": "Chelsea",
+        "league_id": "ENG-PL",
+        "attack_strength": 1.2081,
+        "defense_strength": 1.0571,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Leeds United": {
+        "team_id": "Leeds United",
+        "team_name": "Leeds United",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.9869,
+        "defense_strength": 0.8173,
+        "matches_played": 57,
+        "cold_start": false
+      },
+      "Wolverhampton Wanderers": {
+        "team_id": "Wolverhampton Wanderers",
+        "team_name": "Wolverhampton Wanderers",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.6768,
+        "defense_strength": 1.0562,
+        "matches_played": 127,
+        "cold_start": false
+      },
+      "Tottenham Hotspur": {
+        "team_id": "Tottenham Hotspur",
+        "team_name": "Tottenham Hotspur",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.8177,
+        "defense_strength": 1.0056,
+        "matches_played": 132,
+        "cold_start": false
+      },
+      "Arsenal": {
+        "team_id": "Arsenal",
+        "team_name": "Arsenal",
+        "league_id": "ENG-PL",
+        "attack_strength": 1.2796,
+        "defense_strength": 0.5047,
+        "matches_played": 132,
+        "cold_start": false
+      },
+      "Bournemouth": {
+        "team_id": "Bournemouth",
+        "team_name": "Bournemouth",
+        "league_id": "ENG-PL",
+        "attack_strength": 1.1693,
+        "defense_strength": 0.794,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Brighton & Hove Albion": {
+        "team_id": "Brighton & Hove Albion",
+        "team_name": "Brighton & Hove Albion",
+        "league_id": "ENG-PL",
+        "attack_strength": 1.3678,
+        "defense_strength": 0.7414,
+        "matches_played": 135,
+        "cold_start": false
+      },
+      "West Ham United": {
+        "team_id": "West Ham United",
+        "team_name": "West Ham United",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.9538,
+        "defense_strength": 0.9429,
+        "matches_played": 128,
+        "cold_start": false
+      },
+      "Aston Villa": {
+        "team_id": "Aston Villa",
+        "team_name": "Aston Villa",
+        "league_id": "ENG-PL",
+        "attack_strength": 1.122,
+        "defense_strength": 0.9634,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Crystal Palace": {
+        "team_id": "Crystal Palace",
+        "team_name": "Crystal Palace",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.9112,
+        "defense_strength": 1.037,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Southampton": {
+        "team_id": "Southampton",
+        "team_name": "Southampton",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.6416,
+        "defense_strength": 1.4319,
+        "matches_played": 52,
+        "cold_start": false
+      },
+      "Leicester City": {
+        "team_id": "Leicester City",
+        "team_name": "Leicester City",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.6571,
+        "defense_strength": 1.246,
+        "matches_played": 52,
+        "cold_start": false
+      },
+      "Nottingham Forest": {
+        "team_id": "Nottingham Forest",
+        "team_name": "Nottingham Forest",
+        "league_id": "ENG-PL",
+        "attack_strength": 1.0348,
+        "defense_strength": 0.7557,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Everton": {
+        "team_id": "Everton",
+        "team_name": "Everton",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.9599,
+        "defense_strength": 0.7851,
+        "matches_played": 132,
+        "cold_start": false
+      },
+      "Liverpool": {
+        "team_id": "Liverpool",
+        "team_name": "Liverpool",
+        "league_id": "ENG-PL",
+        "attack_strength": 1.2552,
+        "defense_strength": 0.811,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Manchester United": {
+        "team_id": "Manchester United",
+        "team_name": "Manchester United",
+        "league_id": "ENG-PL",
+        "attack_strength": 1.3382,
+        "defense_strength": 0.8965,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Brentford": {
+        "team_id": "Brentford",
+        "team_name": "Brentford",
+        "league_id": "ENG-PL",
+        "attack_strength": 1.1419,
+        "defense_strength": 0.8081,
+        "matches_played": 134,
+        "cold_start": false
+      },
+      "Fulham": {
+        "team_id": "Fulham",
+        "team_name": "Fulham",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.8123,
+        "defense_strength": 0.8573,
+        "matches_played": 132,
+        "cold_start": false
+      },
+      "Burnley": {
+        "team_id": "Burnley",
+        "team_name": "Burnley",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.7569,
+        "defense_strength": 1.2414,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Sheffield United": {
+        "team_id": "Sheffield United",
+        "team_name": "Sheffield United",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.7405,
+        "defense_strength": 1.6995,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Luton Town": {
+        "team_id": "Luton Town",
+        "team_name": "Luton Town",
+        "league_id": "ENG-PL",
+        "attack_strength": 1.077,
+        "defense_strength": 1.4842,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Ipswich Town": {
+        "team_id": "Ipswich Town",
+        "team_name": "Ipswich Town",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.8254,
+        "defense_strength": 1.386,
+        "matches_played": 43,
+        "cold_start": false
+      },
+      "Sunderland": {
+        "team_id": "Sunderland",
+        "team_name": "Sunderland",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.9548,
+        "defense_strength": 0.9632,
+        "matches_played": 43,
+        "cold_start": false
+      },
+      "Coventry City": {
+        "team_id": "Coventry City",
+        "team_name": "Coventry City",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.6739,
+        "defense_strength": 1.1255,
+        "matches_played": 5,
+        "cold_start": true
+      },
+      "Hull City": {
+        "team_id": "Hull City",
+        "team_name": "Hull City",
+        "league_id": "ENG-PL",
+        "attack_strength": 0.8854,
+        "defense_strength": 0.9229,
+        "matches_played": 5,
+        "cold_start": true
+      }
+    },
+    "ESP-LALIGA": {
+      "Real Sociedad": {
+        "team_id": "Real Sociedad",
+        "team_name": "Real Sociedad",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 1.1853,
+        "defense_strength": 1.1629,
+        "matches_played": 136,
+        "cold_start": false
+      },
+      "Cádiz": {
+        "team_id": "Cádiz",
+        "team_name": "Cádiz",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.5836,
+        "defense_strength": 0.998,
+        "matches_played": 53,
+        "cold_start": false
+      },
+      "Getafe": {
+        "team_id": "Getafe",
+        "team_name": "Getafe",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.58,
+        "defense_strength": 0.655,
+        "matches_played": 136,
+        "cold_start": false
+      },
+      "Girona": {
+        "team_id": "Girona",
+        "team_name": "Girona",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.8542,
+        "defense_strength": 0.9262,
+        "matches_played": 129,
+        "cold_start": false
+      },
+      "Almería": {
+        "team_id": "Almería",
+        "team_name": "Almería",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 1.0458,
+        "defense_strength": 1.2983,
+        "matches_played": 53,
+        "cold_start": false
+      },
+      "Villarreal": {
+        "team_id": "Villarreal",
+        "team_name": "Villarreal",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 1.4352,
+        "defense_strength": 0.9903,
+        "matches_played": 136,
+        "cold_start": false
+      },
+      "Mallorca": {
+        "team_id": "Mallorca",
+        "team_name": "Mallorca",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.9568,
+        "defense_strength": 0.967,
+        "matches_played": 129,
+        "cold_start": false
+      },
+      "Elche": {
+        "team_id": "Elche",
+        "team_name": "Elche",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 1.0802,
+        "defense_strength": 1.0626,
+        "matches_played": 60,
+        "cold_start": false
+      },
+      "Atlético de Madrid": {
+        "team_id": "Atlético de Madrid",
+        "team_name": "Atlético de Madrid",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 1.3773,
+        "defense_strength": 0.7434,
+        "matches_played": 136,
+        "cold_start": false
+      },
+      "Sevilla": {
+        "team_id": "Sevilla",
+        "team_name": "Sevilla",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.9908,
+        "defense_strength": 0.9027,
+        "matches_played": 136,
+        "cold_start": false
+      },
+      "Real Valladolid": {
+        "team_id": "Real Valladolid",
+        "team_name": "Real Valladolid",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.6408,
+        "defense_strength": 1.5861,
+        "matches_played": 53,
+        "cold_start": false
+      },
+      "Espanyol": {
+        "team_id": "Espanyol",
+        "team_name": "Espanyol",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.9277,
+        "defense_strength": 0.9667,
+        "matches_played": 98,
+        "cold_start": false
+      },
+      "Barcelona": {
+        "team_id": "Barcelona",
+        "team_name": "Barcelona",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 2.1556,
+        "defense_strength": 0.7005,
+        "matches_played": 136,
+        "cold_start": false
+      },
+      "Valencia": {
+        "team_id": "Valencia",
+        "team_name": "Valencia",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.8899,
+        "defense_strength": 0.9452,
+        "matches_played": 136,
+        "cold_start": false
+      },
+      "Rayo Vallecano": {
+        "team_id": "Rayo Vallecano",
+        "team_name": "Rayo Vallecano",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 1.0292,
+        "defense_strength": 0.8984,
+        "matches_played": 136,
+        "cold_start": false
+      },
+      "Athletic Club": {
+        "team_id": "Athletic Club",
+        "team_name": "Athletic Club",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.981,
+        "defense_strength": 0.8929,
+        "matches_played": 135,
+        "cold_start": false
+      },
+      "Real Betis": {
+        "team_id": "Real Betis",
+        "team_name": "Real Betis",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 1.1756,
+        "defense_strength": 0.7774,
+        "matches_played": 136,
+        "cold_start": false
+      },
+      "Real Madrid": {
+        "team_id": "Real Madrid",
+        "team_name": "Real Madrid",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 1.5671,
+        "defense_strength": 0.6911,
+        "matches_played": 136,
+        "cold_start": false
+      },
+      "Osasuna": {
+        "team_id": "Osasuna",
+        "team_name": "Osasuna",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.8699,
+        "defense_strength": 1.0403,
+        "matches_played": 136,
+        "cold_start": false
+      },
+      "Celta de Vigo": {
+        "team_id": "Celta de Vigo",
+        "team_name": "Celta de Vigo",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 1.0339,
+        "defense_strength": 0.9434,
+        "matches_played": 136,
+        "cold_start": false
+      },
+      "Las Palmas": {
+        "team_id": "Las Palmas",
+        "team_name": "Las Palmas",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.7725,
+        "defense_strength": 1.1106,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Alavés": {
+        "team_id": "Alavés",
+        "team_name": "Alavés",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 1.0141,
+        "defense_strength": 0.9696,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Granada": {
+        "team_id": "Granada",
+        "team_name": "Granada",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.716,
+        "defense_strength": 1.3678,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Leganés": {
+        "team_id": "Leganés",
+        "team_name": "Leganés",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.8698,
+        "defense_strength": 0.9741,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Real Oviedo": {
+        "team_id": "Real Oviedo",
+        "team_name": "Real Oviedo",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.6172,
+        "defense_strength": 0.9946,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Levante": {
+        "team_id": "Levante",
+        "team_name": "Levante",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 1.0386,
+        "defense_strength": 1.027,
+        "matches_played": 44,
+        "cold_start": false
+      },
+      "Racing de Santander": {
+        "team_id": "Racing de Santander",
+        "team_name": "Racing de Santander",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 1.0135,
+        "defense_strength": 1.3443,
+        "matches_played": 7,
+        "cold_start": true
+      },
+      "Deportivo de A Coruña": {
+        "team_id": "Deportivo de A Coruña",
+        "team_name": "Deportivo de A Coruña",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.9711,
+        "defense_strength": 1.012,
+        "matches_played": 7,
+        "cold_start": true
+      },
+      "Málaga": {
+        "team_id": "Málaga",
+        "team_name": "Málaga",
+        "league_id": "ESP-LALIGA",
+        "attack_strength": 0.6276,
+        "defense_strength": 1.0518,
+        "matches_played": 7,
+        "cold_start": true
+      }
+    },
+    "ITA-SERIEA": {
+      "Napoli": {
+        "team_id": "Napoli",
+        "team_name": "Napoli",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 1.233,
+        "defense_strength": 0.6966,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Lazio": {
+        "team_id": "Lazio",
+        "team_name": "Lazio",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 1.0199,
+        "defense_strength": 0.7378,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Monza": {
+        "team_id": "Monza",
+        "team_name": "Monza",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.7781,
+        "defense_strength": 1.4112,
+        "matches_played": 95,
+        "cold_start": false
+      },
+      "Empoli": {
+        "team_id": "Empoli",
+        "team_name": "Empoli",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.7464,
+        "defense_strength": 1.2062,
+        "matches_played": 90,
+        "cold_start": false
+      },
+      "Atalanta": {
+        "team_id": "Atalanta",
+        "team_name": "Atalanta",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 1.1612,
+        "defense_strength": 0.7748,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Udinese": {
+        "team_id": "Udinese",
+        "team_name": "Udinese",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 1.1058,
+        "defense_strength": 0.9798,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Fiorentina": {
+        "team_id": "Fiorentina",
+        "team_name": "Fiorentina",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 1.0035,
+        "defense_strength": 0.9779,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Milan": {
+        "team_id": "Milan",
+        "team_name": "Milan",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 1.2348,
+        "defense_strength": 0.774,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Spezia": {
+        "team_id": "Spezia",
+        "team_name": "Spezia",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.749,
+        "defense_strength": 1.3049,
+        "matches_played": 15,
+        "cold_start": false
+      },
+      "Hellas Verona": {
+        "team_id": "Hellas Verona",
+        "team_name": "Hellas Verona",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.5972,
+        "defense_strength": 1.041,
+        "matches_played": 129,
+        "cold_start": false
+      },
+      "Sampdoria": {
+        "team_id": "Sampdoria",
+        "team_name": "Sampdoria",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.7568,
+        "defense_strength": 1.4244,
+        "matches_played": 14,
+        "cold_start": false
+      },
+      "Salernitana": {
+        "team_id": "Salernitana",
+        "team_name": "Salernitana",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.8885,
+        "defense_strength": 1.4966,
+        "matches_played": 52,
+        "cold_start": false
+      },
+      "Internazionale": {
+        "team_id": "Internazionale",
+        "team_name": "Internazionale",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 2.1395,
+        "defense_strength": 0.8086,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Lecce": {
+        "team_id": "Lecce",
+        "team_name": "Lecce",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.6411,
+        "defense_strength": 0.9755,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Roma": {
+        "team_id": "Roma",
+        "team_name": "Roma",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 1.6206,
+        "defense_strength": 0.5405,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Juventus": {
+        "team_id": "Juventus",
+        "team_name": "Juventus",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 1.3008,
+        "defense_strength": 0.6402,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Sassuolo": {
+        "team_id": "Sassuolo",
+        "team_name": "Sassuolo",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 1.13,
+        "defense_strength": 1.127,
+        "matches_played": 95,
+        "cold_start": false
+      },
+      "Cremonese": {
+        "team_id": "Cremonese",
+        "team_name": "Cremonese",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.7235,
+        "defense_strength": 1.0706,
+        "matches_played": 52,
+        "cold_start": false
+      },
+      "Torino": {
+        "team_id": "Torino",
+        "team_name": "Torino",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.9976,
+        "defense_strength": 1.0385,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Bologna": {
+        "team_id": "Bologna",
+        "team_name": "Bologna",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.9569,
+        "defense_strength": 0.8986,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Frosinone": {
+        "team_id": "Frosinone",
+        "team_name": "Frosinone",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.9776,
+        "defense_strength": 1.0368,
+        "matches_played": 43,
+        "cold_start": false
+      },
+      "Genoa": {
+        "team_id": "Genoa",
+        "team_name": "Genoa",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.8221,
+        "defense_strength": 0.9896,
+        "matches_played": 119,
+        "cold_start": false
+      },
+      "Cagliari": {
+        "team_id": "Cagliari",
+        "team_name": "Cagliari",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.8982,
+        "defense_strength": 0.8581,
+        "matches_played": 119,
+        "cold_start": false
+      },
+      "Parma": {
+        "team_id": "Parma",
+        "team_name": "Parma",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.7403,
+        "defense_strength": 0.8906,
+        "matches_played": 81,
+        "cold_start": false
+      },
+      "Venezia": {
+        "team_id": "Venezia",
+        "team_name": "Venezia",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.7387,
+        "defense_strength": 1.2861,
+        "matches_played": 43,
+        "cold_start": false
+      },
+      "Como": {
+        "team_id": "Como",
+        "team_name": "Como",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 1.4211,
+        "defense_strength": 0.6742,
+        "matches_played": 81,
+        "cold_start": false
+      },
+      "Pisa": {
+        "team_id": "Pisa",
+        "team_name": "Pisa",
+        "league_id": "ITA-SERIEA",
+        "attack_strength": 0.6176,
+        "defense_strength": 1.3398,
+        "matches_played": 38,
+        "cold_start": false
+      }
+    },
+    "DEU-BUNDESLIGA": {
+      "Borussia Dortmund": {
+        "team_id": "Borussia Dortmund",
+        "team_name": "Borussia Dortmund",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 1.3257,
+        "defense_strength": 0.5923,
+        "matches_played": 118,
+        "cold_start": false
+      },
+      "RB Leipzig": {
+        "team_id": "RB Leipzig",
+        "team_name": "RB Leipzig",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 1.1704,
+        "defense_strength": 0.8045,
+        "matches_played": 118,
+        "cold_start": false
+      },
+      "Borussia M'gladbach": {
+        "team_id": "Borussia M'gladbach",
+        "team_name": "Borussia M'gladbach",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.8633,
+        "defense_strength": 1.0824,
+        "matches_played": 118,
+        "cold_start": false
+      },
+      "Freiburg": {
+        "team_id": "Freiburg",
+        "team_name": "Freiburg",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 1.1096,
+        "defense_strength": 0.8461,
+        "matches_played": 118,
+        "cold_start": false
+      },
+      "Mainz 05": {
+        "team_id": "Mainz 05",
+        "team_name": "Mainz 05",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 1.0774,
+        "defense_strength": 0.8629,
+        "matches_played": 118,
+        "cold_start": false
+      },
+      "Hoffenheim": {
+        "team_id": "Hoffenheim",
+        "team_name": "Hoffenheim",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 1.148,
+        "defense_strength": 1.0649,
+        "matches_played": 118,
+        "cold_start": false
+      },
+      "Bochum": {
+        "team_id": "Bochum",
+        "team_name": "Bochum",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.7257,
+        "defense_strength": 1.0671,
+        "matches_played": 79,
+        "cold_start": false
+      },
+      "Schalke 04": {
+        "team_id": "Schalke 04",
+        "team_name": "Schalke 04",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.8551,
+        "defense_strength": 1.0352,
+        "matches_played": 16,
+        "cold_start": false
+      },
+      "Union Berlin": {
+        "team_id": "Union Berlin",
+        "team_name": "Union Berlin",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.8099,
+        "defense_strength": 1.1507,
+        "matches_played": 117,
+        "cold_start": false
+      },
+      "Köln": {
+        "team_id": "Köln",
+        "team_name": "Köln",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.8644,
+        "defense_strength": 1.1281,
+        "matches_played": 84,
+        "cold_start": false
+      },
+      "Augsburg": {
+        "team_id": "Augsburg",
+        "team_name": "Augsburg",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 1.0263,
+        "defense_strength": 0.9759,
+        "matches_played": 118,
+        "cold_start": false
+      },
+      "Werder Bremen": {
+        "team_id": "Werder Bremen",
+        "team_name": "Werder Bremen",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.807,
+        "defense_strength": 0.9781,
+        "matches_played": 118,
+        "cold_start": false
+      },
+      "Stuttgart": {
+        "team_id": "Stuttgart",
+        "team_name": "Stuttgart",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 1.3241,
+        "defense_strength": 0.8204,
+        "matches_played": 118,
+        "cold_start": false
+      },
+      "Bayern München": {
+        "team_id": "Bayern München",
+        "team_name": "Bayern München",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 2.0772,
+        "defense_strength": 0.6593,
+        "matches_played": 118,
+        "cold_start": false
+      },
+      "Bayer 04 Leverkusen": {
+        "team_id": "Bayer 04 Leverkusen",
+        "team_name": "Bayer 04 Leverkusen",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 1.3222,
+        "defense_strength": 0.7804,
+        "matches_played": 118,
+        "cold_start": false
+      },
+      "Hertha BSC": {
+        "team_id": "Hertha BSC",
+        "team_name": "Hertha BSC",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.8555,
+        "defense_strength": 1.276,
+        "matches_played": 12,
+        "cold_start": false
+      },
+      "Wolfsburg": {
+        "team_id": "Wolfsburg",
+        "team_name": "Wolfsburg",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.8842,
+        "defense_strength": 1.0174,
+        "matches_played": 114,
+        "cold_start": false
+      },
+      "Eintracht Frankfurt": {
+        "team_id": "Eintracht Frankfurt",
+        "team_name": "Eintracht Frankfurt",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 1.2009,
+        "defense_strength": 1.0812,
+        "matches_played": 118,
+        "cold_start": false
+      },
+      "Heidenheim": {
+        "team_id": "Heidenheim",
+        "team_name": "Heidenheim",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.9241,
+        "defense_strength": 1.1029,
+        "matches_played": 102,
+        "cold_start": false
+      },
+      "Darmstadt 98": {
+        "team_id": "Darmstadt 98",
+        "team_name": "Darmstadt 98",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.5594,
+        "defense_strength": 1.3272,
+        "matches_played": 34,
+        "cold_start": false
+      },
+      "Holstein Kiel": {
+        "team_id": "Holstein Kiel",
+        "team_name": "Holstein Kiel",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.9758,
+        "defense_strength": 1.2784,
+        "matches_played": 34,
+        "cold_start": false
+      },
+      "St. Pauli": {
+        "team_id": "St. Pauli",
+        "team_name": "St. Pauli",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.5976,
+        "defense_strength": 0.9712,
+        "matches_played": 68,
+        "cold_start": false
+      },
+      "Hamburger SV": {
+        "team_id": "Hamburger SV",
+        "team_name": "Hamburger SV",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.7682,
+        "defense_strength": 1.0846,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Elversberg": {
+        "team_id": "Elversberg",
+        "team_name": "Elversberg",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.9943,
+        "defense_strength": 1.0405,
+        "matches_played": 4,
+        "cold_start": true
+      },
+      "Paderborn": {
+        "team_id": "Paderborn",
+        "team_name": "Paderborn",
+        "league_id": "DEU-BUNDESLIGA",
+        "attack_strength": 0.7336,
+        "defense_strength": 0.9723,
+        "matches_played": 4,
+        "cold_start": true
+      }
+    },
+    "FRA-LIGUE1": {
+      "Nice": {
+        "team_id": "Nice",
+        "team_name": "Nice",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 0.813,
+        "defense_strength": 0.9404,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Auxerre": {
+        "team_id": "Auxerre",
+        "team_name": "Auxerre",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 1.034,
+        "defense_strength": 0.9785,
+        "matches_played": 86,
+        "cold_start": false
+      },
+      "Lens": {
+        "team_id": "Lens",
+        "team_name": "Lens",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 1.4285,
+        "defense_strength": 0.8376,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Lille": {
+        "team_id": "Lille",
+        "team_name": "Lille",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 1.1037,
+        "defense_strength": 0.6296,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Paris Saint-Germain": {
+        "team_id": "Paris Saint-Germain",
+        "team_name": "Paris Saint-Germain",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 1.6022,
+        "defense_strength": 0.6421,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Nantes": {
+        "team_id": "Nantes",
+        "team_name": "Nantes",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 0.7095,
+        "defense_strength": 0.9612,
+        "matches_played": 114,
+        "cold_start": false
+      },
+      "Troyes": {
+        "team_id": "Troyes",
+        "team_name": "Troyes",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 0.7296,
+        "defense_strength": 1.2823,
+        "matches_played": 18,
+        "cold_start": false
+      },
+      "Monaco": {
+        "team_id": "Monaco",
+        "team_name": "Monaco",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 1.3836,
+        "defense_strength": 0.8398,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Montpellier": {
+        "team_id": "Montpellier",
+        "team_name": "Montpellier",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 0.6006,
+        "defense_strength": 1.3811,
+        "matches_played": 80,
+        "cold_start": false
+      },
+      "Angers": {
+        "team_id": "Angers",
+        "team_name": "Angers",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 0.6775,
+        "defense_strength": 0.8759,
+        "matches_played": 86,
+        "cold_start": false
+      },
+      "Reims": {
+        "team_id": "Reims",
+        "team_name": "Reims",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 0.6999,
+        "defense_strength": 0.9466,
+        "matches_played": 81,
+        "cold_start": false
+      },
+      "Ajaccio": {
+        "team_id": "Ajaccio",
+        "team_name": "Ajaccio",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 0.4785,
+        "defense_strength": 1.2042,
+        "matches_played": 13,
+        "cold_start": false
+      },
+      "Toulouse": {
+        "team_id": "Toulouse",
+        "team_name": "Toulouse",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 1.0977,
+        "defense_strength": 1.0074,
+        "matches_played": 119,
+        "cold_start": false
+      },
+      "Clermont": {
+        "team_id": "Clermont",
+        "team_name": "Clermont",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 0.7153,
+        "defense_strength": 1.1788,
+        "matches_played": 47,
+        "cold_start": false
+      },
+      "Strasbourg": {
+        "team_id": "Strasbourg",
+        "team_name": "Strasbourg",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 1.4038,
+        "defense_strength": 1.0063,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Brest": {
+        "team_id": "Brest",
+        "team_name": "Brest",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 0.9676,
+        "defense_strength": 1.0258,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Olympique Lyonnais": {
+        "team_id": "Olympique Lyonnais",
+        "team_name": "Olympique Lyonnais",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 1.2697,
+        "defense_strength": 0.7144,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Lorient": {
+        "team_id": "Lorient",
+        "team_name": "Lorient",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 1.013,
+        "defense_strength": 0.9904,
+        "matches_played": 86,
+        "cold_start": false
+      },
+      "Rennes": {
+        "team_id": "Rennes",
+        "team_name": "Rennes",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 1.3679,
+        "defense_strength": 0.9796,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Olympique Marseille": {
+        "team_id": "Olympique Marseille",
+        "team_name": "Olympique Marseille",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 1.2181,
+        "defense_strength": 0.9558,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Le Havre": {
+        "team_id": "Le Havre",
+        "team_name": "Le Havre",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 0.7907,
+        "defense_strength": 0.949,
+        "matches_played": 107,
+        "cold_start": false
+      },
+      "Metz": {
+        "team_id": "Metz",
+        "team_name": "Metz",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 0.7915,
+        "defense_strength": 1.3292,
+        "matches_played": 68,
+        "cold_start": false
+      },
+      "Saint-Étienne": {
+        "team_id": "Saint-Étienne",
+        "team_name": "Saint-Étienne",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 0.9683,
+        "defense_strength": 1.4429,
+        "matches_played": 33,
+        "cold_start": false
+      },
+      "Paris FC": {
+        "team_id": "Paris FC",
+        "team_name": "Paris FC",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 1.1054,
+        "defense_strength": 0.7787,
+        "matches_played": 39,
+        "cold_start": false
+      },
+      "Le Mans": {
+        "team_id": "Le Mans",
+        "team_name": "Le Mans",
+        "league_id": "FRA-LIGUE1",
+        "attack_strength": 1.0307,
+        "defense_strength": 1.122,
+        "matches_played": 5,
+        "cold_start": true
+      }
+    },
+    "NED-ERE": {
+      "Utrecht": {
+        "team_id": "Utrecht",
+        "team_name": "Utrecht",
+        "league_id": "NED-ERE",
+        "attack_strength": 1.2421,
+        "defense_strength": 1.0132,
+        "matches_played": 126,
+        "cold_start": false
+      },
+      "Fortuna Sittard": {
+        "team_id": "Fortuna Sittard",
+        "team_name": "Fortuna Sittard",
+        "league_id": "NED-ERE",
+        "attack_strength": 0.9778,
+        "defense_strength": 1.064,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Vitesse": {
+        "team_id": "Vitesse",
+        "team_name": "Vitesse",
+        "league_id": "NED-ERE",
+        "attack_strength": 0.7352,
+        "defense_strength": 1.1967,
+        "matches_played": 45,
+        "cold_start": false
+      },
+      "AZ": {
+        "team_id": "AZ",
+        "team_name": "AZ",
+        "league_id": "NED-ERE",
+        "attack_strength": 1.2394,
+        "defense_strength": 0.7582,
+        "matches_played": 122,
+        "cold_start": false
+      },
+      "Volendam": {
+        "team_id": "Volendam",
+        "team_name": "Volendam",
+        "league_id": "NED-ERE",
+        "attack_strength": 0.6611,
+        "defense_strength": 0.9926,
+        "matches_played": 79,
+        "cold_start": false
+      },
+      "Emmen": {
+        "team_id": "Emmen",
+        "team_name": "Emmen",
+        "league_id": "NED-ERE",
+        "attack_strength": 0.8719,
+        "defense_strength": 1.1902,
+        "matches_played": 11,
+        "cold_start": false
+      },
+      "Feyenoord": {
+        "team_id": "Feyenoord",
+        "team_name": "Feyenoord",
+        "league_id": "NED-ERE",
+        "attack_strength": 1.4612,
+        "defense_strength": 0.7214,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Groningen": {
+        "team_id": "Groningen",
+        "team_name": "Groningen",
+        "league_id": "NED-ERE",
+        "attack_strength": 1.0213,
+        "defense_strength": 0.8374,
+        "matches_played": 87,
+        "cold_start": false
+      },
+      "Twente": {
+        "team_id": "Twente",
+        "team_name": "Twente",
+        "league_id": "NED-ERE",
+        "attack_strength": 1.2269,
+        "defense_strength": 0.6536,
+        "matches_played": 126,
+        "cold_start": false
+      },
+      "Heerenveen": {
+        "team_id": "Heerenveen",
+        "team_name": "Heerenveen",
+        "league_id": "NED-ERE",
+        "attack_strength": 1.0517,
+        "defense_strength": 0.8813,
+        "matches_played": 124,
+        "cold_start": false
+      },
+      "Excelsior": {
+        "team_id": "Excelsior",
+        "team_name": "Excelsior",
+        "league_id": "NED-ERE",
+        "attack_strength": 1.0692,
+        "defense_strength": 0.8812,
+        "matches_played": 86,
+        "cold_start": false
+      },
+      "Sparta Rotterdam": {
+        "team_id": "Sparta Rotterdam",
+        "team_name": "Sparta Rotterdam",
+        "league_id": "NED-ERE",
+        "attack_strength": 0.8305,
+        "defense_strength": 1.0692,
+        "matches_played": 125,
+        "cold_start": false
+      },
+      "RKC Waalwijk": {
+        "team_id": "RKC Waalwijk",
+        "team_name": "RKC Waalwijk",
+        "league_id": "NED-ERE",
+        "attack_strength": 0.921,
+        "defense_strength": 1.139,
+        "matches_played": 79,
+        "cold_start": false
+      },
+      "PSV": {
+        "team_id": "PSV",
+        "team_name": "PSV",
+        "league_id": "NED-ERE",
+        "attack_strength": 2.0809,
+        "defense_strength": 0.84,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Ajax": {
+        "team_id": "Ajax",
+        "team_name": "Ajax",
+        "league_id": "NED-ERE",
+        "attack_strength": 1.4007,
+        "defense_strength": 0.7222,
+        "matches_played": 122,
+        "cold_start": false
+      },
+      "NEC": {
+        "team_id": "NEC",
+        "team_name": "NEC",
+        "league_id": "NED-ERE",
+        "attack_strength": 1.2344,
+        "defense_strength": 0.9679,
+        "matches_played": 122,
+        "cold_start": false
+      },
+      "Cambuur": {
+        "team_id": "Cambuur",
+        "team_name": "Cambuur",
+        "league_id": "NED-ERE",
+        "attack_strength": 0.8552,
+        "defense_strength": 1.3409,
+        "matches_played": 18,
+        "cold_start": false
+      },
+      "Go Ahead Eagles": {
+        "team_id": "Go Ahead Eagles",
+        "team_name": "Go Ahead Eagles",
+        "league_id": "NED-ERE",
+        "attack_strength": 1.1156,
+        "defense_strength": 0.906,
+        "matches_played": 122,
+        "cold_start": false
+      },
+      "Heracles": {
+        "team_id": "Heracles",
+        "team_name": "Heracles",
+        "league_id": "NED-ERE",
+        "attack_strength": 0.6248,
+        "defense_strength": 1.2713,
+        "matches_played": 102,
+        "cold_start": false
+      },
+      "PEC Zwolle": {
+        "team_id": "PEC Zwolle",
+        "team_name": "PEC Zwolle",
+        "league_id": "NED-ERE",
+        "attack_strength": 0.8036,
+        "defense_strength": 1.2027,
+        "matches_played": 109,
+        "cold_start": false
+      },
+      "Almere City": {
+        "team_id": "Almere City",
+        "team_name": "Almere City",
+        "league_id": "NED-ERE",
+        "attack_strength": 0.5474,
+        "defense_strength": 1.0027,
+        "matches_played": 68,
+        "cold_start": false
+      },
+      "NAC Breda": {
+        "team_id": "NAC Breda",
+        "team_name": "NAC Breda",
+        "league_id": "NED-ERE",
+        "attack_strength": 0.7547,
+        "defense_strength": 0.9657,
+        "matches_played": 68,
+        "cold_start": false
+      },
+      "Willem II": {
+        "team_id": "Willem II",
+        "team_name": "Willem II",
+        "league_id": "NED-ERE",
+        "attack_strength": 0.6684,
+        "defense_strength": 1.2181,
+        "matches_played": 41,
+        "cold_start": false
+      },
+      "Telstar": {
+        "team_id": "Telstar",
+        "team_name": "Telstar",
+        "league_id": "NED-ERE",
+        "attack_strength": 0.8132,
+        "defense_strength": 0.9556,
+        "matches_played": 41,
+        "cold_start": false
+      },
+      "ADO Den Haag": {
+        "team_id": "ADO Den Haag",
+        "team_name": "ADO Den Haag",
+        "league_id": "NED-ERE",
+        "attack_strength": 0.7919,
+        "defense_strength": 1.2091,
+        "matches_played": 7,
+        "cold_start": true
+      }
+    },
+    "POR-PRIMEIRA": {
+      "Boavista": {
+        "team_id": "Boavista",
+        "team_name": "Boavista",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.7029,
+        "defense_strength": 1.1834,
+        "matches_played": 80,
+        "cold_start": false
+      },
+      "Arouca": {
+        "team_id": "Arouca",
+        "team_name": "Arouca",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 1.1568,
+        "defense_strength": 0.9586,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Benfica": {
+        "team_id": "Benfica",
+        "team_name": "Benfica",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 2.0094,
+        "defense_strength": 0.6507,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Famalicão": {
+        "team_id": "Famalicão",
+        "team_name": "Famalicão",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 1.0464,
+        "defense_strength": 0.636,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Estoril": {
+        "team_id": "Estoril",
+        "team_name": "Estoril",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.961,
+        "defense_strength": 1.1324,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Vizela": {
+        "team_id": "Vizela",
+        "team_name": "Vizela",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.8946,
+        "defense_strength": 1.2992,
+        "matches_played": 46,
+        "cold_start": false
+      },
+      "Portimonense": {
+        "team_id": "Portimonense",
+        "team_name": "Portimonense",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.937,
+        "defense_strength": 1.3805,
+        "matches_played": 46,
+        "cold_start": false
+      },
+      "Sporting CP": {
+        "team_id": "Sporting CP",
+        "team_name": "Sporting CP",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 1.935,
+        "defense_strength": 0.6998,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Chaves": {
+        "team_id": "Chaves",
+        "team_name": "Chaves",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.6727,
+        "defense_strength": 1.3269,
+        "matches_played": 46,
+        "cold_start": false
+      },
+      "Porto": {
+        "team_id": "Porto",
+        "team_name": "Porto",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 1.629,
+        "defense_strength": 0.5008,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Gil Vicente": {
+        "team_id": "Gil Vicente",
+        "team_name": "Gil Vicente",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.8948,
+        "defense_strength": 0.8032,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Marítimo": {
+        "team_id": "Marítimo",
+        "team_name": "Marítimo",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.9543,
+        "defense_strength": 1.2242,
+        "matches_played": 19,
+        "cold_start": false
+      },
+      "Santa Clara": {
+        "team_id": "Santa Clara",
+        "team_name": "Santa Clara",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.9423,
+        "defense_strength": 0.7225,
+        "matches_played": 87,
+        "cold_start": false
+      },
+      "Vitória Guimarães": {
+        "team_id": "Vitória Guimarães",
+        "team_name": "Vitória Guimarães",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.8351,
+        "defense_strength": 0.839,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Sporting Braga": {
+        "team_id": "Sporting Braga",
+        "team_name": "Sporting Braga",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 1.3042,
+        "defense_strength": 0.7197,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Rio Ave": {
+        "team_id": "Rio Ave",
+        "team_name": "Rio Ave",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.7138,
+        "defense_strength": 1.1666,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Casa Pia": {
+        "team_id": "Casa Pia",
+        "team_name": "Casa Pia",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.6727,
+        "defense_strength": 1.0954,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Paços de Ferreira": {
+        "team_id": "Paços de Ferreira",
+        "team_name": "Paços de Ferreira",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.7252,
+        "defense_strength": 1.2047,
+        "matches_played": 12,
+        "cold_start": false
+      },
+      "Farense": {
+        "team_id": "Farense",
+        "team_name": "Farense",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.8387,
+        "defense_strength": 0.9505,
+        "matches_played": 68,
+        "cold_start": false
+      },
+      "Estrela": {
+        "team_id": "Estrela",
+        "team_name": "Estrela",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 1.1274,
+        "defense_strength": 1.2289,
+        "matches_played": 109,
+        "cold_start": false
+      },
+      "Moreirense": {
+        "team_id": "Moreirense",
+        "team_name": "Moreirense",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.8601,
+        "defense_strength": 0.9695,
+        "matches_played": 109,
+        "cold_start": false
+      },
+      "AVS": {
+        "team_id": "AVS",
+        "team_name": "AVS",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.7703,
+        "defense_strength": 1.1677,
+        "matches_played": 68,
+        "cold_start": false
+      },
+      "Nacional": {
+        "team_id": "Nacional",
+        "team_name": "Nacional",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.7859,
+        "defense_strength": 1.1025,
+        "matches_played": 75,
+        "cold_start": false
+      },
+      "Tondela": {
+        "team_id": "Tondela",
+        "team_name": "Tondela",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.7707,
+        "defense_strength": 1.1249,
+        "matches_played": 34,
+        "cold_start": false
+      },
+      "Alverca": {
+        "team_id": "Alverca",
+        "team_name": "Alverca",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.8783,
+        "defense_strength": 0.9483,
+        "matches_played": 41,
+        "cold_start": false
+      },
+      "Académico de Viseu": {
+        "team_id": "Académico de Viseu",
+        "team_name": "Académico de Viseu",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.9812,
+        "defense_strength": 0.9641,
+        "matches_played": 7,
+        "cold_start": true
+      },
+      "Academico Viseu": {
+        "team_id": "Academico Viseu",
+        "team_name": "Academico Viseu",
+        "league_id": "POR-PRIMEIRA",
+        "attack_strength": 0.8607,
+        "defense_strength": 1.1618,
+        "matches_played": 0,
+        "cold_start": true
+      }
+    },
+    "BEL-PRO": {
+      "KV Oostende": {
+        "team_id": "KV Oostende",
+        "team_name": "KV Oostende",
+        "league_id": "BEL-PRO",
+        "attack_strength": 1.0151,
+        "defense_strength": 1.5698,
+        "matches_played": 7,
+        "cold_start": true
+      },
+      "Club Brugge": {
+        "team_id": "Club Brugge",
+        "team_name": "Club Brugge",
+        "league_id": "BEL-PRO",
+        "attack_strength": 1.9044,
+        "defense_strength": 0.6146,
+        "matches_played": 140,
+        "cold_start": false
+      },
+      "Kortrijk": {
+        "team_id": "Kortrijk",
+        "team_name": "Kortrijk",
+        "league_id": "BEL-PRO",
+        "attack_strength": 0.7469,
+        "defense_strength": 1.1732,
+        "matches_played": 86,
+        "cold_start": false
+      },
+      "Sporting Charleroi": {
+        "team_id": "Sporting Charleroi",
+        "team_name": "Sporting Charleroi",
+        "league_id": "BEL-PRO",
+        "attack_strength": 1.1619,
+        "defense_strength": 0.7668,
+        "matches_played": 131,
+        "cold_start": false
+      },
+      "OH Leuven": {
+        "team_id": "OH Leuven",
+        "team_name": "OH Leuven",
+        "league_id": "BEL-PRO",
+        "attack_strength": 0.7234,
+        "defense_strength": 0.996,
+        "matches_played": 134,
+        "cold_start": false
+      },
+      "Zulte Waregem": {
+        "team_id": "Zulte Waregem",
+        "team_name": "Zulte Waregem",
+        "league_id": "BEL-PRO",
+        "attack_strength": 1.0557,
+        "defense_strength": 0.8806,
+        "matches_played": 50,
+        "cold_start": false
+      },
+      "Cercle Brugge": {
+        "team_id": "Cercle Brugge",
+        "team_name": "Cercle Brugge",
+        "league_id": "BEL-PRO",
+        "attack_strength": 1.1303,
+        "defense_strength": 1.2186,
+        "matches_played": 132,
+        "cold_start": false
+      },
+      "Seraing": {
+        "team_id": "Seraing",
+        "team_name": "Seraing",
+        "league_id": "BEL-PRO",
+        "attack_strength": 0.7433,
+        "defense_strength": 1.2165,
+        "matches_played": 7,
+        "cold_start": true
+      },
+      "Standard Liège": {
+        "team_id": "Standard Liège",
+        "team_name": "Standard Liège",
+        "league_id": "BEL-PRO",
+        "attack_strength": 1.0156,
+        "defense_strength": 0.8334,
+        "matches_played": 139,
+        "cold_start": false
+      },
+      "Westerlo": {
+        "team_id": "Westerlo",
+        "team_name": "Westerlo",
+        "league_id": "BEL-PRO",
+        "attack_strength": 1.2249,
+        "defense_strength": 1.112,
+        "matches_played": 139,
+        "cold_start": false
+      },
+      "Sint-Truiden": {
+        "team_id": "Sint-Truiden",
+        "team_name": "Sint-Truiden",
+        "league_id": "BEL-PRO",
+        "attack_strength": 1.1534,
+        "defense_strength": 0.85,
+        "matches_played": 130,
+        "cold_start": false
+      },
+      "Genk": {
+        "team_id": "Genk",
+        "team_name": "Genk",
+        "league_id": "BEL-PRO",
+        "attack_strength": 1.2596,
+        "defense_strength": 0.8894,
+        "matches_played": 142,
+        "cold_start": false
+      },
+      "Antwerp": {
+        "team_id": "Antwerp",
+        "team_name": "Antwerp",
+        "league_id": "BEL-PRO",
+        "attack_strength": 0.913,
+        "defense_strength": 0.9873,
+        "matches_played": 140,
+        "cold_start": false
+      },
+      "Mechelen": {
+        "team_id": "Mechelen",
+        "team_name": "Mechelen",
+        "league_id": "BEL-PRO",
+        "attack_strength": 0.8335,
+        "defense_strength": 1.0662,
+        "matches_played": 134,
+        "cold_start": false
+      },
+      "Gent": {
+        "team_id": "Gent",
+        "team_name": "Gent",
+        "league_id": "BEL-PRO",
+        "attack_strength": 1.1309,
+        "defense_strength": 0.8096,
+        "matches_played": 142,
+        "cold_start": false
+      },
+      "Anderlecht": {
+        "team_id": "Anderlecht",
+        "team_name": "Anderlecht",
+        "league_id": "BEL-PRO",
+        "attack_strength": 1.0876,
+        "defense_strength": 0.799,
+        "matches_played": 134,
+        "cold_start": false
+      },
+      "Union Saint-Gilloise": {
+        "team_id": "Union Saint-Gilloise",
+        "team_name": "Union Saint-Gilloise",
+        "league_id": "BEL-PRO",
+        "attack_strength": 1.6002,
+        "defense_strength": 0.4313,
+        "matches_played": 140,
+        "cold_start": false
+      },
+      "Eupen": {
+        "team_id": "Eupen",
+        "team_name": "Eupen",
+        "league_id": "BEL-PRO",
+        "attack_strength": 0.551,
+        "defense_strength": 1.1167,
+        "matches_played": 43,
+        "cold_start": false
+      },
+      "RWDM": {
+        "team_id": "RWDM",
+        "team_name": "RWDM",
+        "league_id": "BEL-PRO",
+        "attack_strength": 0.8612,
+        "defense_strength": 1.403,
+        "matches_played": 36,
+        "cold_start": false
+      },
+      "Dender": {
+        "team_id": "Dender",
+        "team_name": "Dender",
+        "league_id": "BEL-PRO",
+        "attack_strength": 0.773,
+        "defense_strength": 1.1573,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Beerschot": {
+        "team_id": "Beerschot",
+        "team_name": "Beerschot",
+        "league_id": "BEL-PRO",
+        "attack_strength": 0.8195,
+        "defense_strength": 1.0863,
+        "matches_played": 35,
+        "cold_start": false
+      },
+      "RAAL La Louvière": {
+        "team_id": "RAAL La Louvière",
+        "team_name": "RAAL La Louvière",
+        "league_id": "BEL-PRO",
+        "attack_strength": 0.789,
+        "defense_strength": 1.1364,
+        "matches_played": 43,
+        "cold_start": false
+      },
+      "Lommel": {
+        "team_id": "Lommel",
+        "team_name": "Lommel",
+        "league_id": "BEL-PRO",
+        "attack_strength": 0.7115,
+        "defense_strength": 0.8655,
+        "matches_played": 7,
+        "cold_start": true
+      },
+      "Beveren": {
+        "team_id": "Beveren",
+        "team_name": "Beveren",
+        "league_id": "BEL-PRO",
+        "attack_strength": 0.7955,
+        "defense_strength": 1.0205,
+        "matches_played": 7,
+        "cold_start": true
+      }
+    },
+    "SCO-PREM": {
+      "Heart Of Midlothian": {
+        "team_id": "Heart Of Midlothian",
+        "team_name": "Heart Of Midlothian",
+        "league_id": "SCO-PREM",
+        "attack_strength": 1.2549,
+        "defense_strength": 0.6148,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Rangers": {
+        "team_id": "Rangers",
+        "team_name": "Rangers",
+        "league_id": "SCO-PREM",
+        "attack_strength": 1.7119,
+        "defense_strength": 0.9196,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Motherwell": {
+        "team_id": "Motherwell",
+        "team_name": "Motherwell",
+        "league_id": "SCO-PREM",
+        "attack_strength": 1.1725,
+        "defense_strength": 0.7034,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Ross County": {
+        "team_id": "Ross County",
+        "team_name": "Ross County",
+        "league_id": "SCO-PREM",
+        "attack_strength": 0.835,
+        "defense_strength": 1.2069,
+        "matches_played": 40,
+        "cold_start": false
+      },
+      "Dundee Utd": {
+        "team_id": "Dundee Utd",
+        "team_name": "Dundee Utd",
+        "league_id": "SCO-PREM",
+        "attack_strength": 0.9203,
+        "defense_strength": 1.006,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Dundee": {
+        "team_id": "Dundee",
+        "team_name": "Dundee",
+        "league_id": "SCO-PREM",
+        "attack_strength": 0.9312,
+        "defense_strength": 1.1294,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "ST Mirren": {
+        "team_id": "ST Mirren",
+        "team_name": "ST Mirren",
+        "league_id": "SCO-PREM",
+        "attack_strength": 0.6986,
+        "defense_strength": 0.9286,
+        "matches_played": 78,
+        "cold_start": false
+      },
+      "Hibernian": {
+        "team_id": "Hibernian",
+        "team_name": "Hibernian",
+        "league_id": "SCO-PREM",
+        "attack_strength": 1.1235,
+        "defense_strength": 0.7765,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Celtic": {
+        "team_id": "Celtic",
+        "team_name": "Celtic",
+        "league_id": "SCO-PREM",
+        "attack_strength": 1.6815,
+        "defense_strength": 0.7458,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Kilmarnock": {
+        "team_id": "Kilmarnock",
+        "team_name": "Kilmarnock",
+        "league_id": "SCO-PREM",
+        "attack_strength": 1.0932,
+        "defense_strength": 1.0645,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "ST Johnstone": {
+        "team_id": "ST Johnstone",
+        "team_name": "ST Johnstone",
+        "league_id": "SCO-PREM",
+        "attack_strength": 0.803,
+        "defense_strength": 1.1129,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Aberdeen": {
+        "team_id": "Aberdeen",
+        "team_name": "Aberdeen",
+        "league_id": "SCO-PREM",
+        "attack_strength": 0.795,
+        "defense_strength": 1.0482,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Partick": {
+        "team_id": "Partick",
+        "team_name": "Partick",
+        "league_id": "SCO-PREM",
+        "attack_strength": 0.7351,
+        "defense_strength": 1.1013,
+        "matches_played": 8,
+        "cold_start": false
+      },
+      "Ayr Utd": {
+        "team_id": "Ayr Utd",
+        "team_name": "Ayr Utd",
+        "league_id": "SCO-PREM",
+        "attack_strength": 0.8116,
+        "defense_strength": 1.153,
+        "matches_played": 2,
+        "cold_start": true
+      },
+      "Livingston": {
+        "team_id": "Livingston",
+        "team_name": "Livingston",
+        "league_id": "SCO-PREM",
+        "attack_strength": 0.8484,
+        "defense_strength": 1.2963,
+        "matches_played": 42,
+        "cold_start": false
+      },
+      "Falkirk": {
+        "team_id": "Falkirk",
+        "team_name": "Falkirk",
+        "league_id": "SCO-PREM",
+        "attack_strength": 1.0498,
+        "defense_strength": 1.1291,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Dunfermline": {
+        "team_id": "Dunfermline",
+        "team_name": "Dunfermline",
+        "league_id": "SCO-PREM",
+        "attack_strength": 0.7856,
+        "defense_strength": 1.036,
+        "matches_played": 4,
+        "cold_start": true
+      },
+      "Arbroath": {
+        "team_id": "Arbroath",
+        "team_name": "Arbroath",
+        "league_id": "SCO-PREM",
+        "attack_strength": 0.7488,
+        "defense_strength": 1.0277,
+        "matches_played": 2,
+        "cold_start": true
+      }
+    },
+    "ENG-CHAMP": {
+      "Preston": {
+        "team_id": "Preston",
+        "team_name": "Preston",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.8875,
+        "defense_strength": 1.234,
+        "matches_played": 92,
+        "cold_start": false
+      },
+      "Sheffield Utd": {
+        "team_id": "Sheffield Utd",
+        "team_name": "Sheffield Utd",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 1.1458,
+        "defense_strength": 1.1377,
+        "matches_played": 95,
+        "cold_start": false
+      },
+      "Blackburn": {
+        "team_id": "Blackburn",
+        "team_name": "Blackburn",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.7474,
+        "defense_strength": 0.8739,
+        "matches_played": 92,
+        "cold_start": false
+      },
+      "Derby": {
+        "team_id": "Derby",
+        "team_name": "Derby",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 1.134,
+        "defense_strength": 0.9538,
+        "matches_played": 92,
+        "cold_start": false
+      },
+      "Cardiff": {
+        "team_id": "Cardiff",
+        "team_name": "Cardiff",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.8645,
+        "defense_strength": 1.1732,
+        "matches_played": 46,
+        "cold_start": false
+      },
+      "Sunderland": {
+        "team_id": "Sunderland",
+        "team_name": "Sunderland",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.9033,
+        "defense_strength": 0.8563,
+        "matches_played": 49,
+        "cold_start": false
+      },
+      "Millwall": {
+        "team_id": "Millwall",
+        "team_name": "Millwall",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 1.0249,
+        "defense_strength": 0.7833,
+        "matches_played": 94,
+        "cold_start": false
+      },
+      "Watford": {
+        "team_id": "Watford",
+        "team_name": "Watford",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.7639,
+        "defense_strength": 1.2578,
+        "matches_played": 92,
+        "cold_start": false
+      },
+      "Leeds": {
+        "team_id": "Leeds",
+        "team_name": "Leeds",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 1.4878,
+        "defense_strength": 0.619,
+        "matches_played": 46,
+        "cold_start": false
+      },
+      "Portsmouth": {
+        "team_id": "Portsmouth",
+        "team_name": "Portsmouth",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 1.0021,
+        "defense_strength": 1.0949,
+        "matches_played": 92,
+        "cold_start": false
+      },
+      "Hull City": {
+        "team_id": "Hull City",
+        "team_name": "Hull City",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 1.0478,
+        "defense_strength": 0.9897,
+        "matches_played": 95,
+        "cold_start": false
+      },
+      "Bristol City": {
+        "team_id": "Bristol City",
+        "team_name": "Bristol City",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.9421,
+        "defense_strength": 1.0577,
+        "matches_played": 94,
+        "cold_start": false
+      },
+      "Middlesbrough": {
+        "team_id": "Middlesbrough",
+        "team_name": "Middlesbrough",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 1.0994,
+        "defense_strength": 0.8087,
+        "matches_played": 95,
+        "cold_start": false
+      },
+      "Swansea": {
+        "team_id": "Swansea",
+        "team_name": "Swansea",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 1.0086,
+        "defense_strength": 0.9582,
+        "matches_played": 92,
+        "cold_start": false
+      },
+      "QPR": {
+        "team_id": "QPR",
+        "team_name": "QPR",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.9308,
+        "defense_strength": 1.2167,
+        "matches_played": 92,
+        "cold_start": false
+      },
+      "West Brom": {
+        "team_id": "West Brom",
+        "team_name": "West Brom",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.7864,
+        "defense_strength": 0.8948,
+        "matches_played": 92,
+        "cold_start": false
+      },
+      "Stoke City": {
+        "team_id": "Stoke City",
+        "team_name": "Stoke City",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.7618,
+        "defense_strength": 1.1458,
+        "matches_played": 92,
+        "cold_start": false
+      },
+      "Coventry": {
+        "team_id": "Coventry",
+        "team_name": "Coventry",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 1.4704,
+        "defense_strength": 0.7349,
+        "matches_played": 94,
+        "cold_start": false
+      },
+      "Oxford United": {
+        "team_id": "Oxford United",
+        "team_name": "Oxford United",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.7476,
+        "defense_strength": 0.9905,
+        "matches_played": 92,
+        "cold_start": false
+      },
+      "Norwich": {
+        "team_id": "Norwich",
+        "team_name": "Norwich",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 1.161,
+        "defense_strength": 0.9101,
+        "matches_played": 92,
+        "cold_start": false
+      },
+      "Sheffield Wednesday": {
+        "team_id": "Sheffield Wednesday",
+        "team_name": "Sheffield Wednesday",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.5693,
+        "defense_strength": 1.3974,
+        "matches_played": 92,
+        "cold_start": false
+      },
+      "Plymouth": {
+        "team_id": "Plymouth",
+        "team_name": "Plymouth",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.981,
+        "defense_strength": 1.3501,
+        "matches_played": 46,
+        "cold_start": false
+      },
+      "Luton": {
+        "team_id": "Luton",
+        "team_name": "Luton",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.8529,
+        "defense_strength": 1.1073,
+        "matches_played": 46,
+        "cold_start": false
+      },
+      "Burnley": {
+        "team_id": "Burnley",
+        "team_name": "Burnley",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 1.2512,
+        "defense_strength": 0.4593,
+        "matches_played": 46,
+        "cold_start": false
+      },
+      "Birmingham": {
+        "team_id": "Birmingham",
+        "team_name": "Birmingham",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.8914,
+        "defense_strength": 0.9217,
+        "matches_played": 46,
+        "cold_start": false
+      },
+      "Ipswich": {
+        "team_id": "Ipswich",
+        "team_name": "Ipswich",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 1.284,
+        "defense_strength": 0.841,
+        "matches_played": 46,
+        "cold_start": false
+      },
+      "Southampton": {
+        "team_id": "Southampton",
+        "team_name": "Southampton",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 1.3996,
+        "defense_strength": 0.8687,
+        "matches_played": 48,
+        "cold_start": false
+      },
+      "Wrexham": {
+        "team_id": "Wrexham",
+        "team_name": "Wrexham",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 1.1531,
+        "defense_strength": 1.1396,
+        "matches_played": 46,
+        "cold_start": false
+      },
+      "Charlton": {
+        "team_id": "Charlton",
+        "team_name": "Charlton",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.789,
+        "defense_strength": 1.0566,
+        "matches_played": 46,
+        "cold_start": false
+      },
+      "Leicester": {
+        "team_id": "Leicester",
+        "team_name": "Leicester",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.9114,
+        "defense_strength": 1.1676,
+        "matches_played": 46,
+        "cold_start": false
+      },
+      "Lincoln": {
+        "team_id": "Lincoln",
+        "team_name": "Lincoln",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.8607,
+        "defense_strength": 1.1618,
+        "matches_played": 0,
+        "cold_start": true
+      },
+      "Bolton": {
+        "team_id": "Bolton",
+        "team_name": "Bolton",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.8607,
+        "defense_strength": 1.1618,
+        "matches_played": 0,
+        "cold_start": true
+      },
+      "Wolves": {
+        "team_id": "Wolves",
+        "team_name": "Wolves",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.8607,
+        "defense_strength": 1.1618,
+        "matches_played": 0,
+        "cold_start": true
+      },
+      "West Ham": {
+        "team_id": "West Ham",
+        "team_name": "West Ham",
+        "league_id": "ENG-CHAMP",
+        "attack_strength": 0.8607,
+        "defense_strength": 1.1618,
+        "matches_played": 0,
+        "cold_start": true
+      }
+    },
+    "USA-MLS": {
+      "Los Angeles": {
+        "team_id": "Los Angeles",
+        "team_name": "Los Angeles",
+        "league_id": "USA-MLS",
+        "attack_strength": 1.0081,
+        "defense_strength": 0.7525,
+        "matches_played": 142,
+        "cold_start": false
+      },
+      "Portland Timbers": {
+        "team_id": "Portland Timbers",
+        "team_name": "Portland Timbers",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.9914,
+        "defense_strength": 1.1361,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Inter Miami": {
+        "team_id": "Inter Miami",
+        "team_name": "Inter Miami",
+        "league_id": "USA-MLS",
+        "attack_strength": 1.5291,
+        "defense_strength": 1.1026,
+        "matches_played": 137,
+        "cold_start": false
+      },
+      "Philadelphia Union": {
+        "team_id": "Philadelphia Union",
+        "team_name": "Philadelphia Union",
+        "league_id": "USA-MLS",
+        "attack_strength": 1.3189,
+        "defense_strength": 0.8766,
+        "matches_played": 134,
+        "cold_start": false
+      },
+      "New England": {
+        "team_id": "New England",
+        "team_name": "New England",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.9704,
+        "defense_strength": 0.928,
+        "matches_played": 130,
+        "cold_start": false
+      },
+      "Houston Dynamo": {
+        "team_id": "Houston Dynamo",
+        "team_name": "Houston Dynamo",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.7874,
+        "defense_strength": 0.7957,
+        "matches_played": 135,
+        "cold_start": false
+      },
+      "Atlanta United": {
+        "team_id": "Atlanta United",
+        "team_name": "Atlanta United",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.7515,
+        "defense_strength": 1.0203,
+        "matches_played": 136,
+        "cold_start": false
+      },
+      "Toronto": {
+        "team_id": "Toronto",
+        "team_name": "Toronto",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.8404,
+        "defense_strength": 1.0475,
+        "matches_played": 128,
+        "cold_start": false
+      },
+      "Columbus Crew": {
+        "team_id": "Columbus Crew",
+        "team_name": "Columbus Crew",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.9605,
+        "defense_strength": 0.97,
+        "matches_played": 139,
+        "cold_start": false
+      },
+      "DC United": {
+        "team_id": "DC United",
+        "team_name": "DC United",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.8619,
+        "defense_strength": 1.0959,
+        "matches_played": 127,
+        "cold_start": false
+      },
+      "Orlando City": {
+        "team_id": "Orlando City",
+        "team_name": "Orlando City",
+        "league_id": "USA-MLS",
+        "attack_strength": 1.1922,
+        "defense_strength": 1.1854,
+        "matches_played": 137,
+        "cold_start": false
+      },
+      "Cincinnati": {
+        "team_id": "Cincinnati",
+        "team_name": "Cincinnati",
+        "league_id": "USA-MLS",
+        "attack_strength": 1.1713,
+        "defense_strength": 1.2943,
+        "matches_played": 138,
+        "cold_start": false
+      },
+      "New York RB": {
+        "team_id": "New York RB",
+        "team_name": "New York RB",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.7206,
+        "defense_strength": 1.0216,
+        "matches_played": 136,
+        "cold_start": false
+      },
+      "Nashville SC": {
+        "team_id": "Nashville SC",
+        "team_name": "Nashville SC",
+        "league_id": "USA-MLS",
+        "attack_strength": 1.0851,
+        "defense_strength": 0.6137,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "Dallas": {
+        "team_id": "Dallas",
+        "team_name": "Dallas",
+        "league_id": "USA-MLS",
+        "attack_strength": 1.0861,
+        "defense_strength": 0.9754,
+        "matches_played": 133,
+        "cold_start": false
+      },
+      "LA Galaxy": {
+        "team_id": "LA Galaxy",
+        "team_name": "LA Galaxy",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.8917,
+        "defense_strength": 1.0315,
+        "matches_played": 135,
+        "cold_start": false
+      },
+      "Austin": {
+        "team_id": "Austin",
+        "team_name": "Austin",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.8147,
+        "defense_strength": 1.0016,
+        "matches_played": 130,
+        "cold_start": false
+      },
+      "Montréal": {
+        "team_id": "Montréal",
+        "team_name": "Montréal",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.7302,
+        "defense_strength": 1.1072,
+        "matches_played": 129,
+        "cold_start": false
+      },
+      "Chicago Fire": {
+        "team_id": "Chicago Fire",
+        "team_name": "Chicago Fire",
+        "league_id": "USA-MLS",
+        "attack_strength": 1.1347,
+        "defense_strength": 0.9791,
+        "matches_played": 132,
+        "cold_start": false
+      },
+      "New York City": {
+        "team_id": "New York City",
+        "team_name": "New York City",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.94,
+        "defense_strength": 0.8799,
+        "matches_played": 137,
+        "cold_start": false
+      },
+      "St. Louis City": {
+        "team_id": "St. Louis City",
+        "team_name": "St. Louis City",
+        "league_id": "USA-MLS",
+        "attack_strength": 1.1868,
+        "defense_strength": 0.9216,
+        "matches_played": 130,
+        "cold_start": false
+      },
+      "Charlotte": {
+        "team_id": "Charlotte",
+        "team_name": "Charlotte",
+        "league_id": "USA-MLS",
+        "attack_strength": 1.0855,
+        "defense_strength": 0.8864,
+        "matches_played": 135,
+        "cold_start": false
+      },
+      "Colorado Rapids": {
+        "team_id": "Colorado Rapids",
+        "team_name": "Colorado Rapids",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.806,
+        "defense_strength": 0.9333,
+        "matches_played": 130,
+        "cold_start": false
+      },
+      "Sporting KC": {
+        "team_id": "Sporting KC",
+        "team_name": "Sporting KC",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.8764,
+        "defense_strength": 1.351,
+        "matches_played": 132,
+        "cold_start": false
+      },
+      "SJ Earthquakes": {
+        "team_id": "SJ Earthquakes",
+        "team_name": "SJ Earthquakes",
+        "league_id": "USA-MLS",
+        "attack_strength": 1.0519,
+        "defense_strength": 1.0351,
+        "matches_played": 129,
+        "cold_start": false
+      },
+      "Vancouver Whitecaps": {
+        "team_id": "Vancouver Whitecaps",
+        "team_name": "Vancouver Whitecaps",
+        "league_id": "USA-MLS",
+        "attack_strength": 1.2935,
+        "defense_strength": 0.8243,
+        "matches_played": 139,
+        "cold_start": false
+      },
+      "Seattle Sounders": {
+        "team_id": "Seattle Sounders",
+        "team_name": "Seattle Sounders",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.9358,
+        "defense_strength": 0.96,
+        "matches_played": 139,
+        "cold_start": false
+      },
+      "Real Salt Lake": {
+        "team_id": "Real Salt Lake",
+        "team_name": "Real Salt Lake",
+        "league_id": "USA-MLS",
+        "attack_strength": 0.8336,
+        "defense_strength": 1.017,
+        "matches_played": 134,
+        "cold_start": false
+      },
+      "Minnesota United": {
+        "team_id": "Minnesota United",
+        "team_name": "Minnesota United",
+        "league_id": "USA-MLS",
+        "attack_strength": 1.0821,
+        "defense_strength": 1.2155,
+        "matches_played": 135,
+        "cold_start": false
+      },
+      "San Diego": {
+        "team_id": "San Diego",
+        "team_name": "San Diego",
+        "league_id": "USA-MLS",
+        "attack_strength": 1.0623,
+        "defense_strength": 1.041,
+        "matches_played": 66,
+        "cold_start": false
+      }
+    },
+    "SAU-PRO": {
+      "Al Raed": {
+        "team_id": "Al Raed",
+        "team_name": "Al Raed",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.9237,
+        "defense_strength": 1.2616,
+        "matches_played": 80,
+        "cold_start": false
+      },
+      "Al Ettifaq": {
+        "team_id": "Al Ettifaq",
+        "team_name": "Al Ettifaq",
+        "league_id": "SAU-PRO",
+        "attack_strength": 1.1147,
+        "defense_strength": 0.947,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Al Khaleej": {
+        "team_id": "Al Khaleej",
+        "team_name": "Al Khaleej",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.8087,
+        "defense_strength": 1.082,
+        "matches_played": 122,
+        "cold_start": false
+      },
+      "Al Ittihad": {
+        "team_id": "Al Ittihad",
+        "team_name": "Al Ittihad",
+        "league_id": "SAU-PRO",
+        "attack_strength": 1.264,
+        "defense_strength": 0.8492,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Al Nassr": {
+        "team_id": "Al Nassr",
+        "team_name": "Al Nassr",
+        "league_id": "SAU-PRO",
+        "attack_strength": 1.7104,
+        "defense_strength": 0.6349,
+        "matches_played": 120,
+        "cold_start": false
+      },
+      "Al Batin": {
+        "team_id": "Al Batin",
+        "team_name": "Al Batin",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.8506,
+        "defense_strength": 1.1388,
+        "matches_played": 12,
+        "cold_start": false
+      },
+      "Damac": {
+        "team_id": "Damac",
+        "team_name": "Damac",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.7528,
+        "defense_strength": 0.9071,
+        "matches_played": 114,
+        "cold_start": false
+      },
+      "Al Taawoun": {
+        "team_id": "Al Taawoun",
+        "team_name": "Al Taawoun",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.9158,
+        "defense_strength": 0.9189,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Al Shabab": {
+        "team_id": "Al Shabab",
+        "team_name": "Al Shabab",
+        "league_id": "SAU-PRO",
+        "attack_strength": 1.0375,
+        "defense_strength": 0.9907,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Al Adalah": {
+        "team_id": "Al Adalah",
+        "team_name": "Al Adalah",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.9948,
+        "defense_strength": 1.18,
+        "matches_played": 12,
+        "cold_start": false
+      },
+      "Al Hilal": {
+        "team_id": "Al Hilal",
+        "team_name": "Al Hilal",
+        "league_id": "SAU-PRO",
+        "attack_strength": 1.9135,
+        "defense_strength": 0.5502,
+        "matches_played": 123,
+        "cold_start": false
+      },
+      "Al Fateh": {
+        "team_id": "Al Fateh",
+        "team_name": "Al Fateh",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.8017,
+        "defense_strength": 0.9609,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Al Wehda": {
+        "team_id": "Al Wehda",
+        "team_name": "Al Wehda",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.9028,
+        "defense_strength": 1.0729,
+        "matches_played": 79,
+        "cold_start": false
+      },
+      "Al Fayha": {
+        "team_id": "Al Fayha",
+        "team_name": "Al Fayha",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.78,
+        "defense_strength": 0.9442,
+        "matches_played": 121,
+        "cold_start": false
+      },
+      "Abha": {
+        "team_id": "Abha",
+        "team_name": "Abha",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.7537,
+        "defense_strength": 1.3756,
+        "matches_played": 52,
+        "cold_start": false
+      },
+      "Al Tai": {
+        "team_id": "Al Tai",
+        "team_name": "Al Tai",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.7813,
+        "defense_strength": 1.1826,
+        "matches_played": 45,
+        "cold_start": false
+      },
+      "Al Ahli": {
+        "team_id": "Al Ahli",
+        "team_name": "Al Ahli",
+        "league_id": "SAU-PRO",
+        "attack_strength": 1.5528,
+        "defense_strength": 0.6158,
+        "matches_played": 109,
+        "cold_start": false
+      },
+      "Al Hazem": {
+        "team_id": "Al Hazem",
+        "team_name": "Al Hazem",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.7948,
+        "defense_strength": 0.9339,
+        "matches_played": 75,
+        "cold_start": false
+      },
+      "Al Riyadh": {
+        "team_id": "Al Riyadh",
+        "team_name": "Al Riyadh",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.802,
+        "defense_strength": 1.09,
+        "matches_played": 109,
+        "cold_start": false
+      },
+      "Al Okhdood": {
+        "team_id": "Al Okhdood",
+        "team_name": "Al Okhdood",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.5834,
+        "defense_strength": 1.2053,
+        "matches_played": 102,
+        "cold_start": false
+      },
+      "Al Orobah": {
+        "team_id": "Al Orobah",
+        "team_name": "Al Orobah",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.775,
+        "defense_strength": 1.3558,
+        "matches_played": 33,
+        "cold_start": false
+      },
+      "Al Qadsiah": {
+        "team_id": "Al Qadsiah",
+        "team_name": "Al Qadsiah",
+        "league_id": "SAU-PRO",
+        "attack_strength": 1.7694,
+        "defense_strength": 0.7189,
+        "matches_played": 75,
+        "cold_start": false
+      },
+      "Al Kholood": {
+        "team_id": "Al Kholood",
+        "team_name": "Al Kholood",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.9422,
+        "defense_strength": 1.027,
+        "matches_played": 75,
+        "cold_start": false
+      },
+      "NEOM": {
+        "team_id": "NEOM",
+        "team_name": "NEOM",
+        "league_id": "SAU-PRO",
+        "attack_strength": 1.0718,
+        "defense_strength": 0.8484,
+        "matches_played": 41,
+        "cold_start": false
+      },
+      "Al Najma": {
+        "team_id": "Al Najma",
+        "team_name": "Al Najma",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.7691,
+        "defense_strength": 1.3518,
+        "matches_played": 34,
+        "cold_start": false
+      },
+      "Diriyah Club": {
+        "team_id": "Diriyah Club",
+        "team_name": "Diriyah Club",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.8304,
+        "defense_strength": 0.8305,
+        "matches_played": 7,
+        "cold_start": true
+      },
+      "Al Faisaly": {
+        "team_id": "Al Faisaly",
+        "team_name": "Al Faisaly",
+        "league_id": "SAU-PRO",
+        "attack_strength": 0.803,
+        "defense_strength": 1.0259,
+        "matches_played": 7,
+        "cold_start": true
+      }
+    },
+    "JPN-J1": {
+      "Sanfrecce Hiroshima": {
+        "team_id": "Sanfrecce Hiroshima",
+        "team_name": "Sanfrecce Hiroshima",
+        "league_id": "JPN-J1",
+        "attack_strength": 1.1295,
+        "defense_strength": 0.676,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Urawa": {
+        "team_id": "Urawa",
+        "team_name": "Urawa",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.8723,
+        "defense_strength": 0.7738,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Nagoya Grampus": {
+        "team_id": "Nagoya Grampus",
+        "team_name": "Nagoya Grampus",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.9279,
+        "defense_strength": 1.0607,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Kashima": {
+        "team_id": "Kashima",
+        "team_name": "Kashima",
+        "league_id": "JPN-J1",
+        "attack_strength": 1.2068,
+        "defense_strength": 0.6494,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Jubilo Iwata": {
+        "team_id": "Jubilo Iwata",
+        "team_name": "Jubilo Iwata",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.973,
+        "defense_strength": 1.3977,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Vissel Kobe": {
+        "team_id": "Vissel Kobe",
+        "team_name": "Vissel Kobe",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.9381,
+        "defense_strength": 0.6977,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Sagan Tosu": {
+        "team_id": "Sagan Tosu",
+        "team_name": "Sagan Tosu",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.9634,
+        "defense_strength": 1.24,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Albirex Niigata": {
+        "team_id": "Albirex Niigata",
+        "team_name": "Albirex Niigata",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.8165,
+        "defense_strength": 1.4108,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Avispa Fukuoka": {
+        "team_id": "Avispa Fukuoka",
+        "team_name": "Avispa Fukuoka",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.6705,
+        "defense_strength": 0.7129,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Consadole Sapporo": {
+        "team_id": "Consadole Sapporo",
+        "team_name": "Consadole Sapporo",
+        "league_id": "JPN-J1",
+        "attack_strength": 1.0041,
+        "defense_strength": 1.2402,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Shonan Bellmare": {
+        "team_id": "Shonan Bellmare",
+        "team_name": "Shonan Bellmare",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.8352,
+        "defense_strength": 1.2974,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Kawasaki Frontale": {
+        "team_id": "Kawasaki Frontale",
+        "team_name": "Kawasaki Frontale",
+        "league_id": "JPN-J1",
+        "attack_strength": 1.4939,
+        "defense_strength": 1.411,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Cerezo Osaka": {
+        "team_id": "Cerezo Osaka",
+        "team_name": "Cerezo Osaka",
+        "league_id": "JPN-J1",
+        "attack_strength": 1.291,
+        "defense_strength": 1.2393,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "FC Tokyo": {
+        "team_id": "FC Tokyo",
+        "team_name": "FC Tokyo",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.916,
+        "defense_strength": 0.9159,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Machida Zelvia": {
+        "team_id": "Machida Zelvia",
+        "team_name": "Machida Zelvia",
+        "league_id": "JPN-J1",
+        "attack_strength": 1.0363,
+        "defense_strength": 0.7363,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Gamba Osaka": {
+        "team_id": "Gamba Osaka",
+        "team_name": "Gamba Osaka",
+        "league_id": "JPN-J1",
+        "attack_strength": 1.1509,
+        "defense_strength": 1.1367,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Kashiwa Reysol": {
+        "team_id": "Kashiwa Reysol",
+        "team_name": "Kashiwa Reysol",
+        "league_id": "JPN-J1",
+        "attack_strength": 1.2909,
+        "defense_strength": 0.7299,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Kyoto Sanga": {
+        "team_id": "Kyoto Sanga",
+        "team_name": "Kyoto Sanga",
+        "league_id": "JPN-J1",
+        "attack_strength": 1.3017,
+        "defense_strength": 0.8146,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Tokyo Verdy": {
+        "team_id": "Tokyo Verdy",
+        "team_name": "Tokyo Verdy",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.5439,
+        "defense_strength": 0.8738,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Yokohama F. Marinos": {
+        "team_id": "Yokohama F. Marinos",
+        "team_name": "Yokohama F. Marinos",
+        "league_id": "JPN-J1",
+        "attack_strength": 1.3073,
+        "defense_strength": 0.9345,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Yokohama FC": {
+        "team_id": "Yokohama FC",
+        "team_name": "Yokohama FC",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.6982,
+        "defense_strength": 0.9336,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Fagiano Okayama": {
+        "team_id": "Fagiano Okayama",
+        "team_name": "Fagiano Okayama",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.7964,
+        "defense_strength": 1.0723,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Shimizu S-pulse": {
+        "team_id": "Shimizu S-pulse",
+        "team_name": "Shimizu S-pulse",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.836,
+        "defense_strength": 1.0455,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "JEF United Chiba": {
+        "team_id": "JEF United Chiba",
+        "team_name": "JEF United Chiba",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.8607,
+        "defense_strength": 1.1618,
+        "matches_played": 0,
+        "cold_start": true
+      },
+      "V-varen Nagasaki": {
+        "team_id": "V-varen Nagasaki",
+        "team_name": "V-varen Nagasaki",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.8607,
+        "defense_strength": 1.1618,
+        "matches_played": 0,
+        "cold_start": true
+      },
+      "Mito Hollyhock": {
+        "team_id": "Mito Hollyhock",
+        "team_name": "Mito Hollyhock",
+        "league_id": "JPN-J1",
+        "attack_strength": 0.8607,
+        "defense_strength": 1.1618,
+        "matches_played": 0,
+        "cold_start": true
+      }
+    },
+    "KOR-K1": {
+      "Ulsan Hyundai FC": {
+        "team_id": "Ulsan Hyundai FC",
+        "team_name": "Ulsan Hyundai FC",
+        "league_id": "KOR-K1",
+        "attack_strength": 0.8872,
+        "defense_strength": 0.9801,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Pohang Steelers": {
+        "team_id": "Pohang Steelers",
+        "team_name": "Pohang Steelers",
+        "league_id": "KOR-K1",
+        "attack_strength": 0.8395,
+        "defense_strength": 0.84,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Jeonbuk Motors": {
+        "team_id": "Jeonbuk Motors",
+        "team_name": "Jeonbuk Motors",
+        "league_id": "KOR-K1",
+        "attack_strength": 1.2424,
+        "defense_strength": 0.7309,
+        "matches_played": 78,
+        "cold_start": false
+      },
+      "Daejeon Citizen": {
+        "team_id": "Daejeon Citizen",
+        "team_name": "Daejeon Citizen",
+        "league_id": "KOR-K1",
+        "attack_strength": 1.2932,
+        "defense_strength": 0.9165,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Gwangju FC": {
+        "team_id": "Gwangju FC",
+        "team_name": "Gwangju FC",
+        "league_id": "KOR-K1",
+        "attack_strength": 0.8228,
+        "defense_strength": 0.7786,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "FC Seoul": {
+        "team_id": "FC Seoul",
+        "team_name": "FC Seoul",
+        "league_id": "KOR-K1",
+        "attack_strength": 1.225,
+        "defense_strength": 1.1192,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Gangwon FC": {
+        "team_id": "Gangwon FC",
+        "team_name": "Gangwon FC",
+        "league_id": "KOR-K1",
+        "attack_strength": 0.8697,
+        "defense_strength": 0.7747,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Jeju United FC": {
+        "team_id": "Jeju United FC",
+        "team_name": "Jeju United FC",
+        "league_id": "KOR-K1",
+        "attack_strength": 0.8435,
+        "defense_strength": 0.9408,
+        "matches_played": 78,
+        "cold_start": false
+      },
+      "Incheon United": {
+        "team_id": "Incheon United",
+        "team_name": "Incheon United",
+        "league_id": "KOR-K1",
+        "attack_strength": 0.8175,
+        "defense_strength": 0.9825,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Suwon City FC": {
+        "team_id": "Suwon City FC",
+        "team_name": "Suwon City FC",
+        "league_id": "KOR-K1",
+        "attack_strength": 1.1281,
+        "defense_strength": 1.2274,
+        "matches_played": 78,
+        "cold_start": false
+      },
+      "Daegu FC": {
+        "team_id": "Daegu FC",
+        "team_name": "Daegu FC",
+        "league_id": "KOR-K1",
+        "attack_strength": 1.1304,
+        "defense_strength": 1.2249,
+        "matches_played": 78,
+        "cold_start": false
+      },
+      "Gimcheon Sangmu FC": {
+        "team_id": "Gimcheon Sangmu FC",
+        "team_name": "Gimcheon Sangmu FC",
+        "league_id": "KOR-K1",
+        "attack_strength": 1.2634,
+        "defense_strength": 0.9278,
+        "matches_played": 76,
+        "cold_start": false
+      },
+      "Asan Mugunghwa": {
+        "team_id": "Asan Mugunghwa",
+        "team_name": "Asan Mugunghwa",
+        "league_id": "KOR-K1",
+        "attack_strength": 0.9837,
+        "defense_strength": 1.2777,
+        "matches_played": 2,
+        "cold_start": true
+      },
+      "Seoul E-Land FC": {
+        "team_id": "Seoul E-Land FC",
+        "team_name": "Seoul E-Land FC",
+        "league_id": "KOR-K1",
+        "attack_strength": 0.9136,
+        "defense_strength": 1.1458,
+        "matches_played": 2,
+        "cold_start": true
+      },
+      "FC Anyang": {
+        "team_id": "FC Anyang",
+        "team_name": "FC Anyang",
+        "league_id": "KOR-K1",
+        "attack_strength": 1.0471,
+        "defense_strength": 0.9242,
+        "matches_played": 38,
+        "cold_start": false
+      },
+      "Suwon Bluewings": {
+        "team_id": "Suwon Bluewings",
+        "team_name": "Suwon Bluewings",
+        "league_id": "KOR-K1",
+        "attack_strength": 0.7317,
+        "defense_strength": 1.1619,
+        "matches_played": 2,
+        "cold_start": true
+      },
+      "Bucheon FC 1995": {
+        "team_id": "Bucheon FC 1995",
+        "team_name": "Bucheon FC 1995",
+        "league_id": "KOR-K1",
+        "attack_strength": 0.9612,
+        "defense_strength": 1.0469,
+        "matches_played": 2,
+        "cold_start": true
+      }
+    },
+    "IDN-L1": {}
+  }
+}

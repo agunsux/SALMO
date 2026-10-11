@@ -32,7 +32,7 @@ const { SettlementEngine } = require('../src/engine/settlement/settlementEngine.
 const { PerformanceMetricsEngine } = require('../src/engine/performance/performanceMetrics.ts');
 const { isPublicPickEligible, classifyDailyPicksState } = require('../src/lib/eligibility.ts');
 
-test('1. Production Ledger Integrity: 30 Pre-Kickoff Rows Strictly PENDING Ahead of Kickoff', () => {
+test('1. Production Ledger Integrity: 12 Finished AH/OU Rows Settled, 18 Rows Strictly PENDING', () => {
   const ledgerPath = path.resolve(__dirname, '..', 'data', 'verification', 'live_prediction_ledger.jsonl');
   assert.strictEqual(fs.existsSync(ledgerPath), true, 'Ledger file must exist');
 
@@ -40,24 +40,39 @@ test('1. Production Ledger Integrity: 30 Pre-Kickoff Rows Strictly PENDING Ahead
   assert.strictEqual(lines.length, 30, 'Ledger must contain exactly 30 prediction rows (10 matches * 3 markets)');
 
   const rows = lines.map(line => JSON.parse(line));
-  const pendingRows = rows.filter(r => r.settlementStatus === 'PENDING' || r.settlement === 'PENDING');
-  assert.strictEqual(pendingRows.length, 30, 'All 30 rows must be strictly PENDING ahead of kickoff');
+  const settledRows = rows.filter(r => r.settlementStatus === 'SETTLED' || r.settlement === 'SETTLED');
+  const pendingRows = rows.filter(r => r.settlementStatus === 'PENDING' && r.settlement === 'PENDING');
 
-  // Assert zero score contamination on forward-tracking ledger
-  for (const r of rows) {
-    assert.strictEqual(r.homeGoals, null, 'homeGoals must be null ahead of kickoff');
-    assert.strictEqual(r.awayGoals, null, 'awayGoals must be null ahead of kickoff');
-    assert.strictEqual(r.result, null, 'result must be null ahead of kickoff');
-    assert.strictEqual(r.profitUnits, 0, 'profitUnits must be 0 for pending positions');
+  assert.strictEqual(settledRows.length, 12, 'Exactly 12 AH/OU positions from 6 finished matches must be SETTLED');
+  assert.strictEqual(pendingRows.length, 18, 'Remaining 18 positions (6 BTTS + 12 upcoming) must be strictly PENDING');
+
+  // Verify settled rows have authentic scores and results
+  for (const r of settledRows) {
+    assert.ok(typeof r.homeGoals === 'number', 'homeGoals must be a number for settled match');
+    assert.ok(typeof r.awayGoals === 'number', 'awayGoals must be a number for settled match');
+    assert.ok(r.result !== null, 'result must not be null for settled match');
     assert.strictEqual(r.bookmaker, 'pinnacle', 'Must use sharp Pinnacle reference odds');
     assert.ok(r.oddsAtPrediction > 1.0, 'Must have valid real odds at prediction');
+  }
+
+  // Verify pending rows have null scores
+  for (const r of pendingRows) {
+    if (r.market === 'BTTS' && r.matchStatus === 'FINISHED') {
+      // BTTS remains pending because market baseline is unvalidated
+      assert.strictEqual(r.settlement, 'PENDING');
+    } else {
+      assert.strictEqual(r.homeGoals, null, 'homeGoals must be null ahead of kickoff');
+      assert.strictEqual(r.awayGoals, null, 'awayGoals must be null ahead of kickoff');
+      assert.strictEqual(r.result, null, 'result must be null ahead of kickoff');
+      assert.strictEqual(r.profitUnits, 0, 'profitUnits must be 0 for pending positions');
+    }
   }
 
   const distinctMatches = new Set(rows.map(r => r.canonicalMatchId));
   assert.strictEqual(distinctMatches.size, 10, 'Must cover exactly 10 distinct fixtures');
 });
 
-test('2. Live Financial Accounting Invariants: 0 Settled Units, 0 Net Profit, N = 0 Strictly INSUFFICIENT SAMPLE', () => {
+test('2. Live Financial Accounting Invariants: 12 Settled Units, N = 12 < 30 Strictly INSUFFICIENT SAMPLE', () => {
   const ledgerPath = path.resolve(__dirname, '..', 'data', 'verification', 'live_prediction_ledger.jsonl');
   const lines = fs.readFileSync(ledgerPath, 'utf8').trim().split('\n').filter(Boolean);
   const rows = lines.map(line => JSON.parse(line));
@@ -92,22 +107,15 @@ test('2. Live Financial Accounting Invariants: 0 Settled Units, 0 Net Profit, N 
 
   const report = PerformanceMetricsEngine.generateReport(snapshots);
 
-  // Invariant 1: Total Staked Denominator = 0 (no finished bets)
-  assert.strictEqual(report.controlFullCohort.unitsStaked, 0.0, 'Staked units must be 0 for pending cohort');
+  // Invariant 1: Total Staked Denominator = 12 (12 finished bets)
+  assert.strictEqual(report.controlFullCohort.unitsStaked, 12.0, 'Staked units must be 12 for finished bets');
 
-  // Invariant 2: Net Profit = 0
-  assert.strictEqual(report.controlFullCohort.profitUnits, 0.0, 'Net profit must be 0 for pending cohort');
+  // Invariant 2: Pending count = 8, Settled = 12
+  assert.strictEqual(report.controlFullCohort.pending, 8, '8 upcoming AH/OU bets must be pending');
+  assert.strictEqual(report.controlFullCohort.settled, 12, 'Settled count must be 12');
 
-  // Invariant 3: Realized Yield / ROI = null ("No settled bets")
-  assert.strictEqual(report.controlFullCohort.roi, null, 'ROI must be null when units staked is 0');
-  assert.strictEqual(report.controlFullCohort.displayStatus, 'No settled bets', 'Display status must be "No settled bets"');
-
-  // Invariant 4: Pending count = 20, Settled = 0
-  assert.strictEqual(report.controlFullCohort.pending, 20, 'All 20 AH/OU bets must be pending');
-  assert.strictEqual(report.controlFullCohort.settled, 0, 'Settled count must be 0');
-
-  // Invariant 5: Sample Size Honesty (N = 0 < 30 strictly enforces INSUFFICIENT SAMPLE)
-  assert.strictEqual(report.controlFullCohort.sampleStatus, 'INSUFFICIENT SAMPLE', 'N=0 must be INSUFFICIENT SAMPLE');
+  // Invariant 3: Sample Size Honesty (N = 12 < 30 strictly enforces INSUFFICIENT SAMPLE)
+  assert.strictEqual(report.controlFullCohort.sampleStatus, 'INSUFFICIENT SAMPLE', 'N=12 must be INSUFFICIENT SAMPLE');
   assert.strictEqual(report.headlineGreenCohort.sampleStatus, 'INSUFFICIENT SAMPLE', 'Green cohort must be INSUFFICIENT SAMPLE');
 });
 

@@ -19,7 +19,8 @@ import { resolveTeamRating, TeamRating, normalizeTeamKey } from '../features/tea
 import { ApiFootballProvider } from '../../services/providers/apiFootballProvider';
 import { OddsPapiProvider } from '../../services/providers/oddsPapiProvider';
 import { LiveOddsDTO } from '../../services/providers/types';
-import { CANONICAL_15_LEAGUES, getTournamentBatches } from '../../config/multiLeagueRegistry';
+import { CANONICAL_15_LEAGUES, getTournamentBatches, getLeagueByNameOrSlug, isLeagueMarketProductionEnabled, getPriorityOrderedLeaguesForOdds } from '../../config/multiLeagueRegistry';
+import { FixtureIntegrityGuard } from '../../lib/fixtureIntegrity';
 import { env } from '../../config/env';
 import { ActiveMatchPrediction, ActivePredictionMarket } from '../../types/index';
 import { Logger } from '../../lib/logger';
@@ -101,12 +102,14 @@ export class ProductionPredictionEngine {
     season: string | number,
     homeTeam: string,
     awayTeam: string,
-    kickoffUtc: string
+    kickoffUtc: string,
+    league?: string
   ): string {
+    const prefix = FixtureIntegrityGuard.resolveLeaguePrefix(league || 'Premier League');
     const h = normalizeTeamKey(homeTeam).toUpperCase();
     const a = normalizeTeamKey(awayTeam).toUpperCase();
     const date = kickoffUtc ? kickoffUtc.slice(0, 10) : '';
-    return `EPL_${season}_${h}_${a}_${date}`;
+    return `${prefix}_${season}_${h}_${a}_${date}`;
   }
 
   /**
@@ -125,15 +128,17 @@ export class ProductionPredictionEngine {
   } {
     const { fixtureId, homeTeam, awayTeam, league, kickoffUtc, venue } = fixture;
     const season = fixture.season || '2026';
-    const canonicalMatchId = this.generateCanonicalMatchId(season, homeTeam, awayTeam, kickoffUtc);
+    const canonicalMatchId = this.generateCanonicalMatchId(season, homeTeam, awayTeam, kickoffUtc, league);
 
     // 1. Resolve League Goals Environment & Team Ratings
     const profile = CompetitionProfileEngine.getProfileForLeague(league);
-    const homeRating = resolveTeamRating(homeTeam);
-    const awayRating = resolveTeamRating(awayTeam);
+    const homeRating = resolveTeamRating(homeTeam, undefined, false, league);
+    const awayRating = resolveTeamRating(awayTeam, undefined, false, league);
 
     const isSufficient = Boolean(
       homeRating && awayRating &&
+      !homeRating.cold_start &&
+      !awayRating.cold_start &&
       homeRating.matches_played >= 3 &&
       awayRating.matches_played >= 3
     );
@@ -154,9 +159,12 @@ export class ProductionPredictionEngine {
     if (isSufficient) {
       lambdaHome = Number(Math.max(0.20, homeAttack * awayDefense * homeBase).toFixed(4));
       lambdaAway = Number(Math.max(0.20, awayAttack * homeDefense * awayBase).toFixed(4));
-    } else {
+    } else if (profile.code === 'EPL' && (!homeRating || !awayRating)) {
       lambdaHome = 1.35;
       lambdaAway = 1.20;
+    } else {
+      lambdaHome = Number(Math.max(0.20, homeAttack * awayDefense * homeBase).toFixed(4));
+      lambdaAway = Number(Math.max(0.20, awayAttack * homeDefense * awayBase).toFixed(4));
     }
 
     // 2. Build 11x11 Dixon-Coles Score Grid
@@ -173,6 +181,7 @@ export class ProductionPredictionEngine {
     const ahOdds = fixture.pinnacleOdds?.ah;
     const ahLine = ahOdds?.line ?? -0.25;
     const ahProb = calculateAsianHandicapProbability(lambdaHome, lambdaAway, ahLine, rho);
+    const isAhCalibrated = CompetitionProfileEngine.isMarketCalibrated(league, 'AH');
 
     let ahMarket: ActivePredictionMarket;
 
@@ -202,7 +211,7 @@ export class ProductionPredictionEngine {
         homeTeam,
         awayTeam,
         league,
-        modelStatus: isSufficient ? 'FIXTURE_SPECIFIC' : 'INSUFFICIENT_MODEL',
+        modelStatus: (isAhCalibrated && isSufficient) ? 'FIXTURE_SPECIFIC' : 'INSUFFICIENT_MODEL',
       });
 
       evaluations.ah = {
@@ -257,6 +266,7 @@ export class ProductionPredictionEngine {
       awayXG: lambdaAway,
       rho,
     });
+    const isOuCalibrated = CompetitionProfileEngine.isMarketCalibrated(league, 'OU');
 
     let ouMarket: ActivePredictionMarket;
 
@@ -266,6 +276,13 @@ export class ProductionPredictionEngine {
         market: 'OU',
         line: ouLine,
         modelProbability: ouResult.coverProbability,
+        ouBreakdown: {
+          fullWin: ouResult.probabilities.fullWin,
+          halfWin: ouResult.probabilities.halfWin,
+          push: ouResult.probabilities.push,
+          halfLoss: ouResult.probabilities.halfLoss,
+          fullLoss: ouResult.probabilities.fullLoss,
+        },
         pinnacleOdds: {
           sideOdds: ouOdds.overOdds,
           oppositeOdds: ouOdds.underOdds,
@@ -279,7 +296,7 @@ export class ProductionPredictionEngine {
         homeTeam,
         awayTeam,
         league,
-        modelStatus: isSufficient ? 'FIXTURE_SPECIFIC' : 'INSUFFICIENT_MODEL',
+        modelStatus: (isOuCalibrated && isSufficient) ? 'FIXTURE_SPECIFIC' : 'INSUFFICIENT_MODEL',
       });
 
       evaluations.ou = {
@@ -646,9 +663,11 @@ export class ProductionPredictionEngine {
           // 3. STEP 1 & 1.1: Production Betting Ledger Qualification Rule
           const isLayak = marketView.verdict === 'LAYAK';
           const isAllowedMarket = shortMarket === 'AH' || shortMarket === 'OU';
+          const isMarketActiveForLeague =
+            isAllowedMarket && isLeagueMarketProductionEnabled(prediction.league, shortMarket);
           const hasValidOdds = typeof marketView.marketOdds === 'number' && marketView.marketOdds > 1.0;
           const isProvider = true;
-          const isActive = true;
+          const isActive = isMarketActiveForLeague;
           const kickoffMs = new Date(prediction.kickoffUtc).getTime();
           const writeTimeMs = Date.now();
           const isPreKickoff = Number.isFinite(kickoffMs) ? writeTimeMs < kickoffMs : true;
@@ -657,6 +676,7 @@ export class ProductionPredictionEngine {
           const qualifiesForLedger =
             isLayak &&
             isAllowedMarket &&
+            isMarketActiveForLeague &&
             hasValidOdds &&
             isPreKickoff &&
             isWithinWindow &&
@@ -665,7 +685,7 @@ export class ProductionPredictionEngine {
 
           if (!qualifiesForLedger) {
             result.excludedCount++;
-            continue; // NEVER write PANTAU, LEWATI, BTTS, Moneyline, invalid odds, or picks outside execution window to prediction_ledger
+            continue; // NEVER write PANTAU, LEWATI, BTTS, Moneyline, invalid odds, unactivated markets, or picks outside execution window to prediction_ledger
           }
 
           // STEP 2: Canonical Position Identity & Idempotency Check
@@ -728,11 +748,14 @@ export class ProductionPredictionEngine {
             created_at: new Date().toISOString(),
           };
 
+          const leagueEntry = getLeagueByNameOrSlug(prediction.league);
+          const competitionId = leagueEntry ? leagueEntry.provider_league_id : 39;
+
           const ledgerRow = {
             id: ledgerDeterministicId,
             doi_id: ledgerPositionId,
             match_id: fixtureUuid,
-            competition_id: 39,
+            competition_id: competitionId,
             market: shortMarket,
             selection: marketView.selection,
             fair_odds: marketView.fairOdds,
@@ -863,9 +886,9 @@ export class ProductionPredictionEngine {
       try {
         const fixtureRes = await oddsPapi.getUpcomingFixtures();
         if (fixtureRes.status === 'AVAILABLE' && fixtureRes.data && fixtureRes.data.length > 0) {
-          // Invariant: batch tournament odds ingestion across 15 canonical leagues
-          // 3 tournament batches x 2 active bookmakers (pinnacle, bet365) = exactly 6 odds requests
-          const tournamentBatches = getTournamentBatches(CANONICAL_15_LEAGUES);
+          // Priority-ordered tournament batches (ACTIVE & validated leagues first)
+          const prioritizedLeagues = getPriorityOrderedLeaguesForOdds();
+          const tournamentBatches = getTournamentBatches(prioritizedLeagues.length > 0 ? prioritizedLeagues : CANONICAL_15_LEAGUES);
           const oddsByFixtureId = new Map<string, LiveOddsDTO[]>();
           const consumedBooks = (
             env.providers.oddsPapi.activeBookmakers && env.providers.oddsPapi.activeBookmakers.length > 0

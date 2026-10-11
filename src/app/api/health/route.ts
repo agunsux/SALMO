@@ -7,6 +7,8 @@ import { NextResponse } from 'next/server';
 import { HandicapLabAdapterFactory } from '@/contracts/handicapLabAdapter';
 import { testDbConnection } from '@/lib/db';
 import { env } from '@/config/env';
+import { CANONICAL_15_LEAGUES } from '@/config/multiLeagueRegistry';
+import { OddsPapiQuotaGuard } from '@/lib/quota/oddsPapiQuotaGuard';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,6 +52,24 @@ export async function GET() {
 
   const latencyMs = Date.now() - start;
 
+  const activeLeagues = CANONICAL_15_LEAGUES.filter(l => l.production_status === 'ACTIVE').map(l => ({
+    internalLeagueId: l.internal_league_id,
+    leagueName: l.league_name,
+    enabledMarkets: l.production_enabled_markets || [],
+  }));
+  const shadowLeagues = CANONICAL_15_LEAGUES.filter(l => l.production_status === 'SHADOW').map(l => ({
+    internalLeagueId: l.internal_league_id,
+    leagueName: l.league_name,
+    validatedMarkets: l.validated_markets || [],
+    ahReadiness: l.market_readiness?.AH,
+    ouReadiness: l.market_readiness?.OU,
+  }));
+  const pausedLeagues = CANONICAL_15_LEAGUES.filter(l => l.production_status === 'PAUSED').map(l => ({
+    internalLeagueId: l.internal_league_id,
+    leagueName: l.league_name,
+    reason: l.activation_reason,
+  }));
+
   const payload = {
     status: overallStatus,
     service: 'salmo',
@@ -58,6 +78,15 @@ export async function GET() {
     uptimeSeconds: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
     latencyMs,
+    multiLeagueActivation: {
+      activeLeaguesCount: activeLeagues.length,
+      shadowLeaguesCount: shadowLeagues.length,
+      pausedLeaguesCount: pausedLeagues.length,
+      mandatoryQuotaReserve: OddsPapiQuotaGuard.MANDATORY_MULTI_LEAGUE_RESERVE,
+      activeLeagues,
+      shadowLeagues,
+      pausedLeagues,
+    },
     dependencies: {
       predictionEngine: {
         status: 'healthy',

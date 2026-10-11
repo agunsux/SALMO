@@ -21,6 +21,7 @@ import { matchesDynamicHorizon } from '../lib/horizon';
 
 import { normalizeTeamKey } from './features/teamRatings';
 import { FixtureIntegrityGuard } from '../lib/fixtureIntegrity';
+import { isLeagueMarketProductionEnabled } from '../config/multiLeagueRegistry';
 export { normalizeTeamKey };
 
 export class MatchIntelligenceService {
@@ -39,8 +40,9 @@ export class MatchIntelligenceService {
   public static async getUpcomingFixturesWithIntelligence(filter?: {
     horizon?: string;
     market?: 'ALL' | 'AH' | 'BTTS' | 'OU';
+    nowMs?: number;
   }): Promise<MatchIntelligence[]> {
-    const nowMs = Date.now();
+    const nowMs = filter?.nowMs ?? Date.now();
     const scheduledFixtures: Array<{
       providerFixtureId: string;
       homeTeam: string;
@@ -97,7 +99,7 @@ export class MatchIntelligenceService {
                 providerFixtureId: String(apiId),
                 homeTeam: m.home_team,
                 awayTeam: m.away_team,
-                league: m.league || 'Premier League',
+                league: m.league || 'UNKNOWN_LEAGUE',
                 season: m.season || '2026',
                 kickoffUtc: kTime,
                 venue: m.venue || m.pipeline_metadata?.venue,
@@ -216,16 +218,17 @@ export class MatchIntelligenceService {
         f.awayTeam,
         f.kickoffUtc
       );
-      const eplCanonicalId = `EPL_2026_${homeNorm}_${awayNorm}_${kickoffDate}`;
+      const isEpl = (f.league || '').toLowerCase().includes('premier league') || (f.league || '').toLowerCase() === 'epl';
+      const eplCanonicalId = isEpl ? `EPL_2026_${homeNorm}_${awayNorm}_${kickoffDate}` : null;
       const legacyHomeSlug = f.homeTeam.toUpperCase().replace(/[^A-Z0-9]/g, '');
       const legacyAwaySlug = f.awayTeam.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      const legacyCanonicalId = `EPL_2026_${legacyHomeSlug}_${legacyAwaySlug}_${kickoffDate}`;
+      const legacyCanonicalId = isEpl ? `EPL_2026_${legacyHomeSlug}_${legacyAwaySlug}_${kickoffDate}` : null;
       const normKey = `${normalizeTeamKey(f.homeTeam)}_${normalizeTeamKey(f.awayTeam)}`;
 
       if (
         processedKeys.has(canonicalMatchId) ||
-        processedKeys.has(eplCanonicalId) ||
-        processedKeys.has(legacyCanonicalId) ||
+        (eplCanonicalId && processedKeys.has(eplCanonicalId)) ||
+        (legacyCanonicalId && processedKeys.has(legacyCanonicalId)) ||
         processedKeys.has(normKey) ||
         (f.providerFixtureId && processedKeys.has(f.providerFixtureId))
       ) {
@@ -233,16 +236,16 @@ export class MatchIntelligenceService {
       }
 
       processedKeys.add(canonicalMatchId);
-      processedKeys.add(eplCanonicalId);
-      processedKeys.add(legacyCanonicalId);
+      if (eplCanonicalId) processedKeys.add(eplCanonicalId);
+      if (legacyCanonicalId) processedKeys.add(legacyCanonicalId);
       processedKeys.add(normKey);
       if (f.providerFixtureId) processedKeys.add(f.providerFixtureId);
 
       // Check for active prediction overlay
       const pred =
         predictionsMap.get(canonicalMatchId) ||
-        predictionsMap.get(eplCanonicalId) ||
-        predictionsMap.get(legacyCanonicalId) ||
+        (eplCanonicalId ? predictionsMap.get(eplCanonicalId) : undefined) ||
+        (legacyCanonicalId ? predictionsMap.get(legacyCanonicalId) : undefined) ||
         predictionsMap.get(normKey) ||
         (f.providerFixtureId ? predictionsMap.get(f.providerFixtureId) : undefined);
 
@@ -297,6 +300,7 @@ export class MatchIntelligenceService {
   public static async getForward7DayMatches(filter?: {
     horizon?: string;
     market?: 'ALL' | 'AH' | 'BTTS' | 'OU';
+    nowMs?: number;
   }): Promise<MatchIntelligence[]> {
     return this.getUpcomingFixturesWithIntelligence(filter);
   }
@@ -308,8 +312,21 @@ export class MatchIntelligenceService {
     marketType: 'ASIAN_HANDICAP' | 'BTTS' | 'OVER_UNDER',
     lineLabel: string,
     summary: any,
-    leagueName: string = 'Premier League'
+    leagueName: string = 'Premier League',
+    explicitReason?: string
   ): MarketView {
+    const isEpl = (leagueName || '').toLowerCase().includes('premier league') || (leagueName || '').toLowerCase() === 'epl';
+    const shortMarket = marketType === 'ASIAN_HANDICAP' ? 'AH' : marketType === 'OVER_UNDER' ? 'OU' : 'BTTS';
+    const isProdEnabled =
+      isEpl ||
+      (shortMarket !== 'BTTS' && isLeagueMarketProductionEnabled(leagueName, shortMarket));
+    const reasonText = explicitReason || (
+      !isProdEnabled
+        ? 'Fixtures only — model baseline not available'
+        : 'Real bookmaker market odds are not currently published for this fixture.'
+    );
+    const statusLabelText = !isProdEnabled ? 'ANALYSIS UNAVAILABLE' : 'ODDS UNAVAILABLE';
+
     return {
       marketType,
       lineLabel,
@@ -319,7 +336,7 @@ export class MatchIntelligenceService {
       bookmaker: null,
       badge: 'GREY',
       status: 'ODDS_UNAVAILABLE',
-      statusLabel: 'ODDS UNAVAILABLE',
+      statusLabel: statusLabelText,
       confidence: 'NONE',
       confidenceScore: 0,
       modelProbabilityPct: null,
@@ -329,7 +346,7 @@ export class MatchIntelligenceService {
       sampleSize: 0,
       dataQuality: 'NONE',
       validationStage: 'UNAVAILABLE',
-      reason: 'Real bookmaker market odds are not currently published for this fixture.',
+      reason: reasonText,
       provenance: {
         source: 'SALMO Native Intelligence',
         datasetVersion: summary?.version || 'v1.0.0-salmo-native',
