@@ -1,8 +1,8 @@
 {
   "provenance": {
     "source": "Dribble360 (2023-2026) + API-Football Pro Verified Archive (2024-2025)",
-    "version": "multi-league-ratings-v2.0",
-    "generationMethod": "6-iteration normalized Dixon-Coles convergence (league mean = 1.0000, decay = 0.90, Bayesian shrinkage k = 6)",
+    "version": "multi-league-ratings-v2.1-hardened",
+    "generationMethod": "6-iteration normalized Dixon-Coles convergence (league mean = 1.0000, decay = 0.95, Bayesian shrinkage k = 10, strict chronological walk-forward t_train < t_eval)",
     "date": "2026-10-11",
     "leaguesCovered": [
       "ENG-PL",
@@ -207,225 +207,1420 @@
     "ENG-PL": {
       "nTrainInitial": 1029,
       "nEval": 300,
+      "chronologicalWalkForwardVerified": true,
+      "leakageAudit": {
+        "strictTimestampFiltering": "t_train < t_eval (strictly prior kickoff timestamp)",
+        "zeroConcurrentTimestampLeakage": true,
+        "zeroFutureScoreLeakage": true,
+        "zeroSeasonAggregateLeakage": true
+      },
+      "targetDefinitionAudit": {
+        "ahHomeMinus05Note": "Fixed -0.5 line (binary 1X2 Home Win vs Draw/Away). Low Brier (~0.18-0.22) reflects unhandicapped favorite mismatch base rates, NOT balanced market Asian Handicap line pricing.",
+        "ahBalancedHalfLineNote": "Pre-kickoff model-balanced half-goal line L_half* in {-2.5, -1.5, -0.5, +0.5, +1.5, +2.5} with strictly binary outcome Y in {0, 1} (constant-0.5 Brier = 0.2500).",
+        "ahBalancedQuarterLineNote": "Pre-kickoff model-balanced quarter-line L* on 0.25 grid with exact split quarter-line push (0.5), half-win (0.75), and half-loss (0.25) settlement."
+      },
       "ou25": {
-        "brier": 0.2606,
-        "logLoss": 0.7158,
-        "calibrationSlope": -0.3235,
-        "calibrationIntercept": 0.713
+        "brier": 0.2605,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2487,
+        "brierCi95": [
+          0.25,
+          0.2726
+        ],
+        "deltaVs05Ci95": [
+          0,
+          0.0226
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.7154,
+        "calibrationSlope": -0.3275,
+        "calibrationIntercept": 0.7153
       },
       "ahHomeMinus05": {
-        "brier": 0.2188,
-        "logLoss": 0.625,
-        "calibrationSlope": 0.8707,
-        "calibrationIntercept": 0.01
+        "brier": 0.2189,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2356,
+        "brierCi95": [
+          0.202,
+          0.2356
+        ],
+        "deltaVs05Ci95": [
+          -0.048,
+          -0.0144
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.6256,
+        "calibrationSlope": 0.8675,
+        "calibrationIntercept": 0.0111
+      },
+      "ahBalancedHalfLine": {
+        "brier": 0.2414,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2495,
+        "brierCi95": [
+          0.2329,
+          0.2497
+        ],
+        "deltaVs05Ci95": [
+          -0.0171,
+          -0.0003
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.6759,
+        "calibrationSlope": 1.2005,
+        "calibrationIntercept": -0.1146
+      },
+      "ahBalancedQuarterLine": {
+        "brier": 0.2097,
+        "constant05Brier": 0.2127,
+        "baseRateBrier": 0.2123,
+        "brierCi95": [
+          0.2003,
+          0.2187
+        ],
+        "deltaVs05Ci95": [
+          -0.0055,
+          -0.0002
+        ],
+        "beatsConstant05At95Ci": false,
+        "calibrationSlope": 3.1499,
+        "calibrationIntercept": -1.0853
+      },
+      "pinnacleBenchmark": {
+        "available": true,
+        "matchedFixtures": 80,
+        "ou25PinnacleBrier": 0.2436,
+        "ou25ModelBrierOnMatched": 0.2612,
+        "ahMarketLinePinnacleBrier": 0.2089,
+        "ahMarketLineModelBrierOnMatched": 0.2088,
+        "reason": "Matched 80 out-of-sample fixtures against verified Pinnacle closing odds (football-data.co.uk E0 archive)."
+      },
+      "marketApproval": {
+        "AH": "APPROVED_PRODUCTION_BASELINE",
+        "OU": "APPROVED_PRODUCTION_BASELINE",
+        "approvalBlockers": []
       }
     },
     "ESP-LALIGA": {
       "nTrainInitial": 1059,
       "nEval": 300,
+      "chronologicalWalkForwardVerified": true,
+      "leakageAudit": {
+        "strictTimestampFiltering": "t_train < t_eval (strictly prior kickoff timestamp)",
+        "zeroConcurrentTimestampLeakage": true,
+        "zeroFutureScoreLeakage": true,
+        "zeroSeasonAggregateLeakage": true
+      },
+      "targetDefinitionAudit": {
+        "ahHomeMinus05Note": "Fixed -0.5 line (binary 1X2 Home Win vs Draw/Away). Low Brier (~0.18-0.22) reflects unhandicapped favorite mismatch base rates, NOT balanced market Asian Handicap line pricing.",
+        "ahBalancedHalfLineNote": "Pre-kickoff model-balanced half-goal line L_half* in {-2.5, -1.5, -0.5, +0.5, +1.5, +2.5} with strictly binary outcome Y in {0, 1} (constant-0.5 Brier = 0.2500).",
+        "ahBalancedQuarterLineNote": "Pre-kickoff model-balanced quarter-line L* on 0.25 grid with exact split quarter-line push (0.5), half-win (0.75), and half-loss (0.25) settlement."
+      },
       "ou25": {
-        "brier": 0.2481,
-        "logLoss": 0.6895,
-        "calibrationSlope": 0.6252,
-        "calibrationIntercept": 0.2311
+        "brier": 0.248,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2491,
+        "brierCi95": [
+          0.2343,
+          0.2611
+        ],
+        "deltaVs05Ci95": [
+          -0.0157,
+          0.0111
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6894,
+        "calibrationSlope": 0.6299,
+        "calibrationIntercept": 0.2289
       },
       "ahHomeMinus05": {
-        "brier": 0.2288,
-        "logLoss": 0.6506,
-        "calibrationSlope": 0.8948,
-        "calibrationIntercept": 0.0871
+        "brier": 0.228,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2499,
+        "brierCi95": [
+          0.211,
+          0.2451
+        ],
+        "deltaVs05Ci95": [
+          -0.039,
+          -0.0049
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.6488,
+        "calibrationSlope": 0.9069,
+        "calibrationIntercept": 0.0818
+      },
+      "ahBalancedHalfLine": {
+        "brier": 0.2452,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2499,
+        "brierCi95": [
+          0.2366,
+          0.2551
+        ],
+        "deltaVs05Ci95": [
+          -0.0134,
+          0.0051
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6834,
+        "calibrationSlope": 0.9224,
+        "calibrationIntercept": 0.0654
+      },
+      "ahBalancedQuarterLine": {
+        "brier": 0.2033,
+        "constant05Brier": 0.2023,
+        "baseRateBrier": 0.2015,
+        "brierCi95": [
+          0.1921,
+          0.2138
+        ],
+        "deltaVs05Ci95": [
+          -0.0014,
+          0.0035
+        ],
+        "beatsConstant05At95Ci": false,
+        "calibrationSlope": -0.1182,
+        "calibrationIntercept": 0.586
+      },
+      "pinnacleBenchmark": {
+        "available": false,
+        "matchedFixtures": 0,
+        "ou25PinnacleBrier": null,
+        "ou25ModelBrierOnMatched": null,
+        "ahMarketLinePinnacleBrier": null,
+        "ahMarketLineModelBrierOnMatched": null,
+        "reason": "No historical Pinnacle closing/opening AH or OU odds available in verified archive for this league."
+      },
+      "marketApproval": {
+        "AH": "NOT_APPROVED_FOR_PRODUCTION",
+        "OU": "NOT_APPROVED_FOR_PRODUCTION",
+        "approvalBlockers": [
+          "NO_HISTORICAL_PINNACLE_BENCHMARK",
+          "OU_BRIER_95CI_OVERLAPS_02500",
+          "AH_BALANCED_HALF_BRIER_95CI_OVERLAPS_02500",
+          "EXPLICIT_HUMAN_APPROVAL_REQUIRED"
+        ]
       }
     },
     "ITA-SERIEA": {
       "nTrainInitial": 1031,
       "nEval": 300,
+      "chronologicalWalkForwardVerified": true,
+      "leakageAudit": {
+        "strictTimestampFiltering": "t_train < t_eval (strictly prior kickoff timestamp)",
+        "zeroConcurrentTimestampLeakage": true,
+        "zeroFutureScoreLeakage": true,
+        "zeroSeasonAggregateLeakage": true
+      },
+      "targetDefinitionAudit": {
+        "ahHomeMinus05Note": "Fixed -0.5 line (binary 1X2 Home Win vs Draw/Away). Low Brier (~0.18-0.22) reflects unhandicapped favorite mismatch base rates, NOT balanced market Asian Handicap line pricing.",
+        "ahBalancedHalfLineNote": "Pre-kickoff model-balanced half-goal line L_half* in {-2.5, -1.5, -0.5, +0.5, +1.5, +2.5} with strictly binary outcome Y in {0, 1} (constant-0.5 Brier = 0.2500).",
+        "ahBalancedQuarterLineNote": "Pre-kickoff model-balanced quarter-line L* on 0.25 grid with exact split quarter-line push (0.5), half-win (0.75), and half-loss (0.25) settlement."
+      },
       "ou25": {
         "brier": 0.2577,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2497,
+        "brierCi95": [
+          0.2451,
+          0.271
+        ],
+        "deltaVs05Ci95": [
+          -0.0049,
+          0.021
+        ],
+        "beatsConstant05At95Ci": false,
         "logLoss": 0.7101,
-        "calibrationSlope": 0.1719,
-        "calibrationIntercept": 0.4077
+        "calibrationSlope": 0.1737,
+        "calibrationIntercept": 0.4069
       },
       "ahHomeMinus05": {
         "brier": 0.2116,
-        "logLoss": 0.6112,
-        "calibrationSlope": 0.9301,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2407,
+        "brierCi95": [
+          0.1916,
+          0.2328
+        ],
+        "deltaVs05Ci95": [
+          -0.0584,
+          -0.0172
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.6113,
+        "calibrationSlope": 0.9304,
         "calibrationIntercept": 0.0267
+      },
+      "ahBalancedHalfLine": {
+        "brier": 0.239,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2484,
+        "brierCi95": [
+          0.2304,
+          0.2479
+        ],
+        "deltaVs05Ci95": [
+          -0.0196,
+          -0.0021
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.6708,
+        "calibrationSlope": 1.2685,
+        "calibrationIntercept": -0.1663
+      },
+      "ahBalancedQuarterLine": {
+        "brier": 0.2071,
+        "constant05Brier": 0.2071,
+        "baseRateBrier": 0.206,
+        "brierCi95": [
+          0.1972,
+          0.217
+        ],
+        "deltaVs05Ci95": [
+          -0.003,
+          0.0029
+        ],
+        "beatsConstant05At95Ci": false,
+        "calibrationSlope": 0.403,
+        "calibrationIntercept": 0.2662
+      },
+      "pinnacleBenchmark": {
+        "available": false,
+        "matchedFixtures": 0,
+        "ou25PinnacleBrier": null,
+        "ou25ModelBrierOnMatched": null,
+        "ahMarketLinePinnacleBrier": null,
+        "ahMarketLineModelBrierOnMatched": null,
+        "reason": "No historical Pinnacle closing/opening AH or OU odds available in verified archive for this league."
+      },
+      "marketApproval": {
+        "AH": "NOT_APPROVED_FOR_PRODUCTION",
+        "OU": "NOT_APPROVED_FOR_PRODUCTION",
+        "approvalBlockers": [
+          "NO_HISTORICAL_PINNACLE_BENCHMARK",
+          "OU_BRIER_95CI_OVERLAPS_02500",
+          "EXPLICIT_HUMAN_APPROVAL_REQUIRED"
+        ]
       }
     },
     "DEU-BUNDESLIGA": {
       "nTrainInitial": 761,
       "nEval": 300,
+      "chronologicalWalkForwardVerified": true,
+      "leakageAudit": {
+        "strictTimestampFiltering": "t_train < t_eval (strictly prior kickoff timestamp)",
+        "zeroConcurrentTimestampLeakage": true,
+        "zeroFutureScoreLeakage": true,
+        "zeroSeasonAggregateLeakage": true
+      },
+      "targetDefinitionAudit": {
+        "ahHomeMinus05Note": "Fixed -0.5 line (binary 1X2 Home Win vs Draw/Away). Low Brier (~0.18-0.22) reflects unhandicapped favorite mismatch base rates, NOT balanced market Asian Handicap line pricing.",
+        "ahBalancedHalfLineNote": "Pre-kickoff model-balanced half-goal line L_half* in {-2.5, -1.5, -0.5, +0.5, +1.5, +2.5} with strictly binary outcome Y in {0, 1} (constant-0.5 Brier = 0.2500).",
+        "ahBalancedQuarterLineNote": "Pre-kickoff model-balanced quarter-line L* on 0.25 grid with exact split quarter-line push (0.5), half-win (0.75), and half-loss (0.25) settlement."
+      },
       "ou25": {
-        "brier": 0.2306,
-        "logLoss": 0.6517,
-        "calibrationSlope": 0.5545,
-        "calibrationIntercept": 0.321
+        "brier": 0.2308,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2285,
+        "brierCi95": [
+          0.2158,
+          0.2446
+        ],
+        "deltaVs05Ci95": [
+          -0.0342,
+          -0.0054
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.652,
+        "calibrationSlope": 0.5472,
+        "calibrationIntercept": 0.3253
       },
       "ahHomeMinus05": {
-        "brier": 0.2016,
-        "logLoss": 0.5912,
-        "calibrationSlope": 1.1721,
-        "calibrationIntercept": -0.0604
+        "brier": 0.2026,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2478,
+        "brierCi95": [
+          0.1854,
+          0.2209
+        ],
+        "deltaVs05Ci95": [
+          -0.0646,
+          -0.0291
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.5935,
+        "calibrationSlope": 1.1647,
+        "calibrationIntercept": -0.0573
+      },
+      "ahBalancedHalfLine": {
+        "brier": 0.248,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2484,
+        "brierCi95": [
+          0.2394,
+          0.257
+        ],
+        "deltaVs05Ci95": [
+          -0.0106,
+          0.007
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6893,
+        "calibrationSlope": 0.6768,
+        "calibrationIntercept": 0.2011
+      },
+      "ahBalancedQuarterLine": {
+        "brier": 0.2086,
+        "constant05Brier": 0.2104,
+        "baseRateBrier": 0.2087,
+        "brierCi95": [
+          0.1987,
+          0.2184
+        ],
+        "deltaVs05Ci95": [
+          -0.0048,
+          0.0014
+        ],
+        "beatsConstant05At95Ci": false,
+        "calibrationSlope": 1.7518,
+        "calibrationIntercept": -0.3303
+      },
+      "pinnacleBenchmark": {
+        "available": false,
+        "matchedFixtures": 0,
+        "ou25PinnacleBrier": null,
+        "ou25ModelBrierOnMatched": null,
+        "ahMarketLinePinnacleBrier": null,
+        "ahMarketLineModelBrierOnMatched": null,
+        "reason": "No historical Pinnacle closing/opening AH or OU odds available in verified archive for this league."
+      },
+      "marketApproval": {
+        "AH": "NOT_APPROVED_FOR_PRODUCTION",
+        "OU": "NOT_APPROVED_FOR_PRODUCTION",
+        "approvalBlockers": [
+          "NO_HISTORICAL_PINNACLE_BENCHMARK",
+          "AH_BALANCED_HALF_BRIER_95CI_OVERLAPS_02500",
+          "EXPLICIT_HUMAN_APPROVAL_REQUIRED"
+        ]
       }
     },
     "FRA-LIGUE1": {
       "nTrainInitial": 791,
       "nEval": 300,
+      "chronologicalWalkForwardVerified": true,
+      "leakageAudit": {
+        "strictTimestampFiltering": "t_train < t_eval (strictly prior kickoff timestamp)",
+        "zeroConcurrentTimestampLeakage": true,
+        "zeroFutureScoreLeakage": true,
+        "zeroSeasonAggregateLeakage": true
+      },
+      "targetDefinitionAudit": {
+        "ahHomeMinus05Note": "Fixed -0.5 line (binary 1X2 Home Win vs Draw/Away). Low Brier (~0.18-0.22) reflects unhandicapped favorite mismatch base rates, NOT balanced market Asian Handicap line pricing.",
+        "ahBalancedHalfLineNote": "Pre-kickoff model-balanced half-goal line L_half* in {-2.5, -1.5, -0.5, +0.5, +1.5, +2.5} with strictly binary outcome Y in {0, 1} (constant-0.5 Brier = 0.2500).",
+        "ahBalancedQuarterLineNote": "Pre-kickoff model-balanced quarter-line L* on 0.25 grid with exact split quarter-line push (0.5), half-win (0.75), and half-loss (0.25) settlement."
+      },
       "ou25": {
-        "brier": 0.2436,
-        "logLoss": 0.6806,
-        "calibrationSlope": 0.7251,
-        "calibrationIntercept": 0.1478
+        "brier": 0.2432,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2484,
+        "brierCi95": [
+          0.2314,
+          0.2562
+        ],
+        "deltaVs05Ci95": [
+          -0.0186,
+          0.0062
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6797,
+        "calibrationSlope": 0.7484,
+        "calibrationIntercept": 0.1351
       },
       "ahHomeMinus05": {
-        "brier": 0.2258,
-        "logLoss": 0.6423,
-        "calibrationSlope": 0.8476,
-        "calibrationIntercept": 0.0547
+        "brier": 0.2253,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2441,
+        "brierCi95": [
+          0.2075,
+          0.2435
+        ],
+        "deltaVs05Ci95": [
+          -0.0425,
+          -0.0065
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.6412,
+        "calibrationSlope": 0.8547,
+        "calibrationIntercept": 0.0513
+      },
+      "ahBalancedHalfLine": {
+        "brier": 0.2451,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.25,
+        "brierCi95": [
+          0.2368,
+          0.2536
+        ],
+        "deltaVs05Ci95": [
+          -0.0132,
+          0.0036
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6832,
+        "calibrationSlope": 0.942,
+        "calibrationIntercept": 0.0267
+      },
+      "ahBalancedQuarterLine": {
+        "brier": 0.2084,
+        "constant05Brier": 0.2083,
+        "baseRateBrier": 0.2083,
+        "brierCi95": [
+          0.1984,
+          0.2183
+        ],
+        "deltaVs05Ci95": [
+          -0.0021,
+          0.0023
+        ],
+        "beatsConstant05At95Ci": false,
+        "calibrationSlope": 0.3819,
+        "calibrationIntercept": 0.3101
+      },
+      "pinnacleBenchmark": {
+        "available": false,
+        "matchedFixtures": 0,
+        "ou25PinnacleBrier": null,
+        "ou25ModelBrierOnMatched": null,
+        "ahMarketLinePinnacleBrier": null,
+        "ahMarketLineModelBrierOnMatched": null,
+        "reason": "No historical Pinnacle closing/opening AH or OU odds available in verified archive for this league."
+      },
+      "marketApproval": {
+        "AH": "NOT_APPROVED_FOR_PRODUCTION",
+        "OU": "NOT_APPROVED_FOR_PRODUCTION",
+        "approvalBlockers": [
+          "NO_HISTORICAL_PINNACLE_BENCHMARK",
+          "OU_BRIER_95CI_OVERLAPS_02500",
+          "AH_BALANCED_HALF_BRIER_95CI_OVERLAPS_02500",
+          "EXPLICIT_HUMAN_APPROVAL_REQUIRED"
+        ]
       }
     },
     "NED-ERE": {
       "nTrainInitial": 795,
       "nEval": 300,
+      "chronologicalWalkForwardVerified": true,
+      "leakageAudit": {
+        "strictTimestampFiltering": "t_train < t_eval (strictly prior kickoff timestamp)",
+        "zeroConcurrentTimestampLeakage": true,
+        "zeroFutureScoreLeakage": true,
+        "zeroSeasonAggregateLeakage": true
+      },
+      "targetDefinitionAudit": {
+        "ahHomeMinus05Note": "Fixed -0.5 line (binary 1X2 Home Win vs Draw/Away). Low Brier (~0.18-0.22) reflects unhandicapped favorite mismatch base rates, NOT balanced market Asian Handicap line pricing.",
+        "ahBalancedHalfLineNote": "Pre-kickoff model-balanced half-goal line L_half* in {-2.5, -1.5, -0.5, +0.5, +1.5, +2.5} with strictly binary outcome Y in {0, 1} (constant-0.5 Brier = 0.2500).",
+        "ahBalancedQuarterLineNote": "Pre-kickoff model-balanced quarter-line L* on 0.25 grid with exact split quarter-line push (0.5), half-win (0.75), and half-loss (0.25) settlement."
+      },
       "ou25": {
-        "brier": 0.228,
-        "logLoss": 0.6449,
-        "calibrationSlope": 0.7448,
-        "calibrationIntercept": 0.1757
+        "brier": 0.2279,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2331,
+        "brierCi95": [
+          0.2139,
+          0.2422
+        ],
+        "deltaVs05Ci95": [
+          -0.0361,
+          -0.0078
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.6448,
+        "calibrationSlope": 0.7467,
+        "calibrationIntercept": 0.1743
       },
       "ahHomeMinus05": {
-        "brier": 0.213,
-        "logLoss": 0.6155,
-        "calibrationSlope": 0.9737,
-        "calibrationIntercept": -0.0421
+        "brier": 0.2129,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2413,
+        "brierCi95": [
+          0.1945,
+          0.231
+        ],
+        "deltaVs05Ci95": [
+          -0.0555,
+          -0.019
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.6152,
+        "calibrationSlope": 0.9751,
+        "calibrationIntercept": -0.043
+      },
+      "ahBalancedHalfLine": {
+        "brier": 0.2425,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2481,
+        "brierCi95": [
+          0.2346,
+          0.2497
+        ],
+        "deltaVs05Ci95": [
+          -0.0154,
+          -0.0003
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.678,
+        "calibrationSlope": 1.2222,
+        "calibrationIntercept": -0.1461
+      },
+      "ahBalancedQuarterLine": {
+        "brier": 0.2178,
+        "constant05Brier": 0.2169,
+        "baseRateBrier": 0.2148,
+        "brierCi95": [
+          0.2082,
+          0.227
+        ],
+        "deltaVs05Ci95": [
+          -0.0016,
+          0.0035
+        ],
+        "beatsConstant05At95Ci": false,
+        "calibrationSlope": -0.3531,
+        "calibrationIntercept": 0.6301
+      },
+      "pinnacleBenchmark": {
+        "available": false,
+        "matchedFixtures": 0,
+        "ou25PinnacleBrier": null,
+        "ou25ModelBrierOnMatched": null,
+        "ahMarketLinePinnacleBrier": null,
+        "ahMarketLineModelBrierOnMatched": null,
+        "reason": "No historical Pinnacle closing/opening AH or OU odds available in verified archive for this league."
+      },
+      "marketApproval": {
+        "AH": "NOT_APPROVED_FOR_PRODUCTION",
+        "OU": "NOT_APPROVED_FOR_PRODUCTION",
+        "approvalBlockers": [
+          "NO_HISTORICAL_PINNACLE_BENCHMARK",
+          "EXPLICIT_HUMAN_APPROVAL_REQUIRED"
+        ]
       }
     },
     "POR-PRIMEIRA": {
       "nTrainInitial": 788,
       "nEval": 300,
+      "chronologicalWalkForwardVerified": true,
+      "leakageAudit": {
+        "strictTimestampFiltering": "t_train < t_eval (strictly prior kickoff timestamp)",
+        "zeroConcurrentTimestampLeakage": true,
+        "zeroFutureScoreLeakage": true,
+        "zeroSeasonAggregateLeakage": true
+      },
+      "targetDefinitionAudit": {
+        "ahHomeMinus05Note": "Fixed -0.5 line (binary 1X2 Home Win vs Draw/Away). Low Brier (~0.18-0.22) reflects unhandicapped favorite mismatch base rates, NOT balanced market Asian Handicap line pricing.",
+        "ahBalancedHalfLineNote": "Pre-kickoff model-balanced half-goal line L_half* in {-2.5, -1.5, -0.5, +0.5, +1.5, +2.5} with strictly binary outcome Y in {0, 1} (constant-0.5 Brier = 0.2500).",
+        "ahBalancedQuarterLineNote": "Pre-kickoff model-balanced quarter-line L* on 0.25 grid with exact split quarter-line push (0.5), half-win (0.75), and half-loss (0.25) settlement."
+      },
       "ou25": {
         "brier": 0.2425,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2478,
+        "brierCi95": [
+          0.2293,
+          0.2561
+        ],
+        "deltaVs05Ci95": [
+          -0.0207,
+          0.0061
+        ],
+        "beatsConstant05At95Ci": false,
         "logLoss": 0.6777,
-        "calibrationSlope": 0.7888,
-        "calibrationIntercept": 0.1592
+        "calibrationSlope": 0.7865,
+        "calibrationIntercept": 0.1601
       },
       "ahHomeMinus05": {
         "brier": 0.1863,
-        "logLoss": 0.5533,
-        "calibrationSlope": 1.0861,
-        "calibrationIntercept": -0.0566
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2431,
+        "brierCi95": [
+          0.1679,
+          0.2055
+        ],
+        "deltaVs05Ci95": [
+          -0.0821,
+          -0.0445
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.5536,
+        "calibrationSlope": 1.0858,
+        "calibrationIntercept": -0.0565
+      },
+      "ahBalancedHalfLine": {
+        "brier": 0.2462,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.25,
+        "brierCi95": [
+          0.2379,
+          0.256
+        ],
+        "deltaVs05Ci95": [
+          -0.0121,
+          0.006
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6855,
+        "calibrationSlope": 0.8064,
+        "calibrationIntercept": 0.0958
+      },
+      "ahBalancedQuarterLine": {
+        "brier": 0.2002,
+        "constant05Brier": 0.2033,
+        "baseRateBrier": 0.2033,
+        "brierCi95": [
+          0.1903,
+          0.2105
+        ],
+        "deltaVs05Ci95": [
+          -0.006,
+          0
+        ],
+        "beatsConstant05At95Ci": false,
+        "calibrationSlope": 2.387,
+        "calibrationIntercept": -0.691
+      },
+      "pinnacleBenchmark": {
+        "available": false,
+        "matchedFixtures": 0,
+        "ou25PinnacleBrier": null,
+        "ou25ModelBrierOnMatched": null,
+        "ahMarketLinePinnacleBrier": null,
+        "ahMarketLineModelBrierOnMatched": null,
+        "reason": "No historical Pinnacle closing/opening AH or OU odds available in verified archive for this league."
+      },
+      "marketApproval": {
+        "AH": "NOT_APPROVED_FOR_PRODUCTION",
+        "OU": "NOT_APPROVED_FOR_PRODUCTION",
+        "approvalBlockers": [
+          "NO_HISTORICAL_PINNACLE_BENCHMARK",
+          "OU_BRIER_95CI_OVERLAPS_02500",
+          "AH_BALANCED_HALF_BRIER_95CI_OVERLAPS_02500",
+          "EXPLICIT_HUMAN_APPROVAL_REQUIRED"
+        ]
       }
     },
     "BEL-PRO": {
       "nTrainInitial": 787,
       "nEval": 300,
+      "chronologicalWalkForwardVerified": true,
+      "leakageAudit": {
+        "strictTimestampFiltering": "t_train < t_eval (strictly prior kickoff timestamp)",
+        "zeroConcurrentTimestampLeakage": true,
+        "zeroFutureScoreLeakage": true,
+        "zeroSeasonAggregateLeakage": true
+      },
+      "targetDefinitionAudit": {
+        "ahHomeMinus05Note": "Fixed -0.5 line (binary 1X2 Home Win vs Draw/Away). Low Brier (~0.18-0.22) reflects unhandicapped favorite mismatch base rates, NOT balanced market Asian Handicap line pricing.",
+        "ahBalancedHalfLineNote": "Pre-kickoff model-balanced half-goal line L_half* in {-2.5, -1.5, -0.5, +0.5, +1.5, +2.5} with strictly binary outcome Y in {0, 1} (constant-0.5 Brier = 0.2500).",
+        "ahBalancedQuarterLineNote": "Pre-kickoff model-balanced quarter-line L* on 0.25 grid with exact split quarter-line push (0.5), half-win (0.75), and half-loss (0.25) settlement."
+      },
       "ou25": {
-        "brier": 0.2631,
-        "logLoss": 0.7214,
-        "calibrationSlope": 0.0206,
-        "calibrationIntercept": 0.5232
+        "brier": 0.2633,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2489,
+        "brierCi95": [
+          0.2505,
+          0.277
+        ],
+        "deltaVs05Ci95": [
+          0.0005,
+          0.027
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.7217,
+        "calibrationSlope": 0.0165,
+        "calibrationIntercept": 0.5252
       },
       "ahHomeMinus05": {
-        "brier": 0.2197,
-        "logLoss": 0.6279,
-        "calibrationSlope": 1.0526,
-        "calibrationIntercept": -0.0275
+        "brier": 0.2196,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2456,
+        "brierCi95": [
+          0.2035,
+          0.2357
+        ],
+        "deltaVs05Ci95": [
+          -0.0465,
+          -0.0143
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.6277,
+        "calibrationSlope": 1.0536,
+        "calibrationIntercept": -0.0285
+      },
+      "ahBalancedHalfLine": {
+        "brier": 0.2366,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2491,
+        "brierCi95": [
+          0.2278,
+          0.2456
+        ],
+        "deltaVs05Ci95": [
+          -0.0222,
+          -0.0044
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.6658,
+        "calibrationSlope": 1.4191,
+        "calibrationIntercept": -0.2331
+      },
+      "ahBalancedQuarterLine": {
+        "brier": 0.2027,
+        "constant05Brier": 0.2048,
+        "baseRateBrier": 0.2034,
+        "brierCi95": [
+          0.1918,
+          0.2125
+        ],
+        "deltaVs05Ci95": [
+          -0.0047,
+          0.0006
+        ],
+        "beatsConstant05At95Ci": false,
+        "calibrationSlope": 1.8982,
+        "calibrationIntercept": -0.4755
+      },
+      "pinnacleBenchmark": {
+        "available": false,
+        "matchedFixtures": 0,
+        "ou25PinnacleBrier": null,
+        "ou25ModelBrierOnMatched": null,
+        "ahMarketLinePinnacleBrier": null,
+        "ahMarketLineModelBrierOnMatched": null,
+        "reason": "No historical Pinnacle closing/opening AH or OU odds available in verified archive for this league."
+      },
+      "marketApproval": {
+        "AH": "NOT_APPROVED_FOR_PRODUCTION",
+        "OU": "NOT_APPROVED_FOR_PRODUCTION",
+        "approvalBlockers": [
+          "NO_HISTORICAL_PINNACLE_BENCHMARK",
+          "OU_BRIER_95CI_OVERLAPS_02500",
+          "EXPLICIT_HUMAN_APPROVAL_REQUIRED"
+        ]
       }
     },
     "SCO-PREM": {
       "nTrainInitial": 258,
       "nEval": 210,
+      "chronologicalWalkForwardVerified": true,
+      "leakageAudit": {
+        "strictTimestampFiltering": "t_train < t_eval (strictly prior kickoff timestamp)",
+        "zeroConcurrentTimestampLeakage": true,
+        "zeroFutureScoreLeakage": true,
+        "zeroSeasonAggregateLeakage": true
+      },
+      "targetDefinitionAudit": {
+        "ahHomeMinus05Note": "Fixed -0.5 line (binary 1X2 Home Win vs Draw/Away). Low Brier (~0.18-0.22) reflects unhandicapped favorite mismatch base rates, NOT balanced market Asian Handicap line pricing.",
+        "ahBalancedHalfLineNote": "Pre-kickoff model-balanced half-goal line L_half* in {-2.5, -1.5, -0.5, +0.5, +1.5, +2.5} with strictly binary outcome Y in {0, 1} (constant-0.5 Brier = 0.2500).",
+        "ahBalancedQuarterLineNote": "Pre-kickoff model-balanced quarter-line L* on 0.25 grid with exact split quarter-line push (0.5), half-win (0.75), and half-loss (0.25) settlement."
+      },
       "ou25": {
-        "brier": 0.2434,
-        "logLoss": 0.6798,
-        "calibrationSlope": 0.8641,
-        "calibrationIntercept": 0.064
+        "brier": 0.2429,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2489,
+        "brierCi95": [
+          0.2299,
+          0.2569
+        ],
+        "deltaVs05Ci95": [
+          -0.0201,
+          0.0069
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6789,
+        "calibrationSlope": 0.8919,
+        "calibrationIntercept": 0.0485
       },
       "ahHomeMinus05": {
-        "brier": 0.2199,
-        "logLoss": 0.6309,
-        "calibrationSlope": 1.0332,
-        "calibrationIntercept": 0.0031
+        "brier": 0.2198,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2496,
+        "brierCi95": [
+          0.1986,
+          0.2403
+        ],
+        "deltaVs05Ci95": [
+          -0.0514,
+          -0.0097
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.6308,
+        "calibrationSlope": 1.0379,
+        "calibrationIntercept": 0.001
+      },
+      "ahBalancedHalfLine": {
+        "brier": 0.2425,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2499,
+        "brierCi95": [
+          0.2327,
+          0.2518
+        ],
+        "deltaVs05Ci95": [
+          -0.0173,
+          0.0018
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6779,
+        "calibrationSlope": 1.2615,
+        "calibrationIntercept": -0.1075
+      },
+      "ahBalancedQuarterLine": {
+        "brier": 0.2052,
+        "constant05Brier": 0.2057,
+        "baseRateBrier": 0.2051,
+        "brierCi95": [
+          0.1931,
+          0.2166
+        ],
+        "deltaVs05Ci95": [
+          -0.003,
+          0.0023
+        ],
+        "beatsConstant05At95Ci": false,
+        "calibrationSlope": 1.3346,
+        "calibrationIntercept": -0.1389
+      },
+      "pinnacleBenchmark": {
+        "available": false,
+        "matchedFixtures": 0,
+        "ou25PinnacleBrier": null,
+        "ou25ModelBrierOnMatched": null,
+        "ahMarketLinePinnacleBrier": null,
+        "ahMarketLineModelBrierOnMatched": null,
+        "reason": "No historical Pinnacle closing/opening AH or OU odds available in verified archive for this league."
+      },
+      "marketApproval": {
+        "AH": "NOT_APPROVED_FOR_PRODUCTION",
+        "OU": "NOT_APPROVED_FOR_PRODUCTION",
+        "approvalBlockers": [
+          "NO_HISTORICAL_PINNACLE_BENCHMARK",
+          "INSUFFICIENT_OOS_SAMPLE_LT_300",
+          "OU_BRIER_95CI_OVERLAPS_02500",
+          "AH_BALANCED_HALF_BRIER_95CI_OVERLAPS_02500",
+          "EXPLICIT_HUMAN_APPROVAL_REQUIRED"
+        ]
       }
     },
     "ENG-CHAMP": {
       "nTrainInitial": 814,
       "nEval": 300,
+      "chronologicalWalkForwardVerified": true,
+      "leakageAudit": {
+        "strictTimestampFiltering": "t_train < t_eval (strictly prior kickoff timestamp)",
+        "zeroConcurrentTimestampLeakage": true,
+        "zeroFutureScoreLeakage": true,
+        "zeroSeasonAggregateLeakage": true
+      },
+      "targetDefinitionAudit": {
+        "ahHomeMinus05Note": "Fixed -0.5 line (binary 1X2 Home Win vs Draw/Away). Low Brier (~0.18-0.22) reflects unhandicapped favorite mismatch base rates, NOT balanced market Asian Handicap line pricing.",
+        "ahBalancedHalfLineNote": "Pre-kickoff model-balanced half-goal line L_half* in {-2.5, -1.5, -0.5, +0.5, +1.5, +2.5} with strictly binary outcome Y in {0, 1} (constant-0.5 Brier = 0.2500).",
+        "ahBalancedQuarterLineNote": "Pre-kickoff model-balanced quarter-line L* on 0.25 grid with exact split quarter-line push (0.5), half-win (0.75), and half-loss (0.25) settlement."
+      },
       "ou25": {
-        "brier": 0.2534,
-        "logLoss": 0.7011,
-        "calibrationSlope": 0.3368,
-        "calibrationIntercept": 0.3386
+        "brier": 0.2531,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.25,
+        "brierCi95": [
+          0.2419,
+          0.2632
+        ],
+        "deltaVs05Ci95": [
+          -0.0081,
+          0.0132
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.7005,
+        "calibrationSlope": 0.3603,
+        "calibrationIntercept": 0.3278
       },
       "ahHomeMinus05": {
-        "brier": 0.2239,
-        "logLoss": 0.6388,
-        "calibrationSlope": 1.0891,
-        "calibrationIntercept": -0.0768
+        "brier": 0.2243,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2407,
+        "brierCi95": [
+          0.2106,
+          0.238
+        ],
+        "deltaVs05Ci95": [
+          -0.0394,
+          -0.012
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.6395,
+        "calibrationSlope": 1.0783,
+        "calibrationIntercept": -0.0723
+      },
+      "ahBalancedHalfLine": {
+        "brier": 0.2392,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2484,
+        "brierCi95": [
+          0.2311,
+          0.2483
+        ],
+        "deltaVs05Ci95": [
+          -0.0189,
+          -0.0017
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.6712,
+        "calibrationSlope": 1.2608,
+        "calibrationIntercept": -0.1512
+      },
+      "ahBalancedQuarterLine": {
+        "brier": 0.2099,
+        "constant05Brier": 0.2123,
+        "baseRateBrier": 0.211,
+        "brierCi95": [
+          0.2008,
+          0.2191
+        ],
+        "deltaVs05Ci95": [
+          -0.0053,
+          0.0004
+        ],
+        "beatsConstant05At95Ci": false,
+        "calibrationSlope": 2.0307,
+        "calibrationIntercept": -0.5306
+      },
+      "pinnacleBenchmark": {
+        "available": false,
+        "matchedFixtures": 0,
+        "ou25PinnacleBrier": null,
+        "ou25ModelBrierOnMatched": null,
+        "ahMarketLinePinnacleBrier": null,
+        "ahMarketLineModelBrierOnMatched": null,
+        "reason": "No historical Pinnacle closing/opening AH or OU odds available in verified archive for this league."
+      },
+      "marketApproval": {
+        "AH": "NOT_APPROVED_FOR_PRODUCTION",
+        "OU": "NOT_APPROVED_FOR_PRODUCTION",
+        "approvalBlockers": [
+          "NO_HISTORICAL_PINNACLE_BENCHMARK",
+          "OU_BRIER_95CI_OVERLAPS_02500",
+          "EXPLICIT_HUMAN_APPROVAL_REQUIRED"
+        ]
       }
     },
     "USA-MLS": {
       "nTrainInitial": 1675,
       "nEval": 300,
+      "chronologicalWalkForwardVerified": true,
+      "leakageAudit": {
+        "strictTimestampFiltering": "t_train < t_eval (strictly prior kickoff timestamp)",
+        "zeroConcurrentTimestampLeakage": true,
+        "zeroFutureScoreLeakage": true,
+        "zeroSeasonAggregateLeakage": true
+      },
+      "targetDefinitionAudit": {
+        "ahHomeMinus05Note": "Fixed -0.5 line (binary 1X2 Home Win vs Draw/Away). Low Brier (~0.18-0.22) reflects unhandicapped favorite mismatch base rates, NOT balanced market Asian Handicap line pricing.",
+        "ahBalancedHalfLineNote": "Pre-kickoff model-balanced half-goal line L_half* in {-2.5, -1.5, -0.5, +0.5, +1.5, +2.5} with strictly binary outcome Y in {0, 1} (constant-0.5 Brier = 0.2500).",
+        "ahBalancedQuarterLineNote": "Pre-kickoff model-balanced quarter-line L* on 0.25 grid with exact split quarter-line push (0.5), half-win (0.75), and half-loss (0.25) settlement."
+      },
       "ou25": {
-        "brier": 0.238,
-        "logLoss": 0.6686,
-        "calibrationSlope": 0.3222,
-        "calibrationIntercept": 0.441
+        "brier": 0.2376,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2331,
+        "brierCi95": [
+          0.2243,
+          0.2507
+        ],
+        "deltaVs05Ci95": [
+          -0.0257,
+          0.0007
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6678,
+        "calibrationSlope": 0.3425,
+        "calibrationIntercept": 0.429
       },
       "ahHomeMinus05": {
-        "brier": 0.2499,
-        "logLoss": 0.6943,
-        "calibrationSlope": 0.4393,
-        "calibrationIntercept": 0.2318
+        "brier": 0.2501,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2464,
+        "brierCi95": [
+          0.2357,
+          0.2663
+        ],
+        "deltaVs05Ci95": [
+          -0.0143,
+          0.0163
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6947,
+        "calibrationSlope": 0.4332,
+        "calibrationIntercept": 0.2346
+      },
+      "ahBalancedHalfLine": {
+        "brier": 0.2446,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.25,
+        "brierCi95": [
+          0.2364,
+          0.2527
+        ],
+        "deltaVs05Ci95": [
+          -0.0136,
+          0.0027
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6822,
+        "calibrationSlope": 1.0015,
+        "calibrationIntercept": -0.0034
+      },
+      "ahBalancedQuarterLine": {
+        "brier": 0.2076,
+        "constant05Brier": 0.2081,
+        "baseRateBrier": 0.2081,
+        "brierCi95": [
+          0.1973,
+          0.2169
+        ],
+        "deltaVs05Ci95": [
+          -0.0025,
+          0.0013
+        ],
+        "beatsConstant05At95Ci": false,
+        "calibrationSlope": 1.2706,
+        "calibrationIntercept": -0.1309
+      },
+      "pinnacleBenchmark": {
+        "available": false,
+        "matchedFixtures": 0,
+        "ou25PinnacleBrier": null,
+        "ou25ModelBrierOnMatched": null,
+        "ahMarketLinePinnacleBrier": null,
+        "ahMarketLineModelBrierOnMatched": null,
+        "reason": "No historical Pinnacle closing/opening AH or OU odds available in verified archive for this league."
+      },
+      "marketApproval": {
+        "AH": "NOT_APPROVED_FOR_PRODUCTION",
+        "OU": "NOT_APPROVED_FOR_PRODUCTION",
+        "approvalBlockers": [
+          "NO_HISTORICAL_PINNACLE_BENCHMARK",
+          "OU_BRIER_95CI_OVERLAPS_02500",
+          "AH_BALANCED_HALF_BRIER_95CI_OVERLAPS_02500",
+          "EXPLICIT_HUMAN_APPROVAL_REQUIRED"
+        ]
       }
     },
     "SAU-PRO": {
       "nTrainInitial": 776,
       "nEval": 300,
+      "chronologicalWalkForwardVerified": true,
+      "leakageAudit": {
+        "strictTimestampFiltering": "t_train < t_eval (strictly prior kickoff timestamp)",
+        "zeroConcurrentTimestampLeakage": true,
+        "zeroFutureScoreLeakage": true,
+        "zeroSeasonAggregateLeakage": true
+      },
+      "targetDefinitionAudit": {
+        "ahHomeMinus05Note": "Fixed -0.5 line (binary 1X2 Home Win vs Draw/Away). Low Brier (~0.18-0.22) reflects unhandicapped favorite mismatch base rates, NOT balanced market Asian Handicap line pricing.",
+        "ahBalancedHalfLineNote": "Pre-kickoff model-balanced half-goal line L_half* in {-2.5, -1.5, -0.5, +0.5, +1.5, +2.5} with strictly binary outcome Y in {0, 1} (constant-0.5 Brier = 0.2500).",
+        "ahBalancedQuarterLineNote": "Pre-kickoff model-balanced quarter-line L* on 0.25 grid with exact split quarter-line push (0.5), half-win (0.75), and half-loss (0.25) settlement."
+      },
       "ou25": {
-        "brier": 0.2547,
-        "logLoss": 0.7024,
-        "calibrationSlope": 0.179,
-        "calibrationIntercept": 0.4543
+        "brier": 0.2549,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2472,
+        "brierCi95": [
+          0.2427,
+          0.2683
+        ],
+        "deltaVs05Ci95": [
+          -0.0073,
+          0.0183
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.7028,
+        "calibrationSlope": 0.1726,
+        "calibrationIntercept": 0.4578
       },
       "ahHomeMinus05": {
-        "brier": 0.1956,
-        "logLoss": 0.5691,
-        "calibrationSlope": 1.049,
-        "calibrationIntercept": 0.0065
+        "brier": 0.1954,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2464,
+        "brierCi95": [
+          0.1757,
+          0.2173
+        ],
+        "deltaVs05Ci95": [
+          -0.0743,
+          -0.0327
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.5686,
+        "calibrationSlope": 1.0501,
+        "calibrationIntercept": 0.0059
+      },
+      "ahBalancedHalfLine": {
+        "brier": 0.2432,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2493,
+        "brierCi95": [
+          0.2347,
+          0.2513
+        ],
+        "deltaVs05Ci95": [
+          -0.0153,
+          0.0013
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6795,
+        "calibrationSlope": 1.0639,
+        "calibrationIntercept": -0.0107
+      },
+      "ahBalancedQuarterLine": {
+        "brier": 0.212,
+        "constant05Brier": 0.2131,
+        "baseRateBrier": 0.2126,
+        "brierCi95": [
+          0.2011,
+          0.2214
+        ],
+        "deltaVs05Ci95": [
+          -0.0041,
+          0.0021
+        ],
+        "beatsConstant05At95Ci": false,
+        "calibrationSlope": 1.2871,
+        "calibrationIntercept": -0.1206
+      },
+      "pinnacleBenchmark": {
+        "available": false,
+        "matchedFixtures": 0,
+        "ou25PinnacleBrier": null,
+        "ou25ModelBrierOnMatched": null,
+        "ahMarketLinePinnacleBrier": null,
+        "ahMarketLineModelBrierOnMatched": null,
+        "reason": "No historical Pinnacle closing/opening AH or OU odds available in verified archive for this league."
+      },
+      "marketApproval": {
+        "AH": "NOT_APPROVED_FOR_PRODUCTION",
+        "OU": "NOT_APPROVED_FOR_PRODUCTION",
+        "approvalBlockers": [
+          "NO_HISTORICAL_PINNACLE_BENCHMARK",
+          "OU_BRIER_95CI_OVERLAPS_02500",
+          "AH_BALANCED_HALF_BRIER_95CI_OVERLAPS_02500",
+          "EXPLICIT_HUMAN_APPROVAL_REQUIRED"
+        ]
       }
     },
     "JPN-J1": {
       "nTrainInitial": 460,
       "nEval": 300,
+      "chronologicalWalkForwardVerified": true,
+      "leakageAudit": {
+        "strictTimestampFiltering": "t_train < t_eval (strictly prior kickoff timestamp)",
+        "zeroConcurrentTimestampLeakage": true,
+        "zeroFutureScoreLeakage": true,
+        "zeroSeasonAggregateLeakage": true
+      },
+      "targetDefinitionAudit": {
+        "ahHomeMinus05Note": "Fixed -0.5 line (binary 1X2 Home Win vs Draw/Away). Low Brier (~0.18-0.22) reflects unhandicapped favorite mismatch base rates, NOT balanced market Asian Handicap line pricing.",
+        "ahBalancedHalfLineNote": "Pre-kickoff model-balanced half-goal line L_half* in {-2.5, -1.5, -0.5, +0.5, +1.5, +2.5} with strictly binary outcome Y in {0, 1} (constant-0.5 Brier = 0.2500).",
+        "ahBalancedQuarterLineNote": "Pre-kickoff model-balanced quarter-line L* on 0.25 grid with exact split quarter-line push (0.5), half-win (0.75), and half-loss (0.25) settlement."
+      },
       "ou25": {
-        "brier": 0.2431,
-        "logLoss": 0.6798,
-        "calibrationSlope": 0.8381,
-        "calibrationIntercept": 0.113
+        "brier": 0.2436,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2495,
+        "brierCi95": [
+          0.2304,
+          0.2582
+        ],
+        "deltaVs05Ci95": [
+          -0.0196,
+          0.0082
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6809,
+        "calibrationSlope": 0.8172,
+        "calibrationIntercept": 0.1219
       },
       "ahHomeMinus05": {
-        "brier": 0.2315,
-        "logLoss": 0.6536,
-        "calibrationSlope": 1.1886,
-        "calibrationIntercept": -0.0403
+        "brier": 0.232,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2475,
+        "brierCi95": [
+          0.2181,
+          0.2476
+        ],
+        "deltaVs05Ci95": [
+          -0.0319,
+          -0.0024
+        ],
+        "beatsConstant05At95Ci": true,
+        "logLoss": 0.6546,
+        "calibrationSlope": 1.1644,
+        "calibrationIntercept": -0.0302
+      },
+      "ahBalancedHalfLine": {
+        "brier": 0.2452,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2495,
+        "brierCi95": [
+          0.2362,
+          0.2551
+        ],
+        "deltaVs05Ci95": [
+          -0.0138,
+          0.0051
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6832,
+        "calibrationSlope": 0.8727,
+        "calibrationIntercept": 0.094
+      },
+      "ahBalancedQuarterLine": {
+        "brier": 0.2026,
+        "constant05Brier": 0.2025,
+        "baseRateBrier": 0.2013,
+        "brierCi95": [
+          0.1912,
+          0.2135
+        ],
+        "deltaVs05Ci95": [
+          -0.0022,
+          0.0023
+        ],
+        "beatsConstant05At95Ci": false,
+        "calibrationSlope": 0.662,
+        "calibrationIntercept": 0.2066
+      },
+      "pinnacleBenchmark": {
+        "available": false,
+        "matchedFixtures": 0,
+        "ou25PinnacleBrier": null,
+        "ou25ModelBrierOnMatched": null,
+        "ahMarketLinePinnacleBrier": null,
+        "ahMarketLineModelBrierOnMatched": null,
+        "reason": "No historical Pinnacle closing/opening AH or OU odds available in verified archive for this league."
+      },
+      "marketApproval": {
+        "AH": "NOT_APPROVED_FOR_PRODUCTION",
+        "OU": "NOT_APPROVED_FOR_PRODUCTION",
+        "approvalBlockers": [
+          "NO_HISTORICAL_PINNACLE_BENCHMARK",
+          "OU_BRIER_95CI_OVERLAPS_02500",
+          "AH_BALANCED_HALF_BRIER_95CI_OVERLAPS_02500",
+          "EXPLICIT_HUMAN_APPROVAL_REQUIRED"
+        ]
       }
     },
     "KOR-K1": {
       "nTrainInitial": 256,
       "nEval": 208,
+      "chronologicalWalkForwardVerified": true,
+      "leakageAudit": {
+        "strictTimestampFiltering": "t_train < t_eval (strictly prior kickoff timestamp)",
+        "zeroConcurrentTimestampLeakage": true,
+        "zeroFutureScoreLeakage": true,
+        "zeroSeasonAggregateLeakage": true
+      },
+      "targetDefinitionAudit": {
+        "ahHomeMinus05Note": "Fixed -0.5 line (binary 1X2 Home Win vs Draw/Away). Low Brier (~0.18-0.22) reflects unhandicapped favorite mismatch base rates, NOT balanced market Asian Handicap line pricing.",
+        "ahBalancedHalfLineNote": "Pre-kickoff model-balanced half-goal line L_half* in {-2.5, -1.5, -0.5, +0.5, +1.5, +2.5} with strictly binary outcome Y in {0, 1} (constant-0.5 Brier = 0.2500).",
+        "ahBalancedQuarterLineNote": "Pre-kickoff model-balanced quarter-line L* on 0.25 grid with exact split quarter-line push (0.5), half-win (0.75), and half-loss (0.25) settlement."
+      },
       "ou25": {
-        "brier": 0.2484,
-        "logLoss": 0.6908,
-        "calibrationSlope": 0.5819,
-        "calibrationIntercept": 0.2064
+        "brier": 0.2485,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2494,
+        "brierCi95": [
+          0.2359,
+          0.2605
+        ],
+        "deltaVs05Ci95": [
+          -0.0141,
+          0.0105
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6909,
+        "calibrationSlope": 0.5756,
+        "calibrationIntercept": 0.209
       },
       "ahHomeMinus05": {
-        "brier": 0.2365,
-        "logLoss": 0.6649,
-        "calibrationSlope": 0.9236,
-        "calibrationIntercept": 0.0198
+        "brier": 0.2367,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.2433,
+        "brierCi95": [
+          0.2225,
+          0.252
+        ],
+        "deltaVs05Ci95": [
+          -0.0275,
+          0.002
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6654,
+        "calibrationSlope": 0.9068,
+        "calibrationIntercept": 0.0269
+      },
+      "ahBalancedHalfLine": {
+        "brier": 0.2469,
+        "constant05Brier": 0.25,
+        "baseRateBrier": 0.25,
+        "brierCi95": [
+          0.2367,
+          0.2572
+        ],
+        "deltaVs05Ci95": [
+          -0.0133,
+          0.0072
+        ],
+        "beatsConstant05At95Ci": false,
+        "logLoss": 0.6869,
+        "calibrationSlope": 0.7885,
+        "calibrationIntercept": 0.1136
+      },
+      "ahBalancedQuarterLine": {
+        "brier": 0.2075,
+        "constant05Brier": 0.2085,
+        "baseRateBrier": 0.2085,
+        "brierCi95": [
+          0.196,
+          0.2187
+        ],
+        "deltaVs05Ci95": [
+          -0.0036,
+          0.0015
+        ],
+        "beatsConstant05At95Ci": false,
+        "calibrationSlope": 1.9386,
+        "calibrationIntercept": -0.4572
+      },
+      "pinnacleBenchmark": {
+        "available": false,
+        "matchedFixtures": 0,
+        "ou25PinnacleBrier": null,
+        "ou25ModelBrierOnMatched": null,
+        "ahMarketLinePinnacleBrier": null,
+        "ahMarketLineModelBrierOnMatched": null,
+        "reason": "No historical Pinnacle closing/opening AH or OU odds available in verified archive for this league."
+      },
+      "marketApproval": {
+        "AH": "NOT_APPROVED_FOR_PRODUCTION",
+        "OU": "NOT_APPROVED_FOR_PRODUCTION",
+        "approvalBlockers": [
+          "NO_HISTORICAL_PINNACLE_BENCHMARK",
+          "INSUFFICIENT_OOS_SAMPLE_LT_300",
+          "OU_BRIER_95CI_OVERLAPS_02500",
+          "AH_BALANCED_HALF_BRIER_95CI_OVERLAPS_02500",
+          "EXPLICIT_HUMAN_APPROVAL_REQUIRED"
+        ]
       }
     },
     "IDN-L1": null

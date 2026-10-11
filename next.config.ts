@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   outputFileTracingRoot: path.join(__dirname),
+  outputFileTracingIncludes: {
+    "/api/v1/research": ["./data/verification/**/*"],
+    "/research": ["./data/verification/**/*"],
+  },
   async headers() {
     return [
       {

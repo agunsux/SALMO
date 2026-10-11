@@ -47,29 +47,36 @@ async function handleCron(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Always run non-billable quota-reset detector first (0 billable requests)
-  const quotaDetection = await OddsPapiQuotaGuard.detectQuotaReset(3);
-
-  // Explicit opt-out kill switch only when ENABLE_PRODUCTION_CRON === 'false'
-  if (process.env.ENABLE_PRODUCTION_CRON === 'false') {
-    Logger.info('[Cron:predict] Prediction cron is explicitly paused via kill-switch (ENABLE_PRODUCTION_CRON === false)', {
+  // H3 Safety Gate: Strict opt-in behavior (ENABLE_PRODUCTION_CRON === 'true' required; default OFF when absent/false or in preview)
+  if (process.env.ENABLE_PRODUCTION_CRON !== 'true' || process.env.VERCEL_ENV === 'preview') {
+    Logger.info('[Cron:predict] Prediction cron is OFF (strict opt-in ENABLE_PRODUCTION_CRON=true required; preview blocked)', {
       requestId,
-      quotaState: quotaDetection.state,
+      enableProductionCron: process.env.ENABLE_PRODUCTION_CRON || 'unset',
+      vercelEnv: process.env.VERCEL_ENV || 'unset',
     });
     return NextResponse.json({
       success: false,
       status: 'OFF',
-      quotaState: quotaDetection.state,
-      quotaDetection,
-      message: 'Production prediction cron is explicitly paused via ENABLE_PRODUCTION_CRON=false.',
+      billableRequestsMade: 0,
+      promotionMode: 'PROPOSE_ONLY',
+      message: 'Production prediction cron is OFF by default. Set ENABLE_PRODUCTION_CRON=true in production to enable.',
     }, { status: 200 });
   }
+
+  const allowDbWrite = OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed(
+    process.env.ALLOW_PRODUCTION_DB_WRITE === 'true'
+  );
+
+  // Run non-billable quota-reset detector (0 billable requests, read-only unless allowDbWrite)
+  const quotaDetection = await OddsPapiQuotaGuard.detectQuotaReset(3, false, undefined, allowDbWrite);
 
   // Fail-closed if quota is still exhausted or unverified (0 billable requests made)
   if (quotaDetection.state !== 'QUOTA_AVAILABLE') {
     const autoUnlockState = await MultiLeagueAutoActivator.runAutoUnlockCycle({
       mode: 'LIVE',
-      persistToDatabase: true,
+      explicitHumanApproval: false,
+      persistToDatabase: false,
+      allowProductionWrite: false,
     });
     const latencyMs = Date.now() - start;
     Logger.info('[Cron:predict] Quota reset not yet available; holding multi-league gate closed with 0 billable requests.', {
@@ -81,8 +88,11 @@ async function handleCron(request: NextRequest) {
     return NextResponse.json({
       success: true,
       status: quotaDetection.state,
+      promotionMode: autoUnlockState.promotionMode,
       billableRequestsMade: 0,
       quotaDetection,
+      leaguesPromoted: autoUnlockState.leaguesPromoted,
+      leaguesProposedForReview: autoUnlockState.leaguesProposedForReview,
       activeLeagues: autoUnlockState.activeLeaguesAfterRun,
       shadowLeaguesCount: autoUnlockState.shadowLeaguesAfterRun.length,
       latencyMs,
@@ -90,24 +100,30 @@ async function handleCron(request: NextRequest) {
   }
 
   try {
-    Logger.info('[Cron:predict] Quota reset verified! Running MultiLeagueAutoActivator & ProductionPredictionEngine...', {
+    Logger.info('[Cron:predict] Quota reset verified! Running MultiLeagueAutoActivator (PROPOSE_ONLY) & ProductionPredictionEngine...', {
       requestId,
       remainingOperationalBudget: quotaDetection.remainingOperationalBudget,
+      allowDbWrite,
     });
 
+    // H2: Always run activator in PROPOSE_ONLY mode (explicitHumanApproval: false) from cron
     const autoUnlockResult = await MultiLeagueAutoActivator.runAutoUnlockCycle({
       mode: 'LIVE',
-      persistToDatabase: true,
+      explicitHumanApproval: false,
+      persistToDatabase: allowDbWrite,
+      allowProductionWrite: allowDbWrite,
     });
     const result = await ProductionPredictionEngine.runPredictionCycle(
       autoUnlockResult.evaluatedFixtures
     );
     const latencyMs = Date.now() - start;
 
-    Logger.info('[Cron:predict] Production prediction & auto-unlock cycle completed successfully', {
+    Logger.info('[Cron:predict] Production prediction & proposal cycle completed successfully', {
       requestId,
       latencyMs,
+      promotionMode: autoUnlockResult.promotionMode,
       leaguesPromoted: autoUnlockResult.leaguesPromoted,
+      leaguesProposedForReview: autoUnlockResult.leaguesProposedForReview,
       billableRequestsMade: autoUnlockResult.billableRequestsMade,
       totalFixtures: result.stats.totalFixtures,
       persistedCount: result.persistedPicksCount,
@@ -120,9 +136,11 @@ async function handleCron(request: NextRequest) {
       success: true,
       timestamp: result.timestampUtc,
       latencyMs,
+      promotionMode: autoUnlockResult.promotionMode,
       quotaState: autoUnlockResult.quotaDetection.state,
       billableRequestsMade: autoUnlockResult.billableRequestsMade,
       leaguesPromoted: autoUnlockResult.leaguesPromoted,
+      leaguesProposedForReview: autoUnlockResult.leaguesProposedForReview,
       activeLeagues: autoUnlockResult.activeLeaguesAfterRun,
       stats: result.stats,
       persistedPicksCount: result.persistedPicksCount,

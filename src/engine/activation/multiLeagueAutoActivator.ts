@@ -39,9 +39,17 @@ export interface MarketEvaluationDetail {
   readinessState: MarketReadinessState;
   productionEnabled: boolean;
   modelValidated: boolean;
+  proposedForHumanReview: boolean;
   brierScore: number | null;
+  brierCi95: [number, number] | null;
+  beatsConstant05At95Ci: boolean;
+  ahFixedMinus05Brier?: number | null;
+  ahBalancedQuarterBrier?: number | null;
   logLoss: number | null;
   calibrationSlope: number | null;
+  pinnacleBenchmarkAvailable: boolean;
+  pinnacleBenchmarkMatchedFixtures: number;
+  chronologicalWalkForwardVerified: boolean;
   liveFixturesWithOddsCount: number;
   smokeTestPassed: boolean;
   qualifyingLayakCount: number;
@@ -57,7 +65,10 @@ export interface LeagueActivationEvaluation {
   oddspapiTournamentId: number;
   previousStatus: ProductionStatus;
   newStatus: ProductionStatus;
+  promotionMode: 'PROPOSE_ONLY' | 'MANUAL_APPROVED_PROMOTION';
+  explicitHumanApprovalGranted: boolean;
   promotedInThisRun: boolean;
+  proposedInThisRun: boolean;
   rolledBackInThisRun: boolean;
   historicalMatchesTotal: number;
   evalSampleSize: number;
@@ -83,10 +94,18 @@ export interface AutoActivationRunResult {
   runId: string;
   executedAtUtc: string;
   mode: 'LIVE' | 'SIMULATED_RESET_TEST';
+  promotionMode: 'PROPOSE_ONLY' | 'MANUAL_APPROVED_PROMOTION';
+  explicitHumanApprovalGranted: boolean;
+  productionWriteAllowed: boolean;
   quotaDetection: QuotaResetDetectionResult;
   billableRequestsMade: number;
   batchesQueried: number[][];
   leaguesPromoted: string[];
+  leaguesProposedForReview: Array<{
+    internalLeagueId: string;
+    leagueName: string;
+    proposedMarkets: MarketKey[];
+  }>;
   leaguesRolledBack: string[];
   activeLeaguesAfterRun: Array<{
     internalLeagueId: string;
@@ -123,8 +142,20 @@ export interface AutoActivationOptions {
   injectedAccountData?: any;
   injectedFixtures?: Array<Partial<LiveFixtureDTO> & { providerFixtureId: string; homeTeam: string; awayTeam: string; league: string; kickoffTime: string }>;
   injectedOddsByTournamentBatch?: Record<string, LiveOddsDTO[]>;
+  injectedBacktestOverride?: Record<string, any>;
   simulateSmokeTestFailureForLeagues?: string[];
+  /**
+   * H2 Safety Gate: Defaults to false (PROPOSE_ONLY mode).
+   * Even when true, requires process.env.ALLOW_MANUAL_LEAGUE_PROMOTION === 'true'
+   * AND all 5 mandatory per-market statistical & benchmark proofs.
+   */
+  explicitHumanApproval?: boolean;
+  /**
+   * H1 Safety Gate: Both persistToDatabase and allowProductionWrite default to false.
+   * Requires process.env.ALLOW_PRODUCTION_DB_WRITE === 'true' and is blocked in CI, test, and preview.
+   */
   persistToDatabase?: boolean;
+  allowProductionWrite?: boolean;
   writeVerificationArtifact?: boolean;
 }
 
@@ -136,8 +167,20 @@ export class MultiLeagueAutoActivator {
   public static readonly MIN_EVAL_SAMPLE = 300;
 
   /**
-   * Executes the complete Phase B -> Phase C -> Phase D Auto-Unlock & Activation flow.
-   * Strictly non-billable when quota is exhausted or unverified.
+   * H2 Safety Gate: Checks whether manual human approval for league promotion is active.
+   * Quota reset alone NEVER authorizes promotion.
+   */
+  public static isManualPromotionAuthorized(explicitHumanApproval = false): boolean {
+    if (!explicitHumanApproval) return false;
+    if (process.env.ALLOW_MANUAL_LEAGUE_PROMOTION !== 'true') return false;
+    if (process.env.VERCEL_ENV === 'preview') return false;
+    return true;
+  }
+
+  /**
+   * Executes the Phase B -> Phase C -> Phase D Multi-League Evaluation & Proposal flow.
+   * H1: Database persistence defaults to FALSE and requires ALLOW_PRODUCTION_DB_WRITE === 'true'.
+   * H2: Runs in PROPOSE_ONLY mode by default; quota reset NEVER promotes any league or market to ACTIVE.
    */
   public static async runAutoUnlockCycle(
     options: AutoActivationOptions = {}
@@ -146,13 +189,19 @@ export class MultiLeagueAutoActivator {
     const executedAtUtc = new Date().toISOString();
     const mode = options.mode || 'LIVE';
 
-    // ─── PHASE B: Non-Billable Quota-Reset Detection ────────────────────────
-    // Require at least 3 operational calls above the 50-request mandatory reserve
-    // (1 fixture discovery + 2 priority tournament batches for the 7 validated leagues)
+    const requestedWrite = Boolean(options.persistToDatabase && options.allowProductionWrite);
+    const productionWriteAllowed = OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed(requestedWrite);
+    const explicitHumanApprovalGranted = this.isManualPromotionAuthorized(Boolean(options.explicitHumanApproval));
+    const promotionMode: 'PROPOSE_ONLY' | 'MANUAL_APPROVED_PROMOTION' = explicitHumanApprovalGranted
+      ? 'MANUAL_APPROVED_PROMOTION'
+      : 'PROPOSE_ONLY';
+
+    // ─── PHASE B: Non-Billable Quota-Reset Detection (Read-Only by Default) ──
     const quotaDetection = await OddsPapiQuotaGuard.detectQuotaReset(
       3,
       options.forceAccountSync ?? false,
-      options.injectedAccountData
+      options.injectedAccountData,
+      productionWriteAllowed
     );
 
     let billableRequestsMade = 0;
@@ -187,6 +236,11 @@ export class MultiLeagueAutoActivator {
       // ─── PHASE D: 10-Step Per-League & Per-Market Independent Evaluation ──
       const leagueEvaluations: LeagueActivationEvaluation[] = [];
       const leaguesPromoted: string[] = [];
+      const leaguesProposedForReview: Array<{
+        internalLeagueId: string;
+        leagueName: string;
+        proposedMarkets: MarketKey[];
+      }> = [];
       const leaguesRolledBack: string[] = [];
       const allEvaluatedFixtures: FixtureInput[] = [];
       const smokeTestedPredictionsForPersistence: Array<{
@@ -203,7 +257,9 @@ export class MultiLeagueAutoActivator {
             entry,
             quotaDetection,
             discoveredFixturesByLeague.get(lid) || [],
-            options.simulateSmokeTestFailureForLeagues?.includes(lid) || false
+            options.simulateSmokeTestFailureForLeagues?.includes(lid) || false,
+            explicitHumanApprovalGranted,
+            options.injectedBacktestOverride?.[lid]
           );
 
           leagueEvaluations.push(evalResult.evaluation);
@@ -212,6 +268,18 @@ export class MultiLeagueAutoActivator {
 
           if (evalResult.evaluation.promotedInThisRun) {
             leaguesPromoted.push(lid);
+          }
+          if (evalResult.evaluation.proposedInThisRun) {
+            const proposedMarkets: MarketKey[] = [];
+            if (evalResult.evaluation.markets.AH.proposedForHumanReview) proposedMarkets.push('AH');
+            if (evalResult.evaluation.markets.OU.proposedForHumanReview) proposedMarkets.push('OU');
+            if (proposedMarkets.length > 0) {
+              leaguesProposedForReview.push({
+                internalLeagueId: lid,
+                leagueName: entry.league_name,
+                proposedMarkets,
+              });
+            }
           }
           if (evalResult.evaluation.rolledBackInThisRun) {
             leaguesRolledBack.push(lid);
@@ -223,9 +291,9 @@ export class MultiLeagueAutoActivator {
         }
       }
 
-      // Optional database persistence for active & newly promoted leagues
+      // H1: Database persistence is strictly blocked unless productionWriteAllowed is true
       let persistenceSummary: AutoActivationRunResult['persistenceSummary'];
-      if (options.persistToDatabase && smokeTestedPredictionsForPersistence.length > 0) {
+      if (productionWriteAllowed && smokeTestedPredictionsForPersistence.length > 0) {
         const persistRes = await ProductionPredictionEngine.persistPredictionCycle(
           smokeTestedPredictionsForPersistence
         );
@@ -263,10 +331,14 @@ export class MultiLeagueAutoActivator {
         runId,
         executedAtUtc,
         mode,
+        promotionMode,
+        explicitHumanApprovalGranted,
+        productionWriteAllowed,
         quotaDetection,
         billableRequestsMade,
         batchesQueried,
         leaguesPromoted,
+        leaguesProposedForReview,
         leaguesRolledBack,
         activeLeaguesAfterRun,
         shadowLeaguesAfterRun,
@@ -276,7 +348,7 @@ export class MultiLeagueAutoActivator {
         persistenceSummary,
       };
 
-      if (options.writeVerificationArtifact !== false && mode === 'LIVE') {
+      if (options.writeVerificationArtifact === true) {
         this.writeVerificationStateFile(runResult);
       }
 
@@ -290,7 +362,7 @@ export class MultiLeagueAutoActivator {
 
   /**
    * Phase C: Priority-ordered tournament batch ingestion respecting the 50-request mandatory reserve.
-   * Only queries leagues that have at least one model-validated market (EPL + 7 validated non-EPL leagues = 8 tournaments = 2 batches of <=5).
+   * Queries top-priority Pinnacle-supported leagues (EPL + top 7 Tier A/B shadow leagues = 8 tournaments = 2 batches of <=5).
    */
   private static async ingestPriorityFixturesAndOdds(
     quotaDetection: QuotaResetDetectionResult,
@@ -304,11 +376,11 @@ export class MultiLeagueAutoActivator {
     const batchesQueried: number[][] = [];
     const fixturesByLeague = new Map<string, FixtureInput[]>();
 
-    // Select only leagues with at least 1 validated market, ordered by activation_priority
-    const prioritizedValidatedLeagues = getPriorityOrderedLeaguesForOdds().filter(
-      l => (l.validated_markets?.length || 0) > 0
+    // Select priority cohort (activation_priority <= 8: ENG-PL + 7 primary European leagues = 8 tournaments = 2 batches of <=5)
+    const prioritizedCohort = getPriorityOrderedLeaguesForOdds().filter(
+      l => (l.activation_priority ?? 99) <= 8
     );
-    const priorityBatches = getTournamentBatches(prioritizedValidatedLeagues);
+    const priorityBatches = getTournamentBatches(prioritizedCohort);
 
     // 1. Discover upcoming fixtures (injected for tests or live via OddsPapiProvider)
     let rawFixtures: Array<Partial<LiveFixtureDTO> & { providerFixtureId: string; homeTeam: string; awayTeam: string; league: string; kickoffTime: string }> = [];
@@ -317,7 +389,8 @@ export class MultiLeagueAutoActivator {
     } else {
       const guard = await OddsPapiQuotaGuard.checkQuota(
         1,
-        OddsPapiQuotaGuard.MANDATORY_MULTI_LEAGUE_RESERVE
+        OddsPapiQuotaGuard.MANDATORY_MULTI_LEAGUE_RESERVE,
+        false
       );
       if (!guard.allowed) {
         Logger.warn('[MultiLeagueAutoActivator] Halting fixture discovery due to 50-request reserve guard:', {
@@ -366,7 +439,8 @@ export class MultiLeagueAutoActivator {
 
       const guard = await OddsPapiQuotaGuard.checkQuota(
         1,
-        OddsPapiQuotaGuard.MANDATORY_MULTI_LEAGUE_RESERVE
+        OddsPapiQuotaGuard.MANDATORY_MULTI_LEAGUE_RESERVE,
+        false
       );
       if (!guard.allowed) {
         Logger.warn('[MultiLeagueAutoActivator] Quota guard blocked batch request:', {
@@ -468,12 +542,16 @@ export class MultiLeagueAutoActivator {
 
   /**
    * Phase D: 10-Step Independent Evaluation & Controlled Smoke Test for a single league.
+   * H2: Defaults to PROPOSE_ONLY mode. Never promotes any non-EPL league to ACTIVE unless
+   * explicitHumanApprovalGranted === true AND all 5 mandatory statistical & benchmark proofs pass.
    */
   public static evaluateSingleLeague(
     entry: MultiLeagueEntry,
     quotaDetection: QuotaResetDetectionResult,
     liveFixtures: FixtureInput[],
-    simulateSmokeTestFailure = false
+    simulateSmokeTestFailure = false,
+    explicitHumanApprovalGranted = false,
+    backtestOverride?: any
   ): {
     evaluation: LeagueActivationEvaluation;
     fixturesUsed: FixtureInput[];
@@ -481,6 +559,9 @@ export class MultiLeagueAutoActivator {
   } {
     const lid = entry.internal_league_id;
     const previousStatus = entry.production_status;
+    const promotionMode: 'PROPOSE_ONLY' | 'MANUAL_APPROVED_PROMOTION' = explicitHumanApprovalGranted
+      ? 'MANUAL_APPROVED_PROMOTION'
+      : 'PROPOSE_ONLY';
 
     // ─── STEP 1: Check PAUSED / Missing Baseline (IDN-L1) ───────────────────
     if (lid === 'IDN-L1' || entry.production_status === 'PAUSED') {
@@ -503,7 +584,10 @@ export class MultiLeagueAutoActivator {
           oddspapiTournamentId: entry.oddspapi_tournament_id,
           previousStatus,
           newStatus: 'PAUSED',
+          promotionMode,
+          explicitHumanApprovalGranted,
           promotedInThisRun: false,
+          proposedInThisRun: false,
           rolledBackInThisRun: false,
           historicalMatchesTotal: 0,
           evalSampleSize: 0,
@@ -518,9 +602,15 @@ export class MultiLeagueAutoActivator {
               readinessState: 'PAUSED_MISSING_BASELINE',
               productionEnabled: false,
               modelValidated: false,
+              proposedForHumanReview: false,
               brierScore: null,
+              brierCi95: null,
+              beatsConstant05At95Ci: false,
               logLoss: null,
               calibrationSlope: null,
+              pinnacleBenchmarkAvailable: false,
+              pinnacleBenchmarkMatchedFixtures: 0,
+              chronologicalWalkForwardVerified: false,
               liveFixturesWithOddsCount: 0,
               smokeTestPassed: false,
               qualifyingLayakCount: 0,
@@ -533,9 +623,15 @@ export class MultiLeagueAutoActivator {
               readinessState: 'PAUSED_MISSING_BASELINE',
               productionEnabled: false,
               modelValidated: false,
+              proposedForHumanReview: false,
               brierScore: null,
+              brierCi95: null,
+              beatsConstant05At95Ci: false,
               logLoss: null,
               calibrationSlope: null,
+              pinnacleBenchmarkAvailable: false,
+              pinnacleBenchmarkMatchedFixtures: 0,
+              chronologicalWalkForwardVerified: false,
               liveFixturesWithOddsCount: 0,
               smokeTestPassed: false,
               qualifyingLayakCount: 0,
@@ -568,14 +664,17 @@ export class MultiLeagueAutoActivator {
     const unratedTeamsCount = ratingList.filter(r => r.matches_played <= 2).length;
 
     const leagueProf = MULTI_LEAGUE_PROFILES[lid];
-    const backtest = MULTI_LEAGUE_BACKTEST_SUMMARY[lid];
+    const backtest = backtestOverride || MULTI_LEAGUE_BACKTEST_SUMMARY[lid];
 
     const historicalMatchesTotal = Number(leagueProf?.sampleMatches ?? (isEpl ? 1329 : 0));
     const evalSampleSize = Number(backtest?.nEval ?? (isEpl ? 300 : 0));
     const maxHistoricalDate: string | null = leagueProf?.maxDate || null;
     const dispersionRatio: number | null = leagueProf?.dispersionRatio ?? null;
+    const chronologicalWalkForwardVerified = Boolean(backtest?.chronologicalWalkForwardVerified ?? true);
+    const pinnacleBenchmarkAvailable = Boolean(backtest?.pinnacleBenchmark?.available ?? isEpl);
+    const pinnacleBenchmarkMatchedFixtures = Number(backtest?.pinnacleBenchmark?.matchedFixtures ?? (isEpl ? 80 : 0));
 
-    // Check data-quality & cold-start blockers before model validation
+    // Check data-quality & cold-start blockers before model validation (Proof 1 & Proof 5)
     let leagueDataBlockerState: MarketReadinessState | null = null;
     let leagueDataBlockerReason: string | null = null;
 
@@ -589,55 +688,100 @@ export class MultiLeagueAutoActivator {
       } else if (evalSampleSize < this.MIN_EVAL_SAMPLE || (maxHistoricalDate && maxHistoricalDate < '2026-08-01')) {
         leagueDataBlockerState = 'BLOCKED_DATA_QUALITY';
         leagueDataBlockerReason = `Data quality blocker: out-of-sample evaluation size nEval=${evalSampleSize} (< ${this.MIN_EVAL_SAMPLE}) or stale maxHistoricalDate=${maxHistoricalDate}.`;
+      } else if (coldStartTeamsCount > ratedTeamsCount * 0.25 || unratedTeamsCount > 0) {
+        leagueDataBlockerState = 'BLOCKED_COLD_START';
+        leagueDataBlockerReason = `Cold-start blocker: ${coldStartTeamsCount}/${ratedTeamsCount} active teams have < 10 historical matches (${unratedTeamsCount} with <= 2 matches).`;
       }
     }
 
-    // ─── STEP 4 & 5: Independent Per-Market Walk-Forward Model Validation ───
-    const ahBrier: number | null = backtest?.ahHomeMinus05?.brier ?? null;
-    const ahLogLoss: number | null = backtest?.ahHomeMinus05?.logLoss ?? null;
-    const ahSlope: number | null = backtest?.ahHomeMinus05?.calibrationSlope ?? null;
+    // ─── STEP 4 & 5: Independent Per-Market 5-Proof Walk-Forward Validation ─
+    // H4: Use ahBalancedHalfLine (binary Y in {0,1}, constant-0.5 Brier = 0.2500) as the authoritative AH target
+    const ahHalfMetric = backtest?.ahBalancedHalfLine || backtest?.ahHomeMinus05;
+    const ahBrier: number | null = ahHalfMetric?.brier ?? null;
+    const ahBrierCi95: [number, number] | null = ahHalfMetric?.brierCi95 ?? null;
+    const ahBeats05Ci95 = Boolean(ahHalfMetric?.beatsConstant05At95Ci ?? false);
+    const ahLogLoss: number | null = ahHalfMetric?.logLoss ?? null;
+    const ahSlope: number | null = ahHalfMetric?.calibrationSlope ?? null;
+    const ahFixedMinus05Brier: number | null = backtest?.ahHomeMinus05?.brier ?? null;
+    const ahBalancedQuarterBrier: number | null = backtest?.ahBalancedQuarterLine?.brier ?? null;
 
     const ouBrier: number | null = backtest?.ou25?.brier ?? null;
+    const ouBrierCi95: [number, number] | null = backtest?.ou25?.brierCi95 ?? null;
+    const ouBeats05Ci95 = Boolean(backtest?.ou25?.beatsConstant05At95Ci ?? false);
     const ouLogLoss: number | null = backtest?.ou25?.logLoss ?? null;
     const ouSlope: number | null = backtest?.ou25?.calibrationSlope ?? null;
 
     const dispersionOk = dispersionRatio !== null && dispersionRatio <= this.MAX_DISPERSION_RATIO;
 
-    const ahMetricsPass =
+    // Proof 1..3 + Proof 5 (Statistical & Data Integrity proofs before Pinnacle benchmark)
+    const ahStatisticalPass =
+      evalSampleSize >= this.MIN_EVAL_SAMPLE &&
+      chronologicalWalkForwardVerified &&
+      !leagueDataBlockerState &&
       dispersionOk &&
       ahBrier !== null &&
       ahLogLoss !== null &&
       ahSlope !== null &&
       ahBrier < this.BRIER_THRESHOLD &&
+      ahBeats05Ci95 &&
       ahLogLoss < this.LOG_LOSS_THRESHOLD &&
       ahSlope >= this.MIN_CALIBRATION_SLOPE &&
       CompetitionProfileEngine.isMarketCalibrated(entry.league_name, 'AH');
 
-    const ouMetricsPass =
+    const ouStatisticalPass =
+      evalSampleSize >= this.MIN_EVAL_SAMPLE &&
+      chronologicalWalkForwardVerified &&
+      !leagueDataBlockerState &&
       dispersionOk &&
       ouBrier !== null &&
       ouLogLoss !== null &&
       ouSlope !== null &&
       ouBrier < this.BRIER_THRESHOLD &&
+      ouBeats05Ci95 &&
       ouLogLoss < this.LOG_LOSS_THRESHOLD &&
       ouSlope >= this.MIN_CALIBRATION_SLOPE &&
       CompetitionProfileEngine.isMarketCalibrated(entry.league_name, 'OU');
 
-    const ahModelValidated = isEpl || (!leagueDataBlockerState && ahMetricsPass);
-    const ouModelValidated = isEpl || (!leagueDataBlockerState && ouMetricsPass);
+    // Proof 4: Historical Pinnacle no-vig benchmark on the same matches
+    const ahAll5ProofsPass = isEpl || (ahStatisticalPass && pinnacleBenchmarkAvailable && pinnacleBenchmarkMatchedFixtures > 0);
+    const ouAll5ProofsPass = isEpl || (ouStatisticalPass && pinnacleBenchmarkAvailable && pinnacleBenchmarkMatchedFixtures > 0);
+
+    // Keep entry.validated_markets synchronized with the 5-proof validation state
+    if (!isEpl) {
+      const nextValidated: MarketKey[] = [];
+      if (ahAll5ProofsPass) nextValidated.push('AH');
+      if (ouAll5ProofsPass) nextValidated.push('OU');
+      entry.validated_markets = nextValidated;
+    }
 
     const buildMarketBlockReason = (
       market: MarketKey,
+      statisticalPass: boolean,
       brier: number | null,
+      ci95: [number, number] | null,
+      beats05Ci: boolean,
       logLoss: number | null,
       slope: number | null
     ): { state: MarketReadinessState; reason: string } => {
       if (leagueDataBlockerState && leagueDataBlockerReason) {
         return { state: leagueDataBlockerState, reason: leagueDataBlockerReason };
       }
+      if (!statisticalPass) {
+        const ciStr = ci95 ? `[${ci95[0]}, ${ci95[1]}]` : 'N/A';
+        return {
+          state: 'BLOCKED_MODEL_VALIDATION',
+          reason: `NOT_APPROVED_FOR_PRODUCTION: ${market} failed walk-forward statistical gate (Brier=${brier ?? 'N/A'}, 95% CI=${ciStr}, beats0.25At95Ci=${beats05Ci}, LogLoss=${logLoss ?? 'N/A'}, slope=${slope ?? 'N/A'}, dispersion=${dispersionRatio ?? 'N/A'}).`,
+        };
+      }
+      if (!pinnacleBenchmarkAvailable || pinnacleBenchmarkMatchedFixtures === 0) {
+        return {
+          state: 'BLOCKED_PINNACLE_BENCHMARK',
+          reason: `NOT_APPROVED_FOR_PRODUCTION: ${market} passed statistical walk-forward (Brier=${brier}, 95% CI=[${ci95?.join(', ')}]), but has 0 matched historical Pinnacle no-vig benchmark fixtures in local archives.`,
+        };
+      }
       return {
-        state: 'BLOCKED_MODEL_VALIDATION',
-        reason: `${market} failed walk-forward validation thresholds (Brier=${brier ?? 'N/A'} [max ${this.BRIER_THRESHOLD}], LogLoss=${logLoss ?? 'N/A'} [max ${this.LOG_LOSS_THRESHOLD}], calibrationSlope=${slope ?? 'N/A'} [min ${this.MIN_CALIBRATION_SLOPE}], dispersion=${dispersionRatio ?? 'N/A'}).`,
+        state: 'BLOCKED_HUMAN_APPROVAL',
+        reason: `PROPOSED_FOR_REVIEW: ${market} passed all 5 statistical & Pinnacle benchmark proofs; awaiting explicit human approval for production promotion.`,
       };
     };
 
@@ -659,12 +803,13 @@ export class MultiLeagueAutoActivator {
     let ouPantau = 0;
     let ouLewati = 0;
 
-    // Candidate markets that passed model validation AND have live Pinnacle odds
-    const candidateMarketsToPromote: MarketKey[] = [];
-    if (ahModelValidated && ahFixturesWithOdds.length > 0) candidateMarketsToPromote.push('AH');
-    if (ouModelValidated && ouFixturesWithOdds.length > 0) candidateMarketsToPromote.push('OU');
+    // Candidate markets that passed all 5 proofs AND have live Pinnacle odds
+    const candidateMarketsPassingAll5Proofs: MarketKey[] = [];
+    if (ahAll5ProofsPass && ahFixturesWithOdds.length > 0) candidateMarketsPassingAll5Proofs.push('AH');
+    if (ouAll5ProofsPass && ouFixturesWithOdds.length > 0) candidateMarketsPassingAll5Proofs.push('OU');
 
     let promotedInThisRun = false;
+    let proposedInThisRun = false;
     let rolledBackInThisRun = false;
 
     if (isEpl) {
@@ -675,111 +820,130 @@ export class MultiLeagueAutoActivator {
       }
       ahSmokePassed = true;
       ouSmokePassed = true;
-    } else if (candidateMarketsToPromote.length > 0 && quotaDetection.state === 'QUOTA_AVAILABLE') {
-      // Provisionally enable candidate markets so ValueEngine Gate 7 evaluates them as production-ready
-      activateLeagueMarkets(
-        lid,
-        candidateMarketsToPromote,
-        `Provisional activation for controlled smoke test (${candidateMarketsToPromote.join(' + ')})`
-      );
-
-      try {
-        if (simulateSmokeTestFailure) {
-          throw new Error(`Simulated smoke test failure for ${lid}`);
-        }
-
-        const ahFairOddsSet = new Set<number>();
-        const ouFairOddsSet = new Set<number>();
-
+    } else if (candidateMarketsPassingAll5Proofs.length > 0 && quotaDetection.state === 'QUOTA_AVAILABLE') {
+      if (!explicitHumanApprovalGranted) {
+        // H2 PROPOSE-ONLY MODE: Run non-mutating smoke check in SHADOW mode and emit proposal, NEVER promote to ACTIVE
         for (const f of liveFixtures) {
           const evalOut = ProductionPredictionEngine.evaluateFixture(f);
-          smokeTestOutputs.push(evalOut);
-
-          const ahM = evalOut.prediction.markets.asianHandicap;
-          const ouM = evalOut.prediction.markets.overUnder;
           const bttsM = evalOut.prediction.markets.btts;
-
-          // Verify BTTS is strictly gated as LEWATI
           if (bttsM.verdict !== 'LEWATI') {
             throw new Error(`Smoke test invariant violation: BTTS verdict was ${bttsM.verdict} instead of LEWATI`);
           }
-
-          if (candidateMarketsToPromote.includes('AH') && f.pinnacleOdds?.ah) {
-            if (
-              ahM.fairOdds === null ||
-              !Number.isFinite(ahM.fairOdds) ||
-              ahM.fairOdds <= 1.0 ||
-              ahM.expectedValuePct === null ||
-              !Number.isFinite(ahM.expectedValuePct)
-            ) {
-              throw new Error(`Invalid AH calculation on fixture ${f.fixtureId}`);
-            }
-            ahFairOddsSet.add(ahM.fairOdds);
-            if (ahM.verdict === 'LAYAK') ahLayak++;
-            else if (ahM.verdict === 'PANTAU') ahPantau++;
-            else ahLewati++;
-          }
-
-          if (candidateMarketsToPromote.includes('OU') && f.pinnacleOdds?.ou) {
-            if (
-              ouM.fairOdds === null ||
-              !Number.isFinite(ouM.fairOdds) ||
-              ouM.fairOdds <= 1.0 ||
-              ouM.expectedValuePct === null ||
-              !Number.isFinite(ouM.expectedValuePct)
-            ) {
-              throw new Error(`Invalid OU calculation on fixture ${f.fixtureId}`);
-            }
-            ouFairOddsSet.add(ouM.fairOdds);
-            if (ouM.verdict === 'LAYAK') ouLayak++;
-            else if (ouM.verdict === 'PANTAU') ouPantau++;
-            else ouLewati++;
-          } else if (!ouModelValidated && f.pinnacleOdds?.ou) {
-            // Uncalibrated OU market (e.g. Serie A or Belgian Pro League) MUST be rejected with LEWATI
-            if (ouM.verdict !== 'LEWATI') {
-              throw new Error(`Uncalibrated OU market in ${lid} was not rejected (verdict=${ouM.verdict})`);
-            }
-          }
         }
-
-        // Verify non-degenerate variance when >= 2 fixtures exist
-        if (candidateMarketsToPromote.includes('AH') && ahFixturesWithOdds.length >= 2 && ahFairOddsSet.size < 2) {
-          throw new Error(`Degenerate AH probabilities detected across ${ahFixturesWithOdds.length} fixtures in ${lid}`);
-        }
-        if (candidateMarketsToPromote.includes('OU') && ouFixturesWithOdds.length >= 2 && ouFairOddsSet.size < 2) {
-          throw new Error(`Degenerate OU probabilities detected across ${ouFixturesWithOdds.length} fixtures in ${lid}`);
-        }
-
-        ahSmokePassed = candidateMarketsToPromote.includes('AH');
-        ouSmokePassed = candidateMarketsToPromote.includes('OU');
-
-        const verifiedMarkets: MarketKey[] = [];
-        if (ahSmokePassed) verifiedMarkets.push('AH');
-        if (ouSmokePassed) verifiedMarkets.push('OU');
-
+        ahSmokePassed = candidateMarketsPassingAll5Proofs.includes('AH');
+        ouSmokePassed = candidateMarketsPassingAll5Proofs.includes('OU');
+        proposedInThisRun = true;
+        promotedInThisRun = false;
+      } else {
+        // MANUAL_APPROVED_PROMOTION MODE (Requires explicitHumanApproval === true + ALLOW_MANUAL_LEAGUE_PROMOTION === 'true')
         activateLeagueMarkets(
           lid,
-          verifiedMarkets,
-          `Auto-unlocked ${verifiedMarkets.join(' + ')} after verified quota reset (${quotaDetection.requestCount}/${quotaDetection.requestLimit}) and passing 10-step smoke test.`
+          candidateMarketsPassingAll5Proofs,
+          `Provisional activation for manually approved smoke test (${candidateMarketsPassingAll5Proofs.join(' + ')})`,
+          new Date().toISOString(),
+          true
         );
-        promotedInThisRun = previousStatus === 'SHADOW' && verifiedMarkets.length > 0;
-      } catch (smokeErr) {
-        Logger.warn(`[MultiLeagueAutoActivator] Smoke test failed for ${lid}; rolling back to SHADOW:`, {
-          error: String(smokeErr),
-        });
-        rollbackLeagueMarkets(lid, `Rolled back to SHADOW after smoke test failure: ${String(smokeErr)}`);
-        rolledBackInThisRun = true;
-        ahSmokePassed = false;
-        ouSmokePassed = false;
-        smokeTestOutputs.length = 0;
+
+        try {
+          if (simulateSmokeTestFailure) {
+            throw new Error(`Simulated smoke test failure for ${lid}`);
+          }
+
+          const ahFairOddsSet = new Set<number>();
+          const ouFairOddsSet = new Set<number>();
+
+          for (const f of liveFixtures) {
+            const evalOut = ProductionPredictionEngine.evaluateFixture(f);
+            smokeTestOutputs.push(evalOut);
+
+            const ahM = evalOut.prediction.markets.asianHandicap;
+            const ouM = evalOut.prediction.markets.overUnder;
+            const bttsM = evalOut.prediction.markets.btts;
+
+            if (bttsM.verdict !== 'LEWATI') {
+              throw new Error(`Smoke test invariant violation: BTTS verdict was ${bttsM.verdict} instead of LEWATI`);
+            }
+
+            if (candidateMarketsPassingAll5Proofs.includes('AH') && f.pinnacleOdds?.ah) {
+              if (
+                ahM.fairOdds === null ||
+                !Number.isFinite(ahM.fairOdds) ||
+                ahM.fairOdds <= 1.0 ||
+                ahM.expectedValuePct === null ||
+                !Number.isFinite(ahM.expectedValuePct)
+              ) {
+                throw new Error(`Invalid AH calculation on fixture ${f.fixtureId}`);
+              }
+              ahFairOddsSet.add(ahM.fairOdds);
+              if (ahM.verdict === 'LAYAK') ahLayak++;
+              else if (ahM.verdict === 'PANTAU') ahPantau++;
+              else ahLewati++;
+            }
+
+            if (candidateMarketsPassingAll5Proofs.includes('OU') && f.pinnacleOdds?.ou) {
+              if (
+                ouM.fairOdds === null ||
+                !Number.isFinite(ouM.fairOdds) ||
+                ouM.fairOdds <= 1.0 ||
+                ouM.expectedValuePct === null ||
+                !Number.isFinite(ouM.expectedValuePct)
+              ) {
+                throw new Error(`Invalid OU calculation on fixture ${f.fixtureId}`);
+              }
+              ouFairOddsSet.add(ouM.fairOdds);
+              if (ouM.verdict === 'LAYAK') ouLayak++;
+              else if (ouM.verdict === 'PANTAU') ouPantau++;
+              else ouLewati++;
+            } else if (!ouAll5ProofsPass && f.pinnacleOdds?.ou) {
+              if (ouM.verdict !== 'LEWATI') {
+                throw new Error(`Uncalibrated OU market in ${lid} was not rejected (verdict=${ouM.verdict})`);
+              }
+            }
+          }
+
+          if (candidateMarketsPassingAll5Proofs.includes('AH') && ahFixturesWithOdds.length >= 2 && ahFairOddsSet.size < 2) {
+            throw new Error(`Degenerate AH probabilities detected across ${ahFixturesWithOdds.length} fixtures in ${lid}`);
+          }
+          if (candidateMarketsPassingAll5Proofs.includes('OU') && ouFixturesWithOdds.length >= 2 && ouFairOddsSet.size < 2) {
+            throw new Error(`Degenerate OU probabilities detected across ${ouFixturesWithOdds.length} fixtures in ${lid}`);
+          }
+
+          ahSmokePassed = candidateMarketsPassingAll5Proofs.includes('AH');
+          ouSmokePassed = candidateMarketsPassingAll5Proofs.includes('OU');
+
+          const verifiedMarkets: MarketKey[] = [];
+          if (ahSmokePassed) verifiedMarkets.push('AH');
+          if (ouSmokePassed) verifiedMarkets.push('OU');
+
+          activateLeagueMarkets(
+            lid,
+            verifiedMarkets,
+            `Manually approved promotion of ${verifiedMarkets.join(' + ')} after verified quota (${quotaDetection.requestCount}/${quotaDetection.requestLimit}), 5-proof validation, and 10-step smoke test.`,
+            new Date().toISOString(),
+            true
+          );
+          promotedInThisRun = previousStatus === 'SHADOW' && verifiedMarkets.length > 0;
+        } catch (smokeErr) {
+          Logger.warn(`[MultiLeagueAutoActivator] Smoke test failed for ${lid}; rolling back to SHADOW:`, {
+            error: String(smokeErr),
+          });
+          rollbackLeagueMarkets(lid, `Rolled back to SHADOW after smoke test failure: ${String(smokeErr)}`);
+          rolledBackInThisRun = true;
+          ahSmokePassed = false;
+          ouSmokePassed = false;
+          smokeTestOutputs.length = 0;
+        }
       }
     }
 
     // ─── STEP 9 & 10: Finalize Market Readiness States & Blocker Reasons ────
     const resolveFinalMarketDetail = (
       market: MarketKey,
-      modelValidated: boolean,
+      statisticalPass: boolean,
+      all5ProofsPass: boolean,
       brier: number | null,
+      ci95: [number, number] | null,
+      beats05Ci: boolean,
       logLoss: number | null,
       slope: number | null,
       fixturesWithOddsCount: number,
@@ -788,15 +952,29 @@ export class MultiLeagueAutoActivator {
       pantauCount: number,
       lewatiCount: number
     ): MarketEvaluationDetail => {
+      const extraAhFields = market === 'AH'
+        ? {
+            ahFixedMinus05Brier,
+            ahBalancedQuarterBrier,
+          }
+        : {};
+
       if (isEpl) {
         return {
           market,
           readinessState: 'ACTIVE',
           productionEnabled: true,
           modelValidated: true,
+          proposedForHumanReview: false,
           brierScore: brier,
+          brierCi95: ci95,
+          beatsConstant05At95Ci: beats05Ci,
+          ...extraAhFields,
           logLoss,
           calibrationSlope: slope,
+          pinnacleBenchmarkAvailable,
+          pinnacleBenchmarkMatchedFixtures,
+          chronologicalWalkForwardVerified,
           liveFixturesWithOddsCount: fixturesWithOddsCount,
           smokeTestPassed: true,
           qualifyingLayakCount: layakCount,
@@ -806,8 +984,8 @@ export class MultiLeagueAutoActivator {
         };
       }
 
-      if (!modelValidated) {
-        const blk = buildMarketBlockReason(market, brier, logLoss, slope);
+      if (!all5ProofsPass) {
+        const blk = buildMarketBlockReason(market, statisticalPass, brier, ci95, beats05Ci, logLoss, slope);
         entry.market_readiness![market] = blk.state;
         entry.market_blockers![market] = blk.reason;
         return {
@@ -815,9 +993,16 @@ export class MultiLeagueAutoActivator {
           readinessState: blk.state,
           productionEnabled: false,
           modelValidated: false,
+          proposedForHumanReview: false,
           brierScore: brier,
+          brierCi95: ci95,
+          beatsConstant05At95Ci: beats05Ci,
+          ...extraAhFields,
           logLoss,
           calibrationSlope: slope,
+          pinnacleBenchmarkAvailable,
+          pinnacleBenchmarkMatchedFixtures,
+          chronologicalWalkForwardVerified,
           liveFixturesWithOddsCount: fixturesWithOddsCount,
           smokeTestPassed: false,
           qualifyingLayakCount: 0,
@@ -836,9 +1021,16 @@ export class MultiLeagueAutoActivator {
           readinessState: 'BLOCKED_ODDS',
           productionEnabled: false,
           modelValidated: true,
+          proposedForHumanReview: false,
           brierScore: brier,
+          brierCi95: ci95,
+          beatsConstant05At95Ci: beats05Ci,
+          ...extraAhFields,
           logLoss,
           calibrationSlope: slope,
+          pinnacleBenchmarkAvailable,
+          pinnacleBenchmarkMatchedFixtures,
+          chronologicalWalkForwardVerified,
           liveFixturesWithOddsCount: fixturesWithOddsCount,
           smokeTestPassed: false,
           qualifyingLayakCount: 0,
@@ -848,7 +1040,7 @@ export class MultiLeagueAutoActivator {
         };
       }
 
-      if (smokePassed && entry.production_enabled_markets?.includes(market)) {
+      if (explicitHumanApprovalGranted && smokePassed && entry.production_enabled_markets?.includes(market)) {
         entry.market_readiness![market] = 'ACTIVE';
         entry.market_blockers![market] = null;
         return {
@@ -856,15 +1048,50 @@ export class MultiLeagueAutoActivator {
           readinessState: 'ACTIVE',
           productionEnabled: true,
           modelValidated: true,
+          proposedForHumanReview: false,
           brierScore: brier,
+          brierCi95: ci95,
+          beatsConstant05At95Ci: beats05Ci,
+          ...extraAhFields,
           logLoss,
           calibrationSlope: slope,
+          pinnacleBenchmarkAvailable,
+          pinnacleBenchmarkMatchedFixtures,
+          chronologicalWalkForwardVerified,
           liveFixturesWithOddsCount: fixturesWithOddsCount,
           smokeTestPassed: true,
           qualifyingLayakCount: layakCount,
           pantauCount,
           lewatiCount,
           blockerReason: null,
+        };
+      }
+
+      if (!explicitHumanApprovalGranted && smokePassed) {
+        const propReason = `PROPOSED_FOR_REVIEW: ${lid} ${market} passed all 5 proofs and live odds smoke check, but automatic promotion is disabled (PROPOSE_ONLY mode). Explicit human approval required.`;
+        entry.market_readiness![market] = 'PROPOSED_FOR_REVIEW';
+        entry.market_blockers![market] = propReason;
+        return {
+          market,
+          readinessState: 'PROPOSED_FOR_REVIEW',
+          productionEnabled: false,
+          modelValidated: true,
+          proposedForHumanReview: true,
+          brierScore: brier,
+          brierCi95: ci95,
+          beatsConstant05At95Ci: beats05Ci,
+          ...extraAhFields,
+          logLoss,
+          calibrationSlope: slope,
+          pinnacleBenchmarkAvailable,
+          pinnacleBenchmarkMatchedFixtures,
+          chronologicalWalkForwardVerified,
+          liveFixturesWithOddsCount: fixturesWithOddsCount,
+          smokeTestPassed: true,
+          qualifyingLayakCount: 0,
+          pantauCount: 0,
+          lewatiCount: 0,
+          blockerReason: propReason,
         };
       }
 
@@ -877,9 +1104,16 @@ export class MultiLeagueAutoActivator {
           readinessState: 'BLOCKED_QUOTA',
           productionEnabled: false,
           modelValidated: true,
+          proposedForHumanReview: false,
           brierScore: brier,
+          brierCi95: ci95,
+          beatsConstant05At95Ci: beats05Ci,
+          ...extraAhFields,
           logLoss,
           calibrationSlope: slope,
+          pinnacleBenchmarkAvailable,
+          pinnacleBenchmarkMatchedFixtures,
+          chronologicalWalkForwardVerified,
           liveFixturesWithOddsCount: 0,
           smokeTestPassed: false,
           qualifyingLayakCount: 0,
@@ -897,9 +1131,16 @@ export class MultiLeagueAutoActivator {
         readinessState: 'BLOCKED_ODDS',
         productionEnabled: false,
         modelValidated: true,
+        proposedForHumanReview: false,
         brierScore: brier,
+        brierCi95: ci95,
+        beatsConstant05At95Ci: beats05Ci,
+        ...extraAhFields,
         logLoss,
         calibrationSlope: slope,
+        pinnacleBenchmarkAvailable,
+        pinnacleBenchmarkMatchedFixtures,
+        chronologicalWalkForwardVerified,
         liveFixturesWithOddsCount: 0,
         smokeTestPassed: false,
         qualifyingLayakCount: 0,
@@ -911,8 +1152,11 @@ export class MultiLeagueAutoActivator {
 
     const ahDetail = resolveFinalMarketDetail(
       'AH',
-      ahModelValidated,
+      ahStatisticalPass,
+      ahAll5ProofsPass,
       ahBrier,
+      ahBrierCi95,
+      ahBeats05Ci95,
       ahLogLoss,
       ahSlope,
       ahFixturesWithOdds.length,
@@ -924,8 +1168,11 @@ export class MultiLeagueAutoActivator {
 
     const ouDetail = resolveFinalMarketDetail(
       'OU',
-      ouModelValidated,
+      ouStatisticalPass,
+      ouAll5ProofsPass,
       ouBrier,
+      ouBrierCi95,
+      ouBeats05Ci95,
       ouLogLoss,
       ouSlope,
       ouFixturesWithOdds.length,
@@ -945,7 +1192,10 @@ export class MultiLeagueAutoActivator {
         oddspapiTournamentId: entry.oddspapi_tournament_id,
         previousStatus,
         newStatus: entry.production_status,
+        promotionMode,
+        explicitHumanApprovalGranted,
         promotedInThisRun,
+        proposedInThisRun,
         rolledBackInThisRun,
         historicalMatchesTotal,
         evalSampleSize,

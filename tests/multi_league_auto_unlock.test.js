@@ -1,22 +1,19 @@
-// SALMO.DEV — Phase F: Multi-League Auto-Unlock & Quota-Reset Activation Test Suite
-// Validates all 13 mandatory requirements across Phases A, B, C, D, E, and F:
-// 1. Quota-reset detector when quota is exhausted (260/250 -> QUOTA_EXHAUSTED, 0 billable calls)
-// 2. Quota-reset detector when provider is unreachable (RESET_UNVERIFIED, no calendar guessing)
-// 3. Quota-reset detector when quota resets (0/250 -> QUOTA_AVAILABLE, 200 operational budget above 50 mandatory reserve)
-// 4. Concurrency lock & idempotency protection (ACTIVATION_IN_PROGRESS prevents duplicate runs)
-// 5. Priority-ordered batch tournament queue & 50-request mandatory reserve hard-stop (199/250 blocks non-EPL)
-// 6. Auto-activation of 5 AH+OU validated leagues (ESP-LALIGA, DEU-BUNDESLIGA, FRA-LIGUE1, NED-ERE, POR-PRIMEIRA)
-// 7. Partial AH-only activation for ITA-SERIEA and BEL-PRO while OU remains BLOCKED_MODEL_VALIDATION
-// 8. Data-quality blocker on SCO-PREM and ENG-CHAMP (missing autumn 2026/2027 season matches -> BLOCKED_DATA_QUALITY)
-// 9. Cold-start blocker on JPN-J1 and KOR-K1 (BLOCKED_COLD_START) & model validation blocker on USA-MLS and SAU-PRO
-// 10. Permanent PAUSED enforcement on IDN-L1 (PAUSED_MISSING_BASELINE)
-// 11. BTTS remains RESEARCH_ONLY (LEWATI) and Moneyline remains unmodeled across all promoted leagues
-// 12. Fault isolation & automatic rollback to SHADOW when a single league fails smoke test
-// 13. Non-regression of ENG-PL (Premier League) production pipeline & MatchIntelligenceService read-path
+// SALMO.DEV — Release Hardening (H1–H6) & Multi-League Propose-Only Governance Test Suite
+// Validates all mandatory requirements across H1, H2, H3, H4, H5, and H6:
+// 1. H1: Default-false database persistence & ALLOW_PRODUCTION_DB_WRITE gate
+// 2. H2: PROPOSE_ONLY mode by default on quota reset (zero automatic production promotions)
+// 3. H2: Manual promotion requires explicitHumanApproval=true + ALLOW_MANUAL_LEAGUE_PROMOTION='true' + all 5 per-market proofs (including historical Pinnacle benchmark)
+// 4. H2/F1: Quota-reset detector states (QUOTA_EXHAUSTED, RESET_UNVERIFIED, QUOTA_AVAILABLE, ACTIVATION_IN_PROGRESS, 50-request EPL reserve)
+// 5. H2/F3: Fault isolation & automatic rollback to SHADOW when smoke test fails under manual approval
+// 6. H3: Cron & scheduler safety (/api/cron/predict & /api/cron/settle default OFF; settle-cron.yml manual workflow_dispatch only)
+// 7. H4: Backtest integrity (strict chronological walk-forward, balanced half-line AH & OU 2.5 95% bootstrap CIs, Pinnacle benchmark, NOT_APPROVED_FOR_PRODUCTION for all 14 non-EPL leagues)
+// 8. H5: Data licensing & provenance (TheSportsDB disabled by default unless ENABLE_THESPORTSDB === 'true')
+// 9. H6: Multi-league research ledger (336 rows across 15 leagues, 12 settled EPL rows, model_probability in 0..1, SHADOW is_pick=false)
 
 const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
+const path = require('path');
 const ts = require('typescript');
 
 if (!require.extensions['.ts']) {
@@ -45,6 +42,7 @@ const { OddsPapiQuotaGuard } = require('../src/lib/quota/oddsPapiQuotaGuard.ts')
 const { MultiLeagueAutoActivator } = require('../src/engine/activation/multiLeagueAutoActivator.ts');
 const { ProductionPredictionEngine } = require('../src/engine/pipeline/productionPredictionEngine.ts');
 const { MatchIntelligenceService } = require('../src/engine/matchIntelligenceService.ts');
+const { TheSportsDbProvider } = require('../src/services/providers/theSportsDbProvider.ts');
 
 function buildMockAccountPayload(requestCount, requestLimit = 250, isActive = true) {
   return {
@@ -76,7 +74,7 @@ function buildSimulatedResetFixturesAndOdds() {
     // EPL
     { providerFixtureId: 'id100001', homeTeam: 'Arsenal', awayTeam: 'Chelsea', league: 'Premier League', kickoffTime: futureKickoff, season: '2026' },
     { providerFixtureId: 'id100002', homeTeam: 'Liverpool', awayTeam: 'Everton', league: 'Premier League', kickoffTime: futureKickoff, season: '2026' },
-    // 5 AH+OU validated leagues (2 fixtures each to prove non-degenerate variance)
+    // Non-EPL candidate fixtures (2 fixtures each to prove non-degenerate variance)
     { providerFixtureId: 'id200001', homeTeam: 'Real Madrid', awayTeam: 'Getafe', league: 'La Liga', kickoffTime: futureKickoff, season: '2026' },
     { providerFixtureId: 'id200002', homeTeam: 'Barcelona', awayTeam: 'Sevilla', league: 'La Liga', kickoffTime: futureKickoff, season: '2026' },
     { providerFixtureId: 'id300001', homeTeam: 'Bayern Munich', awayTeam: 'Augsburg', league: 'Bundesliga', kickoffTime: futureKickoff, season: '2026' },
@@ -87,7 +85,6 @@ function buildSimulatedResetFixturesAndOdds() {
     { providerFixtureId: 'id500002', homeTeam: 'Ajax', awayTeam: 'Twente', league: 'Eredivisie', kickoffTime: futureKickoff, season: '2026' },
     { providerFixtureId: 'id600001', homeTeam: 'Sporting CP', awayTeam: 'Arouca', league: 'Primeira Liga', kickoffTime: futureKickoff, season: '2026' },
     { providerFixtureId: 'id600002', homeTeam: 'Benfica', awayTeam: 'Braga', league: 'Primeira Liga', kickoffTime: futureKickoff, season: '2026' },
-    // 2 AH-only validated leagues (ITA-SERIEA, BEL-PRO)
     { providerFixtureId: 'id700001', homeTeam: 'Inter', awayTeam: 'Cagliari', league: 'Serie A', kickoffTime: futureKickoff, season: '2026' },
     { providerFixtureId: 'id700002', homeTeam: 'Napoli', awayTeam: 'Torino', league: 'Serie A', kickoffTime: futureKickoff, season: '2026' },
     { providerFixtureId: 'id800001', homeTeam: 'Club Brugge', awayTeam: 'Westerlo', league: 'Belgian Pro League', kickoffTime: futureKickoff, season: '2026' },
@@ -157,6 +154,113 @@ function buildSimulatedResetFixturesAndOdds() {
     },
   };
 }
+
+function buildPassingProofOverride(markets = ['AH', 'OU']) {
+  const passAh = markets.includes('AH');
+  const passOu = markets.includes('OU');
+  return {
+    nTrainInitial: 795,
+    nEval: 300,
+    chronologicalWalkForwardVerified: true,
+    ahBalancedHalfLine: {
+      brier: passAh ? 0.2380 : 0.2510,
+      brierCi95: passAh ? [0.2290, 0.2460] : [0.2420, 0.2600],
+      beatsConstant05At95Ci: passAh,
+      logLoss: passAh ? 0.6680 : 0.7010,
+      calibrationSlope: passAh ? 0.9200 : 0.4100,
+    },
+    ahHomeMinus05: {
+      brier: 0.2100,
+      brierCi95: [0.1950, 0.2250],
+      beatsConstant05At95Ci: true,
+      logLoss: 0.6100,
+      calibrationSlope: 0.9000,
+    },
+    ahBalancedQuarterLine: {
+      brier: 0.2050,
+    },
+    ou25: {
+      brier: passOu ? 0.2290 : 0.2580,
+      brierCi95: passOu ? [0.2150, 0.2420] : [0.2440, 0.2710],
+      beatsConstant05At95Ci: passOu,
+      logLoss: passOu ? 0.6510 : 0.7080,
+      calibrationSlope: passOu ? 0.8900 : 0.3500,
+    },
+    pinnacleBenchmark: {
+      available: true,
+      matchedFixtures: 120,
+      ou25PinnacleBrier: 0.2410,
+      ou25ModelBrierOnMatched: 0.2390,
+      ahMarketLinePinnacleBrier: 0.2090,
+      ahMarketLineModelBrierOnMatched: 0.2080,
+    },
+    marketApproval: {
+      AH: passAh ? 'PROPOSED_READY_FOR_HUMAN_REVIEW' : 'NOT_APPROVED_FOR_PRODUCTION',
+      OU: passOu ? 'PROPOSED_READY_FOR_HUMAN_REVIEW' : 'NOT_APPROVED_FOR_PRODUCTION',
+      approvalBlockers: [],
+    },
+  };
+}
+
+// ─── H1: PRODUCTION DATABASE WRITE AUDIT & DEFAULT-FALSE PERSISTENCE ─────────
+
+test('H1.1: OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed defaults to false and blocks test/CI/preview environments', () => {
+  const origAllow = process.env.ALLOW_PRODUCTION_DB_WRITE;
+  const origNodeEnv = process.env.NODE_ENV;
+  const origCi = process.env.CI;
+  const origVercelEnv = process.env.VERCEL_ENV;
+
+  try {
+    delete process.env.ALLOW_PRODUCTION_DB_WRITE;
+    assert.strictEqual(OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed(false), false);
+    assert.strictEqual(OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed(true), false);
+
+    process.env.ALLOW_PRODUCTION_DB_WRITE = 'true';
+    process.env.NODE_ENV = 'production';
+    delete process.env.CI;
+    delete process.env.VERCEL_ENV;
+    assert.strictEqual(OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed(false), false, 'Caller must also pass allowProductionWrite=true');
+    assert.strictEqual(OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed(true), true, 'Allowed only when both caller flag and env var are true in production');
+
+    process.env.VERCEL_ENV = 'preview';
+    assert.strictEqual(OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed(true), false, 'Must block writes in VERCEL_ENV=preview');
+
+    delete process.env.VERCEL_ENV;
+    process.env.CI = 'true';
+    assert.strictEqual(OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed(true), false, 'Must block writes in CI=true');
+
+    delete process.env.CI;
+    process.env.NODE_ENV = 'test';
+    assert.strictEqual(OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed(true), false, 'Must block writes in NODE_ENV=test');
+  } finally {
+    if (origAllow === undefined) delete process.env.ALLOW_PRODUCTION_DB_WRITE;
+    else process.env.ALLOW_PRODUCTION_DB_WRITE = origAllow;
+    if (origNodeEnv === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = origNodeEnv;
+    if (origCi === undefined) delete process.env.CI;
+    else process.env.CI = origCi;
+    if (origVercelEnv === undefined) delete process.env.VERCEL_ENV;
+    else process.env.VERCEL_ENV = origVercelEnv;
+  }
+});
+
+test('H1.2: MultiLeagueAutoActivator defaults productionWriteAllowed to false even if persistToDatabase=true is passed without env override', async () => {
+  resetRegistryToDefaultState();
+  OddsPapiQuotaGuard.resetCircuitBreaker();
+
+  const exhaustedPayload = buildMockAccountPayload(260, 250, true);
+  const res = await MultiLeagueAutoActivator.runAutoUnlockCycle({
+    mode: 'SIMULATED_RESET_TEST',
+    injectedAccountData: exhaustedPayload,
+    persistToDatabase: true,
+    allowProductionWrite: true,
+    writeVerificationArtifact: false,
+  });
+
+  assert.strictEqual(res.productionWriteAllowed, false, 'productionWriteAllowed must remain false when ALLOW_PRODUCTION_DB_WRITE is not set');
+  assert.strictEqual(res.promotionMode, 'PROPOSE_ONLY');
+  assert.strictEqual(res.billableRequestsMade, 0);
+});
 
 // ─── F1: QUOTA-RESET DETECTOR TESTS ─────────────────────────────────────────
 
@@ -235,17 +339,16 @@ test('F1.4: Concurrency lock prevents duplicate concurrent activation runs (retu
   }
 });
 
-// ─── F2: PRIORITY BATCH QUEUE & 50-REQUEST RESERVE TESTS ────────────────────
+// ─── H2: PROPOSE-ONLY MODE & MANUAL PROMOTION GOVERNANCE TESTS ───────────────
 
-test('F2.1: Priority queue groups validated leagues into 2 batches of <= 5 tournament IDs and stops at 50-request mandatory reserve', async () => {
+test('H2.1: Priority queue & 50-request mandatory reserve hard-stop', async () => {
   resetRegistryToDefaultState();
   OddsPapiQuotaGuard.resetCircuitBreaker();
 
-  const prioritized = getPriorityOrderedLeaguesForOdds().filter(l => (l.validated_markets?.length || 0) > 0);
-  const batches = getTournamentBatches(prioritized, 5);
+  const allNonPaused = getPriorityOrderedLeaguesForOdds();
+  const batches = getTournamentBatches(allNonPaused.slice(0, 8), 5);
 
-  assert.strictEqual(prioritized.length, 8, 'EPL + 7 model-validated non-EPL leagues = 8 tournaments');
-  assert.strictEqual(batches.length, 2, '8 tournaments must fit in exactly 2 batches of <= 5');
+  assert.strictEqual(batches.length, 2, '8 tournaments fit in 2 batches of <= 5');
   assert.deepStrictEqual(batches[0], [17, 8, 35, 34, 37], 'Batch 1: EPL, La Liga, Bundesliga, Ligue 1, Eredivisie');
   assert.deepStrictEqual(batches[1], [238, 23, 38], 'Batch 2: Primeira Liga, Serie A, Belgian Pro League');
 
@@ -258,7 +361,7 @@ test('F2.1: Priority queue groups validated leagues into 2 batches of <= 5 tourn
   assert.ok(detection.reason.includes('50-request reserve'));
 });
 
-test('F2.2: Simulated Quota Reset automatically activates both AH + OU for the 5 full-validation leagues', async () => {
+test('H2.2: Default PROPOSE_ONLY mode NEVER promotes any non-EPL league on quota reset even when odds and proofs are present', async () => {
   resetRegistryToDefaultState();
   OddsPapiQuotaGuard.resetCircuitBreaker();
 
@@ -271,223 +374,253 @@ test('F2.2: Simulated Quota Reset automatically activates both AH + OU for the 5
       injectedAccountData: resetAccount,
       injectedFixtures: fixtures,
       injectedOddsByTournamentBatch: oddsByBatch,
+      injectedBacktestOverride: {
+        'NED-ERE': buildPassingProofOverride(['AH', 'OU']),
+        'ITA-SERIEA': buildPassingProofOverride(['AH']),
+      },
       writeVerificationArtifact: false,
     });
 
-    const fullAhOuLeagues = ['ESP-LALIGA', 'DEU-BUNDESLIGA', 'FRA-LIGUE1', 'NED-ERE', 'POR-PRIMEIRA'];
-    for (const lid of fullAhOuLeagues) {
-      assert.strictEqual(isLeagueMarketProductionEnabled(lid, 'AH'), true, `${lid} AH must be ACTIVE`);
-      assert.strictEqual(isLeagueMarketProductionEnabled(lid, 'OU'), true, `${lid} OU must be ACTIVE`);
-      const evalEntry = res.leagueEvaluations.find(e => e.internalLeagueId === lid);
-      assert.strictEqual(evalEntry.newStatus, 'ACTIVE');
-      assert.strictEqual(evalEntry.markets.AH.readinessState, 'ACTIVE');
-      assert.strictEqual(evalEntry.markets.OU.readinessState, 'ACTIVE');
-      assert.strictEqual(evalEntry.markets.AH.smokeTestPassed, true);
-      assert.strictEqual(evalEntry.markets.OU.smokeTestPassed, true);
-    }
+    assert.strictEqual(res.promotionMode, 'PROPOSE_ONLY');
+    assert.strictEqual(res.leaguesPromoted.length, 0, 'PROPOSE_ONLY mode must promote 0 leagues automatically');
+    assert.deepStrictEqual(
+      res.activeLeaguesAfterRun.map(l => l.internalLeagueId),
+      ['ENG-PL'],
+      'Only ENG-PL remains ACTIVE in PROPOSE_ONLY mode'
+    );
+    assert.strictEqual(res.shadowLeaguesAfterRun.length, 13, 'All 13 non-EPL leagues must remain SHADOW');
+    assert.strictEqual(isLeagueMarketProductionEnabled('NED-ERE', 'AH'), false);
+    assert.strictEqual(isLeagueMarketProductionEnabled('NED-ERE', 'OU'), false);
+
+    // Verify NED-ERE was recorded as PROPOSED_FOR_REVIEW (not ACTIVE)
+    const nedEval = res.leagueEvaluations.find(e => e.internalLeagueId === 'NED-ERE');
+    assert.strictEqual(nedEval.newStatus, 'SHADOW');
+    assert.strictEqual(nedEval.markets.AH.readinessState, 'PROPOSED_FOR_REVIEW');
+    assert.strictEqual(nedEval.markets.OU.readinessState, 'PROPOSED_FOR_REVIEW');
+    assert.ok(res.leaguesProposedForReview.some(p => p.internalLeagueId === 'NED-ERE'));
   } finally {
     resetRegistryToDefaultState();
     OddsPapiQuotaGuard.resetCircuitBreaker();
   }
 });
 
-test('F2.3: Simulated Quota Reset activates AH only for ITA-SERIEA and BEL-PRO while keeping OU blocked by BLOCKED_MODEL_VALIDATION', async () => {
+test('H2.3: Even with explicitHumanApproval=true + ALLOW_MANUAL_LEAGUE_PROMOTION=true, real H4 backtest artifact blocks all 14 non-EPL leagues due to missing Pinnacle benchmark (PinMatch=0)', async () => {
   resetRegistryToDefaultState();
   OddsPapiQuotaGuard.resetCircuitBreaker();
+  const origManual = process.env.ALLOW_MANUAL_LEAGUE_PROMOTION;
 
   try {
+    process.env.ALLOW_MANUAL_LEAGUE_PROMOTION = 'true';
     const resetAccount = buildMockAccountPayload(0, 250, true);
     const { fixtures, oddsByBatch } = buildSimulatedResetFixturesAndOdds();
 
     const res = await MultiLeagueAutoActivator.runAutoUnlockCycle({
       mode: 'SIMULATED_RESET_TEST',
+      explicitHumanApproval: true,
       injectedAccountData: resetAccount,
       injectedFixtures: fixtures,
       injectedOddsByTournamentBatch: oddsByBatch,
       writeVerificationArtifact: false,
     });
 
-    for (const lid of ['ITA-SERIEA', 'BEL-PRO']) {
-      assert.strictEqual(isLeagueMarketProductionEnabled(lid, 'AH'), true, `${lid} AH must be ACTIVE`);
-      assert.strictEqual(isLeagueMarketProductionEnabled(lid, 'OU'), false, `${lid} OU must remain BLOCKED`);
-      const evalEntry = res.leagueEvaluations.find(e => e.internalLeagueId === lid);
-      assert.strictEqual(evalEntry.newStatus, 'ACTIVE');
-      assert.strictEqual(evalEntry.markets.AH.readinessState, 'ACTIVE');
-      assert.strictEqual(evalEntry.markets.OU.readinessState, 'BLOCKED_MODEL_VALIDATION');
-      assert.ok(evalEntry.markets.OU.blockerReason.includes('failed walk-forward validation'));
-    }
+    assert.strictEqual(res.promotionMode, 'MANUAL_APPROVED_PROMOTION');
+    assert.strictEqual(res.leaguesPromoted.length, 0, 'Zero non-EPL leagues may promote without historical Pinnacle benchmark');
+    assert.deepStrictEqual(res.activeLeaguesAfterRun.map(l => l.internalLeagueId), ['ENG-PL']);
 
-    const serieAFixture = res.evaluatedFixtures.find(f => f.league === 'Serie A');
-    const serieAEval = ProductionPredictionEngine.evaluateFixture(serieAFixture);
-    assert.strictEqual(serieAEval.prediction.markets.overUnder.verdict, 'LEWATI', 'Uncalibrated OU must remain LEWATI');
-  } finally {
-    resetRegistryToDefaultState();
-    OddsPapiQuotaGuard.resetCircuitBreaker();
-  }
-});
+    // NED-ERE passes balanced Brier CI95 on AH and OU 2.5, so its remaining blocker is BLOCKED_PINNACLE_BENCHMARK
+    const nedEval = res.leagueEvaluations.find(e => e.internalLeagueId === 'NED-ERE');
+    assert.strictEqual(nedEval.newStatus, 'SHADOW');
+    assert.strictEqual(nedEval.markets.AH.readinessState, 'BLOCKED_PINNACLE_BENCHMARK');
+    assert.strictEqual(nedEval.markets.OU.readinessState, 'BLOCKED_PINNACLE_BENCHMARK');
 
-test('F2.4: SCO-PREM and ENG-CHAMP remain in SHADOW with BLOCKED_DATA_QUALITY even after quota reset', async () => {
-  resetRegistryToDefaultState();
-  OddsPapiQuotaGuard.resetCircuitBreaker();
+    // ESP-LALIGA fails balanced half-line CI95 upper bound (< 0.2500), so its blocker is BLOCKED_MODEL_VALIDATION
+    const espEval = res.leagueEvaluations.find(e => e.internalLeagueId === 'ESP-LALIGA');
+    assert.strictEqual(espEval.newStatus, 'SHADOW');
+    assert.strictEqual(espEval.markets.AH.readinessState, 'BLOCKED_MODEL_VALIDATION');
+    assert.strictEqual(espEval.markets.OU.readinessState, 'BLOCKED_MODEL_VALIDATION');
 
-  try {
-    const resetAccount = buildMockAccountPayload(0, 250, true);
-    const { fixtures, oddsByBatch } = buildSimulatedResetFixturesAndOdds();
-
-    const res = await MultiLeagueAutoActivator.runAutoUnlockCycle({
-      mode: 'SIMULATED_RESET_TEST',
-      injectedAccountData: resetAccount,
-      injectedFixtures: fixtures,
-      injectedOddsByTournamentBatch: oddsByBatch,
-      writeVerificationArtifact: false,
-    });
-
+    // SCO-PREM & ENG-CHAMP remain BLOCKED_DATA_QUALITY
     for (const lid of ['SCO-PREM', 'ENG-CHAMP']) {
-      assert.strictEqual(isLeagueMarketProductionEnabled(lid, 'AH'), false);
-      assert.strictEqual(isLeagueMarketProductionEnabled(lid, 'OU'), false);
       const evalEntry = res.leagueEvaluations.find(e => e.internalLeagueId === lid);
       assert.strictEqual(evalEntry.newStatus, 'SHADOW');
       assert.strictEqual(evalEntry.markets.AH.readinessState, 'BLOCKED_DATA_QUALITY');
       assert.strictEqual(evalEntry.markets.OU.readinessState, 'BLOCKED_DATA_QUALITY');
     }
-  } finally {
-    resetRegistryToDefaultState();
-    OddsPapiQuotaGuard.resetCircuitBreaker();
-  }
-});
 
-test('F2.5: JPN-J1 & KOR-K1 remain blocked by BLOCKED_COLD_START and USA-MLS & SAU-PRO remain blocked by BLOCKED_MODEL_VALIDATION', async () => {
-  resetRegistryToDefaultState();
-  OddsPapiQuotaGuard.resetCircuitBreaker();
-
-  try {
-    const resetAccount = buildMockAccountPayload(0, 250, true);
-    const { fixtures, oddsByBatch } = buildSimulatedResetFixturesAndOdds();
-
-    const res = await MultiLeagueAutoActivator.runAutoUnlockCycle({
-      mode: 'SIMULATED_RESET_TEST',
-      injectedAccountData: resetAccount,
-      injectedFixtures: fixtures,
-      injectedOddsByTournamentBatch: oddsByBatch,
-      writeVerificationArtifact: false,
-    });
-
+    // JPN-J1 & KOR-K1 remain BLOCKED_COLD_START
     for (const lid of ['JPN-J1', 'KOR-K1']) {
-      assert.strictEqual(isLeagueMarketProductionEnabled(lid, 'AH'), false);
-      assert.strictEqual(isLeagueMarketProductionEnabled(lid, 'OU'), false);
       const evalEntry = res.leagueEvaluations.find(e => e.internalLeagueId === lid);
       assert.strictEqual(evalEntry.newStatus, 'SHADOW');
       assert.strictEqual(evalEntry.markets.AH.readinessState, 'BLOCKED_COLD_START');
       assert.strictEqual(evalEntry.markets.OU.readinessState, 'BLOCKED_COLD_START');
     }
 
-    for (const lid of ['USA-MLS', 'SAU-PRO']) {
-      assert.strictEqual(isLeagueMarketProductionEnabled(lid, 'AH'), false);
-      assert.strictEqual(isLeagueMarketProductionEnabled(lid, 'OU'), false);
-      const evalEntry = res.leagueEvaluations.find(e => e.internalLeagueId === lid);
-      assert.strictEqual(evalEntry.newStatus, 'SHADOW');
-      assert.strictEqual(evalEntry.markets.AH.readinessState, 'BLOCKED_MODEL_VALIDATION');
-      assert.strictEqual(evalEntry.markets.OU.readinessState, 'BLOCKED_MODEL_VALIDATION');
-    }
-  } finally {
-    resetRegistryToDefaultState();
-    OddsPapiQuotaGuard.resetCircuitBreaker();
-  }
-});
-
-test('F2.6: IDN-L1 remains permanently PAUSED with PAUSED_MISSING_BASELINE', async () => {
-  resetRegistryToDefaultState();
-  OddsPapiQuotaGuard.resetCircuitBreaker();
-
-  try {
-    const resetAccount = buildMockAccountPayload(0, 250, true);
-    const { fixtures, oddsByBatch } = buildSimulatedResetFixturesAndOdds();
-
-    const res = await MultiLeagueAutoActivator.runAutoUnlockCycle({
-      mode: 'SIMULATED_RESET_TEST',
-      injectedAccountData: resetAccount,
-      injectedFixtures: fixtures,
-      injectedOddsByTournamentBatch: oddsByBatch,
-      writeVerificationArtifact: false,
-    });
-
+    // IDN-L1 remains PAUSED_MISSING_BASELINE
     const idnEval = res.leagueEvaluations.find(e => e.internalLeagueId === 'IDN-L1');
     assert.strictEqual(idnEval.newStatus, 'PAUSED');
     assert.strictEqual(idnEval.markets.AH.readinessState, 'PAUSED_MISSING_BASELINE');
     assert.strictEqual(idnEval.markets.OU.readinessState, 'PAUSED_MISSING_BASELINE');
-    assert.strictEqual(isLeagueMarketProductionEnabled('IDN-L1', 'AH'), false);
-    assert.strictEqual(isLeagueMarketProductionEnabled('IDN-L1', 'OU'), false);
   } finally {
+    if (origManual === undefined) delete process.env.ALLOW_MANUAL_LEAGUE_PROMOTION;
+    else process.env.ALLOW_MANUAL_LEAGUE_PROMOTION = origManual;
     resetRegistryToDefaultState();
     OddsPapiQuotaGuard.resetCircuitBreaker();
   }
 });
 
-// ─── F3: BTTS / MONEYLINE GOVERNANCE & FAULT ISOLATION TESTS ────────────────
-
-test('F3.1: BTTS remains RESEARCH_ONLY (LEWATI) and Moneyline (1X2) remains unmodeled across all promoted leagues', async () => {
+test('H2.4: Manual promotion with all 5 proofs satisfied promotes only approved markets (AH+OU vs AH-only) and enforces fault-isolation rollback', async () => {
   resetRegistryToDefaultState();
   OddsPapiQuotaGuard.resetCircuitBreaker();
+  const origManual = process.env.ALLOW_MANUAL_LEAGUE_PROMOTION;
 
   try {
-    const resetAccount = buildMockAccountPayload(0, 250, true);
-    const { fixtures, oddsByBatch } = buildSimulatedResetFixturesAndOdds();
-
-    const res = await MultiLeagueAutoActivator.runAutoUnlockCycle({
-      mode: 'SIMULATED_RESET_TEST',
-      injectedAccountData: resetAccount,
-      injectedFixtures: fixtures,
-      injectedOddsByTournamentBatch: oddsByBatch,
-      writeVerificationArtifact: false,
-    });
-
-    for (const evalEntry of res.leagueEvaluations) {
-      assert.strictEqual(evalEntry.markets.BTTS.readinessState, 'RESEARCH_ONLY');
-      assert.strictEqual(evalEntry.markets.BTTS.productionEnabled, false);
-    }
-
-    const laLigaFixture = res.evaluatedFixtures.find(f => f.league === 'La Liga');
-    const laLigaEval = ProductionPredictionEngine.evaluateFixture(laLigaFixture);
-    assert.strictEqual(laLigaEval.prediction.markets.btts.verdict, 'LEWATI', 'BTTS must always be LEWATI');
-
-    const mlView = MatchIntelligenceService.buildUnmodeledMoneylineMarket();
-    assert.strictEqual(mlView.status, 'MARKET_UNAVAILABLE');
-    assert.strictEqual(mlView.statusLabel, 'NOT MODELED YET');
-  } finally {
-    resetRegistryToDefaultState();
-    OddsPapiQuotaGuard.resetCircuitBreaker();
-  }
-});
-
-test('F3.2: Fault isolation rolls back a failing league to SHADOW while promoting all other passing leagues', async () => {
-  resetRegistryToDefaultState();
-  OddsPapiQuotaGuard.resetCircuitBreaker();
-
-  try {
+    process.env.ALLOW_MANUAL_LEAGUE_PROMOTION = 'true';
     const resetAccount = buildMockAccountPayload(10, 250, true);
     const { fixtures, oddsByBatch } = buildSimulatedResetFixturesAndOdds();
 
     const res = await MultiLeagueAutoActivator.runAutoUnlockCycle({
       mode: 'SIMULATED_RESET_TEST',
+      explicitHumanApproval: true,
       injectedAccountData: resetAccount,
       injectedFixtures: fixtures,
       injectedOddsByTournamentBatch: oddsByBatch,
+      injectedBacktestOverride: {
+        'NED-ERE': buildPassingProofOverride(['AH', 'OU']),
+        'ITA-SERIEA': buildPassingProofOverride(['AH']),
+        'FRA-LIGUE1': buildPassingProofOverride(['AH', 'OU']),
+      },
       simulateSmokeTestFailureForLeagues: ['FRA-LIGUE1'],
       writeVerificationArtifact: false,
     });
 
-    assert.ok(res.leaguesRolledBack.includes('FRA-LIGUE1'), 'FRA-LIGUE1 must be rolled back on smoke test failure');
-    assert.strictEqual(isLeagueMarketProductionEnabled('FRA-LIGUE1', 'AH'), false, 'Rolled-back league must have AH disabled');
-    assert.strictEqual(isLeagueMarketProductionEnabled('FRA-LIGUE1', 'OU'), false, 'Rolled-back league must have OU disabled');
+    // NED-ERE promotes both AH and OU
+    assert.strictEqual(isLeagueMarketProductionEnabled('NED-ERE', 'AH'), true);
+    assert.strictEqual(isLeagueMarketProductionEnabled('NED-ERE', 'OU'), true);
 
-    // Other 6 validated leagues must still promote cleanly
-    assert.strictEqual(res.leaguesPromoted.length, 6);
-    assert.strictEqual(isLeagueMarketProductionEnabled('ESP-LALIGA', 'AH'), true);
-    assert.strictEqual(isLeagueMarketProductionEnabled('DEU-BUNDESLIGA', 'OU'), true);
+    // ITA-SERIEA promotes AH only while OU stays BLOCKED_MODEL_VALIDATION
     assert.strictEqual(isLeagueMarketProductionEnabled('ITA-SERIEA', 'AH'), true);
+    assert.strictEqual(isLeagueMarketProductionEnabled('ITA-SERIEA', 'OU'), false);
+
+    // FRA-LIGUE1 fails smoke test and rolls back to SHADOW
+    assert.ok(res.leaguesRolledBack.includes('FRA-LIGUE1'));
+    assert.strictEqual(isLeagueMarketProductionEnabled('FRA-LIGUE1', 'AH'), false);
+    assert.strictEqual(isLeagueMarketProductionEnabled('FRA-LIGUE1', 'OU'), false);
+
+    // BTTS remains RESEARCH_ONLY (LEWATI) and Moneyline remains NOT MODELED YET
+    for (const evalEntry of res.leagueEvaluations) {
+      assert.strictEqual(evalEntry.markets.BTTS.readinessState, 'RESEARCH_ONLY');
+      assert.strictEqual(evalEntry.markets.BTTS.productionEnabled, false);
+    }
+    const mlView = MatchIntelligenceService.buildUnmodeledMoneylineMarket();
+    assert.strictEqual(mlView.status, 'MARKET_UNAVAILABLE');
+    assert.strictEqual(mlView.statusLabel, 'NOT MODELED YET');
   } finally {
+    if (origManual === undefined) delete process.env.ALLOW_MANUAL_LEAGUE_PROMOTION;
+    else process.env.ALLOW_MANUAL_LEAGUE_PROMOTION = origManual;
     resetRegistryToDefaultState();
     OddsPapiQuotaGuard.resetCircuitBreaker();
+  }
+});
+
+// ─── H3: CRON & SCHEDULER SAFETY TESTS ───────────────────────────────────────
+
+test('H3.1: /api/cron/predict and /api/cron/settle enforce strict opt-in (ENABLE_PRODUCTION_CRON === "true") and block preview deployments', () => {
+  const predictRouteContent = fs.readFileSync(path.join(process.cwd(), 'src/app/api/cron/predict/route.ts'), 'utf8');
+  const settleRouteContent = fs.readFileSync(path.join(process.cwd(), 'src/app/api/cron/settle/route.ts'), 'utf8');
+
+  assert.ok(
+    predictRouteContent.includes("process.env.ENABLE_PRODUCTION_CRON !== 'true'") &&
+      predictRouteContent.includes("process.env.VERCEL_ENV === 'preview'"),
+    '/api/cron/predict must require ENABLE_PRODUCTION_CRON === "true" and block VERCEL_ENV === "preview"'
+  );
+  assert.ok(
+    settleRouteContent.includes("process.env.ENABLE_PRODUCTION_CRON !== 'true'") &&
+      settleRouteContent.includes("process.env.VERCEL_ENV === 'preview'"),
+    '/api/cron/settle must require ENABLE_PRODUCTION_CRON === "true" and block VERCEL_ENV === "preview"'
+  );
+
+  const workflowContent = fs.readFileSync(path.join(process.cwd(), '.github/workflows/settle-cron.yml'), 'utf8');
+  assert.strictEqual(/^\s*schedule:/m.test(workflowContent), false, 'settle-cron.yml must not have active schedule triggers');
+  assert.strictEqual(/^\s*curl\b/m.test(workflowContent), false, 'settle-cron.yml must not invoke curl against cron webhooks');
+  assert.ok(workflowContent.includes('workflow_dispatch:'), 'settle-cron.yml must be manual workflow_dispatch only');
+});
+
+// ─── H4: BACKTEST INTEGRITY & STATISTICAL PROOF TESTS ────────────────────────
+
+test('H4.1: multi_league_team_ratings_v1.0.json enforces chronological walk-forward, balanced AH/OU 95% CIs, Pinnacle benchmark, and NOT_APPROVED_FOR_PRODUCTION for all 14 non-EPL leagues', () => {
+  const artifactPath = path.join(process.cwd(), 'data/artifacts/multi_league_team_ratings_v1.0.json');
+  const artifact = JSON.parse(fs.readFileSync(artifactPath, 'utf8'));
+
+  assert.ok(artifact.provenance.generationMethod.includes('strict chronological walk-forward'));
+
+  // ENG-PL has historical Pinnacle benchmark (80 matched fixtures)
+  const eplBt = artifact.backtestSummary['ENG-PL'];
+  assert.strictEqual(eplBt.chronologicalWalkForwardVerified, true);
+  assert.strictEqual(eplBt.pinnacleBenchmark.available, true);
+  assert.strictEqual(eplBt.pinnacleBenchmark.matchedFixtures, 80);
+  assert.ok(eplBt.ahBalancedHalfLine.brierCi95[1] < 0.2500, 'ENG-PL balanced half-line AH 95% CI upper bound < 0.2500');
+
+  // All 14 non-EPL leagues in backtestSummary: 13 modeled are NOT_APPROVED_FOR_PRODUCTION, IDN-L1 is null (0 matches)
+  const nonEplIds = Object.keys(artifact.backtestSummary).filter(id => id !== 'ENG-PL');
+  assert.strictEqual(nonEplIds.length, 14);
+  for (const lid of nonEplIds) {
+    const entry = artifact.backtestSummary[lid];
+    if (lid === 'IDN-L1') {
+      assert.strictEqual(entry, null, 'IDN-L1 backtestSummary must be null (0 historical matches)');
+    } else {
+      assert.strictEqual(entry.marketApproval.AH, 'NOT_APPROVED_FOR_PRODUCTION', `${lid} AH must be NOT_APPROVED_FOR_PRODUCTION`);
+      assert.strictEqual(entry.marketApproval.OU, 'NOT_APPROVED_FOR_PRODUCTION', `${lid} OU must be NOT_APPROVED_FOR_PRODUCTION`);
+    }
+  }
+  assert.strictEqual(artifact.leagueProfiles['IDN-L1'].sampleMatches, 0, 'IDN-L1 has 0 historical matches');
+});
+
+// ─── H5: DATA LICENSING & PROVENANCE TESTS ───────────────────────────────────
+
+test('H5.1: TheSportsDbProvider is disabled by default unless ENABLE_THESPORTSDB === "true"', async () => {
+  const origFlag = process.env.ENABLE_THESPORTSDB;
+  try {
+    delete process.env.ENABLE_THESPORTSDB;
+    const provider = new TheSportsDbProvider();
+    assert.strictEqual(provider.isConfigured(), false);
+    const res = await provider.getUpcomingFixtures();
+    assert.strictEqual(res.status, 'UNCONFIGURED');
+    assert.ok(res.error.includes('ENABLE_THESPORTSDB=true'));
+  } finally {
+    if (origFlag === undefined) delete process.env.ENABLE_THESPORTSDB;
+    else process.env.ENABLE_THESPORTSDB = origFlag;
+  }
+});
+
+// ─── H6: MULTI-LEAGUE RESEARCH LEDGER & NORMALIZATION TESTS ──────────────────
+
+test('H6.1: Canonical research ledger contains 336 rows across 15 leagues with 12 settled EPL rows and non-PRODUCTION LEWATI enforcement', () => {
+  const ledgerPath = path.join(process.cwd(), 'data/verification/all_leagues_research_ledger.jsonl');
+  const lines = fs.readFileSync(ledgerPath, 'utf8').trim().split('\n').filter(Boolean);
+  const rows = lines.map(l => JSON.parse(l));
+
+  assert.strictEqual(rows.length, 336, 'Must have 336 canonical multi-league research rows (168 fixtures x 2 markets)');
+  const leagues = new Set(rows.map(r => r.league));
+  assert.strictEqual(leagues.size, 15, 'Must cover all 15 registered leagues');
+
+  const prodRows = rows.filter(r => r.ledgerTier === 'PRODUCTION');
+  const shadowRows = rows.filter(r => r.ledgerTier === 'SHADOW');
+  const pausedRows = rows.filter(r => r.ledgerTier === 'NONE');
+  const settledRows = prodRows.filter(r => r.settlement === 'SETTLED');
+
+  assert.strictEqual(prodRows.length, 20, 'EPL must have 20 PRODUCTION rows (10 fixtures x 2 markets)');
+  assert.strictEqual(settledRows.length, 12, 'EPL must have 12 SETTLED rows (6 matches on 10 Oct 2026 x 2 markets)');
+  assert.strictEqual(shadowRows.length, 294, '13 SHADOW leagues must have 294 rows (147 fixtures x 2 markets)');
+  assert.strictEqual(pausedRows.length, 22, 'IDN-L1 must have 22 PAUSED (NONE) rows (11 fixtures x 2 markets)');
+
+  for (const r of rows) {
+    if (r.modelProbability !== null && r.modelProbability !== undefined) {
+      const normalizedProb = r.modelProbability > 1 ? r.modelProbability / 100 : r.modelProbability;
+      assert.ok(normalizedProb >= 0 && normalizedProb <= 1, `Normalized probability must be in 0..1, got ${normalizedProb}`);
+    }
+    if (r.ledgerTier !== 'PRODUCTION') {
+      assert.strictEqual(r.verdict, 'LEWATI', 'All non-PRODUCTION rows must have verdict LEWATI');
+    }
   }
 });
 
@@ -496,44 +629,10 @@ test('F3.2: Fault isolation rolls back a failing league to SHADOW while promotin
 test('F4.1: EPL remains ACTIVE and MatchIntelligenceService reflects market-level activation states accurately', () => {
   resetRegistryToDefaultState();
 
-  // Default state: EPL is ACTIVE (ODDS UNAVAILABLE when odds missing), La Liga is SHADOW (ANALYSIS UNAVAILABLE)
   const eplUnavail = MatchIntelligenceService.buildUnavailableMarket('ASIAN_HANDICAP', '-0.5', null, 'Premier League');
   assert.strictEqual(eplUnavail.statusLabel, 'ODDS UNAVAILABLE');
 
   const laLigaShadow = MatchIntelligenceService.buildUnavailableMarket('ASIAN_HANDICAP', '-0.5', null, 'La Liga');
   assert.strictEqual(laLigaShadow.statusLabel, 'ANALYSIS UNAVAILABLE');
   assert.strictEqual(getLeagueMarketBlocker('ITA-SERIEA', 'OU')?.includes('0.2577'), true);
-});
-
-test('F4.2: persistToDatabase=true with exhausted quota (260/250) persists zero non-EPL league promotions and zero billable requests', async () => {
-  resetRegistryToDefaultState();
-  OddsPapiQuotaGuard.resetCircuitBreaker();
-
-  try {
-    const exhaustedAccount = buildMockAccountPayload(260, 250, true);
-    const res = await MultiLeagueAutoActivator.runAutoUnlockCycle({
-      mode: 'SIMULATED_RESET_TEST',
-      injectedAccountData: exhaustedAccount,
-      persistToDatabase: true,
-      writeVerificationArtifact: false,
-    });
-
-    assert.strictEqual(res.quotaDetection.state, 'QUOTA_EXHAUSTED');
-    assert.strictEqual(res.billableRequestsMade, 0, 'Must make 0 billable requests');
-    assert.strictEqual(res.leaguesPromoted.length, 0, 'Must promote 0 leagues');
-    assert.deepStrictEqual(
-      res.activeLeaguesAfterRun.map((l) => l.internalLeagueId),
-      ['ENG-PL'],
-      'Only ENG-PL may remain ACTIVE'
-    );
-    assert.deepStrictEqual(
-      res.pausedLeaguesAfterRun.map((l) => l.internalLeagueId),
-      ['IDN-L1'],
-      'IDN-L1 must remain PAUSED'
-    );
-    assert.strictEqual(res.shadowLeaguesAfterRun.length, 13, 'All 13 non-EPL leagues must remain SHADOW');
-  } finally {
-    resetRegistryToDefaultState();
-    OddsPapiQuotaGuard.resetCircuitBreaker();
-  }
 });

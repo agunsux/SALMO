@@ -1,25 +1,23 @@
-name: Matchday Settlement Automated Scheduler
+name: Manual Dry-Run Settlement & Readiness Proposal Audit
 
+# H3 Scheduler Safety:
+# vercel.json is the single authoritative scheduler for /api/cron/predict and /api/cron/settle.
+# This GitHub workflow is strictly manual (workflow_dispatch) and non-mutating (dry-run / PROPOSE_ONLY).
 on:
-  schedule:
-    # Daily quota-reset detector & multi-league auto-unlock check at 08:00 UTC
-    - cron: '0 8 * * *'
-    # Matchday settlement & prediction runs: Saturday, Sunday, Monday at 14:00, 17:00, 19:00, 22:00 UTC
-    - cron: '0 14,17,19,22 * * 0,1,6'
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run execution (true/false)'
+        description: 'Dry run execution (strictly enforced true in CI)'
         required: false
-        default: 'false'
+        default: 'true'
 
 concurrency:
-  group: settlement-scheduler
+  group: settlement-manual-audit
   cancel-in-progress: false
 
 jobs:
   settle:
-    name: Settle Finished Fixtures & Run Multi-League Auto-Unlock
+    name: Dry-Run Settlement & Read-Only Readiness Proposal Audit
     runs-on: ubuntu-latest
 
     steps:
@@ -35,27 +33,29 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run Production Settlement Runner
+      - name: Run Production Settlement Runner (Dry-Run Only)
         env:
           NODE_ENV: production
+          CI: 'true'
+          ALLOW_PRODUCTION_DB_WRITE: 'false'
+          ENABLE_THESPORTSDB: 'false'
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
-            node scripts/run_settle.js --dry-run
-          else
-            node scripts/run_settle.js
-          fi
+          node scripts/run_settle.js --dry-run
 
-      - name: Run Quota-Reset Detector & Multi-League Auto-Activator
+      - name: Run Quota-Reset Detector & Multi-League Proposal Evaluator (PROPOSE_ONLY, Read-Only)
         env:
           NODE_ENV: production
+          CI: 'true'
+          ALLOW_PRODUCTION_DB_WRITE: 'false'
+          ALLOW_MANUAL_LEAGUE_PROMOTION: 'false'
+          ENABLE_THESPORTSDB: 'false'
           ODDS_PAPI_KEY: ${{ secrets.ODDS_PAPI_KEY }}
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          DRY_RUN: ${{ github.event.inputs.dry_run }}
         run: |
           node -e '
             const fs = require("fs");
@@ -67,43 +67,27 @@ jobs:
               m._compile(out.outputText, f);
             };
             const { MultiLeagueAutoActivator } = require("./src/engine/activation/multiLeagueAutoActivator.ts");
-            const persist = process.env.DRY_RUN !== "true";
             MultiLeagueAutoActivator.runAutoUnlockCycle({
               mode: "LIVE",
               forceAccountSync: true,
-              persistToDatabase: persist,
-              writeVerificationArtifact: true
+              explicitHumanApproval: false,
+              persistToDatabase: false,
+              allowProductionWrite: false,
+              writeVerificationArtifact: false
             }).then(res => {
               console.log(JSON.stringify({
+                promotionMode: res.promotionMode,
+                productionWriteAllowed: res.productionWriteAllowed,
                 quotaState: res.quotaDetection.state,
                 requestCount: res.quotaDetection.requestCount,
                 requestLimit: res.quotaDetection.requestLimit,
                 billableRequestsMade: res.billableRequestsMade,
                 leaguesPromoted: res.leaguesPromoted,
+                leaguesProposedForReview: res.leaguesProposedForReview,
                 activeLeaguesAfterRun: res.activeLeaguesAfterRun
               }, null, 2));
             }).catch(err => {
-              console.error("[FATAL] Auto-unlock cycle failed:", err);
+              console.error("[FATAL] Proposal evaluation failed:", err);
               process.exit(1);
             });
           '
-
-      - name: Trigger Remote Vercel Settlement Endpoint (Idempotent Webhook)
-        if: env.CRON_SECRET != ''
-        env:
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
-        run: |
-          curl -fsS -X POST \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            -H "Content-Type: application/json" \
-            https://salmo.dev/api/cron/settle
-
-      - name: Trigger Remote Vercel Auto-Unlock & Prediction Endpoint (Quota-Reset Detector)
-        if: env.CRON_SECRET != ''
-        env:
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
-        run: |
-          curl -fsS -X POST \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            -H "Content-Type: application/json" \
-            https://salmo.dev/api/cron/predict

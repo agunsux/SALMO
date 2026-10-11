@@ -44,21 +44,42 @@ async function handleCron(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  try {
-    Logger.info('[Cron:settle] Starting automated production settlement cycle...', { requestId });
+  // H3 Safety Gate: Strict opt-in behavior (ENABLE_PRODUCTION_CRON === 'true' required; preview blocked)
+  if (process.env.ENABLE_PRODUCTION_CRON !== 'true' || process.env.VERCEL_ENV === 'preview') {
+    Logger.info('[Cron:settle] Settlement cron is OFF (strict opt-in ENABLE_PRODUCTION_CRON=true required; preview blocked)', {
+      requestId,
+      enableProductionCron: process.env.ENABLE_PRODUCTION_CRON || 'unset',
+      vercelEnv: process.env.VERCEL_ENV || 'unset',
+    });
+    return NextResponse.json({
+      success: false,
+      status: 'OFF',
+      message: 'Production settlement cron is OFF by default. Set ENABLE_PRODUCTION_CRON=true in production to enable.',
+    }, { status: 200 });
+  }
 
-    const result = await runProductionSettlement({ dryRun: false });
+  const allowProductionWrite = process.env.ALLOW_PRODUCTION_DB_WRITE === 'true';
+
+  try {
+    Logger.info('[Cron:settle] Starting automated production settlement cycle...', {
+      requestId,
+      dryRun: !allowProductionWrite,
+    });
+
+    const result = await runProductionSettlement({ dryRun: !allowProductionWrite });
     const latencyMs = Date.now() - start;
 
     Logger.info('[Cron:settle] Production settlement cycle completed successfully', {
       requestId,
       latencyMs,
+      dryRun: !allowProductionWrite,
       settledCount: result.settledCount,
       pendingCount: result.pendingCount,
     });
 
     return NextResponse.json({
       success: true,
+      dryRun: !allowProductionWrite,
       timestamp: result.timestampUtc,
       latencyMs,
       settledCount: result.settledCount,

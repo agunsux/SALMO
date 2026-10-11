@@ -23,7 +23,7 @@ interface PredictionRecord {
   id: string;
   run_id: string;
   model_version: string;
-  fixture_id: number;
+  fixture_id: number | string;
   match: string;
   home_team: string;
   away_team: string;
@@ -44,6 +44,10 @@ interface PredictionRecord {
   confidence_tier: string;
   confidence_score: number;
   is_pick: boolean;
+  ledgerTier?: 'PRODUCTION' | 'SHADOW' | 'NONE';
+  settlement?: string;
+  matchScore?: string | null;
+  result?: string | null;
   odds_snapshot: {
     bookmaker: string;
     line: number;
@@ -528,13 +532,37 @@ export default function ResearchPage() {
                       const isMedium =
                         row.confidence_tier === 'WATCH' || row.confidence_tier === 'MEDIUM';
                       const isResearchOnly =
-                        row.market === 'BTTS' || row.confidence_tier === 'RESEARCH_ONLY';
+                        row.market === 'BTTS' || row.confidence_tier === 'RESEARCH_ONLY' || row.ledgerTier !== 'PRODUCTION';
 
                       return (
                         <tr key={row.id} className="hover:bg-[#F6F3EE]/60 transition-colors">
                           <td className="px-4 py-3 font-sans">
-                            <div className="font-semibold text-[#14110F]">{row.match}</div>
-                            <div className="text-[10px] text-[#9E968D]">{row.competition}</div>
+                            <div className="font-semibold text-[#14110F] flex items-center gap-2 flex-wrap">
+                              <span>{row.match}</span>
+                              {row.settlement === 'SETTLED' && row.matchScore && (
+                                <span className="rounded bg-[#EAF7EE] border border-[#BFE7CA] px-1.5 py-0.5 text-[9px] font-mono font-bold text-[#137333]">
+                                  FT {row.matchScore} · {row.result || 'SETTLED'}
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[10px] text-[#9E968D] flex items-center gap-1.5 mt-0.5">
+                              <span>{row.competition}</span>
+                              <span
+                                className={`rounded px-1 py-0.2 text-[9px] font-mono font-semibold ${
+                                  row.ledgerTier === 'PRODUCTION'
+                                    ? 'bg-[#EAF7EE] text-[#137333]'
+                                    : row.ledgerTier === 'NONE'
+                                    ? 'bg-[#FCE8E6] text-[#C5221F]'
+                                    : 'bg-[#F3E8FD] text-[#681DA8]'
+                                }`}
+                              >
+                                {row.ledgerTier === 'PRODUCTION'
+                                  ? 'PRODUCTION'
+                                  : row.ledgerTier === 'NONE'
+                                  ? 'PAUSED'
+                                  : 'SHADOW'}
+                              </span>
+                            </div>
                           </td>
                           <td className="px-4 py-3 text-[#6B645C] text-[11px] whitespace-nowrap">
                             {kickDate}
@@ -628,17 +656,22 @@ export default function ResearchPage() {
                   const isMedium =
                     row.confidence_tier === 'WATCH' || row.confidence_tier === 'MEDIUM';
                   const isResearchOnly =
-                    row.market === 'BTTS' || row.confidence_tier === 'RESEARCH_ONLY';
+                    row.market === 'BTTS' || row.confidence_tier === 'RESEARCH_ONLY' || row.ledgerTier !== 'PRODUCTION';
 
                   return (
                     <div key={row.id} className="p-4 space-y-2.5 bg-white">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <div className="font-semibold text-sm text-[#14110F] font-sans">
-                            {row.match}
+                          <div className="font-semibold text-sm text-[#14110F] font-sans flex items-center gap-1.5 flex-wrap">
+                            <span>{row.match}</span>
+                            {row.settlement === 'SETTLED' && row.matchScore && (
+                              <span className="rounded bg-[#EAF7EE] border border-[#BFE7CA] px-1.5 py-0.5 text-[9px] font-mono font-bold text-[#137333]">
+                                FT {row.matchScore} · {row.result || 'SETTLED'}
+                              </span>
+                            )}
                           </div>
                           <div className="text-[10px] text-[#9E968D] font-mono">
-                            {row.competition} • {row.kickoff_utc?.replace('T', ' ').slice(0, 16)} UTC
+                            {row.competition} [{row.ledgerTier || 'SHADOW'}] • {row.kickoff_utc?.replace('T', ' ').slice(0, 16)} UTC
                           </div>
                         </div>
                         <span

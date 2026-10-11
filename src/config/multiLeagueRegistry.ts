@@ -19,6 +19,9 @@ export type MarketKey = 'AH' | 'OU';
 export type MarketReadinessState =
   | 'ACTIVE'
   | 'READY_FOR_PRODUCTION'
+  | 'PROPOSED_FOR_REVIEW'
+  | 'BLOCKED_HUMAN_APPROVAL'
+  | 'BLOCKED_PINNACLE_BENCHMARK'
   | 'BLOCKED_QUOTA'
   | 'BLOCKED_ODDS'
   | 'BLOCKED_MISSING_ODDS'
@@ -480,6 +483,10 @@ export const CANONICAL_15_LEAGUES: MultiLeagueEntry[] = [
 ];
 
 // ─── Default Market Readiness & Blocker Matrix ────────────────────────────────
+// Under H2 & H4 hardening:
+// - ENG-PL is the only production-approved league.
+// - All 14 non-EPL leagues lack historical Pinnacle no-vig benchmarks in local archives (PinMatch=0)
+//   and require explicit human approval before any production promotion.
 
 const DEFAULT_LEAGUE_READINESS_MAP: Record<
   string,
@@ -499,73 +506,73 @@ const DEFAULT_LEAGUE_READINESS_MAP: Record<
     market_blockers: { AH: null, OU: null },
   },
   'ESP-LALIGA': {
-    validated_markets: ['AH', 'OU'],
+    validated_markets: [],
     production_enabled_markets: [],
     activation_priority: 2,
-    market_readiness: { AH: 'BLOCKED_MISSING_ODDS', OU: 'BLOCKED_MISSING_ODDS' },
+    market_readiness: { AH: 'BLOCKED_MODEL_VALIDATION', OU: 'BLOCKED_MODEL_VALIDATION' },
     market_blockers: {
-      AH: 'BLOCKED_MISSING_ODDS: Awaiting verified live Pinnacle AH odds post quota reset',
-      OU: 'BLOCKED_MISSING_ODDS: Awaiting verified live Pinnacle OU odds post quota reset',
+      AH: 'NOT_APPROVED_FOR_PRODUCTION: AH balanced half-line Brier=0.2452 (95% CI [0.2366, 0.2551] overlaps 0.2500) and no historical Pinnacle benchmark (PinMatch=0)',
+      OU: 'NOT_APPROVED_FOR_PRODUCTION: OU Brier=0.2480 (95% CI [0.2343, 0.2611] overlaps 0.2500) and no historical Pinnacle benchmark (PinMatch=0)',
     },
   },
   'DEU-BUNDESLIGA': {
-    validated_markets: ['AH', 'OU'],
+    validated_markets: [],
     production_enabled_markets: [],
     activation_priority: 3,
-    market_readiness: { AH: 'BLOCKED_MISSING_ODDS', OU: 'BLOCKED_MISSING_ODDS' },
+    market_readiness: { AH: 'BLOCKED_MODEL_VALIDATION', OU: 'BLOCKED_PINNACLE_BENCHMARK' },
     market_blockers: {
-      AH: 'BLOCKED_MISSING_ODDS: Awaiting verified live Pinnacle AH odds post quota reset',
-      OU: 'BLOCKED_MISSING_ODDS: Awaiting verified live Pinnacle OU odds post quota reset',
+      AH: 'NOT_APPROVED_FOR_PRODUCTION: AH balanced half-line Brier=0.2480 (95% CI [0.2394, 0.2570] overlaps 0.2500) and no historical Pinnacle benchmark',
+      OU: 'NOT_APPROVED_FOR_PRODUCTION: OU Brier=0.2308 (95% CI [0.2158, 0.2446] < 0.2500), but no historical Pinnacle benchmark (PinMatch=0) and awaiting explicit human approval',
     },
   },
   'FRA-LIGUE1': {
-    validated_markets: ['AH', 'OU'],
+    validated_markets: [],
     production_enabled_markets: [],
     activation_priority: 4,
-    market_readiness: { AH: 'BLOCKED_MISSING_ODDS', OU: 'BLOCKED_MISSING_ODDS' },
+    market_readiness: { AH: 'BLOCKED_MODEL_VALIDATION', OU: 'BLOCKED_MODEL_VALIDATION' },
     market_blockers: {
-      AH: 'BLOCKED_MISSING_ODDS: Awaiting verified live Pinnacle AH odds post quota reset',
-      OU: 'BLOCKED_MISSING_ODDS: Awaiting verified live Pinnacle OU odds post quota reset',
+      AH: 'NOT_APPROVED_FOR_PRODUCTION: AH balanced half-line Brier=0.2451 (95% CI [0.2368, 0.2536] overlaps 0.2500) and no historical Pinnacle benchmark',
+      OU: 'NOT_APPROVED_FOR_PRODUCTION: OU Brier=0.2432 (95% CI [0.2314, 0.2562] overlaps 0.2500) and no historical Pinnacle benchmark',
     },
   },
   'NED-ERE': {
-    validated_markets: ['AH', 'OU'],
+    validated_markets: [],
     production_enabled_markets: [],
     activation_priority: 5,
-    market_readiness: { AH: 'BLOCKED_MISSING_ODDS', OU: 'BLOCKED_MISSING_ODDS' },
+    market_readiness: { AH: 'BLOCKED_PINNACLE_BENCHMARK', OU: 'BLOCKED_PINNACLE_BENCHMARK' },
     market_blockers: {
-      AH: 'BLOCKED_MISSING_ODDS: Awaiting verified live Pinnacle AH odds post quota reset',
-      OU: 'BLOCKED_MISSING_ODDS: Awaiting verified live Pinnacle OU odds post quota reset',
+      AH: 'NOT_APPROVED_FOR_PRODUCTION: AH balanced half-line Brier=0.2425 (95% CI [0.2346, 0.2497] < 0.2500), but no historical Pinnacle benchmark (PinMatch=0) and awaiting explicit human approval',
+      OU: 'NOT_APPROVED_FOR_PRODUCTION: OU Brier=0.2279 (95% CI [0.2139, 0.2422] < 0.2500), but no historical Pinnacle benchmark (PinMatch=0) and awaiting explicit human approval',
     },
   },
   'POR-PRIMEIRA': {
-    validated_markets: ['AH', 'OU'],
+    validated_markets: [],
     production_enabled_markets: [],
     activation_priority: 6,
-    market_readiness: { AH: 'BLOCKED_MISSING_ODDS', OU: 'BLOCKED_MISSING_ODDS' },
+    market_readiness: { AH: 'BLOCKED_MODEL_VALIDATION', OU: 'BLOCKED_MODEL_VALIDATION' },
     market_blockers: {
-      AH: 'BLOCKED_MISSING_ODDS: Awaiting verified live Pinnacle AH odds post quota reset',
-      OU: 'BLOCKED_MISSING_ODDS: Awaiting verified live Pinnacle OU odds post quota reset',
+      AH: 'NOT_APPROVED_FOR_PRODUCTION: AH balanced half-line Brier=0.2462 (95% CI [0.2379, 0.2560] overlaps 0.2500) and no historical Pinnacle benchmark',
+      OU: 'NOT_APPROVED_FOR_PRODUCTION: OU Brier=0.2425 (95% CI [0.2293, 0.2561] overlaps 0.2500) and no historical Pinnacle benchmark',
     },
   },
   'ITA-SERIEA': {
-    validated_markets: ['AH'],
+    validated_markets: [],
     production_enabled_markets: [],
     activation_priority: 7,
-    market_readiness: { AH: 'BLOCKED_MISSING_ODDS', OU: 'BLOCKED_MODEL_VALIDATION' },
+    market_readiness: { AH: 'BLOCKED_PINNACLE_BENCHMARK', OU: 'BLOCKED_MODEL_VALIDATION' },
     market_blockers: {
-      AH: 'BLOCKED_MISSING_ODDS: Awaiting verified live Pinnacle AH odds post quota reset',
-      OU: 'BLOCKED_MODEL_VALIDATION: OU Brier=0.2577 (>0.2500), calibrationSlope=0.1719 (<0.50)',
+      AH: 'NOT_APPROVED_FOR_PRODUCTION: AH balanced half-line Brier=0.2390 (95% CI [0.2304, 0.2479] < 0.2500), but no historical Pinnacle benchmark (PinMatch=0) and awaiting explicit human approval',
+      OU: 'NOT_APPROVED_FOR_PRODUCTION: OU Brier=0.2577 (>0.2500, 95% CI [0.2451, 0.2710]) and no historical Pinnacle benchmark',
     },
   },
   'BEL-PRO': {
-    validated_markets: ['AH'],
+    validated_markets: [],
     production_enabled_markets: [],
     activation_priority: 8,
-    market_readiness: { AH: 'BLOCKED_MISSING_ODDS', OU: 'BLOCKED_MODEL_VALIDATION' },
+    market_readiness: { AH: 'BLOCKED_PINNACLE_BENCHMARK', OU: 'BLOCKED_MODEL_VALIDATION' },
     market_blockers: {
-      AH: 'BLOCKED_MISSING_ODDS: Awaiting verified live Pinnacle AH odds post quota reset',
-      OU: 'BLOCKED_MODEL_VALIDATION: OU Brier=0.2631 (>0.2500), calibrationSlope=0.0206 (<0.50)',
+      AH: 'NOT_APPROVED_FOR_PRODUCTION: AH balanced half-line Brier=0.2366 (95% CI [0.2278, 0.2456] < 0.2500), but no historical Pinnacle benchmark (PinMatch=0) and awaiting explicit human approval',
+      OU: 'NOT_APPROVED_FOR_PRODUCTION: OU Brier=0.2633 (>0.2500, 95% CI [0.2505, 0.2770]) and no historical Pinnacle benchmark',
     },
   },
   'SCO-PREM': {
@@ -574,8 +581,8 @@ const DEFAULT_LEAGUE_READINESS_MAP: Record<
     activation_priority: 9,
     market_readiness: { AH: 'RESEARCH_ONLY', OU: 'RESEARCH_ONLY' },
     market_blockers: {
-      AH: 'RESEARCH_ONLY: Evaluation sample nEval=210 (<300) and promoted team Falkirk n=5',
-      OU: 'RESEARCH_ONLY: Evaluation sample nEval=210 (<300) and promoted team Falkirk n=5',
+      AH: 'NOT_APPROVED_FOR_PRODUCTION: Evaluation sample nEval=210 (<300), missing autumn 2026 fixtures, and no historical Pinnacle benchmark',
+      OU: 'NOT_APPROVED_FOR_PRODUCTION: Evaluation sample nEval=210 (<300), missing autumn 2026 fixtures, and no historical Pinnacle benchmark',
     },
   },
   'SAU-PRO': {
@@ -584,8 +591,8 @@ const DEFAULT_LEAGUE_READINESS_MAP: Record<
     activation_priority: 10,
     market_readiness: { AH: 'RESEARCH_ONLY', OU: 'BLOCKED_MODEL_VALIDATION' },
     market_blockers: {
-      AH: 'RESEARCH_ONLY: 2 newly promoted clubs (Neom, Al Najma) have n=7 matches',
-      OU: 'BLOCKED_MODEL_VALIDATION: OU Brier=0.2547 (>0.2500), calibrationSlope=0.1790 (<0.50)',
+      AH: 'NOT_APPROVED_FOR_PRODUCTION: AH balanced half-line 95% CI [0.2347, 0.2513] overlaps 0.2500, 2 promoted clubs have n=7 matches, and no historical Pinnacle benchmark',
+      OU: 'NOT_APPROVED_FOR_PRODUCTION: OU Brier=0.2549 (>0.2500) and no historical Pinnacle benchmark',
     },
   },
   'ENG-CHAMP': {
@@ -594,8 +601,8 @@ const DEFAULT_LEAGUE_READINESS_MAP: Record<
     activation_priority: 11,
     market_readiness: { AH: 'BLOCKED_DATA_INTEGRITY', OU: 'BLOCKED_MODEL_VALIDATION' },
     market_blockers: {
-      AH: 'BLOCKED_DATA_INTEGRITY: 6 active relegated/promoted clubs have matches_played=0 (COLD_START)',
-      OU: 'BLOCKED_MODEL_VALIDATION: OU Brier=0.2534 (>0.2500), calibrationSlope=0.3368 (<0.50) + 6 COLD_START teams',
+      AH: 'NOT_APPROVED_FOR_PRODUCTION: 6 active relegated/promoted clubs have matches_played=0 (COLD_START) and no historical Pinnacle benchmark',
+      OU: 'NOT_APPROVED_FOR_PRODUCTION: OU Brier=0.2531 (>0.2500) + 6 COLD_START teams and no historical Pinnacle benchmark',
     },
   },
   'JPN-J1': {
@@ -604,8 +611,8 @@ const DEFAULT_LEAGUE_READINESS_MAP: Record<
     activation_priority: 12,
     market_readiness: { AH: 'BLOCKED_DATA_INTEGRITY', OU: 'BLOCKED_DATA_INTEGRITY' },
     market_blockers: {
-      AH: 'BLOCKED_DATA_INTEGRITY: Missing 2026 season matches after 2025-12-06 and 3 promoted teams with matches_played=0',
-      OU: 'BLOCKED_DATA_INTEGRITY: Missing 2026 season matches after 2025-12-06 and 3 promoted teams with matches_played=0',
+      AH: 'NOT_APPROVED_FOR_PRODUCTION: Missing 2026 season matches after 2025-12-06, 3 promoted teams with matches_played=0, and no historical Pinnacle benchmark',
+      OU: 'NOT_APPROVED_FOR_PRODUCTION: Missing 2026 season matches after 2025-12-06, 3 promoted teams with matches_played=0, and no historical Pinnacle benchmark',
     },
   },
   'KOR-K1': {
@@ -614,8 +621,8 @@ const DEFAULT_LEAGUE_READINESS_MAP: Record<
     activation_priority: 13,
     market_readiness: { AH: 'BLOCKED_DATA_INTEGRITY', OU: 'BLOCKED_MODEL_VALIDATION' },
     market_blockers: {
-      AH: 'BLOCKED_DATA_INTEGRITY: 4 active clubs have matches_played=2 (COLD_START) and nEval=208 (<300)',
-      OU: 'BLOCKED_MODEL_VALIDATION: OU Brier=0.2547 (>0.2500), calibrationSlope=0.3917 (<0.50) + 4 COLD_START teams',
+      AH: 'NOT_APPROVED_FOR_PRODUCTION: 4 active clubs have matches_played=2 (COLD_START), nEval=208 (<300), and no historical Pinnacle benchmark',
+      OU: 'NOT_APPROVED_FOR_PRODUCTION: OU Brier=0.2485 (95% CI [0.2359, 0.2605] overlaps 0.2500), nEval=208 (<300), and 4 COLD_START teams',
     },
   },
   'USA-MLS': {
@@ -624,8 +631,8 @@ const DEFAULT_LEAGUE_READINESS_MAP: Record<
     activation_priority: 14,
     market_readiness: { AH: 'BLOCKED_MODEL_VALIDATION', OU: 'BLOCKED_MODEL_VALIDATION' },
     market_blockers: {
-      AH: 'BLOCKED_MODEL_VALIDATION: Overdispersion ratio 1.2253 (>1.15), AH Brier=0.2499, calibrationSlope=0.4393 (<0.50)',
-      OU: 'BLOCKED_MODEL_VALIDATION: Overdispersion ratio 1.2253 (>1.15), OU calibrationSlope=0.3222 (<0.50)',
+      AH: 'NOT_APPROVED_FOR_PRODUCTION: Overdispersion ratio 1.2253 (>1.15), AH balanced half-line 95% CI [0.2364, 0.2527] overlaps 0.2500, and no historical Pinnacle benchmark',
+      OU: 'NOT_APPROVED_FOR_PRODUCTION: Overdispersion ratio 1.2253 (>1.15), OU 95% CI [0.2243, 0.2507] overlaps 0.2500, and no historical Pinnacle benchmark',
     },
   },
   'IDN-L1': {
@@ -752,18 +759,25 @@ export function getLeagueMarketBlocker(leagueKeyOrName: string, market: 'AH' | '
 }
 
 /**
- * Idempotently activates only the validated & verified markets for a league after all gates pass.
- * Never activates IDN-L1 while model_ready is false, and never activates an unvalidated market.
+ * H2 Hardening: Activates only the validated & verified markets for a league ONLY when
+ * explicitHumanApproval === true (or for ENG-PL).
+ * Never promotes any non-EPL league automatically without explicit human approval.
  */
 export function activateLeagueMarkets(
   internalLeagueId: string,
   marketsToEnable: MarketKey[],
   reason: string,
-  timestampIso = new Date().toISOString()
+  timestampIso = new Date().toISOString(),
+  explicitHumanApproval = false
 ): MultiLeagueEntry | null {
   const entry = getLeagueByKey(internalLeagueId);
   if (!entry) return null;
   if (entry.production_status === 'PAUSED' || !entry.model_ready) {
+    return entry;
+  }
+
+  // H2: Block automatic promotion of non-EPL leagues without explicit human approval
+  if (internalLeagueId !== 'ENG-PL' && !explicitHumanApproval) {
     return entry;
   }
 

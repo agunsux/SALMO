@@ -193,14 +193,30 @@ export class OddsPapiQuotaGuard {
   }
 
   /**
+   * H1 Safety Gate: Production database writes are strictly opt-in (default FALSE).
+   * Never writes in CI, tests, preview deployments, or dry-run executions unless BOTH
+   * caller flag `allowProductionWrite === true` AND `process.env.ALLOW_PRODUCTION_DB_WRITE === 'true'`.
+   */
+  public static isProductionDatabaseWriteAllowed(allowProductionWrite = false): boolean {
+    if (!allowProductionWrite) return false;
+    if (process.env.ALLOW_PRODUCTION_DB_WRITE !== 'true') return false;
+    if (process.env.VERCEL_ENV === 'preview') return false;
+    if (process.env.CI === 'true') return false;
+    if (process.env.NODE_ENV === 'test') return false;
+    return true;
+  }
+
+  /**
    * Non-billable Quota-Reset Detector (Phase B).
    * Never guesses quota reset by calendar date; strictly inspects /v4/account state.
    * Enforces mandatory 50-request reserve for EPL, controlled retries, and near-kickoff updates.
+   * By default, allowProductionWrite = false (read-only quota inspection).
    */
   public static async detectQuotaReset(
     minRequiredOperationalCalls = 3,
     forceSync = false,
-    injectedAccountData?: any
+    injectedAccountData?: any,
+    allowProductionWrite = false
   ): Promise<QuotaResetDetectionResult> {
     const checkedAtUtc = new Date().toISOString();
     const mandatoryReserve = Number(
@@ -297,8 +313,10 @@ export class OddsPapiQuotaGuard {
     const remainingOperationalBudget = Math.max(0, operationalCeiling - effectiveCommitted);
     const idempotencyCycleKey = `cycle_${validFrom || 'default'}_c${requestCount}_${checkedAtUtc.slice(0, 10)}`;
 
-    // Sync reset count downward or upward to persistent database if needed
-    await this.syncCountToDatabaseIfChanged(requestCount, requestLimit);
+    // Sync reset count downward or upward to persistent database ONLY when production writes are explicitly authorized (H1)
+    if (this.isProductionDatabaseWriteAllowed(allowProductionWrite)) {
+      await this.syncCountToDatabaseIfChanged(requestCount, requestLimit, allowProductionWrite);
+    }
 
     if (!isActive) {
       return {
@@ -387,7 +405,14 @@ export class OddsPapiQuotaGuard {
     };
   }
 
-  private static async syncCountToDatabaseIfChanged(providerCount: number, providerLimit: number): Promise<void> {
+  private static async syncCountToDatabaseIfChanged(
+    providerCount: number,
+    providerLimit: number,
+    allowProductionWrite = false
+  ): Promise<void> {
+    if (!this.isProductionDatabaseWriteAllowed(allowProductionWrite)) {
+      return;
+    }
     try {
       const client = getDbClient();
       const { data: dbRow, error } = await client
@@ -466,9 +491,13 @@ export class OddsPapiQuotaGuard {
 
   /**
    * Evaluates persistent OddsPapi quota and enforces hard-stop.
-   * Persists state in Supabase public.quota_state and checks account sync.
+   * Persists state in Supabase public.quota_state ONLY when allowProductionWrite is authorized.
    */
-  public static async checkQuota(requiredCost = 1, customReserve?: number): Promise<QuotaGuardStatus> {
+  public static async checkQuota(
+    requiredCost = 1,
+    customReserve?: number,
+    allowProductionWrite = false
+  ): Promise<QuotaGuardStatus> {
     const reserve = customReserve ?? Number(process.env.ODDSPAPI_QUOTA_RESERVE || this.DEFAULT_RESERVE);
 
     if (this.circuitTripped) {
@@ -523,7 +552,7 @@ export class OddsPapiQuotaGuard {
         limit = providerLimit;
         source = 'ODDSPAPI_ACCOUNT_SYNC';
 
-        if (client && dbRecordId) {
+        if (client && dbRecordId && this.isProductionDatabaseWriteAllowed(allowProductionWrite)) {
           try {
             await client
               .from('quota_state')
@@ -580,7 +609,7 @@ export class OddsPapiQuotaGuard {
    * Reserves quota units before executing a paid request.
    */
   public static async reserveQuota(cost = 1): Promise<{ allowed: boolean; reservationId?: string; reason?: string }> {
-    const status = await this.checkQuota(cost);
+    const status = await this.checkQuota(cost, undefined, false);
     if (!status.allowed) {
       return { allowed: false, reason: status.reason };
     }
@@ -601,7 +630,8 @@ export class OddsPapiQuotaGuard {
    */
   public static async confirmQuota(
     reservationId: string,
-    details: { endpoint: string; params: Record<string, any>; countBefore?: number; countAfter?: number }
+    details: { endpoint: string; params: Record<string, any>; countBefore?: number; countAfter?: number },
+    allowProductionWrite = false
   ): Promise<void> {
     const reservation = this.activeReservations.get(reservationId);
     const cost = reservation?.cost || 1;
@@ -610,7 +640,7 @@ export class OddsPapiQuotaGuard {
     const countBefore = details.countBefore ?? (this.cachedAccountData?.subscriptions?.[0]?.request_count || 0);
     const countAfter = details.countAfter ?? (countBefore + cost);
 
-    await this.recordUsage(cost);
+    await this.recordUsage(cost, allowProductionWrite);
 
     this.logAudit({
       timestamp: new Date().toISOString(),
@@ -667,9 +697,12 @@ export class OddsPapiQuotaGuard {
   }
 
   /**
-   * Atomically records billable quota usage to persistent Supabase storage.
+   * Atomically records billable quota usage to persistent Supabase storage ONLY when allowProductionWrite is authorized.
    */
-  public static async recordUsage(cost = 1): Promise<void> {
+  public static async recordUsage(cost = 1, allowProductionWrite = false): Promise<void> {
+    if (!this.isProductionDatabaseWriteAllowed(allowProductionWrite)) {
+      return;
+    }
     try {
       const client = getDbClient();
       const { data: dbRow, error } = await client
