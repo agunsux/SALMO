@@ -1,0 +1,4055 @@
+{
+  "schemaVersion": "1.0.0-phase2b-step6-football-data-probe",
+  "generatedAt": "2026-10-12T14:58:11.797Z",
+  "networkCompliance": {
+    "allowedPattern": "https://www.football-data.co.uk/mmz4281/{2324|2425|2526}/{CODE}.csv",
+    "minDelayMsEnforced": 2100,
+    "e0Modified": false,
+    "totalFilesCheckedOrDownloaded": 27,
+    "downloadLog": [
+      {
+        "leagueId": "ESP-LALIGA",
+        "fdCode": "SP1",
+        "season": "2324",
+        "url": "https://www.football-data.co.uk/mmz4281/2324/SP1.csv",
+        "filePath": "data/external/football-data/2324_SP1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 168164,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "ESP-LALIGA",
+        "fdCode": "SP1",
+        "season": "2425",
+        "url": "https://www.football-data.co.uk/mmz4281/2425/SP1.csv",
+        "filePath": "data/external/football-data/2425_SP1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 192863,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "ESP-LALIGA",
+        "fdCode": "SP1",
+        "season": "2526",
+        "url": "https://www.football-data.co.uk/mmz4281/2526/SP1.csv",
+        "filePath": "data/external/football-data/2526_SP1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 197653,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "ITA-SERIEA",
+        "fdCode": "I1",
+        "season": "2324",
+        "url": "https://www.football-data.co.uk/mmz4281/2324/I1.csv",
+        "filePath": "data/external/football-data/2324_I1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 167015,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "ITA-SERIEA",
+        "fdCode": "I1",
+        "season": "2425",
+        "url": "https://www.football-data.co.uk/mmz4281/2425/I1.csv",
+        "filePath": "data/external/football-data/2425_I1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 191722,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "ITA-SERIEA",
+        "fdCode": "I1",
+        "season": "2526",
+        "url": "https://www.football-data.co.uk/mmz4281/2526/I1.csv",
+        "filePath": "data/external/football-data/2526_I1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 196217,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "DEU-BUNDESLIGA",
+        "fdCode": "D1",
+        "season": "2324",
+        "url": "https://www.football-data.co.uk/mmz4281/2324/D1.csv",
+        "filePath": "data/external/football-data/2324_D1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 135825,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "DEU-BUNDESLIGA",
+        "fdCode": "D1",
+        "season": "2425",
+        "url": "https://www.football-data.co.uk/mmz4281/2425/D1.csv",
+        "filePath": "data/external/football-data/2425_D1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 156414,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "DEU-BUNDESLIGA",
+        "fdCode": "D1",
+        "season": "2526",
+        "url": "https://www.football-data.co.uk/mmz4281/2526/D1.csv",
+        "filePath": "data/external/football-data/2526_D1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 159944,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "FRA-LIGUE1",
+        "fdCode": "F1",
+        "season": "2324",
+        "url": "https://www.football-data.co.uk/mmz4281/2324/F1.csv",
+        "filePath": "data/external/football-data/2324_F1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 135000,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "FRA-LIGUE1",
+        "fdCode": "F1",
+        "season": "2425",
+        "url": "https://www.football-data.co.uk/mmz4281/2425/F1.csv",
+        "filePath": "data/external/football-data/2425_F1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 154703,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "FRA-LIGUE1",
+        "fdCode": "F1",
+        "season": "2526",
+        "url": "https://www.football-data.co.uk/mmz4281/2526/F1.csv",
+        "filePath": "data/external/football-data/2526_F1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 158471,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "NED-ERE",
+        "fdCode": "N1",
+        "season": "2324",
+        "url": "https://www.football-data.co.uk/mmz4281/2324/N1.csv",
+        "filePath": "data/external/football-data/2324_N1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 135643,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "NED-ERE",
+        "fdCode": "N1",
+        "season": "2425",
+        "url": "https://www.football-data.co.uk/mmz4281/2425/N1.csv",
+        "filePath": "data/external/football-data/2425_N1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 155460,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "NED-ERE",
+        "fdCode": "N1",
+        "season": "2526",
+        "url": "https://www.football-data.co.uk/mmz4281/2526/N1.csv",
+        "filePath": "data/external/football-data/2526_N1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 158364,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "POR-PRIMEIRA",
+        "fdCode": "P1",
+        "season": "2324",
+        "url": "https://www.football-data.co.uk/mmz4281/2324/P1.csv",
+        "filePath": "data/external/football-data/2324_P1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 135008,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "POR-PRIMEIRA",
+        "fdCode": "P1",
+        "season": "2425",
+        "url": "https://www.football-data.co.uk/mmz4281/2425/P1.csv",
+        "filePath": "data/external/football-data/2425_P1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 153596,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "POR-PRIMEIRA",
+        "fdCode": "P1",
+        "season": "2526",
+        "url": "https://www.football-data.co.uk/mmz4281/2526/P1.csv",
+        "filePath": "data/external/football-data/2526_P1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 157715,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "BEL-PRO",
+        "fdCode": "B1",
+        "season": "2324",
+        "url": "https://www.football-data.co.uk/mmz4281/2324/B1.csv",
+        "filePath": "data/external/football-data/2324_B1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 136827,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "BEL-PRO",
+        "fdCode": "B1",
+        "season": "2425",
+        "url": "https://www.football-data.co.uk/mmz4281/2425/B1.csv",
+        "filePath": "data/external/football-data/2425_B1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 158659,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "BEL-PRO",
+        "fdCode": "B1",
+        "season": "2526",
+        "url": "https://www.football-data.co.uk/mmz4281/2526/B1.csv",
+        "filePath": "data/external/football-data/2526_B1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 158888,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "SCO-PREM",
+        "fdCode": "SC0",
+        "season": "2324",
+        "url": "https://www.football-data.co.uk/mmz4281/2324/SC0.csv",
+        "filePath": "data/external/football-data/2324_SC0.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 103688,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "SCO-PREM",
+        "fdCode": "SC0",
+        "season": "2425",
+        "url": "https://www.football-data.co.uk/mmz4281/2425/SC0.csv",
+        "filePath": "data/external/football-data/2425_SC0.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 118635,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "SCO-PREM",
+        "fdCode": "SC0",
+        "season": "2526",
+        "url": "https://www.football-data.co.uk/mmz4281/2526/SC0.csv",
+        "filePath": "data/external/football-data/2526_SC0.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 118594,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "ENG-CHAMP",
+        "fdCode": "E1",
+        "season": "2324",
+        "url": "https://www.football-data.co.uk/mmz4281/2324/E1.csv",
+        "filePath": "data/external/football-data/2324_E1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 251182,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "ENG-CHAMP",
+        "fdCode": "E1",
+        "season": "2425",
+        "url": "https://www.football-data.co.uk/mmz4281/2425/E1.csv",
+        "filePath": "data/external/football-data/2425_E1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 286983,
+        "waitMsBeforeRequest": 0
+      },
+      {
+        "leagueId": "ENG-CHAMP",
+        "fdCode": "E1",
+        "season": "2526",
+        "url": "https://www.football-data.co.uk/mmz4281/2526/E1.csv",
+        "filePath": "data/external/football-data/2526_E1.csv",
+        "cached": true,
+        "statusCode": 200,
+        "bytes": 294390,
+        "waitMsBeforeRequest": 0
+      }
+    ]
+  },
+  "probedLeagues": {
+    "ESP-LALIGA": {
+      "leagueId": "ESP-LALIGA",
+      "fdCode": "SP1",
+      "name": "La Liga",
+      "seasonsProbed": [
+        "2324",
+        "2425",
+        "2526"
+      ],
+      "lastPinnaclePopulatedDateInCsv": "2026-01-12",
+      "bySeason": {
+        "2324": {
+          "exists": true,
+          "rowCount": 380,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 380,
+            "PAHH": 380,
+            "PAHA": 380,
+            "PCAHH": 380,
+            "PCAHA": 380,
+            "AHCh": 380,
+            "P>2.5": 379,
+            "P<2.5": 379,
+            "PC>2.5": 380,
+            "PC<2.5": 380
+          }
+        },
+        "2425": {
+          "exists": true,
+          "rowCount": 380,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 380,
+            "PAHH": 379,
+            "PAHA": 379,
+            "PCAHH": 380,
+            "PCAHA": 380,
+            "AHCh": 380,
+            "P>2.5": 378,
+            "P<2.5": 378,
+            "PC>2.5": 378,
+            "PC<2.5": 378
+          }
+        },
+        "2526": {
+          "exists": true,
+          "rowCount": 380,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 376,
+            "PAHH": 189,
+            "PAHA": 189,
+            "PCAHH": 189,
+            "PCAHA": 189,
+            "AHCh": 380,
+            "P>2.5": 188,
+            "P<2.5": 188,
+            "PC>2.5": 189,
+            "PC<2.5": 189
+          }
+        }
+      },
+      "aggregateColumns": {
+        "AHh": {
+          "presentInAllSeasons": true,
+          "filledRows": 1136,
+          "totalCsvRows": 1140,
+          "fillRate": 0.996491
+        },
+        "PAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 948,
+          "totalCsvRows": 1140,
+          "fillRate": 0.831579
+        },
+        "PAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 948,
+          "totalCsvRows": 1140,
+          "fillRate": 0.831579
+        },
+        "PCAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 949,
+          "totalCsvRows": 1140,
+          "fillRate": 0.832456
+        },
+        "PCAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 949,
+          "totalCsvRows": 1140,
+          "fillRate": 0.832456
+        },
+        "AHCh": {
+          "presentInAllSeasons": true,
+          "filledRows": 1140,
+          "totalCsvRows": 1140,
+          "fillRate": 1
+        },
+        "P>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 945,
+          "totalCsvRows": 1140,
+          "fillRate": 0.828947
+        },
+        "P<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 945,
+          "totalCsvRows": 1140,
+          "fillRate": 0.828947
+        },
+        "PC>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 947,
+          "totalCsvRows": 1140,
+          "fillRate": 0.830702
+        },
+        "PC<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 947,
+          "totalCsvRows": 1140,
+          "fillRate": 0.830702
+        }
+      },
+      "joinSummary": {
+        "nHistoricalTotal": 1359,
+        "nHistoricalSince2023_08": 1209,
+        "totalCsvRows": 1140,
+        "totalMatchedToHistorical": 1140,
+        "totalMatchedWithPinnacleAh": 949,
+        "totalMatchedWithPinnacleOu": 947,
+        "overlapJoinRateSince2023_08": 0.942928,
+        "primaryEvalWindow": {
+          "warmUpMatches": 1059,
+          "nEval": 300,
+          "ahMatchedFixtures": 40,
+          "ahResolvedLegs": 51,
+          "ouMatchedFixtures": 40,
+          "ouResolvedLegs": 40
+        },
+        "expandedWalkForwardWindow": {
+          "warmUpMatches": 380,
+          "nEval": 979,
+          "ahMatchedFixtures": 719,
+          "ahResolvedLegs": 947,
+          "ouMatchedFixtures": 716,
+          "ouResolvedLegs": 716
+        }
+      },
+      "primaryBenchmark": {
+        "nEvalTotal": 300,
+        "ahMatchedFixtures": 40,
+        "ouMatchedFixtures": 40,
+        "ahBinaryNoPush": {
+          "totalLegs": 59,
+          "pushesExcluded": 8,
+          "resolvedLegs": 51,
+          "brier": {
+            "n": 51,
+            "modelMean": 0.2664,
+            "marketMean": 0.257099,
+            "deltaMean": 0.009301,
+            "ci95": [
+              -0.018621,
+              0.038779
+            ],
+            "pValueModelBeatsMarket": 0.7365
+          },
+          "logLoss": {
+            "n": 51,
+            "modelMean": 0.72804,
+            "marketMean": 0.707394,
+            "deltaMean": 0.020646,
+            "ci95": [
+              -0.038034,
+              0.079618
+            ],
+            "pValueModelBeatsMarket": 0.7535
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 5,
+          "resolvedLegs": 16,
+          "brier": {
+            "n": 16,
+            "modelMean": 0.227819,
+            "marketMean": 0.251081,
+            "deltaMean": -0.023262,
+            "ci95": [
+              -0.053632,
+              0.011191
+            ],
+            "pValueModelBeatsMarket": 0.086
+          },
+          "logLoss": {
+            "n": 16,
+            "modelMean": 0.64812,
+            "marketMean": 0.695312,
+            "deltaMean": -0.047192,
+            "ci95": [
+              -0.107301,
+              0.022857
+            ],
+            "pValueModelBeatsMarket": 0.0795
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 40,
+          "brier": {
+            "n": 40,
+            "modelMean": 0.273797,
+            "marketMean": 0.273848,
+            "deltaMean": -0.000051,
+            "ci95": [
+              -0.015605,
+              0.016532
+            ],
+            "pValueModelBeatsMarket": 0.4775
+          },
+          "logLoss": {
+            "n": 40,
+            "modelMean": 0.743825,
+            "marketMean": 0.743891,
+            "deltaMean": -0.000065,
+            "ci95": [
+              -0.033464,
+              0.034741
+            ],
+            "pValueModelBeatsMarket": 0.486
+          }
+        }
+      },
+      "expandedWalkForwardBenchmark": {
+        "nEvalTotal": 979,
+        "ahMatchedFixtures": 719,
+        "ouMatchedFixtures": 716,
+        "ahBinaryNoPush": {
+          "totalLegs": 1107,
+          "pushesExcluded": 160,
+          "resolvedLegs": 947,
+          "brier": {
+            "n": 947,
+            "modelMean": 0.257651,
+            "marketMean": 0.250591,
+            "deltaMean": 0.00706,
+            "ci95": [
+              0.000389,
+              0.014112
+            ],
+            "pValueModelBeatsMarket": 0.981
+          },
+          "logLoss": {
+            "n": 947,
+            "modelMean": 0.709919,
+            "marketMean": 0.694333,
+            "deltaMean": 0.015585,
+            "ci95": [
+              0.001904,
+              0.029795
+            ],
+            "pValueModelBeatsMarket": 0.986
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 45,
+          "resolvedLegs": 286,
+          "brier": {
+            "n": 286,
+            "modelMean": 0.261325,
+            "marketMean": 0.24905,
+            "deltaMean": 0.012274,
+            "ci95": [
+              0.0021,
+              0.022584
+            ],
+            "pValueModelBeatsMarket": 0.993
+          },
+          "logLoss": {
+            "n": 286,
+            "modelMean": 0.716793,
+            "marketMean": 0.691245,
+            "deltaMean": 0.025548,
+            "ci95": [
+              0.005106,
+              0.046455
+            ],
+            "pValueModelBeatsMarket": 0.992
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 716,
+          "brier": {
+            "n": 716,
+            "modelMean": 0.240703,
+            "marketMean": 0.233021,
+            "deltaMean": 0.007682,
+            "ci95": [
+              0.003048,
+              0.012446
+            ],
+            "pValueModelBeatsMarket": 0.999
+          },
+          "logLoss": {
+            "n": 716,
+            "modelMean": 0.674472,
+            "marketMean": 0.658723,
+            "deltaMean": 0.01575,
+            "ci95": [
+              0.006147,
+              0.025628
+            ],
+            "pValueModelBeatsMarket": 0.9985
+          }
+        }
+      }
+    },
+    "ITA-SERIEA": {
+      "leagueId": "ITA-SERIEA",
+      "fdCode": "I1",
+      "name": "Serie A",
+      "seasonsProbed": [
+        "2324",
+        "2425",
+        "2526"
+      ],
+      "lastPinnaclePopulatedDateInCsv": "2026-01-14",
+      "bySeason": {
+        "2324": {
+          "exists": true,
+          "rowCount": 380,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 380,
+            "PAHH": 380,
+            "PAHA": 380,
+            "PCAHH": 380,
+            "PCAHA": 380,
+            "AHCh": 380,
+            "P>2.5": 380,
+            "P<2.5": 380,
+            "PC>2.5": 380,
+            "PC<2.5": 380
+          }
+        },
+        "2425": {
+          "exists": true,
+          "rowCount": 380,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 380,
+            "PAHH": 379,
+            "PAHA": 379,
+            "PCAHH": 380,
+            "PCAHA": 380,
+            "AHCh": 380,
+            "P>2.5": 379,
+            "P<2.5": 379,
+            "PC>2.5": 380,
+            "PC<2.5": 380
+          }
+        },
+        "2526": {
+          "exists": true,
+          "rowCount": 380,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 380,
+            "PAHH": 200,
+            "PAHA": 200,
+            "PCAHH": 198,
+            "PCAHA": 198,
+            "AHCh": 380,
+            "P>2.5": 200,
+            "P<2.5": 200,
+            "PC>2.5": 198,
+            "PC<2.5": 198
+          }
+        }
+      },
+      "aggregateColumns": {
+        "AHh": {
+          "presentInAllSeasons": true,
+          "filledRows": 1140,
+          "totalCsvRows": 1140,
+          "fillRate": 1
+        },
+        "PAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 959,
+          "totalCsvRows": 1140,
+          "fillRate": 0.841228
+        },
+        "PAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 959,
+          "totalCsvRows": 1140,
+          "fillRate": 0.841228
+        },
+        "PCAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 958,
+          "totalCsvRows": 1140,
+          "fillRate": 0.840351
+        },
+        "PCAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 958,
+          "totalCsvRows": 1140,
+          "fillRate": 0.840351
+        },
+        "AHCh": {
+          "presentInAllSeasons": true,
+          "filledRows": 1140,
+          "totalCsvRows": 1140,
+          "fillRate": 1
+        },
+        "P>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 959,
+          "totalCsvRows": 1140,
+          "fillRate": 0.841228
+        },
+        "P<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 959,
+          "totalCsvRows": 1140,
+          "fillRate": 0.841228
+        },
+        "PC>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 958,
+          "totalCsvRows": 1140,
+          "fillRate": 0.840351
+        },
+        "PC<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 958,
+          "totalCsvRows": 1140,
+          "fillRate": 0.840351
+        }
+      },
+      "joinSummary": {
+        "nHistoricalTotal": 1331,
+        "nHistoricalSince2023_08": 1190,
+        "totalCsvRows": 1140,
+        "totalMatchedToHistorical": 1140,
+        "totalMatchedWithPinnacleAh": 958,
+        "totalMatchedWithPinnacleOu": 958,
+        "overlapJoinRateSince2023_08": 0.957983,
+        "primaryEvalWindow": {
+          "warmUpMatches": 1031,
+          "nEval": 300,
+          "ahMatchedFixtures": 68,
+          "ahResolvedLegs": 94,
+          "ouMatchedFixtures": 68,
+          "ouResolvedLegs": 68
+        },
+        "expandedWalkForwardWindow": {
+          "warmUpMatches": 380,
+          "nEval": 951,
+          "ahMatchedFixtures": 719,
+          "ahResolvedLegs": 919,
+          "ouMatchedFixtures": 719,
+          "ouResolvedLegs": 719
+        }
+      },
+      "primaryBenchmark": {
+        "nEvalTotal": 300,
+        "ahMatchedFixtures": 68,
+        "ouMatchedFixtures": 68,
+        "ahBinaryNoPush": {
+          "totalLegs": 104,
+          "pushesExcluded": 10,
+          "resolvedLegs": 94,
+          "brier": {
+            "n": 94,
+            "modelMean": 0.26976,
+            "marketMean": 0.24964,
+            "deltaMean": 0.02012,
+            "ci95": [
+              -0.005489,
+              0.046324
+            ],
+            "pValueModelBeatsMarket": 0.941
+          },
+          "logLoss": {
+            "n": 94,
+            "modelMean": 0.738462,
+            "marketMean": 0.69243,
+            "deltaMean": 0.046032,
+            "ci95": [
+              -0.007259,
+              0.103956
+            ],
+            "pValueModelBeatsMarket": 0.9485
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 2,
+          "resolvedLegs": 30,
+          "brier": {
+            "n": 30,
+            "modelMean": 0.258172,
+            "marketMean": 0.255998,
+            "deltaMean": 0.002174,
+            "ci95": [
+              -0.037507,
+              0.044408
+            ],
+            "pValueModelBeatsMarket": 0.541
+          },
+          "logLoss": {
+            "n": 30,
+            "modelMean": 0.712878,
+            "marketMean": 0.705174,
+            "deltaMean": 0.007704,
+            "ci95": [
+              -0.079649,
+              0.096446
+            ],
+            "pValueModelBeatsMarket": 0.5505
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 68,
+          "brier": {
+            "n": 68,
+            "modelMean": 0.24837,
+            "marketMean": 0.25499,
+            "deltaMean": -0.00662,
+            "ci95": [
+              -0.021865,
+              0.00908
+            ],
+            "pValueModelBeatsMarket": 0.192
+          },
+          "logLoss": {
+            "n": 68,
+            "modelMean": 0.690276,
+            "marketMean": 0.703884,
+            "deltaMean": -0.013608,
+            "ci95": [
+              -0.04412,
+              0.019155
+            ],
+            "pValueModelBeatsMarket": 0.196
+          }
+        }
+      },
+      "expandedWalkForwardBenchmark": {
+        "nEvalTotal": 951,
+        "ahMatchedFixtures": 719,
+        "ouMatchedFixtures": 719,
+        "ahBinaryNoPush": {
+          "totalLegs": 1082,
+          "pushesExcluded": 163,
+          "resolvedLegs": 919,
+          "brier": {
+            "n": 919,
+            "modelMean": 0.254633,
+            "marketMean": 0.249935,
+            "deltaMean": 0.004699,
+            "ci95": [
+              -0.002909,
+              0.012324
+            ],
+            "pValueModelBeatsMarket": 0.8845
+          },
+          "logLoss": {
+            "n": 919,
+            "modelMean": 0.704166,
+            "marketMean": 0.693016,
+            "deltaMean": 0.01115,
+            "ci95": [
+              -0.005069,
+              0.027487
+            ],
+            "pValueModelBeatsMarket": 0.9095
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 55,
+          "resolvedLegs": 301,
+          "brier": {
+            "n": 301,
+            "modelMean": 0.258336,
+            "marketMean": 0.251048,
+            "deltaMean": 0.007288,
+            "ci95": [
+              -0.003378,
+              0.01902
+            ],
+            "pValueModelBeatsMarket": 0.896
+          },
+          "logLoss": {
+            "n": 301,
+            "modelMean": 0.711554,
+            "marketMean": 0.695247,
+            "deltaMean": 0.016306,
+            "ci95": [
+              -0.006482,
+              0.042042
+            ],
+            "pValueModelBeatsMarket": 0.9195
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 719,
+          "brier": {
+            "n": 719,
+            "modelMean": 0.249474,
+            "marketMean": 0.243458,
+            "deltaMean": 0.006016,
+            "ci95": [
+              0.001273,
+              0.010766
+            ],
+            "pValueModelBeatsMarket": 0.993
+          },
+          "logLoss": {
+            "n": 719,
+            "modelMean": 0.692457,
+            "marketMean": 0.680138,
+            "deltaMean": 0.012319,
+            "ci95": [
+              0.002314,
+              0.02231
+            ],
+            "pValueModelBeatsMarket": 0.993
+          }
+        }
+      }
+    },
+    "DEU-BUNDESLIGA": {
+      "leagueId": "DEU-BUNDESLIGA",
+      "fdCode": "D1",
+      "name": "Bundesliga",
+      "seasonsProbed": [
+        "2324",
+        "2425",
+        "2526"
+      ],
+      "lastPinnaclePopulatedDateInCsv": "2026-01-14",
+      "bySeason": {
+        "2324": {
+          "exists": true,
+          "rowCount": 306,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 306,
+            "PAHH": 306,
+            "PAHA": 306,
+            "PCAHH": 306,
+            "PCAHA": 306,
+            "AHCh": 306,
+            "P>2.5": 292,
+            "P<2.5": 292,
+            "PC>2.5": 293,
+            "PC<2.5": 293
+          }
+        },
+        "2425": {
+          "exists": true,
+          "rowCount": 306,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 306,
+            "PAHH": 304,
+            "PAHA": 304,
+            "PCAHH": 306,
+            "PCAHA": 306,
+            "AHCh": 306,
+            "P>2.5": 297,
+            "P<2.5": 297,
+            "PC>2.5": 297,
+            "PC<2.5": 297
+          }
+        },
+        "2526": {
+          "exists": true,
+          "rowCount": 306,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 306,
+            "PAHH": 150,
+            "PAHA": 150,
+            "PCAHH": 149,
+            "PCAHA": 149,
+            "AHCh": 306,
+            "P>2.5": 142,
+            "P<2.5": 142,
+            "PC>2.5": 142,
+            "PC<2.5": 142
+          }
+        }
+      },
+      "aggregateColumns": {
+        "AHh": {
+          "presentInAllSeasons": true,
+          "filledRows": 918,
+          "totalCsvRows": 918,
+          "fillRate": 1
+        },
+        "PAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 760,
+          "totalCsvRows": 918,
+          "fillRate": 0.827887
+        },
+        "PAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 760,
+          "totalCsvRows": 918,
+          "fillRate": 0.827887
+        },
+        "PCAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 761,
+          "totalCsvRows": 918,
+          "fillRate": 0.828976
+        },
+        "PCAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 761,
+          "totalCsvRows": 918,
+          "fillRate": 0.828976
+        },
+        "AHCh": {
+          "presentInAllSeasons": true,
+          "filledRows": 918,
+          "totalCsvRows": 918,
+          "fillRate": 1
+        },
+        "P>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 731,
+          "totalCsvRows": 918,
+          "fillRate": 0.796296
+        },
+        "P<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 731,
+          "totalCsvRows": 918,
+          "fillRate": 0.796296
+        },
+        "PC>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 732,
+          "totalCsvRows": 918,
+          "fillRate": 0.797386
+        },
+        "PC<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 732,
+          "totalCsvRows": 918,
+          "fillRate": 0.797386
+        }
+      },
+      "joinSummary": {
+        "nHistoricalTotal": 1061,
+        "nHistoricalSince2023_08": 953,
+        "totalCsvRows": 918,
+        "totalMatchedToHistorical": 917,
+        "totalMatchedWithPinnacleAh": 760,
+        "totalMatchedWithPinnacleOu": 731,
+        "overlapJoinRateSince2023_08": 0.962225,
+        "primaryEvalWindow": {
+          "warmUpMatches": 761,
+          "nEval": 300,
+          "ahMatchedFixtures": 107,
+          "ahResolvedLegs": 135,
+          "ouMatchedFixtures": 101,
+          "ouResolvedLegs": 101
+        },
+        "expandedWalkForwardWindow": {
+          "warmUpMatches": 380,
+          "nEval": 681,
+          "ahMatchedFixtures": 488,
+          "ahResolvedLegs": 641,
+          "ouMatchedFixtures": 468,
+          "ouResolvedLegs": 468
+        }
+      },
+      "primaryBenchmark": {
+        "nEvalTotal": 300,
+        "ahMatchedFixtures": 107,
+        "ouMatchedFixtures": 101,
+        "ahBinaryNoPush": {
+          "totalLegs": 156,
+          "pushesExcluded": 21,
+          "resolvedLegs": 135,
+          "brier": {
+            "n": 135,
+            "modelMean": 0.266113,
+            "marketMean": 0.246416,
+            "deltaMean": 0.019696,
+            "ci95": [
+              0.002913,
+              0.037593
+            ],
+            "pValueModelBeatsMarket": 0.9885
+          },
+          "logLoss": {
+            "n": 135,
+            "modelMean": 0.728029,
+            "marketMean": 0.685959,
+            "deltaMean": 0.04207,
+            "ci95": [
+              0.005753,
+              0.080424
+            ],
+            "pValueModelBeatsMarket": 0.989
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 10,
+          "resolvedLegs": 48,
+          "brier": {
+            "n": 48,
+            "modelMean": 0.256397,
+            "marketMean": 0.246592,
+            "deltaMean": 0.009805,
+            "ci95": [
+              -0.013986,
+              0.034256
+            ],
+            "pValueModelBeatsMarket": 0.7965
+          },
+          "logLoss": {
+            "n": 48,
+            "modelMean": 0.70664,
+            "marketMean": 0.686326,
+            "deltaMean": 0.020314,
+            "ci95": [
+              -0.028361,
+              0.069019
+            ],
+            "pValueModelBeatsMarket": 0.802
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 101,
+          "brier": {
+            "n": 101,
+            "modelMean": 0.253277,
+            "marketMean": 0.242689,
+            "deltaMean": 0.010587,
+            "ci95": [
+              -0.001906,
+              0.023737
+            ],
+            "pValueModelBeatsMarket": 0.949
+          },
+          "logLoss": {
+            "n": 101,
+            "modelMean": 0.699932,
+            "marketMean": 0.678348,
+            "deltaMean": 0.021584,
+            "ci95": [
+              -0.004125,
+              0.047105
+            ],
+            "pValueModelBeatsMarket": 0.9485
+          }
+        }
+      },
+      "expandedWalkForwardBenchmark": {
+        "nEvalTotal": 681,
+        "ahMatchedFixtures": 488,
+        "ouMatchedFixtures": 468,
+        "ahBinaryNoPush": {
+          "totalLegs": 729,
+          "pushesExcluded": 88,
+          "resolvedLegs": 641,
+          "brier": {
+            "n": 641,
+            "modelMean": 0.264368,
+            "marketMean": 0.246801,
+            "deltaMean": 0.017567,
+            "ci95": [
+              0.008674,
+              0.026387
+            ],
+            "pValueModelBeatsMarket": 1
+          },
+          "logLoss": {
+            "n": 641,
+            "modelMean": 0.724881,
+            "marketMean": 0.686731,
+            "deltaMean": 0.03815,
+            "ci95": [
+              0.020191,
+              0.057133
+            ],
+            "pValueModelBeatsMarket": 0.9995
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 33,
+          "resolvedLegs": 214,
+          "brier": {
+            "n": 214,
+            "modelMean": 0.259368,
+            "marketMean": 0.246262,
+            "deltaMean": 0.013106,
+            "ci95": [
+              -0.001562,
+              0.027315
+            ],
+            "pValueModelBeatsMarket": 0.9595
+          },
+          "logLoss": {
+            "n": 214,
+            "modelMean": 0.714311,
+            "marketMean": 0.685649,
+            "deltaMean": 0.028662,
+            "ci95": [
+              -0.00199,
+              0.060356
+            ],
+            "pValueModelBeatsMarket": 0.9695
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 468,
+          "brier": {
+            "n": 468,
+            "modelMean": 0.236688,
+            "marketMean": 0.228103,
+            "deltaMean": 0.008585,
+            "ci95": [
+              0.002332,
+              0.01435
+            ],
+            "pValueModelBeatsMarket": 0.9925
+          },
+          "logLoss": {
+            "n": 468,
+            "modelMean": 0.665972,
+            "marketMean": 0.647904,
+            "deltaMean": 0.018068,
+            "ci95": [
+              0.005367,
+              0.031499
+            ],
+            "pValueModelBeatsMarket": 0.9955
+          }
+        }
+      }
+    },
+    "FRA-LIGUE1": {
+      "leagueId": "FRA-LIGUE1",
+      "fdCode": "F1",
+      "name": "Ligue 1",
+      "seasonsProbed": [
+        "2324",
+        "2425",
+        "2526"
+      ],
+      "lastPinnaclePopulatedDateInCsv": "2026-01-04",
+      "bySeason": {
+        "2324": {
+          "exists": true,
+          "rowCount": 306,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 306,
+            "PAHH": 306,
+            "PAHA": 306,
+            "PCAHH": 306,
+            "PCAHA": 306,
+            "AHCh": 306,
+            "P>2.5": 306,
+            "P<2.5": 306,
+            "PC>2.5": 306,
+            "PC<2.5": 306
+          }
+        },
+        "2425": {
+          "exists": true,
+          "rowCount": 306,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 306,
+            "PAHH": 306,
+            "PAHA": 306,
+            "PCAHH": 306,
+            "PCAHA": 306,
+            "AHCh": 306,
+            "P>2.5": 304,
+            "P<2.5": 304,
+            "PC>2.5": 304,
+            "PC<2.5": 304
+          }
+        },
+        "2526": {
+          "exists": true,
+          "rowCount": 306,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 306,
+            "PAHH": 153,
+            "PAHA": 153,
+            "PCAHH": 153,
+            "PCAHA": 153,
+            "AHCh": 306,
+            "P>2.5": 152,
+            "P<2.5": 152,
+            "PC>2.5": 152,
+            "PC<2.5": 152
+          }
+        }
+      },
+      "aggregateColumns": {
+        "AHh": {
+          "presentInAllSeasons": true,
+          "filledRows": 918,
+          "totalCsvRows": 918,
+          "fillRate": 1
+        },
+        "PAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 765,
+          "totalCsvRows": 918,
+          "fillRate": 0.833333
+        },
+        "PAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 765,
+          "totalCsvRows": 918,
+          "fillRate": 0.833333
+        },
+        "PCAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 765,
+          "totalCsvRows": 918,
+          "fillRate": 0.833333
+        },
+        "PCAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 765,
+          "totalCsvRows": 918,
+          "fillRate": 0.833333
+        },
+        "AHCh": {
+          "presentInAllSeasons": true,
+          "filledRows": 918,
+          "totalCsvRows": 918,
+          "fillRate": 1
+        },
+        "P>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 762,
+          "totalCsvRows": 918,
+          "fillRate": 0.830065
+        },
+        "P<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 762,
+          "totalCsvRows": 918,
+          "fillRate": 0.830065
+        },
+        "PC>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 762,
+          "totalCsvRows": 918,
+          "fillRate": 0.830065
+        },
+        "PC<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 762,
+          "totalCsvRows": 918,
+          "fillRate": 0.830065
+        }
+      },
+      "joinSummary": {
+        "nHistoricalTotal": 1091,
+        "nHistoricalSince2023_08": 961,
+        "totalCsvRows": 918,
+        "totalMatchedToHistorical": 916,
+        "totalMatchedWithPinnacleAh": 764,
+        "totalMatchedWithPinnacleOu": 761,
+        "overlapJoinRateSince2023_08": 0.953174,
+        "primaryEvalWindow": {
+          "warmUpMatches": 791,
+          "nEval": 300,
+          "ahMatchedFixtures": 103,
+          "ahResolvedLegs": 137,
+          "ouMatchedFixtures": 103,
+          "ouResolvedLegs": 103
+        },
+        "expandedWalkForwardWindow": {
+          "warmUpMatches": 380,
+          "nEval": 711,
+          "ahMatchedFixtures": 514,
+          "ahResolvedLegs": 683,
+          "ouMatchedFixtures": 510,
+          "ouResolvedLegs": 510
+        }
+      },
+      "primaryBenchmark": {
+        "nEvalTotal": 300,
+        "ahMatchedFixtures": 103,
+        "ouMatchedFixtures": 103,
+        "ahBinaryNoPush": {
+          "totalLegs": 154,
+          "pushesExcluded": 17,
+          "resolvedLegs": 137,
+          "brier": {
+            "n": 137,
+            "modelMean": 0.26033,
+            "marketMean": 0.253345,
+            "deltaMean": 0.006985,
+            "ci95": [
+              -0.009302,
+              0.023394
+            ],
+            "pValueModelBeatsMarket": 0.801
+          },
+          "logLoss": {
+            "n": 137,
+            "modelMean": 0.715196,
+            "marketMean": 0.699871,
+            "deltaMean": 0.015325,
+            "ci95": [
+              -0.015945,
+              0.049713
+            ],
+            "pValueModelBeatsMarket": 0.815
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 6,
+          "resolvedLegs": 46,
+          "brier": {
+            "n": 46,
+            "modelMean": 0.249968,
+            "marketMean": 0.252384,
+            "deltaMean": -0.002415,
+            "ci95": [
+              -0.021227,
+              0.015927
+            ],
+            "pValueModelBeatsMarket": 0.3755
+          },
+          "logLoss": {
+            "n": 46,
+            "modelMean": 0.6933,
+            "marketMean": 0.697924,
+            "deltaMean": -0.004624,
+            "ci95": [
+              -0.043522,
+              0.033971
+            ],
+            "pValueModelBeatsMarket": 0.399
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 103,
+          "brier": {
+            "n": 103,
+            "modelMean": 0.263629,
+            "marketMean": 0.241953,
+            "deltaMean": 0.021676,
+            "ci95": [
+              0.006705,
+              0.037139
+            ],
+            "pValueModelBeatsMarket": 0.9985
+          },
+          "logLoss": {
+            "n": 103,
+            "modelMean": 0.722265,
+            "marketMean": 0.677003,
+            "deltaMean": 0.045262,
+            "ci95": [
+              0.014467,
+              0.076318
+            ],
+            "pValueModelBeatsMarket": 0.9955
+          }
+        }
+      },
+      "expandedWalkForwardBenchmark": {
+        "nEvalTotal": 711,
+        "ahMatchedFixtures": 514,
+        "ouMatchedFixtures": 510,
+        "ahBinaryNoPush": {
+          "totalLegs": 779,
+          "pushesExcluded": 96,
+          "resolvedLegs": 683,
+          "brier": {
+            "n": 683,
+            "modelMean": 0.258506,
+            "marketMean": 0.250041,
+            "deltaMean": 0.008465,
+            "ci95": [
+              0.00015,
+              0.016823
+            ],
+            "pValueModelBeatsMarket": 0.977
+          },
+          "logLoss": {
+            "n": 683,
+            "modelMean": 0.711793,
+            "marketMean": 0.693218,
+            "deltaMean": 0.018575,
+            "ci95": [
+              0.000908,
+              0.036989
+            ],
+            "pValueModelBeatsMarket": 0.98
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 27,
+          "resolvedLegs": 222,
+          "brier": {
+            "n": 222,
+            "modelMean": 0.263938,
+            "marketMean": 0.25021,
+            "deltaMean": 0.013728,
+            "ci95": [
+              0.000383,
+              0.027781
+            ],
+            "pValueModelBeatsMarket": 0.9785
+          },
+          "logLoss": {
+            "n": 222,
+            "modelMean": 0.722879,
+            "marketMean": 0.693533,
+            "deltaMean": 0.029346,
+            "ci95": [
+              0.002499,
+              0.057581
+            ],
+            "pValueModelBeatsMarket": 0.9835
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 510,
+          "brier": {
+            "n": 510,
+            "modelMean": 0.250644,
+            "marketMean": 0.239682,
+            "deltaMean": 0.010962,
+            "ci95": [
+              0.005071,
+              0.017105
+            ],
+            "pValueModelBeatsMarket": 1
+          },
+          "logLoss": {
+            "n": 510,
+            "modelMean": 0.694909,
+            "marketMean": 0.672306,
+            "deltaMean": 0.022602,
+            "ci95": [
+              0.009581,
+              0.03593
+            ],
+            "pValueModelBeatsMarket": 1
+          }
+        }
+      }
+    },
+    "NED-ERE": {
+      "leagueId": "NED-ERE",
+      "fdCode": "N1",
+      "name": "Eredivisie",
+      "seasonsProbed": [
+        "2324",
+        "2425",
+        "2526"
+      ],
+      "lastPinnaclePopulatedDateInCsv": "2026-01-11",
+      "bySeason": {
+        "2324": {
+          "exists": true,
+          "rowCount": 306,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 306,
+            "PAHH": 306,
+            "PAHA": 306,
+            "PCAHH": 306,
+            "PCAHA": 306,
+            "AHCh": 306,
+            "P>2.5": 306,
+            "P<2.5": 306,
+            "PC>2.5": 306,
+            "PC<2.5": 306
+          }
+        },
+        "2425": {
+          "exists": true,
+          "rowCount": 306,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 306,
+            "PAHH": 306,
+            "PAHA": 306,
+            "PCAHH": 305,
+            "PCAHA": 305,
+            "AHCh": 306,
+            "P>2.5": 306,
+            "P<2.5": 306,
+            "PC>2.5": 306,
+            "PC<2.5": 306
+          }
+        },
+        "2526": {
+          "exists": true,
+          "rowCount": 306,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 305,
+            "PAHH": 142,
+            "PAHA": 142,
+            "PCAHH": 142,
+            "PCAHA": 142,
+            "AHCh": 306,
+            "P>2.5": 142,
+            "P<2.5": 142,
+            "PC>2.5": 142,
+            "PC<2.5": 142
+          }
+        }
+      },
+      "aggregateColumns": {
+        "AHh": {
+          "presentInAllSeasons": true,
+          "filledRows": 917,
+          "totalCsvRows": 918,
+          "fillRate": 0.998911
+        },
+        "PAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 754,
+          "totalCsvRows": 918,
+          "fillRate": 0.821351
+        },
+        "PAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 754,
+          "totalCsvRows": 918,
+          "fillRate": 0.821351
+        },
+        "PCAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 753,
+          "totalCsvRows": 918,
+          "fillRate": 0.820261
+        },
+        "PCAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 753,
+          "totalCsvRows": 918,
+          "fillRate": 0.820261
+        },
+        "AHCh": {
+          "presentInAllSeasons": true,
+          "filledRows": 918,
+          "totalCsvRows": 918,
+          "fillRate": 1
+        },
+        "P>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 754,
+          "totalCsvRows": 918,
+          "fillRate": 0.821351
+        },
+        "P<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 754,
+          "totalCsvRows": 918,
+          "fillRate": 0.821351
+        },
+        "PC>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 754,
+          "totalCsvRows": 918,
+          "fillRate": 0.821351
+        },
+        "PC<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 754,
+          "totalCsvRows": 918,
+          "fillRate": 0.821351
+        }
+      },
+      "joinSummary": {
+        "nHistoricalTotal": 1095,
+        "nHistoricalSince2023_08": 990,
+        "totalCsvRows": 918,
+        "totalMatchedToHistorical": 918,
+        "totalMatchedWithPinnacleAh": 753,
+        "totalMatchedWithPinnacleOu": 754,
+        "overlapJoinRateSince2023_08": 0.927273,
+        "primaryEvalWindow": {
+          "warmUpMatches": 795,
+          "nEval": 300,
+          "ahMatchedFixtures": 70,
+          "ahResolvedLegs": 88,
+          "ouMatchedFixtures": 70,
+          "ouResolvedLegs": 70
+        },
+        "expandedWalkForwardWindow": {
+          "warmUpMatches": 380,
+          "nEval": 715,
+          "ahMatchedFixtures": 478,
+          "ahResolvedLegs": 612,
+          "ouMatchedFixtures": 479,
+          "ouResolvedLegs": 479
+        }
+      },
+      "primaryBenchmark": {
+        "nEvalTotal": 300,
+        "ahMatchedFixtures": 70,
+        "ouMatchedFixtures": 70,
+        "ahBinaryNoPush": {
+          "totalLegs": 101,
+          "pushesExcluded": 13,
+          "resolvedLegs": 88,
+          "brier": {
+            "n": 88,
+            "modelMean": 0.245697,
+            "marketMean": 0.247336,
+            "deltaMean": -0.001639,
+            "ci95": [
+              -0.024447,
+              0.021024
+            ],
+            "pValueModelBeatsMarket": 0.4355
+          },
+          "logLoss": {
+            "n": 88,
+            "modelMean": 0.684209,
+            "marketMean": 0.687694,
+            "deltaMean": -0.003485,
+            "ci95": [
+              -0.051754,
+              0.043614
+            ],
+            "pValueModelBeatsMarket": 0.4325
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 4,
+          "resolvedLegs": 35,
+          "brier": {
+            "n": 35,
+            "modelMean": 0.262098,
+            "marketMean": 0.252697,
+            "deltaMean": 0.0094,
+            "ci95": [
+              -0.019713,
+              0.037381
+            ],
+            "pValueModelBeatsMarket": 0.7445
+          },
+          "logLoss": {
+            "n": 35,
+            "modelMean": 0.718362,
+            "marketMean": 0.698499,
+            "deltaMean": 0.019863,
+            "ci95": [
+              -0.040692,
+              0.082863
+            ],
+            "pValueModelBeatsMarket": 0.7435
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 70,
+          "brier": {
+            "n": 70,
+            "modelMean": 0.228892,
+            "marketMean": 0.226762,
+            "deltaMean": 0.002129,
+            "ci95": [
+              -0.008078,
+              0.011737
+            ],
+            "pValueModelBeatsMarket": 0.652
+          },
+          "logLoss": {
+            "n": 70,
+            "modelMean": 0.648118,
+            "marketMean": 0.643559,
+            "deltaMean": 0.004559,
+            "ci95": [
+              -0.017778,
+              0.025381
+            ],
+            "pValueModelBeatsMarket": 0.656
+          }
+        }
+      },
+      "expandedWalkForwardBenchmark": {
+        "nEvalTotal": 715,
+        "ahMatchedFixtures": 478,
+        "ouMatchedFixtures": 479,
+        "ahBinaryNoPush": {
+          "totalLegs": 715,
+          "pushesExcluded": 103,
+          "resolvedLegs": 612,
+          "brier": {
+            "n": 612,
+            "modelMean": 0.260102,
+            "marketMean": 0.248467,
+            "deltaMean": 0.011634,
+            "ci95": [
+              0.00297,
+              0.020326
+            ],
+            "pValueModelBeatsMarket": 0.9965
+          },
+          "logLoss": {
+            "n": 612,
+            "modelMean": 0.715256,
+            "marketMean": 0.690065,
+            "deltaMean": 0.025192,
+            "ci95": [
+              0.007412,
+              0.043601
+            ],
+            "pValueModelBeatsMarket": 0.996
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 28,
+          "resolvedLegs": 213,
+          "brier": {
+            "n": 213,
+            "modelMean": 0.257565,
+            "marketMean": 0.25029,
+            "deltaMean": 0.007275,
+            "ci95": [
+              -0.005566,
+              0.020229
+            ],
+            "pValueModelBeatsMarket": 0.8605
+          },
+          "logLoss": {
+            "n": 213,
+            "modelMean": 0.709342,
+            "marketMean": 0.693725,
+            "deltaMean": 0.015618,
+            "ci95": [
+              -0.011107,
+              0.042982
+            ],
+            "pValueModelBeatsMarket": 0.884
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 479,
+          "brier": {
+            "n": 479,
+            "modelMean": 0.240295,
+            "marketMean": 0.234885,
+            "deltaMean": 0.00541,
+            "ci95": [
+              0.000689,
+              0.010218
+            ],
+            "pValueModelBeatsMarket": 0.989
+          },
+          "logLoss": {
+            "n": 479,
+            "modelMean": 0.673396,
+            "marketMean": 0.661464,
+            "deltaMean": 0.011932,
+            "ci95": [
+              0.001746,
+              0.022035
+            ],
+            "pValueModelBeatsMarket": 0.9885
+          }
+        }
+      }
+    },
+    "POR-PRIMEIRA": {
+      "leagueId": "POR-PRIMEIRA",
+      "fdCode": "P1",
+      "name": "Primeira Liga",
+      "seasonsProbed": [
+        "2324",
+        "2425",
+        "2526"
+      ],
+      "lastPinnaclePopulatedDateInCsv": "2026-01-11",
+      "bySeason": {
+        "2324": {
+          "exists": true,
+          "rowCount": 306,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 306,
+            "PAHH": 305,
+            "PAHA": 305,
+            "PCAHH": 306,
+            "PCAHA": 306,
+            "AHCh": 306,
+            "P>2.5": 305,
+            "P<2.5": 305,
+            "PC>2.5": 306,
+            "PC<2.5": 306
+          }
+        },
+        "2425": {
+          "exists": true,
+          "rowCount": 306,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 306,
+            "PAHH": 306,
+            "PAHA": 306,
+            "PCAHH": 306,
+            "PCAHA": 306,
+            "AHCh": 306,
+            "P>2.5": 306,
+            "P<2.5": 306,
+            "PC>2.5": 306,
+            "PC<2.5": 306
+          }
+        },
+        "2526": {
+          "exists": true,
+          "rowCount": 306,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 306,
+            "PAHH": 153,
+            "PAHA": 153,
+            "PCAHH": 153,
+            "PCAHA": 153,
+            "AHCh": 306,
+            "P>2.5": 153,
+            "P<2.5": 153,
+            "PC>2.5": 153,
+            "PC<2.5": 153
+          }
+        }
+      },
+      "aggregateColumns": {
+        "AHh": {
+          "presentInAllSeasons": true,
+          "filledRows": 918,
+          "totalCsvRows": 918,
+          "fillRate": 1
+        },
+        "PAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 764,
+          "totalCsvRows": 918,
+          "fillRate": 0.832244
+        },
+        "PAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 764,
+          "totalCsvRows": 918,
+          "fillRate": 0.832244
+        },
+        "PCAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 765,
+          "totalCsvRows": 918,
+          "fillRate": 0.833333
+        },
+        "PCAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 765,
+          "totalCsvRows": 918,
+          "fillRate": 0.833333
+        },
+        "AHCh": {
+          "presentInAllSeasons": true,
+          "filledRows": 918,
+          "totalCsvRows": 918,
+          "fillRate": 1
+        },
+        "P>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 764,
+          "totalCsvRows": 918,
+          "fillRate": 0.832244
+        },
+        "P<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 764,
+          "totalCsvRows": 918,
+          "fillRate": 0.832244
+        },
+        "PC>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 765,
+          "totalCsvRows": 918,
+          "fillRate": 0.833333
+        },
+        "PC<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 765,
+          "totalCsvRows": 918,
+          "fillRate": 0.833333
+        }
+      },
+      "joinSummary": {
+        "nHistoricalTotal": 1088,
+        "nHistoricalSince2023_08": 980,
+        "totalCsvRows": 918,
+        "totalMatchedToHistorical": 918,
+        "totalMatchedWithPinnacleAh": 765,
+        "totalMatchedWithPinnacleOu": 765,
+        "overlapJoinRateSince2023_08": 0.936735,
+        "primaryEvalWindow": {
+          "warmUpMatches": 788,
+          "nEval": 300,
+          "ahMatchedFixtures": 85,
+          "ahResolvedLegs": 106,
+          "ouMatchedFixtures": 85,
+          "ouResolvedLegs": 85
+        },
+        "expandedWalkForwardWindow": {
+          "warmUpMatches": 380,
+          "nEval": 708,
+          "ahMatchedFixtures": 493,
+          "ahResolvedLegs": 640,
+          "ouMatchedFixtures": 493,
+          "ouResolvedLegs": 493
+        }
+      },
+      "primaryBenchmark": {
+        "nEvalTotal": 300,
+        "ahMatchedFixtures": 85,
+        "ouMatchedFixtures": 85,
+        "ahBinaryNoPush": {
+          "totalLegs": 130,
+          "pushesExcluded": 24,
+          "resolvedLegs": 106,
+          "brier": {
+            "n": 106,
+            "modelMean": 0.247142,
+            "marketMean": 0.25351,
+            "deltaMean": -0.006368,
+            "ci95": [
+              -0.023095,
+              0.011312
+            ],
+            "pValueModelBeatsMarket": 0.267
+          },
+          "logLoss": {
+            "n": 106,
+            "modelMean": 0.687215,
+            "marketMean": 0.70018,
+            "deltaMean": -0.012964,
+            "ci95": [
+              -0.050221,
+              0.023448
+            ],
+            "pValueModelBeatsMarket": 0.257
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 11,
+          "resolvedLegs": 29,
+          "brier": {
+            "n": 29,
+            "modelMean": 0.235878,
+            "marketMean": 0.24626,
+            "deltaMean": -0.010382,
+            "ci95": [
+              -0.037121,
+              0.017045
+            ],
+            "pValueModelBeatsMarket": 0.2565
+          },
+          "logLoss": {
+            "n": 29,
+            "modelMean": 0.66356,
+            "marketMean": 0.685652,
+            "deltaMean": -0.022092,
+            "ci95": [
+              -0.079244,
+              0.03845
+            ],
+            "pValueModelBeatsMarket": 0.2355
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 85,
+          "brier": {
+            "n": 85,
+            "modelMean": 0.246379,
+            "marketMean": 0.238644,
+            "deltaMean": 0.007735,
+            "ci95": [
+              -0.005853,
+              0.021516
+            ],
+            "pValueModelBeatsMarket": 0.863
+          },
+          "logLoss": {
+            "n": 85,
+            "modelMean": 0.685802,
+            "marketMean": 0.66988,
+            "deltaMean": 0.015923,
+            "ci95": [
+              -0.013433,
+              0.043713
+            ],
+            "pValueModelBeatsMarket": 0.8695
+          }
+        }
+      },
+      "expandedWalkForwardBenchmark": {
+        "nEvalTotal": 708,
+        "ahMatchedFixtures": 493,
+        "ouMatchedFixtures": 493,
+        "ahBinaryNoPush": {
+          "totalLegs": 749,
+          "pushesExcluded": 109,
+          "resolvedLegs": 640,
+          "brier": {
+            "n": 640,
+            "modelMean": 0.258281,
+            "marketMean": 0.251485,
+            "deltaMean": 0.006795,
+            "ci95": [
+              -0.001414,
+              0.015829
+            ],
+            "pValueModelBeatsMarket": 0.945
+          },
+          "logLoss": {
+            "n": 640,
+            "modelMean": 0.71139,
+            "marketMean": 0.696133,
+            "deltaMean": 0.015257,
+            "ci95": [
+              -0.002518,
+              0.034083
+            ],
+            "pValueModelBeatsMarket": 0.9435
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 44,
+          "resolvedLegs": 193,
+          "brier": {
+            "n": 193,
+            "modelMean": 0.256925,
+            "marketMean": 0.249529,
+            "deltaMean": 0.007396,
+            "ci95": [
+              -0.004274,
+              0.01973
+            ],
+            "pValueModelBeatsMarket": 0.886
+          },
+          "logLoss": {
+            "n": 193,
+            "modelMean": 0.707066,
+            "marketMean": 0.692192,
+            "deltaMean": 0.014874,
+            "ci95": [
+              -0.009124,
+              0.040113
+            ],
+            "pValueModelBeatsMarket": 0.8785
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 493,
+          "brier": {
+            "n": 493,
+            "modelMean": 0.241934,
+            "marketMean": 0.232666,
+            "deltaMean": 0.009268,
+            "ci95": [
+              0.003537,
+              0.01492
+            ],
+            "pValueModelBeatsMarket": 0.999
+          },
+          "logLoss": {
+            "n": 493,
+            "modelMean": 0.67686,
+            "marketMean": 0.657386,
+            "deltaMean": 0.019474,
+            "ci95": [
+              0.007494,
+              0.031493
+            ],
+            "pValueModelBeatsMarket": 0.9985
+          }
+        }
+      }
+    },
+    "BEL-PRO": {
+      "leagueId": "BEL-PRO",
+      "fdCode": "B1",
+      "name": "Pro League",
+      "seasonsProbed": [
+        "2324",
+        "2425",
+        "2526"
+      ],
+      "lastPinnaclePopulatedDateInCsv": "2025-10-26",
+      "bySeason": {
+        "2324": {
+          "exists": true,
+          "rowCount": 312,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 312,
+            "PAHH": 312,
+            "PAHA": 312,
+            "PCAHH": 312,
+            "PCAHA": 312,
+            "AHCh": 312,
+            "P>2.5": 312,
+            "P<2.5": 312,
+            "PC>2.5": 312,
+            "PC<2.5": 312
+          }
+        },
+        "2425": {
+          "exists": true,
+          "rowCount": 312,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 312,
+            "PAHH": 311,
+            "PAHA": 311,
+            "PCAHH": 312,
+            "PCAHA": 312,
+            "AHCh": 312,
+            "P>2.5": 311,
+            "P<2.5": 311,
+            "PC>2.5": 312,
+            "PC<2.5": 312
+          }
+        },
+        "2526": {
+          "exists": true,
+          "rowCount": 311,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 310,
+            "PAHH": 96,
+            "PAHA": 96,
+            "PCAHH": 96,
+            "PCAHA": 96,
+            "AHCh": 311,
+            "P>2.5": 96,
+            "P<2.5": 96,
+            "PC>2.5": 96,
+            "PC<2.5": 96
+          }
+        }
+      },
+      "aggregateColumns": {
+        "AHh": {
+          "presentInAllSeasons": true,
+          "filledRows": 934,
+          "totalCsvRows": 935,
+          "fillRate": 0.99893
+        },
+        "PAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 719,
+          "totalCsvRows": 935,
+          "fillRate": 0.768984
+        },
+        "PAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 719,
+          "totalCsvRows": 935,
+          "fillRate": 0.768984
+        },
+        "PCAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 720,
+          "totalCsvRows": 935,
+          "fillRate": 0.770053
+        },
+        "PCAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 720,
+          "totalCsvRows": 935,
+          "fillRate": 0.770053
+        },
+        "AHCh": {
+          "presentInAllSeasons": true,
+          "filledRows": 935,
+          "totalCsvRows": 935,
+          "fillRate": 1
+        },
+        "P>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 719,
+          "totalCsvRows": 935,
+          "fillRate": 0.768984
+        },
+        "P<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 719,
+          "totalCsvRows": 935,
+          "fillRate": 0.768984
+        },
+        "PC>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 720,
+          "totalCsvRows": 935,
+          "fillRate": 0.770053
+        },
+        "PC<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 720,
+          "totalCsvRows": 935,
+          "fillRate": 0.770053
+        }
+      },
+      "joinSummary": {
+        "nHistoricalTotal": 1087,
+        "nHistoricalSince2023_08": 992,
+        "totalCsvRows": 935,
+        "totalMatchedToHistorical": 934,
+        "totalMatchedWithPinnacleAh": 719,
+        "totalMatchedWithPinnacleOu": 719,
+        "overlapJoinRateSince2023_08": 0.941532,
+        "primaryEvalWindow": {
+          "warmUpMatches": 787,
+          "nEval": 300,
+          "ahMatchedFixtures": 20,
+          "ahResolvedLegs": 19,
+          "ouMatchedFixtures": 20,
+          "ouResolvedLegs": 20
+        },
+        "expandedWalkForwardWindow": {
+          "warmUpMatches": 380,
+          "nEval": 707,
+          "ahMatchedFixtures": 426,
+          "ahResolvedLegs": 542,
+          "ouMatchedFixtures": 426,
+          "ouResolvedLegs": 426
+        }
+      },
+      "primaryBenchmark": {
+        "nEvalTotal": 300,
+        "ahMatchedFixtures": 20,
+        "ouMatchedFixtures": 20,
+        "ahBinaryNoPush": {
+          "totalLegs": 27,
+          "pushesExcluded": 8,
+          "resolvedLegs": 19,
+          "brier": {
+            "n": 19,
+            "modelMean": 0.217642,
+            "marketMean": 0.250965,
+            "deltaMean": -0.033322,
+            "ci95": [
+              -0.079055,
+              0.015937
+            ],
+            "pValueModelBeatsMarket": 0.0795
+          },
+          "logLoss": {
+            "n": 19,
+            "modelMean": 0.626711,
+            "marketMean": 0.695046,
+            "deltaMean": -0.068335,
+            "ci95": [
+              -0.165862,
+              0.031311
+            ],
+            "pValueModelBeatsMarket": 0.0925
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 4,
+          "resolvedLegs": 9,
+          "brier": {
+            "n": 9,
+            "modelMean": 0.231983,
+            "marketMean": 0.266879,
+            "deltaMean": -0.034896,
+            "ci95": [
+              -0.108973,
+              0.047629
+            ],
+            "pValueModelBeatsMarket": 0.2035
+          },
+          "logLoss": {
+            "n": 9,
+            "modelMean": 0.655568,
+            "marketMean": 0.727078,
+            "deltaMean": -0.07151,
+            "ci95": [
+              -0.226858,
+              0.088853
+            ],
+            "pValueModelBeatsMarket": 0.198
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 20,
+          "brier": {
+            "n": 20,
+            "modelMean": 0.247541,
+            "marketMean": 0.269283,
+            "deltaMean": -0.021742,
+            "ci95": [
+              -0.058321,
+              0.015442
+            ],
+            "pValueModelBeatsMarket": 0.1395
+          },
+          "logLoss": {
+            "n": 20,
+            "modelMean": 0.687836,
+            "marketMean": 0.731931,
+            "deltaMean": -0.044095,
+            "ci95": [
+              -0.123986,
+              0.031233
+            ],
+            "pValueModelBeatsMarket": 0.144
+          }
+        }
+      },
+      "expandedWalkForwardBenchmark": {
+        "nEvalTotal": 707,
+        "ahMatchedFixtures": 426,
+        "ouMatchedFixtures": 426,
+        "ahBinaryNoPush": {
+          "totalLegs": 655,
+          "pushesExcluded": 113,
+          "resolvedLegs": 542,
+          "brier": {
+            "n": 542,
+            "modelMean": 0.253407,
+            "marketMean": 0.249616,
+            "deltaMean": 0.00379,
+            "ci95": [
+              -0.005825,
+              0.013102
+            ],
+            "pValueModelBeatsMarket": 0.7765
+          },
+          "logLoss": {
+            "n": 542,
+            "modelMean": 0.701581,
+            "marketMean": 0.692374,
+            "deltaMean": 0.009207,
+            "ci95": [
+              -0.010632,
+              0.02873
+            ],
+            "pValueModelBeatsMarket": 0.8165
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 35,
+          "resolvedLegs": 162,
+          "brier": {
+            "n": 162,
+            "modelMean": 0.254034,
+            "marketMean": 0.25181,
+            "deltaMean": 0.002224,
+            "ci95": [
+              -0.014273,
+              0.018641
+            ],
+            "pValueModelBeatsMarket": 0.633
+          },
+          "logLoss": {
+            "n": 162,
+            "modelMean": 0.70191,
+            "marketMean": 0.696782,
+            "deltaMean": 0.005129,
+            "ci95": [
+              -0.027432,
+              0.040623
+            ],
+            "pValueModelBeatsMarket": 0.6135
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 426,
+          "brier": {
+            "n": 426,
+            "modelMean": 0.248048,
+            "marketMean": 0.2437,
+            "deltaMean": 0.004349,
+            "ci95": [
+              -0.001969,
+              0.010511
+            ],
+            "pValueModelBeatsMarket": 0.9105
+          },
+          "logLoss": {
+            "n": 426,
+            "modelMean": 0.689272,
+            "marketMean": 0.680518,
+            "deltaMean": 0.008754,
+            "ci95": [
+              -0.004559,
+              0.021609
+            ],
+            "pValueModelBeatsMarket": 0.9055
+          }
+        }
+      }
+    },
+    "SCO-PREM": {
+      "leagueId": "SCO-PREM",
+      "fdCode": "SC0",
+      "name": "Scottish Premiership",
+      "seasonsProbed": [
+        "2324",
+        "2425",
+        "2526"
+      ],
+      "lastPinnaclePopulatedDateInCsv": "2025-10-26",
+      "bySeason": {
+        "2324": {
+          "exists": true,
+          "rowCount": 228,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 228,
+            "PAHH": 228,
+            "PAHA": 228,
+            "PCAHH": 228,
+            "PCAHA": 228,
+            "AHCh": 228,
+            "P>2.5": 228,
+            "P<2.5": 228,
+            "PC>2.5": 228,
+            "PC<2.5": 228
+          }
+        },
+        "2425": {
+          "exists": true,
+          "rowCount": 228,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 228,
+            "PAHH": 228,
+            "PAHA": 228,
+            "PCAHH": 228,
+            "PCAHA": 228,
+            "AHCh": 228,
+            "P>2.5": 228,
+            "P<2.5": 228,
+            "PC>2.5": 228,
+            "PC<2.5": 228
+          }
+        },
+        "2526": {
+          "exists": true,
+          "rowCount": 228,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 228,
+            "PAHH": 55,
+            "PAHA": 55,
+            "PCAHH": 55,
+            "PCAHA": 55,
+            "AHCh": 228,
+            "P>2.5": 55,
+            "P<2.5": 55,
+            "PC>2.5": 55,
+            "PC<2.5": 55
+          }
+        }
+      },
+      "aggregateColumns": {
+        "AHh": {
+          "presentInAllSeasons": true,
+          "filledRows": 684,
+          "totalCsvRows": 684,
+          "fillRate": 1
+        },
+        "PAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 511,
+          "totalCsvRows": 684,
+          "fillRate": 0.747076
+        },
+        "PAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 511,
+          "totalCsvRows": 684,
+          "fillRate": 0.747076
+        },
+        "PCAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 511,
+          "totalCsvRows": 684,
+          "fillRate": 0.747076
+        },
+        "PCAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 511,
+          "totalCsvRows": 684,
+          "fillRate": 0.747076
+        },
+        "AHCh": {
+          "presentInAllSeasons": true,
+          "filledRows": 684,
+          "totalCsvRows": 684,
+          "fillRate": 1
+        },
+        "P>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 511,
+          "totalCsvRows": 684,
+          "fillRate": 0.747076
+        },
+        "P<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 511,
+          "totalCsvRows": 684,
+          "fillRate": 0.747076
+        },
+        "PC>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 511,
+          "totalCsvRows": 684,
+          "fillRate": 0.747076
+        },
+        "PC<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 511,
+          "totalCsvRows": 684,
+          "fillRate": 0.747076
+        }
+      },
+      "joinSummary": {
+        "nHistoricalTotal": 468,
+        "nHistoricalSince2023_08": 468,
+        "totalCsvRows": 684,
+        "totalMatchedToHistorical": 456,
+        "totalMatchedWithPinnacleAh": 283,
+        "totalMatchedWithPinnacleOu": 283,
+        "overlapJoinRateSince2023_08": 0.974359,
+        "primaryEvalWindow": {
+          "warmUpMatches": 258,
+          "nEval": 210,
+          "ahMatchedFixtures": 31,
+          "ahResolvedLegs": 40,
+          "ouMatchedFixtures": 31,
+          "ouResolvedLegs": 31
+        },
+        "expandedWalkForwardWindow": {
+          "warmUpMatches": 68,
+          "nEval": 400,
+          "ahMatchedFixtures": 215,
+          "ahResolvedLegs": 279,
+          "ouMatchedFixtures": 215,
+          "ouResolvedLegs": 215
+        }
+      },
+      "primaryBenchmark": {
+        "nEvalTotal": 210,
+        "ahMatchedFixtures": 31,
+        "ouMatchedFixtures": 31,
+        "ahBinaryNoPush": {
+          "totalLegs": 43,
+          "pushesExcluded": 3,
+          "resolvedLegs": 40,
+          "brier": {
+            "n": 40,
+            "modelMean": 0.256024,
+            "marketMean": 0.248997,
+            "deltaMean": 0.007027,
+            "ci95": [
+              -0.026838,
+              0.040819
+            ],
+            "pValueModelBeatsMarket": 0.653
+          },
+          "logLoss": {
+            "n": 40,
+            "modelMean": 0.708764,
+            "marketMean": 0.691177,
+            "deltaMean": 0.017587,
+            "ci95": [
+              -0.056939,
+              0.092592
+            ],
+            "pValueModelBeatsMarket": 0.6645
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 2,
+          "resolvedLegs": 17,
+          "brier": {
+            "n": 17,
+            "modelMean": 0.267249,
+            "marketMean": 0.262452,
+            "deltaMean": 0.004797,
+            "ci95": [
+              -0.051534,
+              0.060148
+            ],
+            "pValueModelBeatsMarket": 0.5385
+          },
+          "logLoss": {
+            "n": 17,
+            "modelMean": 0.73542,
+            "marketMean": 0.718304,
+            "deltaMean": 0.017116,
+            "ci95": [
+              -0.097831,
+              0.149484
+            ],
+            "pValueModelBeatsMarket": 0.581
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 31,
+          "brier": {
+            "n": 31,
+            "modelMean": 0.24063,
+            "marketMean": 0.245349,
+            "deltaMean": -0.004719,
+            "ci95": [
+              -0.022417,
+              0.012076
+            ],
+            "pValueModelBeatsMarket": 0.2965
+          },
+          "logLoss": {
+            "n": 31,
+            "modelMean": 0.674719,
+            "marketMean": 0.684594,
+            "deltaMean": -0.009875,
+            "ci95": [
+              -0.046769,
+              0.025141
+            ],
+            "pValueModelBeatsMarket": 0.305
+          }
+        }
+      },
+      "expandedWalkForwardBenchmark": {
+        "nEvalTotal": 400,
+        "ahMatchedFixtures": 215,
+        "ouMatchedFixtures": 215,
+        "ahBinaryNoPush": {
+          "totalLegs": 306,
+          "pushesExcluded": 27,
+          "resolvedLegs": 279,
+          "brier": {
+            "n": 279,
+            "modelMean": 0.265631,
+            "marketMean": 0.253591,
+            "deltaMean": 0.012041,
+            "ci95": [
+              -0.003051,
+              0.02698
+            ],
+            "pValueModelBeatsMarket": 0.944
+          },
+          "logLoss": {
+            "n": 279,
+            "modelMean": 0.727717,
+            "marketMean": 0.700352,
+            "deltaMean": 0.027365,
+            "ci95": [
+              -0.005184,
+              0.060104
+            ],
+            "pValueModelBeatsMarket": 0.9465
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 10,
+          "resolvedLegs": 114,
+          "brier": {
+            "n": 114,
+            "modelMean": 0.254603,
+            "marketMean": 0.251817,
+            "deltaMean": 0.002785,
+            "ci95": [
+              -0.020863,
+              0.026979
+            ],
+            "pValueModelBeatsMarket": 0.5745
+          },
+          "logLoss": {
+            "n": 114,
+            "modelMean": 0.706213,
+            "marketMean": 0.696821,
+            "deltaMean": 0.009392,
+            "ci95": [
+              -0.042928,
+              0.062591
+            ],
+            "pValueModelBeatsMarket": 0.6305
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 215,
+          "brier": {
+            "n": 215,
+            "modelMean": 0.250625,
+            "marketMean": 0.243221,
+            "deltaMean": 0.007404,
+            "ci95": [
+              -0.004283,
+              0.018327
+            ],
+            "pValueModelBeatsMarket": 0.903
+          },
+          "logLoss": {
+            "n": 215,
+            "modelMean": 0.69477,
+            "marketMean": 0.679374,
+            "deltaMean": 0.015397,
+            "ci95": [
+              -0.00705,
+              0.038665
+            ],
+            "pValueModelBeatsMarket": 0.9095
+          }
+        }
+      }
+    },
+    "ENG-CHAMP": {
+      "leagueId": "ENG-CHAMP",
+      "fdCode": "E1",
+      "name": "Championship",
+      "seasonsProbed": [
+        "2324",
+        "2425",
+        "2526"
+      ],
+      "lastPinnaclePopulatedDateInCsv": "2026-01-05",
+      "bySeason": {
+        "2324": {
+          "exists": true,
+          "rowCount": 552,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 552,
+            "PAHH": 552,
+            "PAHA": 552,
+            "PCAHH": 552,
+            "PCAHA": 552,
+            "AHCh": 552,
+            "P>2.5": 552,
+            "P<2.5": 552,
+            "PC>2.5": 552,
+            "PC<2.5": 552
+          }
+        },
+        "2425": {
+          "exists": true,
+          "rowCount": 552,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 552,
+            "PAHH": 552,
+            "PAHA": 552,
+            "PCAHH": 552,
+            "PCAHA": 552,
+            "AHCh": 552,
+            "P>2.5": 551,
+            "P<2.5": 551,
+            "PC>2.5": 552,
+            "PC<2.5": 552
+          }
+        },
+        "2526": {
+          "exists": true,
+          "rowCount": 552,
+          "columnsPresent": {
+            "AHh": true,
+            "PAHH": true,
+            "PAHA": true,
+            "PCAHH": true,
+            "PCAHA": true,
+            "AHCh": true,
+            "P>2.5": true,
+            "P<2.5": true,
+            "PC>2.5": true,
+            "PC<2.5": true
+          },
+          "filledCounts": {
+            "AHh": 552,
+            "PAHH": 260,
+            "PAHA": 260,
+            "PCAHH": 271,
+            "PCAHA": 271,
+            "AHCh": 552,
+            "P>2.5": 260,
+            "P<2.5": 260,
+            "PC>2.5": 271,
+            "PC<2.5": 271
+          }
+        }
+      },
+      "aggregateColumns": {
+        "AHh": {
+          "presentInAllSeasons": true,
+          "filledRows": 1656,
+          "totalCsvRows": 1656,
+          "fillRate": 1
+        },
+        "PAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 1364,
+          "totalCsvRows": 1656,
+          "fillRate": 0.823671
+        },
+        "PAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 1364,
+          "totalCsvRows": 1656,
+          "fillRate": 0.823671
+        },
+        "PCAHH": {
+          "presentInAllSeasons": true,
+          "filledRows": 1375,
+          "totalCsvRows": 1656,
+          "fillRate": 0.830314
+        },
+        "PCAHA": {
+          "presentInAllSeasons": true,
+          "filledRows": 1375,
+          "totalCsvRows": 1656,
+          "fillRate": 0.830314
+        },
+        "AHCh": {
+          "presentInAllSeasons": true,
+          "filledRows": 1656,
+          "totalCsvRows": 1656,
+          "fillRate": 1
+        },
+        "P>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 1363,
+          "totalCsvRows": 1656,
+          "fillRate": 0.823068
+        },
+        "P<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 1363,
+          "totalCsvRows": 1656,
+          "fillRate": 0.823068
+        },
+        "PC>2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 1375,
+          "totalCsvRows": 1656,
+          "fillRate": 0.830314
+        },
+        "PC<2.5": {
+          "presentInAllSeasons": true,
+          "filledRows": 1375,
+          "totalCsvRows": 1656,
+          "fillRate": 0.830314
+        }
+      },
+      "joinSummary": {
+        "nHistoricalTotal": 1114,
+        "nHistoricalSince2023_08": 1114,
+        "totalCsvRows": 1656,
+        "totalMatchedToHistorical": 1100,
+        "totalMatchedWithPinnacleAh": 820,
+        "totalMatchedWithPinnacleOu": 820,
+        "overlapJoinRateSince2023_08": 0.987433,
+        "primaryEvalWindow": {
+          "warmUpMatches": 814,
+          "nEval": 300,
+          "ahMatchedFixtures": 50,
+          "ahResolvedLegs": 69,
+          "ouMatchedFixtures": 50,
+          "ouResolvedLegs": 50
+        },
+        "expandedWalkForwardWindow": {
+          "warmUpMatches": 380,
+          "nEval": 734,
+          "ahMatchedFixtures": 441,
+          "ahResolvedLegs": 576,
+          "ouMatchedFixtures": 441,
+          "ouResolvedLegs": 441
+        }
+      },
+      "primaryBenchmark": {
+        "nEvalTotal": 300,
+        "ahMatchedFixtures": 50,
+        "ouMatchedFixtures": 50,
+        "ahBinaryNoPush": {
+          "totalLegs": 74,
+          "pushesExcluded": 5,
+          "resolvedLegs": 69,
+          "brier": {
+            "n": 69,
+            "modelMean": 0.235603,
+            "marketMean": 0.248825,
+            "deltaMean": -0.013222,
+            "ci95": [
+              -0.03329,
+              0.00814
+            ],
+            "pValueModelBeatsMarket": 0.1125
+          },
+          "logLoss": {
+            "n": 69,
+            "modelMean": 0.663316,
+            "marketMean": 0.690801,
+            "deltaMean": -0.027485,
+            "ci95": [
+              -0.069387,
+              0.016633
+            ],
+            "pValueModelBeatsMarket": 0.125
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 2,
+          "resolvedLegs": 24,
+          "brier": {
+            "n": 24,
+            "modelMean": 0.244025,
+            "marketMean": 0.249438,
+            "deltaMean": -0.005413,
+            "ci95": [
+              -0.035114,
+              0.025004
+            ],
+            "pValueModelBeatsMarket": 0.346
+          },
+          "logLoss": {
+            "n": 24,
+            "modelMean": 0.681075,
+            "marketMean": 0.692021,
+            "deltaMean": -0.010946,
+            "ci95": [
+              -0.068524,
+              0.048097
+            ],
+            "pValueModelBeatsMarket": 0.362
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 50,
+          "brier": {
+            "n": 50,
+            "modelMean": 0.249619,
+            "marketMean": 0.250219,
+            "deltaMean": -0.0006,
+            "ci95": [
+              -0.012591,
+              0.012403
+            ],
+            "pValueModelBeatsMarket": 0.4735
+          },
+          "logLoss": {
+            "n": 50,
+            "modelMean": 0.692983,
+            "marketMean": 0.69387,
+            "deltaMean": -0.000887,
+            "ci95": [
+              -0.026163,
+              0.024033
+            ],
+            "pValueModelBeatsMarket": 0.467
+          }
+        }
+      },
+      "expandedWalkForwardBenchmark": {
+        "nEvalTotal": 734,
+        "ahMatchedFixtures": 441,
+        "ouMatchedFixtures": 441,
+        "ahBinaryNoPush": {
+          "totalLegs": 665,
+          "pushesExcluded": 89,
+          "resolvedLegs": 576,
+          "brier": {
+            "n": 576,
+            "modelMean": 0.247654,
+            "marketMean": 0.247057,
+            "deltaMean": 0.000597,
+            "ci95": [
+              -0.007739,
+              0.00895
+            ],
+            "pValueModelBeatsMarket": 0.548
+          },
+          "logLoss": {
+            "n": 576,
+            "modelMean": 0.688717,
+            "marketMean": 0.687272,
+            "deltaMean": 0.001445,
+            "ci95": [
+              -0.016126,
+              0.020456
+            ],
+            "pValueModelBeatsMarket": 0.5745
+          }
+        },
+        "ahStrictSingleLineSubset": {
+          "pushesExcluded": 32,
+          "resolvedLegs": 185,
+          "brier": {
+            "n": 185,
+            "modelMean": 0.251464,
+            "marketMean": 0.247272,
+            "deltaMean": 0.004192,
+            "ci95": [
+              -0.007899,
+              0.01645
+            ],
+            "pValueModelBeatsMarket": 0.7435
+          },
+          "logLoss": {
+            "n": 185,
+            "modelMean": 0.695768,
+            "marketMean": 0.687682,
+            "deltaMean": 0.008086,
+            "ci95": [
+              -0.016286,
+              0.032465
+            ],
+            "pValueModelBeatsMarket": 0.7495
+          }
+        },
+        "ou25": {
+          "resolvedLegs": 441,
+          "brier": {
+            "n": 441,
+            "modelMean": 0.255649,
+            "marketMean": 0.246857,
+            "deltaMean": 0.008792,
+            "ci95": [
+              0.002568,
+              0.015124
+            ],
+            "pValueModelBeatsMarket": 0.997
+          },
+          "logLoss": {
+            "n": 441,
+            "modelMean": 0.70543,
+            "marketMean": 0.686804,
+            "deltaMean": 0.018626,
+            "ci95": [
+              0.005086,
+              0.031738
+            ],
+            "pValueModelBeatsMarket": 0.996
+          }
+        }
+      }
+    }
+  },
+  "nonFootballDataLeagues": [
+    {
+      "leagueId": "USA-MLS",
+      "status": "BENCHMARK_UNAVAILABLE",
+      "reason": "Not included in football-data.co.uk mmz4281 seasonal archive with Pinnacle AH/OU columns (AHh/AHCh/PCAHH/PCAHA/PC>2.5/PC<2.5)."
+    },
+    {
+      "leagueId": "JPN-J1",
+      "status": "BENCHMARK_UNAVAILABLE",
+      "reason": "Not included in football-data.co.uk mmz4281 seasonal archive with Pinnacle AH/OU columns (AHh/AHCh/PCAHH/PCAHA/PC>2.5/PC<2.5)."
+    },
+    {
+      "leagueId": "KOR-K1",
+      "status": "BENCHMARK_UNAVAILABLE",
+      "reason": "Not included in football-data.co.uk mmz4281 seasonal archive with Pinnacle AH/OU columns (AHh/AHCh/PCAHH/PCAHA/PC>2.5/PC<2.5)."
+    },
+    {
+      "leagueId": "SAU-PRO",
+      "status": "BENCHMARK_UNAVAILABLE",
+      "reason": "Not included in football-data.co.uk mmz4281 seasonal archive with Pinnacle AH/OU columns (AHh/AHCh/PCAHH/PCAHA/PC>2.5/PC<2.5)."
+    },
+    {
+      "leagueId": "IDN-L1",
+      "status": "PAUSED",
+      "reason": "Paused due to zero historical archive matches (0 matches) and no Pinnacle historical benchmark source."
+    }
+  ],
+  "holmStepDownMultipleTesting": {
+    "alpha": 0.05,
+    "primaryWindowFamily": {
+      "familySizeK": 5,
+      "promotedCount": 0,
+      "results": [
+        {
+          "leagueId": "DEU-BUNDESLIGA",
+          "market": "AH",
+          "window": "PRIMARY_CANONICAL_NEVAL",
+          "resolvedLegs": 135,
+          "brierDelta": 0.019696,
+          "brierCi95": [
+            0.002913,
+            0.037593
+          ],
+          "logLossDelta": 0.04207,
+          "logLossCi95": [
+            0.005753,
+            0.080424
+          ],
+          "rawPValue": 0.9885,
+          "eligibleForSignificance": false,
+          "origIdx": 0,
+          "rank": 4,
+          "familySizeK": 5,
+          "holmThreshold": 0.025,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "DEU-BUNDESLIGA",
+          "market": "OU_2_5",
+          "window": "PRIMARY_CANONICAL_NEVAL",
+          "resolvedLegs": 101,
+          "brierDelta": 0.010587,
+          "brierCi95": [
+            -0.001906,
+            0.023737
+          ],
+          "logLossDelta": 0.021584,
+          "logLossCi95": [
+            -0.004125,
+            0.047105
+          ],
+          "rawPValue": 0.949,
+          "eligibleForSignificance": false,
+          "origIdx": 1,
+          "rank": 3,
+          "familySizeK": 5,
+          "holmThreshold": 0.016667,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "FRA-LIGUE1",
+          "market": "AH",
+          "window": "PRIMARY_CANONICAL_NEVAL",
+          "resolvedLegs": 137,
+          "brierDelta": 0.006985,
+          "brierCi95": [
+            -0.009302,
+            0.023394
+          ],
+          "logLossDelta": 0.015325,
+          "logLossCi95": [
+            -0.015945,
+            0.049713
+          ],
+          "rawPValue": 0.801,
+          "eligibleForSignificance": false,
+          "origIdx": 2,
+          "rank": 2,
+          "familySizeK": 5,
+          "holmThreshold": 0.0125,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "FRA-LIGUE1",
+          "market": "OU_2_5",
+          "window": "PRIMARY_CANONICAL_NEVAL",
+          "resolvedLegs": 103,
+          "brierDelta": 0.021676,
+          "brierCi95": [
+            0.006705,
+            0.037139
+          ],
+          "logLossDelta": 0.045262,
+          "logLossCi95": [
+            0.014467,
+            0.076318
+          ],
+          "rawPValue": 0.9985,
+          "eligibleForSignificance": false,
+          "origIdx": 3,
+          "rank": 5,
+          "familySizeK": 5,
+          "holmThreshold": 0.05,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "POR-PRIMEIRA",
+          "market": "AH",
+          "window": "PRIMARY_CANONICAL_NEVAL",
+          "resolvedLegs": 106,
+          "brierDelta": -0.006368,
+          "brierCi95": [
+            -0.023095,
+            0.011312
+          ],
+          "logLossDelta": -0.012964,
+          "logLossCi95": [
+            -0.050221,
+            0.023448
+          ],
+          "rawPValue": 0.267,
+          "eligibleForSignificance": false,
+          "origIdx": 4,
+          "rank": 1,
+          "familySizeK": 5,
+          "holmThreshold": 0.01,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        }
+      ]
+    },
+    "expandedWalkForwardFamily": {
+      "familySizeK": 18,
+      "promotedCount": 0,
+      "results": [
+        {
+          "leagueId": "ESP-LALIGA",
+          "market": "AH",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 947,
+          "brierDelta": 0.00706,
+          "brierCi95": [
+            0.000389,
+            0.014112
+          ],
+          "logLossDelta": 0.015585,
+          "logLossCi95": [
+            0.001904,
+            0.029795
+          ],
+          "rawPValue": 0.981,
+          "eligibleForSignificance": false,
+          "origIdx": 0,
+          "rank": 9,
+          "familySizeK": 18,
+          "holmThreshold": 0.005,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "ESP-LALIGA",
+          "market": "OU_2_5",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 716,
+          "brierDelta": 0.007682,
+          "brierCi95": [
+            0.003048,
+            0.012446
+          ],
+          "logLossDelta": 0.01575,
+          "logLossCi95": [
+            0.006147,
+            0.025628
+          ],
+          "rawPValue": 0.999,
+          "eligibleForSignificance": false,
+          "origIdx": 1,
+          "rank": 15,
+          "familySizeK": 18,
+          "holmThreshold": 0.0125,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "ITA-SERIEA",
+          "market": "AH",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 919,
+          "brierDelta": 0.004699,
+          "brierCi95": [
+            -0.002909,
+            0.012324
+          ],
+          "logLossDelta": 0.01115,
+          "logLossCi95": [
+            -0.005069,
+            0.027487
+          ],
+          "rawPValue": 0.8845,
+          "eligibleForSignificance": false,
+          "origIdx": 2,
+          "rank": 3,
+          "familySizeK": 18,
+          "holmThreshold": 0.003125,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "ITA-SERIEA",
+          "market": "OU_2_5",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 719,
+          "brierDelta": 0.006016,
+          "brierCi95": [
+            0.001273,
+            0.010766
+          ],
+          "logLossDelta": 0.012319,
+          "logLossCi95": [
+            0.002314,
+            0.02231
+          ],
+          "rawPValue": 0.993,
+          "eligibleForSignificance": false,
+          "origIdx": 3,
+          "rank": 12,
+          "familySizeK": 18,
+          "holmThreshold": 0.007143,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "DEU-BUNDESLIGA",
+          "market": "AH",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 641,
+          "brierDelta": 0.017567,
+          "brierCi95": [
+            0.008674,
+            0.026387
+          ],
+          "logLossDelta": 0.03815,
+          "logLossCi95": [
+            0.020191,
+            0.057133
+          ],
+          "rawPValue": 1,
+          "eligibleForSignificance": false,
+          "origIdx": 4,
+          "rank": 17,
+          "familySizeK": 18,
+          "holmThreshold": 0.025,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "DEU-BUNDESLIGA",
+          "market": "OU_2_5",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 468,
+          "brierDelta": 0.008585,
+          "brierCi95": [
+            0.002332,
+            0.01435
+          ],
+          "logLossDelta": 0.018068,
+          "logLossCi95": [
+            0.005367,
+            0.031499
+          ],
+          "rawPValue": 0.9925,
+          "eligibleForSignificance": false,
+          "origIdx": 5,
+          "rank": 11,
+          "familySizeK": 18,
+          "holmThreshold": 0.00625,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "FRA-LIGUE1",
+          "market": "AH",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 683,
+          "brierDelta": 0.008465,
+          "brierCi95": [
+            0.00015,
+            0.016823
+          ],
+          "logLossDelta": 0.018575,
+          "logLossCi95": [
+            0.000908,
+            0.036989
+          ],
+          "rawPValue": 0.977,
+          "eligibleForSignificance": false,
+          "origIdx": 6,
+          "rank": 8,
+          "familySizeK": 18,
+          "holmThreshold": 0.004545,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "FRA-LIGUE1",
+          "market": "OU_2_5",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 510,
+          "brierDelta": 0.010962,
+          "brierCi95": [
+            0.005071,
+            0.017105
+          ],
+          "logLossDelta": 0.022602,
+          "logLossCi95": [
+            0.009581,
+            0.03593
+          ],
+          "rawPValue": 1,
+          "eligibleForSignificance": false,
+          "origIdx": 7,
+          "rank": 18,
+          "familySizeK": 18,
+          "holmThreshold": 0.05,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "NED-ERE",
+          "market": "AH",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 612,
+          "brierDelta": 0.011634,
+          "brierCi95": [
+            0.00297,
+            0.020326
+          ],
+          "logLossDelta": 0.025192,
+          "logLossCi95": [
+            0.007412,
+            0.043601
+          ],
+          "rawPValue": 0.9965,
+          "eligibleForSignificance": false,
+          "origIdx": 8,
+          "rank": 13,
+          "familySizeK": 18,
+          "holmThreshold": 0.008333,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "NED-ERE",
+          "market": "OU_2_5",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 479,
+          "brierDelta": 0.00541,
+          "brierCi95": [
+            0.000689,
+            0.010218
+          ],
+          "logLossDelta": 0.011932,
+          "logLossCi95": [
+            0.001746,
+            0.022035
+          ],
+          "rawPValue": 0.989,
+          "eligibleForSignificance": false,
+          "origIdx": 9,
+          "rank": 10,
+          "familySizeK": 18,
+          "holmThreshold": 0.005556,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "POR-PRIMEIRA",
+          "market": "AH",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 640,
+          "brierDelta": 0.006795,
+          "brierCi95": [
+            -0.001414,
+            0.015829
+          ],
+          "logLossDelta": 0.015257,
+          "logLossCi95": [
+            -0.002518,
+            0.034083
+          ],
+          "rawPValue": 0.945,
+          "eligibleForSignificance": false,
+          "origIdx": 10,
+          "rank": 7,
+          "familySizeK": 18,
+          "holmThreshold": 0.004167,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "POR-PRIMEIRA",
+          "market": "OU_2_5",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 493,
+          "brierDelta": 0.009268,
+          "brierCi95": [
+            0.003537,
+            0.01492
+          ],
+          "logLossDelta": 0.019474,
+          "logLossCi95": [
+            0.007494,
+            0.031493
+          ],
+          "rawPValue": 0.999,
+          "eligibleForSignificance": false,
+          "origIdx": 11,
+          "rank": 16,
+          "familySizeK": 18,
+          "holmThreshold": 0.016667,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "BEL-PRO",
+          "market": "AH",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 542,
+          "brierDelta": 0.00379,
+          "brierCi95": [
+            -0.005825,
+            0.013102
+          ],
+          "logLossDelta": 0.009207,
+          "logLossCi95": [
+            -0.010632,
+            0.02873
+          ],
+          "rawPValue": 0.7765,
+          "eligibleForSignificance": false,
+          "origIdx": 12,
+          "rank": 2,
+          "familySizeK": 18,
+          "holmThreshold": 0.002941,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "BEL-PRO",
+          "market": "OU_2_5",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 426,
+          "brierDelta": 0.004349,
+          "brierCi95": [
+            -0.001969,
+            0.010511
+          ],
+          "logLossDelta": 0.008754,
+          "logLossCi95": [
+            -0.004559,
+            0.021609
+          ],
+          "rawPValue": 0.9105,
+          "eligibleForSignificance": false,
+          "origIdx": 13,
+          "rank": 5,
+          "familySizeK": 18,
+          "holmThreshold": 0.003571,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "SCO-PREM",
+          "market": "AH",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 279,
+          "brierDelta": 0.012041,
+          "brierCi95": [
+            -0.003051,
+            0.02698
+          ],
+          "logLossDelta": 0.027365,
+          "logLossCi95": [
+            -0.005184,
+            0.060104
+          ],
+          "rawPValue": 0.944,
+          "eligibleForSignificance": false,
+          "origIdx": 14,
+          "rank": 6,
+          "familySizeK": 18,
+          "holmThreshold": 0.003846,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "SCO-PREM",
+          "market": "OU_2_5",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 215,
+          "brierDelta": 0.007404,
+          "brierCi95": [
+            -0.004283,
+            0.018327
+          ],
+          "logLossDelta": 0.015397,
+          "logLossCi95": [
+            -0.00705,
+            0.038665
+          ],
+          "rawPValue": 0.903,
+          "eligibleForSignificance": false,
+          "origIdx": 15,
+          "rank": 4,
+          "familySizeK": 18,
+          "holmThreshold": 0.003333,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "ENG-CHAMP",
+          "market": "AH",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 576,
+          "brierDelta": 0.000597,
+          "brierCi95": [
+            -0.007739,
+            0.00895
+          ],
+          "logLossDelta": 0.001445,
+          "logLossCi95": [
+            -0.016126,
+            0.020456
+          ],
+          "rawPValue": 0.548,
+          "eligibleForSignificance": false,
+          "origIdx": 16,
+          "rank": 1,
+          "familySizeK": 18,
+          "holmThreshold": 0.002778,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        },
+        {
+          "leagueId": "ENG-CHAMP",
+          "market": "OU_2_5",
+          "window": "EXPANDED_WALKFORWARD",
+          "resolvedLegs": 441,
+          "brierDelta": 0.008792,
+          "brierCi95": [
+            0.002568,
+            0.015124
+          ],
+          "logLossDelta": 0.018626,
+          "logLossCi95": [
+            0.005086,
+            0.031738
+          ],
+          "rawPValue": 0.997,
+          "eligibleForSignificance": false,
+          "origIdx": 17,
+          "rank": 14,
+          "familySizeK": 18,
+          "holmThreshold": 0.01,
+          "adjustedPValue": 1,
+          "passedHolm": false
+        }
+      ]
+    }
+  }
+}

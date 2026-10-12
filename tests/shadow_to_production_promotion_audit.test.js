@@ -390,3 +390,44 @@ test('P5.3: Step 4 manifest reproducibility — re-running generate_promotion_ma
   assert.strictEqual(committed.step5LedgerReconciliation.researchLedger336Breakdown.retrospectiveExcludedRows, 144);
   assert.strictEqual(committed.step5LedgerReconciliation.researchLedger336Breakdown.unverifiedBulkPlaceholderRows, 172);
 });
+
+test('P5.4: Step 6 Football-Data coverage probe verifies 9 mapped leagues, 4 BENCHMARK_UNAVAILABLE leagues, and Holm step-down promotes 0', () => {
+  const probePath = path.join(process.cwd(), 'data/verification/football_data_coverage_probe.json');
+  assert.ok(fs.existsSync(probePath), 'football_data_coverage_probe.json must exist');
+  const probe = JSON.parse(fs.readFileSync(probePath, 'utf8'));
+
+  assert.strictEqual(probe.networkCompliance.e0Modified, false);
+  assert.ok(probe.networkCompliance.minDelayMsEnforced >= 2000);
+  assert.strictEqual(probe.networkCompliance.totalFilesCheckedOrDownloaded, 27);
+
+  const expectedLeagues = [
+    'ESP-LALIGA',
+    'ITA-SERIEA',
+    'DEU-BUNDESLIGA',
+    'FRA-LIGUE1',
+    'NED-ERE',
+    'POR-PRIMEIRA',
+    'BEL-PRO',
+    'SCO-PREM',
+    'ENG-CHAMP',
+  ];
+  for (const lid of expectedLeagues) {
+    const p = probe.probedLeagues[lid];
+    assert.ok(p, `Missing probedLeague entry for ${lid}`);
+    assert.ok(p.joinSummary.overlapJoinRateSince2023_08 >= 0.92, `Join rate for ${lid} must be >= 92%`);
+    assert.strictEqual(p.aggregateColumns['PCAHH'].presentInAllSeasons, true);
+    assert.strictEqual(p.aggregateColumns['PC>2.5'].presentInAllSeasons, true);
+  }
+
+  const nonFdByCode = Object.fromEntries(probe.nonFootballDataLeagues.map(x => [x.leagueId, x]));
+  for (const lid of ['USA-MLS', 'JPN-J1', 'KOR-K1', 'SAU-PRO']) {
+    assert.strictEqual(nonFdByCode[lid].status, 'BENCHMARK_UNAVAILABLE');
+  }
+  assert.strictEqual(nonFdByCode['IDN-L1'].status, 'PAUSED');
+
+  assert.strictEqual(probe.holmStepDownMultipleTesting.primaryWindowFamily.familySizeK, 5);
+  assert.strictEqual(probe.holmStepDownMultipleTesting.primaryWindowFamily.promotedCount, 0);
+  assert.strictEqual(probe.holmStepDownMultipleTesting.expandedWalkForwardFamily.familySizeK, 18);
+  assert.strictEqual(probe.holmStepDownMultipleTesting.expandedWalkForwardFamily.promotedCount, 0);
+});
+

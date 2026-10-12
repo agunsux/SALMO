@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-12T14:49:45.749Z",
+  "generatedAt": "2026-10-12T14:58:12.669Z",
   "auditScope": "SALMO 14-League Historical & Shadow-to-Production Promotion Audit (+ IDN-L1 Paused Registry Entry) — Phase 2B Reproducible Manifest",
   "canonicalRatingsArtifactSha256": "53466f88ae63f5246f8756f8873f71c472669b0912f09979cfc5e77b82050984",
   "immutableFileHashesSha256": {
@@ -67,18 +67,18 @@
       }
     },
     "passingGates": [
-      "DATA_INTEGRITY_HISTORICAL_MATCHES (1329 >= undefined)",
-      "DATA_INTEGRITY_WALK_FORWARD_SAMPLE (300 >= undefined)",
-      "DATA_INTEGRITY_RECENCY (2026-09-20 >= undefined)",
-      "DATA_INTEGRITY_RATED_TEAMS (20 >= undefined, coldStart=0, unrated=0)",
+      "DATA_INTEGRITY_HISTORICAL_MATCHES (1329 >= 120)",
+      "DATA_INTEGRITY_WALK_FORWARD_SAMPLE (300 >= 300)",
+      "DATA_INTEGRITY_RECENCY (2026-09-20 >= 2026-08-01)",
+      "DATA_INTEGRITY_RATED_TEAMS (20 rated teams, coldStart=0, unrated=0)",
       "CHRONOLOGICAL_WALK_FORWARD_VERIFIED (0 temporal violations across 300 eval matches)",
-      "DISPERSION_RATIO_IN_BOUNDS (0.9239 in [undefined, undefined])",
-      "AH_CALIBRATION_SLOPE_AND_LOGLOSS (slope=1.2005 in [undefined, undefined], logLoss=0.6759 <= undefined)",
-      "AH_BALANCED_HALF_LINE_SANITY_FLOOR (0.2411, CI95=[0.2323, 0.2496] < undefined)"
+      "DISPERSION_RATIO_IN_BOUNDS (0.9239 <= 1.15)",
+      "AH_CALIBRATION_SLOPE_AND_LOGLOSS (slope=1.2005 >= 0.5, logLoss=0.6759 <= 0.6931)",
+      "AH_BALANCED_HALF_LINE_SANITY_FLOOR (0.2411, CI95=[0.2323, 0.2496] < 0.25)"
     ],
     "failingGatesByMarket": {
       "AH": [
-        "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2463, CI95=[0.2396, 0.253], beats025=undefined, LogLoss=0.6759, slope=1.2005)",
+        "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2463, CI95=[0.2396, 0.253], beats025=false, LogLoss=0.6759, slope=1.2005)",
         "PAIRED_BRIER_DIFF_CI95_UPPER_NOT_NEGATIVE (ci95Upper=0.0179 >= 0)",
         "PAIRED_LOG_LOSS_DIFF_CI95_UPPER_NOT_NEGATIVE (ci95Upper=0.0382 >= 0)",
         "INSUFFICIENT_PINNACLE_BENCHMARK_SAMPLE (matchedFixtures=80 < 300)",
