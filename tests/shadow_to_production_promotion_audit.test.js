@@ -368,3 +368,25 @@ test('P5.2: Step 2 paired Pinnacle benchmark artifact verifies identical-leg Bri
   assert.strictEqual(step2.exploratoryExpandedWalkForward.ahAllBinaryNoPushLegs.beatsPinnacleAt95Ci, false);
   assert.strictEqual(step2.exploratoryExpandedWalkForward.ou25IdenticalLegs.beatsPinnacleAt95Ci, false);
 });
+
+test('P5.3: Step 4 manifest reproducibility — re-running generate_promotion_manifest.js matches committed shadow_to_production_promotion_manifest.json except generatedAt', () => {
+  const { generatePromotionManifest } = require('../scripts/generate_promotion_manifest.js');
+  const committedPath = path.join(process.cwd(), 'data/verification/shadow_to_production_promotion_manifest.json');
+  const committed = JSON.parse(fs.readFileSync(committedPath, 'utf8'));
+  const regenerated = generatePromotionManifest({
+    writeManifest: false,
+    fixedGeneratedAt: committed.generatedAt,
+  });
+
+  assert.deepStrictEqual(
+    regenerated,
+    committed,
+    'Regenerated promotion manifest must match committed shadow_to_production_promotion_manifest.json except generatedAt'
+  );
+  assert.strictEqual(committed.step3EngPlStatusAuditProposeOnly.proposedStatus, 'SHADOW');
+  assert.strictEqual(committed.step3EngPlStatusAuditProposeOnly.registryModifiedInPhase2B, false);
+  assert.strictEqual(committed.step5LedgerReconciliation.researchLedger336Breakdown.totalRows, 336);
+  assert.strictEqual(committed.step5LedgerReconciliation.researchLedger336Breakdown.validPreMatchRows, 20);
+  assert.strictEqual(committed.step5LedgerReconciliation.researchLedger336Breakdown.retrospectiveExcludedRows, 144);
+  assert.strictEqual(committed.step5LedgerReconciliation.researchLedger336Breakdown.unverifiedBulkPlaceholderRows, 172);
+});
