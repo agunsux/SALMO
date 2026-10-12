@@ -11,7 +11,49 @@ import { Logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
-function normalizeResearchRow(raw: any, index: number, liveSettledMap: Map<string, any>) {
+import { SettlementEngine } from '@/engine/settlement/settlementEngine';
+
+function bootstrapConfidenceInterval(values: number[], iterations = 2000): {
+  n: number;
+  mean: number;
+  stdErr: number;
+  ci95Low: number;
+  ci95High: number;
+} | null {
+  if (!values || values.length === 0) return null;
+  const n = values.length;
+  const mean = values.reduce((a, b) => a + b, 0) / n;
+  const variance = n > 1 ? values.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / (n - 1) : 0;
+  const stdErr = Math.sqrt(variance / n);
+  let seed = 42;
+  const nextRand = () => {
+    seed = (seed * 1664525 + 1013904223) % 4294967296;
+    return seed / 4294967296;
+  };
+  const means: number[] = [];
+  for (let b = 0; b < iterations; b++) {
+    let sum = 0;
+    for (let i = 0; i < n; i++) {
+      sum += values[Math.floor(nextRand() * n)];
+    }
+    means.push(sum / n);
+  }
+  means.sort((a, b) => a - b);
+  return {
+    n,
+    mean: Number(mean.toFixed(4)),
+    stdErr: Number(stdErr.toFixed(4)),
+    ci95Low: Number(means[Math.floor(0.025 * iterations)].toFixed(4)),
+    ci95High: Number(means[Math.floor(0.975 * iterations)].toFixed(4)),
+  };
+}
+
+function normalizeResearchRow(
+  raw: any,
+  index: number,
+  liveSettledMap: Map<string, any>,
+  evidenceFtMap: Map<string, { homeGoals: number; awayGoals: number; matchScore: string }>
+) {
   const ledgerTier: 'PRODUCTION' | 'SHADOW' | 'NONE' =
     raw.ledgerTier || (raw.league === 'Premier League' || raw.competition === 'Premier League' ? 'PRODUCTION' : 'SHADOW');
 
@@ -83,6 +125,9 @@ function normalizeResearchRow(raw: any, index: number, liveSettledMap: Map<strin
         (raw.canonicalMatchId ? liveSettledMap.get(`${raw.canonicalMatchId}_${market}`) : undefined)
       : undefined;
 
+  // Enrich finished non-EPL fixtures with verified API-Football final score (zero OddsPapi needed)
+  const evidenceFt = evidenceFtMap.get(fixtureId);
+
   const settlement =
     liveSettled?.settlementStatus ||
     liveSettled?.settlement ||
@@ -91,8 +136,48 @@ function normalizeResearchRow(raw: any, index: number, liveSettledMap: Map<strin
     raw.status ||
     'PENDING';
 
-  const matchScore = liveSettled?.matchScore || raw.matchScore || null;
-  const result = liveSettled?.result || raw.result || null;
+  const homeGoals =
+    typeof liveSettled?.homeGoals === 'number'
+      ? liveSettled.homeGoals
+      : typeof raw.homeGoals === 'number'
+      ? raw.homeGoals
+      : evidenceFt?.homeGoals ?? null;
+  const awayGoals =
+    typeof liveSettled?.awayGoals === 'number'
+      ? liveSettled.awayGoals
+      : typeof raw.awayGoals === 'number'
+      ? raw.awayGoals
+      : evidenceFt?.awayGoals ?? null;
+
+  const matchScore =
+    liveSettled?.matchScore ||
+    raw.matchScore ||
+    evidenceFt?.matchScore ||
+    (typeof homeGoals === 'number' && typeof awayGoals === 'number' ? `${homeGoals}-${awayGoals}` : null);
+
+  let scoreOutcome: string | null = liveSettled?.result || raw.result || null;
+  if (!scoreOutcome && typeof homeGoals === 'number' && typeof awayGoals === 'number' && (market === 'AH' || market === 'OU') && line !== null) {
+    try {
+      const settledOutcome = SettlementEngine.settlePosition({
+        ledgerPositionId: id,
+        marketType: market,
+        selection,
+        line: Number(line),
+        oddsTaken: Number(marketOdds || 2.0),
+        homeGoals,
+        awayGoals,
+        matchStatus: 'FINISHED',
+        homeTeam,
+        awayTeam,
+      });
+      scoreOutcome = settledOutcome.result;
+    } catch {}
+  }
+
+  const result = liveSettled?.result || raw.result || scoreOutcome || null;
+  const scoreVerified = typeof homeGoals === 'number' && typeof awayGoals === 'number';
+
+  // Financial P&L is strictly computed ONLY when pick-time odds were recorded (PRODUCTION tier)
   const profitLossUnits =
     ledgerTier === 'PRODUCTION' && settlement === 'SETTLED'
       ? Number(liveSettled?.profitUnits ?? liveSettled?.profitLoss ?? raw.profitLossUnits ?? 0)
@@ -139,7 +224,11 @@ function normalizeResearchRow(raw: any, index: number, liveSettledMap: Map<strin
     is_pick: isPick,
     ledgerTier,
     settlement,
+    homeGoals,
+    awayGoals,
     matchScore,
+    scoreVerified,
+    scoreOutcome,
     result,
     profitLossUnits,
     stakeUnits,
@@ -169,6 +258,30 @@ export async function GET(request: NextRequest) {
           }
           if (parsed.canonicalMatchId && parsed.market) {
             liveSettledMap.set(`${parsed.canonicalMatchId}_${parsed.market}`, parsed);
+          }
+        }
+      } catch {}
+    }
+
+    // Load stage_b1_fixture_evidence.json for verified API-Football FT scores across all 15 leagues
+    const evidenceFtMap = new Map<string, { homeGoals: number; awayGoals: number; matchScore: string }>();
+    const evidencePath = path.resolve(process.cwd(), 'data', 'verification', 'stage_b1_fixture_evidence.json');
+    if (fs.existsSync(evidencePath)) {
+      try {
+        const ev = JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
+        for (const lr of ev.leagueResults || []) {
+          for (const f of lr.fixtures || []) {
+            if (
+              f.fixture?.status?.short === 'FT' &&
+              typeof f.goals?.home === 'number' &&
+              typeof f.goals?.away === 'number'
+            ) {
+              evidenceFtMap.set(String(f.fixture.id), {
+                homeGoals: f.goals.home,
+                awayGoals: f.goals.away,
+                matchScore: `${f.goals.home}-${f.goals.away}`,
+              });
+            }
           }
         }
       } catch {}
@@ -232,7 +345,9 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const predictions = rawPredictions.map((row, idx) => normalizeResearchRow(row, idx, liveSettledMap));
+    const predictions = rawPredictions.map((row, idx) =>
+      normalizeResearchRow(row, idx, liveSettledMap, evidenceFtMap)
+    );
 
     const searchParams = request.nextUrl?.searchParams;
     const tierParam = (searchParams?.get('tier') || 'ALL').toUpperCase();
@@ -273,6 +388,93 @@ export async function GET(request: NextRequest) {
       netProfitUnits,
     };
 
+    // Build per-league Metric Computability Matrix (Stage 1 Audit contract)
+    const outcomeValueMap: Record<string, number> = {
+      WIN: 1.0,
+      HALF_WIN: 0.75,
+      PUSH: 0.5,
+      HALF_LOSS: 0.25,
+      LOSS: 0.0,
+    };
+    const byLeagueMap = new Map<string, any>();
+    for (const p of predictions) {
+      const lg = p.competition || p.league || 'Unknown';
+      if (!byLeagueMap.has(lg)) {
+        byLeagueMap.set(lg, {
+          league: lg,
+          tier: p.ledgerTier,
+          informative: Boolean(p.informative ?? (p.ledgerTier !== 'NONE')),
+          nPredictions: 0,
+          nWithPickOdds: 0,
+          nExcludedMissingOdds: 0,
+          oddsProvider: null as string | null,
+          oddsTimestampSample: null as string | null,
+          nWithClosingSnapshot: 0,
+          nWithVerifiedFinalScore: 0,
+          nSettledWithOdds: 0,
+          nScoreResolvedWithoutOdds: 0,
+          _profits: [] as number[],
+          _brierErrors: [] as number[],
+        });
+      }
+      const entry = byLeagueMap.get(lg)!;
+      entry.nPredictions++;
+      const hasPickOdds = typeof p.market_odds === 'number' && p.market_odds > 1.0;
+      if (hasPickOdds) {
+        entry.nWithPickOdds++;
+        entry.oddsProvider = p.bookmaker || 'PINNACLE';
+        entry.oddsTimestampSample = p.createdAt || p.predictionTimestamp || null;
+      } else {
+        entry.nExcludedMissingOdds++;
+      }
+      if (p.closingOdds !== null && p.closingOdds !== undefined) {
+        entry.nWithClosingSnapshot++;
+      }
+      if (p.scoreVerified) {
+        entry.nWithVerifiedFinalScore++;
+        const y = p.scoreOutcome ? outcomeValueMap[p.scoreOutcome] : undefined;
+        if (entry.informative && typeof y === 'number' && typeof p.model_probability === 'number') {
+          entry._brierErrors.push(Math.pow(p.model_probability - y, 2));
+        }
+        if (hasPickOdds && typeof p.profitLossUnits === 'number') {
+          entry.nSettledWithOdds++;
+          entry._profits.push(p.profitLossUnits);
+        } else {
+          entry.nScoreResolvedWithoutOdds++;
+        }
+      }
+    }
+
+    const metricComputabilityMatrix = Array.from(byLeagueMap.values()).map(entry => {
+      const yieldCi = bootstrapConfidenceInterval(entry._profits);
+      const brierCi = bootstrapConfidenceInterval(entry._brierErrors);
+      return {
+        league: entry.league,
+        tier: entry.tier,
+        informative: entry.informative,
+        nPredictions: entry.nPredictions,
+        nWithPickOdds: entry.nWithPickOdds,
+        nExcludedMissingOdds: entry.nExcludedMissingOdds,
+        oddsProvider: entry.oddsProvider,
+        oddsTimestampSample: entry.oddsTimestampSample,
+        nWithClosingSnapshot: entry.nWithClosingSnapshot,
+        nWithVerifiedFinalScore: entry.nWithVerifiedFinalScore,
+        nSettledWithOdds: entry.nSettledWithOdds,
+        nScoreResolvedWithoutOdds: entry.nScoreResolvedWithoutOdds,
+        computableNow: {
+          roi: entry.nSettledWithOdds > 0,
+          yield: entry.nSettledWithOdds > 0,
+          clv: entry.nWithClosingSnapshot > 0,
+          brier: entry.informative && entry._brierErrors.length > 0,
+        },
+        bootstrap95CI: {
+          yield: yieldCi,
+          brier: brierCi,
+          clv: null,
+        },
+      };
+    });
+
     let filteredPredictions = predictions;
     if (tierParam === 'PRODUCTION') filteredPredictions = productionRows;
     else if (tierParam === 'SHADOW') filteredPredictions = shadowRows;
@@ -292,9 +494,9 @@ export async function GET(request: NextRequest) {
     }
 
     if (settlementParam === 'SETTLED') {
-      filteredPredictions = filteredPredictions.filter((p: any) => p.settlement === 'SETTLED');
+      filteredPredictions = filteredPredictions.filter((p: any) => p.settlement === 'SETTLED' || p.scoreVerified);
     } else if (settlementParam === 'PENDING') {
-      filteredPredictions = filteredPredictions.filter((p: any) => p.settlement !== 'SETTLED');
+      filteredPredictions = filteredPredictions.filter((p: any) => p.settlement !== 'SETTLED' && !p.scoreVerified);
     }
 
     if (searchParam) {
@@ -342,6 +544,7 @@ export async function GET(request: NextRequest) {
       dailyPicks: dailyPicksCount,
       settled: settledCount,
       pending: pendingCount,
+      verifiedFinalScoresCount: predictions.filter((p: any) => p.scoreVerified).length,
       byLedgerTier: {
         PRODUCTION: productionRows.length,
         SHADOW: shadowRows.length,
@@ -362,6 +565,7 @@ export async function GET(request: NextRequest) {
       dataState,
       counts,
       settlementSummary,
+      metricComputabilityMatrix,
       observability,
       pagination,
       predictions: outputPredictions,

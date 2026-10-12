@@ -47,6 +47,8 @@ interface PredictionRecord {
   ledgerTier?: 'PRODUCTION' | 'SHADOW' | 'NONE';
   settlement?: string;
   matchScore?: string | null;
+  scoreVerified?: boolean;
+  scoreOutcome?: string | null;
   result?: string | null;
   profitLossUnits?: number | null;
   stakeUnits?: number | null;
@@ -169,10 +171,10 @@ export default function ResearchPage() {
       }
 
       // Settlement status filter (SETTLED / PENDING)
-      if (selectedSettlement === 'SETTLED' && p.settlement !== 'SETTLED') {
+      if (selectedSettlement === 'SETTLED' && p.settlement !== 'SETTLED' && !p.scoreVerified) {
         return false;
       }
-      if (selectedSettlement === 'PENDING' && p.settlement === 'SETTLED') {
+      if (selectedSettlement === 'PENDING' && (p.settlement === 'SETTLED' || p.scoreVerified)) {
         return false;
       }
 
@@ -590,7 +592,7 @@ export default function ResearchPage() {
                           <td className="px-4 py-3 font-sans">
                             <div className="font-semibold text-[#14110F] flex items-center gap-2 flex-wrap">
                               <span>{row.match}</span>
-                              {row.settlement === 'SETTLED' && row.matchScore && (
+                              {(row.settlement === 'SETTLED' || row.scoreVerified) && row.matchScore && (
                                 <span className="rounded bg-[#EAF7EE] border border-[#BFE7CA] px-1.5 py-0.5 text-[9px] font-mono font-bold text-[#137333]">
                                   FT {row.matchScore} · {row.result || 'SETTLED'}
                                 </span>
@@ -689,7 +691,7 @@ export default function ResearchPage() {
                             )}
                           </td>
                           <td className="px-3 py-3 text-center whitespace-nowrap">
-                            {row.settlement === 'SETTLED' ? (
+                            {row.settlement === 'SETTLED' || row.scoreVerified ? (
                               <div className="inline-flex flex-col items-center">
                                 <span
                                   className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
@@ -701,7 +703,7 @@ export default function ResearchPage() {
                                   }`}
                                 >
                                   {row.result || 'SETTLED'}{' '}
-                                  {hasPnl ? `(${pnl! > 0 ? '+' : ''}${pnl!.toFixed(2)}u)` : ''}
+                                  {hasPnl ? `(${pnl! > 0 ? '+' : ''}${pnl!.toFixed(2)}u)` : '(No Odds)'}
                                 </span>
                               </div>
                             ) : (
@@ -735,12 +737,12 @@ export default function ResearchPage() {
                         <div>
                           <div className="font-semibold text-sm text-[#14110F] font-sans flex items-center gap-1.5 flex-wrap">
                             <span>{row.match}</span>
-                            {row.settlement === 'SETTLED' && row.matchScore && (
+                            {(row.settlement === 'SETTLED' || row.scoreVerified) && row.matchScore && (
                               <span className="rounded bg-[#EAF7EE] border border-[#BFE7CA] px-1.5 py-0.5 text-[9px] font-mono font-bold text-[#137333]">
                                 FT {row.matchScore} · {row.result || 'SETTLED'}
                                 {typeof row.profitLossUnits === 'number'
                                   ? ` (${row.profitLossUnits > 0 ? '+' : ''}${row.profitLossUnits.toFixed(2)}u)`
-                                  : ''}
+                                  : ' (No Odds)'}
                               </span>
                             )}
                           </div>
