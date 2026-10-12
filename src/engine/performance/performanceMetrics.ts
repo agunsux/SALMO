@@ -1,16 +1,22 @@
 // SALMO.DEV — Production Performance & Evidence Metrics Engine
-// Implements strict settlement accounting, green cohort headline isolation,
-// and statistical sample size thresholds (n < 30 labeled INSUFFICIENT SAMPLE).
+// Implements strict settlement accounting, qualified public pick cohort isolation,
+// binary no-push per-leg Brier scoring, and statistical sample size thresholds (n < 30 labeled INSUFFICIENT SAMPLE).
 // Invariants:
-// 1. Headline cohort: green_cohort = true (confidence > 70).
-// 2. Units staked: WIN, LOSS, PUSH, HALF_WIN, HALF_LOSS count 1.0 unit. PENDING and VOID count 0.
-// 3. Profit: WIN (odds - 1), LOSS (-1), PUSH (0), HALF_WIN ((odds-1)/2), HALF_LOSS (-0.5), VOID (0).
-// 4. ROI: (profit_units / units_staked) * 100. If units_staked === 0 -> ROI = null ("No settled bets").
-// 5. Never conflate predicted EV with realized ROI.
-// 6. Average CLV computed strictly over non-null observations.
+// 1. Headline cohort (greenCohort): strictly rows with is_pick === true AND verdict === 'LAYAK' (no confidence > 70 fallback).
+// 2. All-rows flat-stake diagnostic cohort: explicitly labeled MODEL_ALL_ROWS_DIAGNOSTIC (NOT PUBLIC PICKS).
+// 3. Units staked: WIN, LOSS, PUSH, HALF_WIN, HALF_LOSS count 1.0 unit. PENDING and VOID count 0.
+// 4. Profit: WIN (odds - 1), LOSS (-1), PUSH (0), HALF_WIN ((odds-1)/2), HALF_LOSS (-0.5), VOID (0).
+// 5. ROI: (profit_units / units_staked) * 100. If units_staked === 0 -> ROI = null ("No settled bets").
+// 6. Brier: binary no-push scoring per leg; quarter-lines decomposed into two half-stake legs, push legs excluded.
+// 7. Never conflate predicted EV with realized ROI.
+// 8. Average CLV computed strictly over non-null observations.
 
 import { SettlementOutcome } from '../../types/index';
 import { SettlementStatus } from '../settlement/settlementEngine';
+import { BrierLegEvaluation, PositionBrierDecomposition } from './brierScoring';
+
+export const DIAGNOSTIC_ALL_ROWS_COHORT_LABEL = 'MODEL_ALL_ROWS_DIAGNOSTIC (NOT PUBLIC PICKS)' as const;
+export const QUALIFIED_PUBLIC_PICKS_COHORT_LABEL = 'QUALIFIED_PUBLIC_PICKS' as const;
 
 export interface LedgerPositionSnapshot {
   ledgerPositionId: string;
@@ -27,16 +33,47 @@ export interface LedgerPositionSnapshot {
   confidence: number; // 0 - 100
   edge: number;
   expectedValuePct: number;
-  greenCohort: boolean; // confidence > 70
+  greenCohort: boolean; // strictly is_pick === true && verdict === 'LAYAK'
+  is_pick?: boolean;
+  isPick?: boolean;
+  isDailyPick?: boolean;
+  verdict?: string | null;
   settlementStatus: SettlementStatus;
   result: SettlementOutcome | null;
   profitUnits: number;
   clvPct: number | null; // null if moved or missing
+  brierDecomposition?: PositionBrierDecomposition | null;
+  brierLegs?: BrierLegEvaluation[];
   settledAt?: string | null;
   createdAt?: string;
 }
 
+/**
+ * Evaluates whether a row qualifies for the public pick cohort (greenCohort).
+ * Hotfix H8 Rule 2: Removes the `confidence > 70` fallback; strictly requires `is_pick === true` and `verdict === 'LAYAK'`.
+ */
+export function isQualifiedPublicPickCohort(row: {
+  is_pick?: boolean;
+  isPick?: boolean;
+  isDailyPick?: boolean;
+  verdict?: string | null;
+  greenCohort?: boolean;
+}): boolean {
+  if (
+    row.is_pick !== undefined ||
+    row.isPick !== undefined ||
+    row.isDailyPick !== undefined ||
+    row.verdict !== undefined
+  ) {
+    const isPick = row.is_pick === true || row.isPick === true || row.isDailyPick === true;
+    const isLayak = String(row.verdict || '').toUpperCase() === 'LAYAK';
+    return isPick && isLayak;
+  }
+  return row.greenCohort === true;
+}
+
 export interface MetricSummary {
+  cohortLabel?: string;
   n: number;
   sampleStatus: 'SUFFICIENT' | 'INSUFFICIENT SAMPLE';
   unitsStaked: number;
@@ -56,11 +93,17 @@ export interface MetricSummary {
   avgConfidence: number | null;
   avgClvPct: number | null;
   nClv: number;
+  brierScore?: number | null;
+  brierStakeWeighted?: number | null;
+  nBrierLegsTotal?: number;
+  nBrierLegsResolved?: number;
+  nBrierLegsExcludedPush?: number;
 }
 
 export interface FullPerformanceReport {
   headlineGreenCohort: MetricSummary;
   controlFullCohort: MetricSummary;
+  modelAllRowsDiagnostic?: MetricSummary;
   breakdowns: {
     byMarket: {
       AH: MetricSummary;
@@ -93,7 +136,10 @@ export class PerformanceMetricsEngine {
   /**
    * Aggregate metrics for an arbitrary list of positions.
    */
-  public static aggregateMetrics(positions: LedgerPositionSnapshot[]): MetricSummary {
+  public static aggregateMetrics(
+    positions: LedgerPositionSnapshot[],
+    cohortLabel?: string
+  ): MetricSummary {
     let unitsStaked = 0;
     let profitUnits = 0;
     let wins = 0;
@@ -109,6 +155,13 @@ export class PerformanceMetricsEngine {
     let totalConf = 0;
     let totalClv = 0;
     let nClv = 0;
+
+    let nBrierLegsTotal = 0;
+    let nBrierLegsResolved = 0;
+    let nBrierLegsExcludedPush = 0;
+    let brierLegSqErrorSum = 0;
+    let brierWeightedSqErrorSum = 0;
+    let brierWeightSum = 0;
 
     for (const pos of positions) {
       totalEv += pos.expectedValuePct;
@@ -133,6 +186,19 @@ export class PerformanceMetricsEngine {
       settled++;
       unitsStaked += 1.0;
       profitUnits += pos.profitUnits;
+
+      const legs = pos.brierDecomposition?.legs || pos.brierLegs || [];
+      for (const leg of legs) {
+        nBrierLegsTotal++;
+        if (leg.excludedPush || leg.brierSqError === null || !Number.isFinite(leg.brierSqError)) {
+          nBrierLegsExcludedPush++;
+        } else {
+          nBrierLegsResolved++;
+          brierLegSqErrorSum += leg.brierSqError;
+          brierWeightedSqErrorSum += leg.stakeWeight * leg.brierSqError;
+          brierWeightSum += leg.stakeWeight;
+        }
+      }
 
       switch (pos.result) {
         case 'WIN':
@@ -171,7 +237,13 @@ export class PerformanceMetricsEngine {
       positions.length > 0 ? Number((totalConf / positions.length).toFixed(1)) : null;
     const avgClvPct = nClv > 0 ? Number((totalClv / nClv).toFixed(2)) : null;
 
+    const brierScore =
+      nBrierLegsResolved > 0 ? Number((brierLegSqErrorSum / nBrierLegsResolved).toFixed(4)) : null;
+    const brierStakeWeighted =
+      brierWeightSum > 0 ? Number((brierWeightedSqErrorSum / brierWeightSum).toFixed(4)) : null;
+
     return {
+      ...(cohortLabel ? { cohortLabel } : {}),
       n,
       sampleStatus,
       unitsStaked: Number(unitsStaked.toFixed(2)),
@@ -191,6 +263,11 @@ export class PerformanceMetricsEngine {
       avgConfidence,
       avgClvPct,
       nClv,
+      brierScore,
+      brierStakeWeighted,
+      nBrierLegsTotal,
+      nBrierLegsResolved,
+      nBrierLegsExcludedPush,
     };
   }
 
@@ -198,10 +275,16 @@ export class PerformanceMetricsEngine {
    * Build complete performance report including Green Cohort isolation and breakdowns.
    */
   public static generateReport(allPositions: LedgerPositionSnapshot[]): FullPerformanceReport {
-    const greenPositions = allPositions.filter(p => p.greenCohort === true);
+    const greenPositions = allPositions.filter(p => isQualifiedPublicPickCohort(p));
 
-    const headlineGreenCohort = this.aggregateMetrics(greenPositions);
-    const controlFullCohort = this.aggregateMetrics(allPositions);
+    const headlineGreenCohort = this.aggregateMetrics(
+      greenPositions,
+      QUALIFIED_PUBLIC_PICKS_COHORT_LABEL
+    );
+    const controlFullCohort = this.aggregateMetrics(
+      allPositions,
+      DIAGNOSTIC_ALL_ROWS_COHORT_LABEL
+    );
 
     // Breakdowns on green cohort (headline universe), fallback to allPositions if green cohort empty
     const targetCohort = greenPositions.length > 0 ? greenPositions : allPositions;
@@ -234,6 +317,7 @@ export class PerformanceMetricsEngine {
     return {
       headlineGreenCohort,
       controlFullCohort,
+      modelAllRowsDiagnostic: controlFullCohort,
       breakdowns: {
         byMarket,
         byConfidence,

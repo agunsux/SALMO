@@ -155,22 +155,25 @@ export default function PerformancePage() {
               <div className="rounded-xl border border-[#232830] bg-[#111418] overflow-hidden">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#232830] bg-[#161B22] px-5 py-4">
                   <div>
-                    <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-emerald-400">
+                    <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-amber-400">
                       <ShieldCheck className="h-3.5 w-3.5" />
-                      <span>IMMUTABLE SETTLEMENT AUDIT TRAIL • QUARTER-LINE ACCOUNTING</span>
+                      <span>MODEL_ALL_ROWS_DIAGNOSTIC (NOT PUBLIC PICKS) • QUARTER-LINE ACCOUNTING</span>
                     </div>
                     <h3 className="mt-1 text-base font-bold text-white">
-                      Verified Settled Positions ({settledPositions.length} Settled · 1.0u Flat Stake)
+                      Diagnostic All-Rows Settled Positions ({settledPositions.length} Settled · 1.0u Flat Stake)
                     </h3>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+                    <span className="rounded border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-amber-300 font-bold">
+                      COHORT: {perfReport?.controlFullCohort?.cohortLabel || 'MODEL_ALL_ROWS_DIAGNOSTIC (NOT PUBLIC PICKS)'}
+                    </span>
                     <span className="rounded border border-[#232830] bg-[#0B0D10] px-2.5 py-1 text-zinc-300">
                       Staked: <strong>{perfReport?.controlFullCohort?.unitsStaked ?? settledPositions.length}.0u</strong>
                     </span>
                     <span className="rounded border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-emerald-400 font-bold">
-                      Net Units: {perfReport?.controlFullCohort?.profitUnits !== undefined
+                      Diagnostic Net Units: {perfReport?.controlFullCohort?.profitUnits !== undefined
                         ? `${perfReport.controlFullCohort.profitUnits >= 0 ? '+' : ''}${perfReport.controlFullCohort.profitUnits.toFixed(2)}u`
-                        : '+1.83u'}
+                        : '+0.83u'}
                     </span>
                     <span className="rounded border border-[#232830] bg-[#0B0D10] px-2.5 py-1 text-zinc-400">
                       Last Sync: {observability?.lastSettlementRunAt ? observability.lastSettlementRunAt.replace('T', ' ').slice(0, 16) : '2026-10-10 18:47'} UTC
@@ -269,18 +272,21 @@ export default function PerformancePage() {
             <div className="rounded-xl border border-emerald-500/30 bg-[#111418] p-6 sm:p-8">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#232830] pb-6">
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
                     <ShieldCheck className="h-4 w-4" />
-                    <span>AUDITED SETTLEMENT LEDGER • QUALIFIED SAMPLE</span>
+                    <span>MODEL_ALL_ROWS_DIAGNOSTIC (NOT PUBLIC PICKS)</span>
                   </div>
                   <h2 className="mt-1 text-2xl font-extrabold text-white tracking-tight">
-                    Realized Production Performance
+                    Diagnostic All-Rows Flat-Stake Performance
                   </h2>
                   <p className="mt-1 text-xs text-[#8A93A0]">
-                    Canonical settlement record from verified finished fixtures. All bets audited at 1.0 unit flat stake.
+                    Diagnostic all-rows settlement record from verified finished fixtures (not public picks). All rows audited at 1.0 unit flat stake.
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
+                  <span className="rounded border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-amber-300 font-bold text-xs">
+                    {perfReport?.controlFullCohort?.cohortLabel || 'MODEL_ALL_ROWS_DIAGNOSTIC (NOT PUBLIC PICKS)'}
+                  </span>
                   <span className="rounded border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-emerald-400 font-bold text-sm">
                     {perfReport?.controlFullCohort?.displayStatus || 'INSUFFICIENT SAMPLE'}
                   </span>

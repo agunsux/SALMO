@@ -16,6 +16,12 @@ import {
   evaluateRowTemporalIntegrity,
   isKnownBatchPlaceholderTimestamp,
 } from '@/engine/archive/temporalIntegrityGuard';
+import { evaluatePositionBrierLegs } from '@/engine/performance/brierScoring';
+import {
+  isQualifiedPublicPickCohort,
+  DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,
+  QUALIFIED_PUBLIC_PICKS_COHORT_LABEL,
+} from '@/engine/performance/performanceMetrics';
 
 function bootstrapConfidenceInterval(values: number[], iterations = 2000): {
   n: number;
@@ -164,11 +170,16 @@ function normalizeResearchRow(
 
   const eligibleForPreMatchMetrics = temporalEval.eligibleForPreMatchMetrics;
 
-  // Strictly enforce that SHADOW / NONE / temporally ineligible rows are never marked as production picks
+  // Strictly enforce Hotfix H8 Rule 2: public pick cohort requires is_pick === true && verdict === 'LAYAK'
   const isPick =
     eligibleForPreMatchMetrics &&
     ledgerTier === 'PRODUCTION' &&
-    Boolean(raw.is_pick || raw.isDailyPick || raw.verdict === 'LAYAK');
+    isQualifiedPublicPickCohort({
+      is_pick: raw.is_pick,
+      isPick: raw.isPick,
+      isDailyPick: raw.isDailyPick,
+      verdict: raw.verdict ?? null,
+    });
 
   // Enrich finished fixtures with verified API-Football final score (zero OddsPapi needed)
   const evidenceFt = evidenceFtMap.get(fixtureId);
@@ -238,6 +249,24 @@ function normalizeResearchRow(
   const scoreOutcome = eligibleForPreMatchMetrics ? rawScoreOutcome : null;
   const result = eligibleForPreMatchMetrics ? (liveSettled?.result || raw.result || rawScoreOutcome || null) : null;
 
+  // Evaluate binary no-push per-leg Brier decomposition (Hotfix H8 Rule 1)
+  const brierDecomposition =
+    scoreVerified && (market === 'AH' || market === 'OU') && line !== null
+      ? evaluatePositionBrierLegs({
+          positionId: id,
+          fixtureId,
+          league: competition,
+          homeTeam,
+          awayTeam,
+          marketType: market,
+          selection,
+          line: Number(line),
+          homeGoals: homeGoals as number,
+          awayGoals: awayGoals as number,
+          fallbackModelProbDecimal: modelProbabilityDecimal,
+        })
+      : null;
+
   // Financial P&L is strictly computed ONLY when pick-time odds were recorded AND row is pre-match eligible (PRODUCTION tier)
   const profitLossUnits =
     eligibleForPreMatchMetrics && ledgerTier === 'PRODUCTION' && settlement === 'SETTLED'
@@ -297,6 +326,9 @@ function normalizeResearchRow(
     model_version: raw.model_version || raw.modelVersion || 'dixon-coles-v2.1',
     modelVersion: raw.modelVersion || raw.model_version || 'dixon-coles-v2.1',
     is_pick: isPick,
+    cohortClassification: isPick
+      ? QUALIFIED_PUBLIC_PICKS_COHORT_LABEL
+      : DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,
     ledgerTier,
     settlement,
     homeGoals,
@@ -307,6 +339,9 @@ function normalizeResearchRow(
     scoreVerified,
     scoreOutcome,
     result,
+    brierDecomposition,
+    brierLegs: brierDecomposition?.legs || [],
+    brierPositionMean: brierDecomposition?.positionBrierMean ?? null,
     profitLossUnits,
     stakeUnits,
     settledAt,
@@ -478,6 +513,7 @@ export async function GET(request: NextRequest) {
     );
 
     const settlementSummary = {
+      cohortLabel: DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,
       settledCount,
       pendingCount,
       winsCount: settledRows.filter((r: any) => r.result === 'WIN').length,
@@ -501,14 +537,7 @@ export async function GET(request: NextRequest) {
       ).length,
     };
 
-    // Build per-league Metric Computability Matrix (Hotfix H7 P1: strictly over eligibleForPreMatchMetrics rows)
-    const outcomeValueMap: Record<string, number> = {
-      WIN: 1.0,
-      HALF_WIN: 0.75,
-      PUSH: 0.5,
-      HALF_LOSS: 0.25,
-      LOSS: 0.0,
-    };
+    // Build per-league Metric Computability Matrix (Hotfix H7 P1 + Hotfix H8 P1: strictly over eligibleForPreMatchMetrics rows, binary no-push per-leg Brier)
     const byLeagueMap = new Map<string, any>();
     for (const p of predictions) {
       const lg = p.competition || p.league || 'Unknown';
@@ -531,8 +560,13 @@ export async function GET(request: NextRequest) {
           nWithVerifiedFinalScore: 0,
           nSettledWithOdds: 0,
           nScoreResolvedWithoutOdds: 0,
+          nBrierLegsTotal: 0,
+          nBrierLegsResolved: 0,
+          nBrierLegsExcludedPush: 0,
           _profits: [] as number[],
-          _brierErrors: [] as number[],
+          _brierLegErrors: [] as number[],
+          _brierWeightedSum: 0,
+          _brierWeightSum: 0,
         });
       }
       const entry = byLeagueMap.get(lg)!;
@@ -566,9 +600,18 @@ export async function GET(request: NextRequest) {
       }
       if (p.scoreVerified) {
         entry.nWithVerifiedFinalScore++;
-        const y = p.scoreOutcome ? outcomeValueMap[p.scoreOutcome] : undefined;
-        if (entry.informative && typeof y === 'number' && typeof p.model_probability === 'number') {
-          entry._brierErrors.push(Math.pow(p.model_probability - y, 2));
+        if (entry.informative && Array.isArray(p.brierLegs)) {
+          for (const leg of p.brierLegs) {
+            entry.nBrierLegsTotal++;
+            if (leg.excludedPush || leg.brierSqError === null || !Number.isFinite(leg.brierSqError)) {
+              entry.nBrierLegsExcludedPush++;
+            } else {
+              entry.nBrierLegsResolved++;
+              entry._brierLegErrors.push(leg.brierSqError);
+              entry._brierWeightedSum += leg.stakeWeight * leg.brierSqError;
+              entry._brierWeightSum += leg.stakeWeight;
+            }
+          }
         }
         if (hasPickOdds && typeof p.profitLossUnits === 'number') {
           entry.nSettledWithOdds++;
@@ -581,11 +624,17 @@ export async function GET(request: NextRequest) {
 
     const metricComputabilityMatrix = Array.from(byLeagueMap.values()).map(entry => {
       const yieldCi = bootstrapConfidenceInterval(entry._profits);
-      const brierCi = bootstrapConfidenceInterval(entry._brierErrors);
+      const brierCi = bootstrapConfidenceInterval(entry._brierLegErrors);
+      const brierStakeWeighted =
+        entry._brierWeightSum > 0
+          ? Number((entry._brierWeightedSum / entry._brierWeightSum).toFixed(4))
+          : null;
       return {
         league: entry.league,
         tier: entry.tier,
         informative: entry.informative,
+        yieldCohortLabel: DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,
+        brierScoringMethod: 'BINARY_NO_PUSH_PER_LEG',
         nPredictions: entry.nPredictions,
         nEligiblePreMatch: entry.nEligiblePreMatch,
         nConfirmedRetrospectiveExcluded: entry.nConfirmedRetrospectiveExcluded,
@@ -600,11 +649,15 @@ export async function GET(request: NextRequest) {
         nWithVerifiedFinalScore: entry.nWithVerifiedFinalScore,
         nSettledWithOdds: entry.nSettledWithOdds,
         nScoreResolvedWithoutOdds: entry.nScoreResolvedWithoutOdds,
+        nBrierLegsTotal: entry.nBrierLegsTotal,
+        nBrierLegsResolved: entry.nBrierLegsResolved,
+        nBrierLegsExcludedPush: entry.nBrierLegsExcludedPush,
+        brierStakeWeighted,
         computableNow: {
           roi: entry.nSettledWithOdds > 0,
           yield: entry.nSettledWithOdds > 0,
           clv: entry.nWithClosingSnapshot > 0,
-          brier: entry.informative && entry._brierErrors.length > 0,
+          brier: entry.informative && entry._brierLegErrors.length > 0,
         },
         bootstrap95CI: {
           yield: yieldCi,

@@ -4,7 +4,14 @@
 // Strictly enforces sample size gate (n < 30 -> INSUFFICIENT SAMPLE).
 
 import { NextRequest, NextResponse } from 'next/server';
-import { PerformanceMetricsEngine, LedgerPositionSnapshot } from '@/engine/performance/performanceMetrics';
+import {
+  PerformanceMetricsEngine,
+  LedgerPositionSnapshot,
+  isQualifiedPublicPickCohort,
+  DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,
+  QUALIFIED_PUBLIC_PICKS_COHORT_LABEL,
+} from '@/engine/performance/performanceMetrics';
+import { evaluatePositionBrierLegs } from '@/engine/performance/brierScoring';
 import { CanonicalMatchArchiveService } from '@/engine/archive/canonicalMatchArchiveService';
 import { Logger } from '@/lib/logger';
 import path from 'path';
@@ -20,6 +27,27 @@ export async function GET(request: NextRequest) {
     const positions: LedgerPositionSnapshot[] = [];
     const settledPositions: any[] = [];
 
+    // Build fixture metadata lookup from all_leagues_research_ledger.jsonl so homeTeam/awayTeam/kickoffUtc are resolved for Brier score grid
+    const fixtureMetaMap = new Map<string, { homeTeam: string; awayTeam: string; kickoffUtc: string; league: string }>();
+    const allLeaguesPath = path.resolve(process.cwd(), 'data', 'verification', 'all_leagues_research_ledger.jsonl');
+    if (fs.existsSync(allLeaguesPath)) {
+      try {
+        const metaLines = fs.readFileSync(allLeaguesPath, 'utf8').trim().split('\n').filter(Boolean);
+        for (const ml of metaLines) {
+          const parsed = JSON.parse(ml);
+          const fId = String(parsed.fixtureId || parsed.fixture_id || '');
+          if (fId && parsed.homeTeam && parsed.awayTeam) {
+            fixtureMetaMap.set(fId, {
+              homeTeam: parsed.homeTeam,
+              awayTeam: parsed.awayTeam,
+              kickoffUtc: parsed.kickoffUtc || parsed.kickoff_utc || '',
+              league: parsed.league || parsed.competition || 'Premier League',
+            });
+          }
+        }
+      } catch {}
+    }
+
     // 1. Read from canonical verification ledger
     const ledgerPath = path.resolve(process.cwd(), 'data', 'verification', 'live_prediction_ledger.jsonl');
     if (fs.existsSync(ledgerPath)) {
@@ -31,27 +59,64 @@ export async function GET(request: NextRequest) {
             const mType = (row.marketType || row.market)?.toUpperCase();
             if (mType !== 'AH' && mType !== 'OU') continue;
 
+            const fixtureId = String(row.fixtureId || row.providerProvenance?.apiFootballFixtureId || '');
+            const meta = fixtureMetaMap.get(fixtureId);
+            const homeTeam = row.homeTeam || meta?.homeTeam || 'Unknown Home';
+            const awayTeam = row.awayTeam || meta?.awayTeam || 'Unknown Away';
+            const kickoffUtc = row.kickoffUtc || meta?.kickoffUtc || '';
+            const league = row.league || meta?.league || 'Premier League';
+
             const isSettled = row.settlementStatus === 'SETTLED' || row.settlement === 'SETTLED';
+            const isQualifiedPick = isQualifiedPublicPickCohort({
+              is_pick: row.is_pick,
+              isPick: row.isPick,
+              isDailyPick: row.isDailyPick,
+              verdict: row.verdict ?? null,
+            });
+
+            const pWinFallback = Number(row.pWin ?? (row.modelProbability ? row.modelProbability / 100 : 0.5));
+            const hasVerifiedGoals = isSettled && typeof row.homeGoals === 'number' && typeof row.awayGoals === 'number';
+
+            const brierDecomposition = hasVerifiedGoals
+              ? evaluatePositionBrierLegs({
+                  positionId: row.ledgerPositionId || row.predictionId,
+                  fixtureId,
+                  league,
+                  homeTeam,
+                  awayTeam,
+                  marketType: mType as 'AH' | 'OU',
+                  selection: row.selection,
+                  line: Number(row.line ?? 0),
+                  homeGoals: row.homeGoals,
+                  awayGoals: row.awayGoals,
+                  fallbackModelProbDecimal: pWinFallback,
+                })
+              : null;
+
             const snap: LedgerPositionSnapshot = {
               ledgerPositionId: row.ledgerPositionId || row.predictionId,
-              fixtureId: String(row.fixtureId || row.providerProvenance?.apiFootballFixtureId || ''),
+              fixtureId,
               marketType: mType as 'AH' | 'OU',
               selection: row.selection,
               line: Number(row.line ?? 0),
               stakeUnits: 1.0,
               marketOdds: Number(row.marketOdds || row.oddsAtPrediction || 1.95),
               fairOdds: Number(row.fairOdds || 1.90),
-              pWin: Number(row.pWin ?? (row.modelProbability ? row.modelProbability / 100 : 0.5)),
+              pWin: pWinFallback,
               pPush: Number(row.pPush ?? 0),
               pLoss: Number(row.pLoss ?? 0.5),
               confidence: Number(row.confidence ?? 0),
               edge: Number(row.edge ?? 0),
               expectedValuePct: Number(row.expectedValuePct ?? row.EV ?? 0),
-              greenCohort: (row.greenCohort !== undefined) ? Boolean(row.greenCohort) : (Number(row.confidence ?? 0) > 70),
+              greenCohort: isQualifiedPick,
+              is_pick: Boolean(row.is_pick || row.isPick || row.isDailyPick),
+              verdict: row.verdict || 'LEWATI',
               settlementStatus: isSettled ? 'SETTLED' : 'PENDING',
               result: row.result || null,
               profitUnits: Number(row.profitUnits ?? row.profitLoss ?? 0),
               clvPct: (row.clvPct !== undefined) ? row.clvPct : (row.CLV !== undefined ? row.CLV : null),
+              brierDecomposition,
+              brierLegs: brierDecomposition?.legs || [],
               settledAt: row.settledAt || null,
               createdAt: row.createdAt || row.predictionTimestamp,
             };
@@ -62,10 +127,10 @@ export async function GET(request: NextRequest) {
                 predictionId: snap.ledgerPositionId,
                 canonicalMatchId: row.canonicalMatchId || snap.fixtureId,
                 fixtureId: snap.fixtureId,
-                league: row.league || 'Premier League',
-                homeTeam: row.homeTeam,
-                awayTeam: row.awayTeam,
-                kickoffUtc: row.kickoffUtc,
+                league,
+                homeTeam,
+                awayTeam,
+                kickoffUtc,
                 market: mType,
                 line: snap.line,
                 selection: snap.selection,
@@ -74,13 +139,20 @@ export async function GET(request: NextRequest) {
                 modelProbability: row.modelProbability ?? Number((snap.pWin * 100).toFixed(1)),
                 edge: snap.edge,
                 confidence: snap.confidence,
-                verdict: row.verdict || (snap.greenCohort ? 'LAYAK' : 'LEWATI'),
+                is_pick: snap.is_pick,
+                verdict: row.verdict || 'LEWATI',
+                greenCohort: snap.greenCohort,
+                cohortClassification: snap.greenCohort
+                  ? QUALIFIED_PUBLIC_PICKS_COHORT_LABEL
+                  : DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,
                 matchScore: row.matchScore || `${row.homeGoals ?? 0}-${row.awayGoals ?? 0}`,
                 homeGoals: row.homeGoals ?? null,
                 awayGoals: row.awayGoals ?? null,
                 result: snap.result,
                 profitUnits: snap.profitUnits,
                 stakeUnits: snap.stakeUnits,
+                brierPositionMean: brierDecomposition?.positionBrierMean ?? null,
+                brierLegs: brierDecomposition?.legs || [],
                 settledAt: snap.settledAt,
                 bookmaker: row.bookmaker || 'pinnacle',
               });
@@ -116,6 +188,8 @@ export async function GET(request: NextRequest) {
             edge: 0,
             expectedValuePct: 0,
             greenCohort: false,
+            is_pick: false,
+            verdict: 'LEWATI',
             settlementStatus: 'SETTLED',
             result: sr.outcome,
             profitUnits: Number(sr.profit_units ?? 0),
@@ -134,6 +208,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       version: 'v1',
+      cohortLabels: {
+        publicPicksCohort: QUALIFIED_PUBLIC_PICKS_COHORT_LABEL,
+        allRowsDiagnosticCohort: DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,
+      },
       report,
       settledPositions,
       observability,

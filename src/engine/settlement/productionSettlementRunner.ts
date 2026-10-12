@@ -2,7 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 import { SettlementEngine } from './settlementEngine';
-import { PerformanceMetricsEngine, LedgerPositionSnapshot } from '../performance/performanceMetrics';
+import {
+  PerformanceMetricsEngine,
+  LedgerPositionSnapshot,
+  isQualifiedPublicPickCohort,
+} from '../performance/performanceMetrics';
 import { getLeagueByNameOrSlug } from '../../config/multiLeagueRegistry';
 import { Logger } from '../../lib/logger';
 
@@ -196,7 +200,14 @@ export async function runProductionSettlement(options: SettlementRunnerOptions =
           confidence: Number(updatedRow.confidence || 0),
           edge: Number(updatedRow.edge || 0),
           expectedValuePct: Number(updatedRow.EV || 0),
-          greenCohort: Number(updatedRow.confidence || 0) > 70,
+          greenCohort: isQualifiedPublicPickCohort({
+            is_pick: updatedRow.is_pick,
+            isPick: updatedRow.isPick,
+            isDailyPick: updatedRow.isDailyPick,
+            verdict: updatedRow.verdict ?? null,
+          }),
+          is_pick: Boolean(updatedRow.is_pick || updatedRow.isPick || updatedRow.isDailyPick),
+          verdict: updatedRow.verdict || 'LEWATI',
           settlementStatus: settlement.settlementStatus,
           result: settlement.result,
           profitUnits: settlement.profitUnits,
