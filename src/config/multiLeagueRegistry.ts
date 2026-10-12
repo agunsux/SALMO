@@ -86,17 +86,19 @@ export const CANONICAL_15_LEAGUES: MultiLeagueEntry[] = [
     supported_ah_availability: true,
     supported_ou_availability: true,
     supported_btts_inputs: true,
-    production_status: 'ACTIVE',
-    ledger_tier: 'PRODUCTION',
+    production_status: 'SHADOW',
+    ledger_tier: 'SHADOW',
     model_version: 'dixon-coles-v1.0',
     fixture_enabled: true,
-    odds_enabled: true,
+    odds_enabled: false,
     ah_research_enabled: true,
     ou_research_enabled: true,
     ah_prediction_enabled: true,
     ou_prediction_enabled: true,
     model_ready: true,
-    production_pick_enabled: true,
+    production_pick_enabled: false,
+    production_enabled_markets: [],
+    validated_markets: [],
   },
   {
     internal_league_id: 'ESP-LALIGA',
@@ -499,11 +501,14 @@ const DEFAULT_LEAGUE_READINESS_MAP: Record<
   }
 > = {
   'ENG-PL': {
-    validated_markets: ['AH', 'OU'],
-    production_enabled_markets: ['AH', 'OU'],
+    validated_markets: [],
+    production_enabled_markets: [],
     activation_priority: 1,
-    market_readiness: { AH: 'READY_FOR_PRODUCTION', OU: 'READY_FOR_PRODUCTION' },
-    market_blockers: { AH: null, OU: null },
+    market_readiness: { AH: 'BLOCKED_MODEL_VALIDATION', OU: 'BLOCKED_MODEL_VALIDATION' },
+    market_blockers: {
+      AH: 'NOT_APPROVED_FOR_PRODUCTION: Benchmark underperformance vs Pinnacle closing and 0/100 live CLV evidence',
+      OU: 'NOT_APPROVED_FOR_PRODUCTION: Benchmark underperformance vs Pinnacle closing and 0/100 live CLV evidence',
+    },
   },
   'ESP-LALIGA': {
     validated_markets: [],
@@ -650,14 +655,7 @@ const DEFAULT_LEAGUE_READINESS_MAP: Record<
 export function resetRegistryToDefaultState(): void {
   for (const entry of CANONICAL_15_LEAGUES) {
     const def = DEFAULT_LEAGUE_READINESS_MAP[entry.internal_league_id];
-    if (entry.internal_league_id === 'ENG-PL') {
-      entry.production_status = 'ACTIVE';
-      entry.ledger_tier = 'PRODUCTION';
-      entry.odds_enabled = true;
-      entry.production_pick_enabled = true;
-      entry.ou_prediction_enabled = true;
-      entry.ah_prediction_enabled = true;
-    } else if (entry.internal_league_id === 'IDN-L1') {
+    if (entry.internal_league_id === 'IDN-L1') {
       entry.production_status = 'PAUSED';
       entry.ledger_tier = 'NONE';
       entry.odds_enabled = false;
@@ -737,10 +735,32 @@ export function isLeagueMarketValidated(leagueKeyOrName: string, market: 'AH' | 
 /**
  * Returns the current production activation state ('ACTIVE' | 'SHADOW' | 'PAUSED' | 'DISABLED') for a league.
  */
-export function getLeagueActivationState(leagueKeyOrName: string): ProductionStatus {
+export interface LeagueActivationStateSummary {
+  production_status: ProductionStatus;
+  production_pick_enabled: boolean;
+  ledger_tier: LedgerTier;
+  production_enabled_markets: MarketKey[];
+}
+
+/**
+ * Returns the current production activation state ('ACTIVE' | 'SHADOW' | 'PAUSED' | 'DISABLED') for a league.
+ */
+export function getLeagueActivationState(leagueKeyOrName: string): LeagueActivationStateSummary {
   const entry = getLeagueByNameOrSlug(leagueKeyOrName);
-  if (!entry) return 'DISABLED';
-  return entry.production_status;
+  if (!entry) {
+    return {
+      production_status: 'DISABLED',
+      production_pick_enabled: false,
+      ledger_tier: 'NONE',
+      production_enabled_markets: [],
+    };
+  }
+  return {
+    production_status: entry.production_status,
+    production_pick_enabled: entry.production_pick_enabled,
+    ledger_tier: entry.ledger_tier,
+    production_enabled_markets: entry.production_enabled_markets || [],
+  };
 }
 
 /**
@@ -767,33 +787,60 @@ export function getLeagueMarketBlocker(leagueKeyOrName: string, market: 'AH' | '
   return entry.market_blockers?.[market] || null;
 }
 
+export interface LeagueMarketActionResult {
+  success: boolean;
+  reason: string;
+  previousStatus?: ProductionStatus;
+  entry: MultiLeagueEntry | null;
+}
+
 /**
  * H2 Hardening: Activates only the validated & verified markets for a league ONLY when
- * explicitHumanApproval === true (or for ENG-PL).
- * Never promotes any non-EPL league automatically without explicit human approval.
+ * explicitHumanApproval === true.
+ * Never promotes any league (including ENG-PL) automatically without explicit human approval.
  */
 export function activateLeagueMarkets(
   internalLeagueId: string,
   marketsToEnable: MarketKey[],
-  reason: string,
-  timestampIso = new Date().toISOString(),
-  explicitHumanApproval = false
-): MultiLeagueEntry | null {
+  reasonOrOptions?: string | { explicitHumanApproval?: boolean; reason?: string; timestampIso?: string },
+  timestampIsoArg?: string,
+  explicitHumanApprovalArg = false
+): LeagueMarketActionResult {
+  const reason = typeof reasonOrOptions === 'string'
+    ? reasonOrOptions
+    : reasonOrOptions?.reason || 'Market activation';
+  const timestampIso = typeof reasonOrOptions === 'object' && reasonOrOptions?.timestampIso
+    ? reasonOrOptions.timestampIso
+    : timestampIsoArg || new Date().toISOString();
+  const explicitHumanApproval = typeof reasonOrOptions === 'object' && reasonOrOptions?.explicitHumanApproval !== undefined
+    ? reasonOrOptions.explicitHumanApproval
+    : explicitHumanApprovalArg;
+
   const entry = getLeagueByKey(internalLeagueId);
-  if (!entry) return null;
+  if (!entry) {
+    return { success: false, reason: `League '${internalLeagueId}' not found`, entry: null };
+  }
   if (entry.production_status === 'PAUSED' || !entry.model_ready) {
-    return entry;
+    return { success: false, reason: `League ${internalLeagueId} is PAUSED or model not ready`, entry };
   }
 
-  // H2: Block automatic promotion of non-EPL leagues without explicit human approval
-  if (internalLeagueId !== 'ENG-PL' && !explicitHumanApproval) {
-    return entry;
+  // Mandatory: Block automatic promotion of ANY league (including ENG-PL) without explicit human approval
+  if (!explicitHumanApproval) {
+    return {
+      success: false,
+      reason: `Blocked: Promotion of ${internalLeagueId} requires explicit human approval`,
+      entry,
+    };
   }
 
   // Filter strictly to markets that have passed model validation
   const allowedMarkets = marketsToEnable.filter((m) => entry.validated_markets?.includes(m));
   if (allowedMarkets.length === 0) {
-    return entry;
+    return {
+      success: false,
+      reason: `No validated markets to enable for ${internalLeagueId}. Validated: ${JSON.stringify(entry.validated_markets)}`,
+      entry,
+    };
   }
 
   entry.production_enabled_markets = Array.from(new Set(allowedMarkets));
@@ -818,22 +865,24 @@ export function activateLeagueMarkets(
     }
   }
 
-  return entry;
+  return { success: true, reason: 'Activated successfully', entry };
 }
 
 /**
- * Idempotently rolls back a non-EPL league to SHADOW if smoke test or post-activation verification fails.
- * Never rolls back ENG-PL.
+ * Idempotently rolls back a league to SHADOW if smoke test or post-activation verification fails.
+ * Fully supports ENG-PL without hardcoded exceptions.
  */
 export function rollbackLeagueMarkets(
   internalLeagueId: string,
   reason: string,
   timestampIso = new Date().toISOString()
-): MultiLeagueEntry | null {
-  if (internalLeagueId === 'ENG-PL') return getLeagueByKey('ENG-PL') || null;
+): LeagueMarketActionResult {
   const entry = getLeagueByKey(internalLeagueId);
-  if (!entry) return null;
+  if (!entry) {
+    return { success: false, reason: `League '${internalLeagueId}' not found`, entry: null };
+  }
 
+  const previousStatus = entry.production_status;
   const def = DEFAULT_LEAGUE_READINESS_MAP[internalLeagueId];
   entry.production_enabled_markets = [];
   entry.production_status = entry.internal_league_id === 'IDN-L1' ? 'PAUSED' : 'SHADOW';
@@ -850,7 +899,12 @@ export function rollbackLeagueMarkets(
       OU: def.market_blockers.OU || reason,
     };
   }
-  return entry;
+  return {
+    success: true,
+    reason: `Rolled back: ${reason}`,
+    previousStatus,
+    entry,
+  };
 }
 
 /**

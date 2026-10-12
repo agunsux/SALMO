@@ -319,13 +319,8 @@ export class ValueEngine {
     const evThreshold = modelValid && expectedValue >= this.MIN_EV_THRESHOLD;
 
     // GATE 7: DATA_COMPLETENESS (Per-League & Per-Market Eligibility)
-    const leagueLower = (input.league || '').toLowerCase().trim();
-    const isEplLegacy =
-      WHITELIST_LEAGUES.some((l) => leagueLower.includes(l)) ||
-      leagueLower.startsWith('epl') ||
-      leagueLower.startsWith('premier');
     const isRegistryMarketEnabled = isLeagueMarketProductionEnabled(input.league, input.market);
-    const isWhitelistedLeague = isEplLegacy || isRegistryMarketEnabled;
+    const isWhitelistedLeague = isRegistryMarketEnabled;
 
     const hasTeamIdentity =
       Boolean(input.homeTeam) &&
@@ -333,12 +328,13 @@ export class ValueEngine {
       input.homeTeam.trim() !== '' &&
       input.awayTeam.trim() !== '';
 
+    const effectiveFixtureId = input.fixtureId || (input as any).matchId;
     const hasValidFixtureId =
-      Boolean(input.fixtureId) &&
-      input.fixtureId.trim() !== '' &&
-      !input.fixtureId.toLowerCase().startsWith('mock-') &&
-      !input.fixtureId.toLowerCase().startsWith('synth-') &&
-      !input.fixtureId.toLowerCase().startsWith('fake-');
+      Boolean(effectiveFixtureId) &&
+      effectiveFixtureId.trim() !== '' &&
+      !effectiveFixtureId.toLowerCase().startsWith('mock-') &&
+      !effectiveFixtureId.toLowerCase().startsWith('synth-') &&
+      !effectiveFixtureId.toLowerCase().startsWith('fake-');
 
     const dataCompleteness =
       isWhitelistedLeague && hasTeamIdentity && hasValidFixtureId;
@@ -427,9 +423,13 @@ export class ValueEngine {
         verdict = 'LEWATI';
         validationStatus = 'INCOMPLETE_METADATA';
         const marketBlocker = getLeagueMarketBlocker(input.league, input.market);
-        rejectionReason = marketBlocker
-          ? `INCOMPLETE_METADATA: League '${input.league}' (${input.market}) not whitelisted — ${marketBlocker}`
-          : `INCOMPLETE_METADATA: League '${input.league}' not whitelisted or invalid entity identifier`;
+        if (!isWhitelistedLeague) {
+          rejectionReason = `MARKET_NOT_PRODUCTION_ENABLED: League '${input.league}' market '${input.market}' is not enabled in production registry${marketBlocker ? ` (${marketBlocker})` : ''}`;
+        } else {
+          rejectionReason = marketBlocker
+            ? `INCOMPLETE_METADATA: League '${input.league}' (${input.market}) not whitelisted — ${marketBlocker}`
+            : `INCOMPLETE_METADATA: League '${input.league}' not whitelisted or invalid entity identifier`;
+        }
       } else if (!edgeThreshold) {
         verdict = edge > 0 ? 'PANTAU' : 'LEWATI';
         validationStatus = 'NO_EDGE';

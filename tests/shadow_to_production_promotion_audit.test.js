@@ -281,9 +281,9 @@ test('P4.1: MultiLeagueAutoActivator.evaluateAllShadowLeagues() uses H8 binary n
 
   assert.strictEqual(report.promotionMode, 'PROPOSE_ONLY');
   assert.strictEqual(report.totalLeaguesInRegistry, 15);
-  assert.strictEqual(report.totalShadowEvaluated, 13);
+  assert.strictEqual(report.totalShadowEvaluated, 14);
   assert.deepStrictEqual(report.newlyUnlocked, [], 'Zero SHADOW leagues may be unlocked');
-  assert.strictEqual(report.remainedShadow.length, 13, 'All 13 SHADOW leagues must remain SHADOW');
+  assert.strictEqual(report.remainedShadow.length, 14, 'All 14 SHADOW leagues must remain SHADOW');
 
   for (const d of report.decisions) {
     assert.strictEqual(d.finalDecision, 'REMAIN_SHADOW', `${d.leagueCode} must remain SHADOW`);

@@ -128,7 +128,17 @@ export function resolveFixtureScoreGrid(params: {
   let lambdaHome: number;
   let lambdaAway: number;
 
-  if (profile.code === 'EPL' && (!homeRating || !awayRating)) {
+  if (
+    typeof params.lambdaHome === 'number' &&
+    typeof params.lambdaAway === 'number' &&
+    Number.isFinite(params.lambdaHome) &&
+    Number.isFinite(params.lambdaAway) &&
+    params.lambdaHome > 0 &&
+    params.lambdaAway > 0
+  ) {
+    lambdaHome = params.lambdaHome;
+    lambdaAway = params.lambdaAway;
+  } else if (profile.code === 'EPL' && (!homeRating || !awayRating)) {
     lambdaHome = 1.35;
     lambdaAway = 1.20;
   } else {

@@ -278,6 +278,8 @@ export interface MarketView {
     lossPct: number;
   };
   reason: string;
+  isProductionEnabled?: boolean;
+  productionEligible?: boolean;
   verdict?: 'LAYAK' | 'PANTAU' | 'LEWATI';
   rejectionReason?: string | null;
   bestAvailableOdds?: number | null;

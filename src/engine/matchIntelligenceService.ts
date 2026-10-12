@@ -21,7 +21,7 @@ import { matchesDynamicHorizon } from '../lib/horizon';
 
 import { normalizeTeamKey } from './features/teamRatings';
 import { FixtureIntegrityGuard } from '../lib/fixtureIntegrity';
-import { isLeagueMarketProductionEnabled } from '../config/multiLeagueRegistry';
+import { isLeagueMarketProductionEnabled, type MarketKey } from '../config/multiLeagueRegistry';
 export { normalizeTeamKey };
 
 export class MatchIntelligenceService {
@@ -309,18 +309,41 @@ export class MatchIntelligenceService {
    * Intentional GREY unavailable market state with zero fake numbers.
    */
   public static buildUnavailableMarket(
-    marketType: 'ASIAN_HANDICAP' | 'BTTS' | 'OVER_UNDER',
-    lineLabel: string,
-    summary: any,
-    leagueName: string = 'Premier League',
+    marketTypeOrFixture: 'ASIAN_HANDICAP' | 'BTTS' | 'OVER_UNDER' | string | any,
+    lineLabelOrMarket: string = '-',
+    summaryOrReason?: any,
+    leagueNameOrReason: string = 'Premier League',
     explicitReason?: string
   ): MarketView {
-    const isEpl = (leagueName || '').toLowerCase().includes('premier league') || (leagueName || '').toLowerCase() === 'epl';
-    const shortMarket = marketType === 'ASIAN_HANDICAP' ? 'AH' : marketType === 'OVER_UNDER' ? 'OU' : 'BTTS';
+    let resolvedMarketType: 'ASIAN_HANDICAP' | 'BTTS' | 'OVER_UNDER';
+    let lineLabel: string = '-';
+    let summary: any = null;
+    let leagueName: string = 'Premier League';
+    let reasonTextCustom: string | undefined = undefined;
+
+    if (typeof marketTypeOrFixture === 'object' && marketTypeOrFixture !== null) {
+      leagueName = marketTypeOrFixture.league || 'Premier League';
+      const mStr = String(lineLabelOrMarket || 'AH').toUpperCase();
+      resolvedMarketType = mStr.includes('HANDICAP') || mStr === 'AH'
+        ? 'ASIAN_HANDICAP'
+        : mStr.includes('OVER') || mStr === 'OU'
+        ? 'OVER_UNDER'
+        : 'BTTS';
+      lineLabel = resolvedMarketType === 'OVER_UNDER' ? '2.5' : resolvedMarketType === 'BTTS' ? 'YES' : '-';
+      reasonTextCustom = typeof summaryOrReason === 'string' ? summaryOrReason : undefined;
+    } else {
+      resolvedMarketType = marketTypeOrFixture;
+      lineLabel = lineLabelOrMarket || '-';
+      summary = summaryOrReason;
+      leagueName = leagueNameOrReason || 'Premier League';
+      reasonTextCustom = explicitReason;
+    }
+
+    const shortMarket: MarketKey | 'BTTS' =
+      resolvedMarketType === 'ASIAN_HANDICAP' ? 'AH' : resolvedMarketType === 'OVER_UNDER' ? 'OU' : 'BTTS';
     const isProdEnabled =
-      isEpl ||
-      (shortMarket !== 'BTTS' && isLeagueMarketProductionEnabled(leagueName, shortMarket));
-    const reasonText = explicitReason || (
+      shortMarket !== 'BTTS' && isLeagueMarketProductionEnabled(leagueName, shortMarket);
+    const reasonText = reasonTextCustom || (
       !isProdEnabled
         ? 'Fixtures only — model baseline not available'
         : 'Real bookmaker market odds are not currently published for this fixture.'
@@ -328,10 +351,12 @@ export class MatchIntelligenceService {
     const statusLabelText = !isProdEnabled ? 'ANALYSIS UNAVAILABLE' : 'ODDS UNAVAILABLE';
 
     return {
-      marketType,
+      marketType: resolvedMarketType,
       lineLabel,
       selection: 'none',
       available: false,
+      isProductionEnabled: isProdEnabled,
+      productionEligible: isProdEnabled,
       odds: null,
       bookmaker: null,
       badge: 'GREY',
@@ -352,7 +377,7 @@ export class MatchIntelligenceService {
         datasetVersion: summary?.version || 'v1.0.0-salmo-native',
         dateRange: 'Real-time',
         league: leagueName,
-        market: marketType,
+        market: resolvedMarketType,
         line: lineLabel,
         sampleSize: 0,
         settlementMethodology: 'Unsettled',

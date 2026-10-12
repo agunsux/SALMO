@@ -370,11 +370,11 @@ function computeCommittedFootballDataPinnacleMatches(perLeagueStats) {
   };
 }
 
-// Known 5 promoted/relegated clubs in 2026-10-06 EPL snapshot that used 1.35/1.20 fallback in CANONICAL_EPL_RATINGS
+// Known 4 promoted/relegated clubs in 2026-10-06 EPL snapshot that used 1.35/1.20 fallback in CANONICAL_EPL_RATINGS
+// (Ipswich Town has canonical ratings in CANONICAL_EPL_RATINGS: att=0.88, def=1.30)
 const EPL_2026_10_06_FALLBACK_CLUBS = new Set([
   'Leeds United',
   'Sunderland AFC',
-  'Ipswich Town',
   'Hull City',
   'Coventry City',
 ]);

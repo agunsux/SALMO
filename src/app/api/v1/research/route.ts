@@ -92,11 +92,11 @@ function normalizeResearchRow(
   // Enrich PRODUCTION rows with verified pre-match provenance & settlement P&L from live_prediction_ledger.jsonl
   // Authoritative rule (Phase 1D): live_prediction_ledger.jsonl (recorded 2026-10-06T21:36Z before kickoff) is the
   // canonical immutable pre-match record for the 20 EPL PRODUCTION rows.
+  // Enrich rows with verified pre-match provenance & settlement P&L from live_prediction_ledger.jsonl
+  // Authoritative rule: live_prediction_ledger.jsonl is the canonical immutable record whenever present.
   const liveSettled =
-    ledgerTier === 'PRODUCTION'
-      ? liveSettledMap.get(`${fixtureId}_${market}`) ||
-        (raw.canonicalMatchId ? liveSettledMap.get(`${raw.canonicalMatchId}_${market}`) : undefined)
-      : undefined;
+    liveSettledMap.get(`${fixtureId}_${market}`) ||
+    (raw.canonicalMatchId ? liveSettledMap.get(`${raw.canonicalMatchId}_${market}`) : undefined);
 
   const regeneratedProbPct =
     typeof raw.modelProbability === 'number'
@@ -107,21 +107,25 @@ function normalizeResearchRow(
         : raw.model_probability
       : null;
 
-  const authoritativeProbSource =
-    typeof liveSettled?.modelProbability === 'number'
-      ? liveSettled.modelProbability
-      : raw.model_probability ?? raw.modelProbability ?? null;
-
-  // Normalize model_probability to 0..1 decimal for UI while preserving modelProbability (0..100) for API consumers
-  const modelProbabilityDecimal =
-    typeof authoritativeProbSource === 'number'
-      ? authoritativeProbSource > 1
-        ? Number((authoritativeProbSource / 100).toFixed(4))
-        : Number(authoritativeProbSource.toFixed(4))
+  const authoritativeProbDecimal =
+    typeof liveSettled?.pWin === 'number'
+      ? liveSettled.pWin
+      : typeof liveSettled?.modelProbability === 'number'
+      ? Number((liveSettled.modelProbability / 100).toFixed(4))
+      : typeof raw.model_probability === 'number'
+      ? raw.model_probability > 1
+        ? Number((raw.model_probability / 100).toFixed(4))
+        : Number(raw.model_probability.toFixed(4))
+      : typeof raw.modelProbability === 'number'
+      ? Number((raw.modelProbability / 100).toFixed(4))
       : 0;
+
+  const modelProbabilityDecimal = authoritativeProbDecimal;
   const modelProbabilityPct =
     typeof liveSettled?.modelProbability === 'number'
       ? liveSettled.modelProbability
+      : typeof liveSettled?.pWin === 'number'
+      ? Number((liveSettled.pWin * 100).toFixed(1))
       : regeneratedProbPct;
 
   const fairOdds = liveSettled?.fairOdds ?? raw.fair_odds ?? raw.fairOdds ?? null;

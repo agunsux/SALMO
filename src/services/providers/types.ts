@@ -17,6 +17,7 @@ export interface ProviderResult<T> {
   latencyMs: number;
   cached: boolean;
   timestamp: string;
+  requestsConsumed?: number;
 }
 
 export const CONSUMED_BOOKMAKERS = [

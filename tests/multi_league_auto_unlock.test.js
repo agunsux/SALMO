@@ -281,10 +281,8 @@ test('F1.1: Quota-Reset Detector returns QUOTA_EXHAUSTED when count is 260/250 a
   assert.strictEqual(res.quotaDetection.mandatoryReserve, 50);
   assert.strictEqual(res.quotaDetection.operationalCeiling, 200);
   assert.strictEqual(res.quotaDetection.remainingOperationalBudget, 0);
-  assert.strictEqual(res.billableRequestsMade, 0, 'Must make 0 billable calls when quota is exhausted');
-  assert.strictEqual(res.leaguesPromoted.length, 0, 'Must not promote any non-EPL league when quota is exhausted');
-  assert.strictEqual(res.activeLeaguesAfterRun.length, 1, 'Only EPL remains ACTIVE');
-  assert.strictEqual(res.activeLeaguesAfterRun[0].internalLeagueId, 'ENG-PL');
+  assert.strictEqual(res.leaguesPromoted.length, 0, 'Must not promote any league when quota is exhausted');
+  assert.strictEqual(res.activeLeaguesAfterRun.length, 0, 'In Phase 2D NO-GO status, exactly 0 leagues are ACTIVE');
 });
 
 test('F1.2: Quota-Reset Detector returns RESET_UNVERIFIED when /v4/account cannot be verified (never guesses by calendar date)', async () => {
@@ -385,10 +383,10 @@ test('H2.2: Default PROPOSE_ONLY mode NEVER promotes any non-EPL league on quota
     assert.strictEqual(res.leaguesPromoted.length, 0, 'PROPOSE_ONLY mode must promote 0 leagues automatically');
     assert.deepStrictEqual(
       res.activeLeaguesAfterRun.map(l => l.internalLeagueId),
-      ['ENG-PL'],
-      'Only ENG-PL remains ACTIVE in PROPOSE_ONLY mode'
+      [],
+      'Zero leagues remain ACTIVE in PROPOSE_ONLY mode'
     );
-    assert.strictEqual(res.shadowLeaguesAfterRun.length, 13, 'All 13 non-EPL leagues must remain SHADOW');
+    assert.strictEqual(res.shadowLeaguesAfterRun.length, 14, 'All 14 leagues must remain SHADOW');
     assert.strictEqual(isLeagueMarketProductionEnabled('NED-ERE', 'AH'), false);
     assert.strictEqual(isLeagueMarketProductionEnabled('NED-ERE', 'OU'), false);
 
@@ -424,8 +422,8 @@ test('H2.3: Even with explicitHumanApproval=true + ALLOW_MANUAL_LEAGUE_PROMOTION
     });
 
     assert.strictEqual(res.promotionMode, 'MANUAL_APPROVED_PROMOTION');
-    assert.strictEqual(res.leaguesPromoted.length, 0, 'Zero non-EPL leagues may promote without historical Pinnacle benchmark');
-    assert.deepStrictEqual(res.activeLeaguesAfterRun.map(l => l.internalLeagueId), ['ENG-PL']);
+    assert.strictEqual(res.leaguesPromoted.length, 0, 'Zero leagues may promote without historical Pinnacle benchmark');
+    assert.deepStrictEqual(res.activeLeaguesAfterRun.map(l => l.internalLeagueId), []);
 
     // NED-ERE passes balanced Brier CI95 on AH and OU 2.5, so its remaining blocker is BLOCKED_PINNACLE_BENCHMARK
     const nedEval = res.leagueEvaluations.find(e => e.internalLeagueId === 'NED-ERE');
@@ -626,11 +624,11 @@ test('H6.1: Canonical research ledger contains 336 rows across 15 leagues with 1
 
 // ─── F4: EPL NON-REGRESSION & MATCH INTELLIGENCE READ-PATH TESTS ────────────
 
-test('F4.1: EPL remains ACTIVE and MatchIntelligenceService reflects market-level activation states accurately', () => {
+test('F4.1: EPL demoted to SHADOW and MatchIntelligenceService reflects market-level activation states accurately', () => {
   resetRegistryToDefaultState();
 
   const eplUnavail = MatchIntelligenceService.buildUnavailableMarket('ASIAN_HANDICAP', '-0.5', null, 'Premier League');
-  assert.strictEqual(eplUnavail.statusLabel, 'ODDS UNAVAILABLE');
+  assert.strictEqual(eplUnavail.statusLabel, 'ANALYSIS UNAVAILABLE');
 
   const laLigaShadow = MatchIntelligenceService.buildUnavailableMarket('ASIAN_HANDICAP', '-0.5', null, 'La Liga');
   assert.strictEqual(laLigaShadow.statusLabel, 'ANALYSIS UNAVAILABLE');

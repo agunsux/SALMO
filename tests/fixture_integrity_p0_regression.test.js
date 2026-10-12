@@ -61,7 +61,9 @@ test('Test 1: Empty provider result fails closed (0 fixtures, 0 picks)', async (
 });
 
 test('Test 2: OddsPapi 429 fails closed (no fallback)', async () => {
-  const engineCode = fs.readFileSync(path.resolve('src/engine/pipeline/productionPredictionEngine.ts'), 'utf8');
+  const engineCode = fs
+    .readFileSync(path.resolve('src/engine/pipeline/productionPredictionEngine.ts'), 'utf8')
+    .replace(/\r\n/g, '\n');
 
   // Verify that provider failure or empty result falls closed to return []
   assert.ok(

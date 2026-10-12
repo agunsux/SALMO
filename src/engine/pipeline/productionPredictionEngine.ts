@@ -581,7 +581,10 @@ export class ProductionPredictionEngine {
 
         // HOTFIX H7 P2 — Strictly reject SHADOW and PAUSED leagues from daily_picks, predictions, and prediction_ledger
         const leagueActivationState = getLeagueActivationState(prediction.league);
-        if (leagueActivationState !== 'ACTIVE') {
+        const currentProdStatus = typeof leagueActivationState === 'string'
+          ? leagueActivationState
+          : leagueActivationState?.production_status;
+        if (currentProdStatus !== 'ACTIVE') {
           Logger.info('[ProductionPredictionEngine] Excluding non-ACTIVE league from production persistence:', {
             league: prediction.league,
             leagueActivationState,

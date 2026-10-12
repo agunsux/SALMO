@@ -59,6 +59,7 @@ const {
   OddsPapiProvider,
 } = require('../src/services/providers/oddsPapiProvider.ts');
 const {
+  CANONICAL_15_LEAGUES,
   resetRegistryToDefaultState,
 } = require('../src/config/multiLeagueRegistry.ts');
 const {
@@ -521,6 +522,12 @@ test('P2.3: When persistence is explicitly authorized, SHADOW and PAUSED leagues
     assert.strictEqual(shadowDb.upserts.prediction_ledger.length, 0, 'SHADOW/PAUSED must write 0 rows to prediction_ledger');
 
     // 2. Test mixed ACTIVE EPL + SHADOW La Liga + PAUSED Liga 1 -> only ACTIVE EPL (AH and OU, never BTTS) is persisted
+    const eplEntry = CANONICAL_15_LEAGUES.find(l => l.internal_league_id === 'ENG-PL');
+    eplEntry.production_status = 'ACTIVE';
+    eplEntry.production_pick_enabled = true;
+    eplEntry.ledger_tier = 'PRODUCTION';
+    eplEntry.production_enabled_markets = ['AH', 'OU'];
+
     await ProductionPredictionEngine.runPredictionCycle(fixtures, {
       persistToDatabase: true,
       allowProductionWrite: true,
@@ -560,6 +567,7 @@ test('P2.3: When persistence is explicitly authorized, SHADOW and PAUSED leagues
     else process.env.CI = origCi;
     if (origVercelEnv === undefined) delete process.env.VERCEL_ENV;
     else process.env.VERCEL_ENV = origVercelEnv;
+    resetRegistryToDefaultState();
   }
 });
 

@@ -198,12 +198,10 @@ test('T2.1: Multi-league registry has independent capability flags and strict PR
   assert.strictEqual(CANONICAL_15_LEAGUES.length, 15);
 
   const prodLeagues = getProductionPickLeagues();
-  assert.strictEqual(prodLeagues.length, 1, 'Only EPL is enabled for PRODUCTION picks');
-  assert.strictEqual(prodLeagues[0].internal_league_id, 'ENG-PL');
-  assert.strictEqual(prodLeagues[0].ledger_tier, 'PRODUCTION');
+  assert.strictEqual(prodLeagues.length, 0, 'In Phase 2D NO-GO status, exactly 0 leagues are enabled for PRODUCTION picks');
 
   const shadowLeagues = getShadowResearchLeagues();
-  assert.strictEqual(shadowLeagues.length, 13, '13 empirically refitted non-EPL leagues are in SHADOW mode');
+  assert.strictEqual(shadowLeagues.length, 14, '14 empirically refitted leagues (including demoted ENG-PL) are in SHADOW mode');
 
   for (const l of shadowLeagues) {
     assert.strictEqual(l.production_status, 'SHADOW', `${l.internal_league_id} production_status must be SHADOW`);

@@ -149,11 +149,16 @@ export function evaluateRowTemporalIntegrity(
     };
   }
 
-  // Candidate timestamp for temporal comparison: prefer explicit prediction timestamp, fallback to archiveCreatedAt
+  // Candidate timestamp for temporal comparison: prefer explicit prediction timestamp, fallback to archiveCreatedAt, then context.batchCommitTimestampUtc
+  const batchCommitTs =
+    typeof context.batchCommitTimestampUtc === 'string' && context.batchCommitTimestampUtc.trim() !== ''
+      ? context.batchCommitTimestampUtc.trim()
+      : null;
+
   const candidateRaw =
     typeof explicitPredictionRaw === 'string' && explicitPredictionRaw.trim() !== ''
       ? explicitPredictionRaw.trim()
-      : archiveCreatedAt;
+      : archiveCreatedAt || batchCommitTs;
 
   if (!candidateRaw) {
     return {

@@ -754,9 +754,14 @@ export class MultiLeagueAutoActivator {
 
       const oddsPapi = new OddsPapiProvider();
       const oddsRes = await oddsPapi.getTournamentOdds(batch, 'pinnacle');
+      const consumedByBatch =
+        typeof oddsRes.requestsConsumed === 'number'
+          ? oddsRes.requestsConsumed
+          : (oddsRes.status === 'AVAILABLE' ? 1 : 0);
+      billableRequestsMade += consumedByBatch;
+
       if (oddsRes.status === 'AVAILABLE' && oddsRes.data) {
         batchesQueried.push(batch);
-        billableRequestsMade += 1;
         for (const o of oddsRes.data) {
           allFetchedOdds.push(o);
           const list = oddsByFixtureId.get(o.providerFixtureId) || [];
@@ -768,6 +773,7 @@ export class MultiLeagueAutoActivator {
           batch,
           status: oddsRes.status,
           error: oddsRes.error,
+          requestsConsumed: consumedByBatch,
         });
         if (OddsPapiQuotaGuard.isCircuitTripped()) {
           break;

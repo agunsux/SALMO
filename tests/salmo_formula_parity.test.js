@@ -69,6 +69,10 @@ const {
   ProductionPredictionEngine,
 } = require('../src/engine/pipeline/productionPredictionEngine.ts');
 
+const {
+  CANONICAL_15_LEAGUES,
+} = require('../src/config/multiLeagueRegistry.ts');
+
 // =========================================================================
 // 1. DIXON-COLES & POISSON MATHEMATICAL PARITY
 // =========================================================================
@@ -355,8 +359,8 @@ test('Formula Parity 8: Value Engine 7-factor composite value gate', () => {
   assert.strictEqual(negEv.verdict, 'LEWATI', 'Negative EV must be LEWATI');
   assert.strictEqual(negEv.actionable, false);
 
-  // 2. High EV + Valid Edge + Sufficient Sample in Premier League -> LAYAK
-  const qualified = ValueEngine.evaluateSelection({
+  // 2. In Phase 2D, default registry status is SHADOW -> strictly LEWATI
+  const shadowEval = ValueEngine.evaluateSelection({
     selection: 'Arsenal -0.25',
     market: 'AH',
     line: -0.25,
@@ -377,10 +381,53 @@ test('Formula Parity 8: Value Engine 7-factor composite value gate', () => {
     league: 'Premier League',
     modelStatus: 'FIXTURE_SPECIFIC',
   });
-  assert.strictEqual(qualified.verdict, 'LAYAK', 'Candidate meeting all 7 gates must qualify as LAYAK');
-  assert.ok(qualified.expectedValue > 0.02, 'EV must be positive and > 2.0%');
-  assert.ok(qualified.confidence >= 70, `Confidence must be high (>= 70), got ${qualified.confidence}`);
-  assert.strictEqual(qualified.actionable, true);
+  assert.strictEqual(shadowEval.verdict, 'LEWATI', 'Default SHADOW status must fail-closed as LEWATI');
+  assert.strictEqual(shadowEval.actionable, false);
+
+  // 3. When production market is explicitly enabled, all 7 gates pass -> LAYAK
+  const eplEntry = CANONICAL_15_LEAGUES.find(l => l.internal_league_id === 'ENG-PL');
+  const prevStatus = eplEntry.production_status;
+  const prevPick = eplEntry.production_pick_enabled;
+  const prevTier = eplEntry.ledger_tier;
+  const prevMarkets = [...(eplEntry.production_enabled_markets || [])];
+
+  eplEntry.production_status = 'ACTIVE';
+  eplEntry.production_pick_enabled = true;
+  eplEntry.ledger_tier = 'PRODUCTION';
+  eplEntry.production_enabled_markets = ['AH'];
+
+  try {
+    const qualified = ValueEngine.evaluateSelection({
+      selection: 'Arsenal -0.25',
+      market: 'AH',
+      line: -0.25,
+      modelProbability: 0.60,
+      ahBreakdown: { win: 0.45, halfWin: 0, push: 0, halfLoss: 0.30, loss: 0.25 },
+      pinnacleOdds: {
+        sideOdds: 2.15,
+        oppositeOdds: 1.80,
+      },
+      sampleSizeHome: 15,
+      sampleSizeAway: 15,
+      oddsTimestampUtc: oddsTime,
+      predictionTimestampUtc: predTime,
+      kickoffUtc: kickTime,
+      fixtureId: 'epl_test_fixture_layak',
+      homeTeam: 'Arsenal',
+      awayTeam: 'Chelsea',
+      league: 'Premier League',
+      modelStatus: 'FIXTURE_SPECIFIC',
+    });
+    assert.strictEqual(qualified.verdict, 'LAYAK', 'Candidate meeting all 7 gates must qualify as LAYAK when enabled');
+    assert.ok(qualified.expectedValue > 0.02, 'EV must be positive and > 2.0%');
+    assert.ok(qualified.confidence >= 70, `Confidence must be high (>= 70), got ${qualified.confidence}`);
+    assert.strictEqual(qualified.actionable, true);
+  } finally {
+    eplEntry.production_status = prevStatus;
+    eplEntry.production_pick_enabled = prevPick;
+    eplEntry.ledger_tier = prevTier;
+    eplEntry.production_enabled_markets = prevMarkets;
+  }
 });
 
 // =========================================================================

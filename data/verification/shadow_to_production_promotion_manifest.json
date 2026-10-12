@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-12T14:58:12.669Z",
+  "generatedAt": "2026-10-12T18:03:39.099Z",
   "auditScope": "SALMO 14-League Historical & Shadow-to-Production Promotion Audit (+ IDN-L1 Paused Registry Entry) — Phase 2B Reproducible Manifest",
   "canonicalRatingsArtifactSha256": "53466f88ae63f5246f8756f8873f71c472669b0912f09979cfc5e77b82050984",
   "immutableFileHashesSha256": {
@@ -10,9 +10,7 @@
   "promotionMode": "PROPOSE_ONLY",
   "promotedLeaguesCount": 0,
   "promotedLeagues": [],
-  "activeProductionLeagues": [
-    "ENG-PL"
-  ],
+  "activeProductionLeagues": [],
   "untestedVsMarketShadowMarkets": [
     {
       "leagueId": "ITA-SERIEA",
@@ -276,7 +274,7 @@
       "totalPhysicalRowsInFile": 30,
       "validPreMatchAhOuRows": 20,
       "segregatedUnvalidatedBttsRows": 10,
-      "epl2026Oct06FallbackLambdaAhOuRows": 10,
+      "epl2026Oct06FallbackLambdaAhOuRows": 8,
       "duplicateRows": 0,
       "noteOnCohortCount": "164 is the sum of 20 VALID_PRE_MATCH EPL rows + 144 RETROSPECTIVE_EXCLUDED non-EPL rows (kickoff <= 2026-10-11T05:00:00Z) in all_leagues_research_ledger.jsonl (164 + 172 UNVERIFIED_BULK = 336 total rows). The physical file data/verification/live_prediction_ledger.jsonl contains 30 rows (20 valid pre-match EPL AH/OU rows + 10 segregated BTTS rows)."
     },
@@ -753,9 +751,10 @@
   ],
   "evaluateAllShadowLeaguesSummary": {
     "totalLeaguesInRegistry": 15,
-    "totalShadowEvaluated": 13,
+    "totalShadowEvaluated": 14,
     "newlyUnlocked": [],
     "remainedShadow": [
+      "ENG-PL",
       "ESP-LALIGA",
       "ITA-SERIEA",
       "DEU-BUNDESLIGA",
@@ -776,8 +775,8 @@
       "leagueId": "ENG-PL",
       "leagueName": "Premier League",
       "country": "England",
-      "previousStatus": "ACTIVE",
-      "newStatus": "ACTIVE",
+      "previousStatus": "SHADOW",
+      "newStatus": "SHADOW",
       "finalDecision": "REMAIN_ACTIVE_PROPOSE_SHADOW_DEMOTION",
       "historicalInventory": {
         "uniquePlayedMatches": 1329,
