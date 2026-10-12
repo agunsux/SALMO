@@ -559,6 +559,10 @@ export async function GET(request: NextRequest) {
       cohortLabel: DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,
       settledCount,
       minSampleRequired: HEADLINE_COHORT_MIN_SETTLED_POSITIONS,
+      sampleStatus:
+        settledCount >= HEADLINE_COHORT_MIN_SETTLED_POSITIONS
+          ? 'SUFFICIENT'
+          : 'INSUFFICIENT SAMPLE',
       insufficientSampleLabel:
         settledCount < HEADLINE_COHORT_MIN_SETTLED_POSITIONS
           ? formatInsufficientSampleLabel(settledCount, HEADLINE_COHORT_MIN_SETTLED_POSITIONS)
@@ -686,6 +690,15 @@ export async function GET(request: NextRequest) {
         yieldCohortLabel: DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,
         brierScoringMethod: 'BINARY_NO_PUSH_PER_LEG',
         referenceBenchmarkBookmaker: REFERENCE_BENCHMARK_BOOKMAKER,
+        minSampleRequired: HEADLINE_COHORT_MIN_SETTLED_POSITIONS,
+        sampleStatus:
+          entry.nSettledWithOdds >= HEADLINE_COHORT_MIN_SETTLED_POSITIONS
+            ? 'SUFFICIENT'
+            : 'INSUFFICIENT SAMPLE',
+        insufficientSampleLabel:
+          entry.nSettledWithOdds < HEADLINE_COHORT_MIN_SETTLED_POSITIONS
+            ? formatInsufficientSampleLabel(entry.nSettledWithOdds, HEADLINE_COHORT_MIN_SETTLED_POSITIONS)
+            : null,
         nPredictions: entry.nPredictions,
         nEligiblePreMatch: entry.nEligiblePreMatch,
         nConfirmedRetrospectiveExcluded: entry.nConfirmedRetrospectiveExcluded,

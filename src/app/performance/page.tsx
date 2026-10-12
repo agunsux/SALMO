@@ -205,6 +205,13 @@ export default function PerformancePage() {
                     <span className="rounded border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-amber-300 font-bold">
                       COHORT: {perfReport?.controlFullCohort?.cohortLabel || 'MODEL_ALL_ROWS_DIAGNOSTIC (NOT PUBLIC PICKS)'}
                     </span>
+                    <span className="rounded border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-amber-400 font-bold">
+                      {perfReport?.controlFullCohort?.insufficientSampleLabel ||
+                        formatInsufficientSampleLabel(
+                          perfReport?.controlFullCohort?.settled ?? settledPositions.length,
+                          HEADLINE_COHORT_MIN_SETTLED_POSITIONS
+                        )}
+                    </span>
                     <span className="rounded border border-[#232830] bg-[#0B0D10] px-2.5 py-1 text-zinc-300">
                       Staked: <strong>{perfReport?.controlFullCohort?.unitsStaked ?? settledPositions.length}.0u</strong>
                     </span>

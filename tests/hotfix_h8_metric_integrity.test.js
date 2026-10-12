@@ -707,9 +707,13 @@ test('H8.12: UI/API return "Insufficient sample (n/100)" (or NOT_COMPUTABLE_YET)
 
   assert.strictEqual(resJson.registeredGates.headlineCohortMinSettledPositions, 100);
   assert.strictEqual(resJson.settlementSummary.minSampleRequired, 100);
+  assert.strictEqual(resJson.settlementSummary.sampleStatus, 'INSUFFICIENT SAMPLE');
   assert.strictEqual(resJson.settlementSummary.insufficientSampleLabel, 'Insufficient sample (12/100)');
   const eplMatrix = resJson.metricComputabilityMatrix.find(m => m.league === 'Premier League');
   assert.strictEqual(eplMatrix.referenceBenchmarkBookmaker, 'pinnacle');
+  assert.strictEqual(eplMatrix.minSampleRequired, 100);
+  assert.strictEqual(eplMatrix.sampleStatus, 'INSUFFICIENT SAMPLE');
+  assert.strictEqual(eplMatrix.insufficientSampleLabel, 'Insufficient sample (12/100)');
   assert.strictEqual(eplMatrix.clvGateStatus, 'NOT_COMPUTABLE_YET');
   assert.strictEqual(eplMatrix.clvInsufficientSampleLabel, 'Insufficient sample (0/100)');
   assert.strictEqual(eplMatrix.marketBaselineStatus, 'NOT_COMPUTABLE_YET');
