@@ -518,3 +518,202 @@ test('H8.8: /api/v1/research serves authoritative live_prediction_ledger.jsonl p
     assert.strictEqual(rp.fairOdds, sp.fairOdds);
   }
 });
+
+// ─── PHASE 2: PRE-REGISTERED GATES (DOCS + CONFIG + WIRE-UP + BENCHMARK GUARD) ─
+
+const gatesModule = require('../src/engine/performance/gates.ts');
+
+test('H8.9: gates.ts exports match documented values in docs/governance/promotion_gates.md', () => {
+  assert.strictEqual(gatesModule.REFERENCE_BENCHMARK_BOOKMAKER, 'pinnacle');
+  assert.strictEqual(gatesModule.SOFT_BOOK_LINE_SHOPPING_LABEL, 'soft book, not a benchmark');
+  assert.strictEqual(gatesModule.CLOSING_PRICE_RULE_ID, 'LAST_ACTIVE_AT_OR_BEFORE_KICKOFF');
+  assert.strictEqual(gatesModule.MISSING_CLOSING_LINE_REASON, 'line_not_in_series');
+  assert.strictEqual(gatesModule.PRIMARY_DEVIG_METHOD_ID, 'PROPORTIONAL_TWO_WAY');
+  assert.strictEqual(gatesModule.SENSITIVITY_DEVIG_METHOD_ID, 'SHIN_SENSITIVITY_ONLY');
+  assert.strictEqual(gatesModule.GATE_STATUS_NOT_COMPUTABLE_YET, 'NOT_COMPUTABLE_YET');
+  assert.strictEqual(gatesModule.CLV_HEADLINE_MIN_POSITIONS, 100);
+  assert.strictEqual(gatesModule.HEADLINE_COHORT_MIN_SETTLED_POSITIONS, 100);
+  assert.strictEqual(gatesModule.BRIER_VS_MARKET_MIN_LEGS, 300);
+  assert.strictEqual(gatesModule.BRIER_DIFF_VS_MARKET_CI95_UPPER_MAX, 0);
+  assert.strictEqual(gatesModule.BRIER_COIN_FLIP_SANITY_FLOOR, 0.25);
+
+  const govDocPath = path.resolve(process.cwd(), 'docs/governance/promotion_gates.md');
+  assert.strictEqual(fs.existsSync(govDocPath), true, 'docs/governance/promotion_gates.md must exist');
+  const govDoc = fs.readFileSync(govDocPath, 'utf8');
+  assert.ok(govDoc.includes('pinnacle'), 'Must document pinnacle as sole reference benchmark');
+  assert.ok(govDoc.includes('1xBet'), 'Must explicitly address 1xBet exclusion from benchmark');
+  assert.ok(govDoc.includes('soft book, not a benchmark'), 'Must document soft-book line-shopping label');
+  assert.ok(govDoc.includes('line_not_in_series'), 'Must document missing-line rule');
+  assert.ok(govDoc.includes('PROPORTIONAL_TWO_WAY'), 'Must document proportional two-way devig');
+  assert.ok(govDoc.includes('Insufficient sample (n/100)'), 'Must document Insufficient sample (n/100) rule');
+  assert.ok(govDoc.includes('NOT_COMPUTABLE_YET'), 'Must document NOT_COMPUTABLE_YET rule');
+  assert.ok(govDoc.includes('2026-01'), 'Must document OddsPapi historical depth constraint (since 2026-01)');
+  assert.ok(govDoc.includes('Football-Data.co.uk'), 'Must document Football-Data.co.uk prior-season closing source');
+});
+
+test('H8.10: Static scan confirms no hardcoded 30 sample-size or 0.25 pass-criterion literals remain in src/ outside gates.ts', () => {
+  const gatesFullPath = path.resolve(process.cwd(), 'src/engine/performance/gates.ts');
+
+  function walkTsFiles(dir, out = []) {
+    for (const entry of fs.readdirSync(dir)) {
+      const full = path.join(dir, entry);
+      if (fs.statSync(full).isDirectory()) {
+        walkTsFiles(full, out);
+      } else if (full.endsWith('.ts') || full.endsWith('.tsx')) {
+        out.push(full);
+      }
+    }
+    return out;
+  }
+
+  const allSrcFiles = walkTsFiles(path.resolve(process.cwd(), 'src'));
+  for (const file of allSrcFiles) {
+    if (path.resolve(file) === gatesFullPath) continue;
+    const content = fs.readFileSync(file, 'utf8');
+    const relPath = path.relative(process.cwd(), file);
+
+    assert.ok(
+      !content.includes('MIN_SAMPLE_SIZE = 30'),
+      `${relPath} must not hardcode MIN_SAMPLE_SIZE = 30`
+    );
+    assert.ok(
+      !content.includes('settledCount < 30') && !content.includes('settled ?? settledCount) < 30'),
+      `${relPath} must not hardcode settledCount < 30`
+    );
+    assert.ok(
+      !content.includes('/ 30 min') && !content.includes('minimum sample of 30') && !content.includes('threshold of 30 settled'),
+      `${relPath} must not hardcode 30 settled sample copy`
+    );
+    assert.ok(
+      !content.includes('BRIER_THRESHOLD = 0.25'),
+      `${relPath} must not hardcode BRIER_THRESHOLD = 0.25 outside gates.ts`
+    );
+    assert.ok(
+      !content.includes('MIN_EVAL_SAMPLE = 300'),
+      `${relPath} must not hardcode MIN_EVAL_SAMPLE = 300 outside gates.ts`
+    );
+  }
+});
+
+test('H8.11: Any non-pinnacle bookmaker (including 1xbet) is rejected as a CLV/baseline reference', () => {
+  assert.strictEqual(gatesModule.isValidBenchmarkBookmaker('pinnacle'), true);
+  assert.strictEqual(gatesModule.isValidBenchmarkBookmaker('PINNACLE'), true);
+  assert.strictEqual(gatesModule.isValidBenchmarkBookmaker('  Pinnacle '), true);
+  assert.strictEqual(gatesModule.validateBenchmarkBookmaker ? gatesModule.validateBenchmarkBookmaker('pinnacle') : gatesModule.assertBenchmarkBookmaker('pinnacle'), 'pinnacle');
+
+  for (const invalidBook of ['1xbet', '1xBet', 'bet365', 'draftkings', 'fanduel', 'williamhill', '', null, undefined]) {
+    assert.strictEqual(
+      gatesModule.isValidBenchmarkBookmaker(invalidBook),
+      false,
+      `Bookmaker ${String(invalidBook)} must be rejected by isValidBenchmarkBookmaker`
+    );
+    assert.throws(
+      () => gatesModule.assertBenchmarkBookmaker(invalidBook),
+      /Invalid reference benchmark bookmaker/,
+      `Bookmaker ${String(invalidBook)} must throw in assertBenchmarkBookmaker`
+    );
+    assert.throws(
+      () => PerformanceMetricsEngine.validateBenchmarkBookmaker(invalidBook),
+      /Invalid reference benchmark bookmaker/,
+      `Bookmaker ${String(invalidBook)} must throw in PerformanceMetricsEngine.validateBenchmarkBookmaker`
+    );
+  }
+
+  // Passing a position with clvBookmaker: '1xbet' into aggregateMetrics must throw
+  assert.throws(
+    () =>
+      PerformanceMetricsEngine.aggregateMetrics([
+        {
+          ledgerPositionId: 'bad_book_1',
+          fixtureId: 'fix_1',
+          marketType: 'AH',
+          selection: 'Home -0.5',
+          line: -0.5,
+          stakeUnits: 1.0,
+          marketOdds: 1.95,
+          fairOdds: 1.9,
+          pWin: 0.53,
+          pPush: 0,
+          pLoss: 0.47,
+          confidence: 75,
+          edge: 2.5,
+          expectedValuePct: 3.1,
+          greenCohort: true,
+          is_pick: true,
+          verdict: 'LAYAK',
+          settlementStatus: 'SETTLED',
+          result: 'WIN',
+          profitUnits: 0.95,
+          clvPct: 1.8,
+          clvBookmaker: '1xbet',
+        },
+      ]),
+    /1xBet and soft books are strictly excluded/
+  );
+});
+
+test('H8.12: UI/API return "Insufficient sample (n/100)" (or NOT_COMPUTABLE_YET) and null values (never zeros) when n is below 100', async () => {
+  // 1. Engine level: n = 0
+  const zeroSummary = PerformanceMetricsEngine.aggregateMetrics([]);
+  assert.strictEqual(zeroSummary.n, 0);
+  assert.strictEqual(zeroSummary.minSampleRequired, 100);
+  assert.strictEqual(zeroSummary.sampleStatus, 'INSUFFICIENT SAMPLE');
+  assert.strictEqual(zeroSummary.insufficientSampleLabel, 'Insufficient sample (0/100)');
+  assert.strictEqual(zeroSummary.roi, null, 'ROI must be null, never 0');
+  assert.strictEqual(zeroSummary.yield, null, 'Yield must be null, never 0');
+  assert.strictEqual(zeroSummary.avgClvPct, null, 'avgClvPct must be null, never 0');
+  assert.strictEqual(zeroSummary.clvHeadlinePct, null, 'clvHeadlinePct must be null, never 0');
+  assert.strictEqual(zeroSummary.clvGateStatus, 'NOT_COMPUTABLE_YET');
+  assert.strictEqual(zeroSummary.clvInsufficientSampleLabel, 'Insufficient sample (0/100)');
+  assert.strictEqual(zeroSummary.brierScore, null, 'brierScore must be null, never 0');
+  assert.strictEqual(zeroSummary.marketBaselineStatus, 'NOT_COMPUTABLE_YET');
+  assert.strictEqual(zeroSummary.marketBaselineBrier, null);
+  assert.strictEqual(zeroSummary.brierDiffVsMarket, null);
+  assert.strictEqual(zeroSummary.brierDiffVsMarketCi95Upper, null);
+
+  // 2. API level: /api/v1/performance (n = 12 settled diagnostic, n = 0 green cohort, nClv = 0)
+  const perfResponse = await getPerformance({
+    headers: new Map([['x-request-id', 'test_h8_12_perf']]),
+  });
+  const perfJson = await perfResponse.json();
+
+  assert.strictEqual(perfJson.registeredGates.headlineCohortMinSettledPositions, 100);
+  assert.strictEqual(perfJson.registeredGates.clvHeadlineMinPositions, 100);
+  assert.strictEqual(perfJson.registeredGates.brierVsMarketMinLegs, 300);
+  assert.strictEqual(perfJson.registeredGates.referenceBenchmarkBookmaker, 'pinnacle');
+
+  assert.strictEqual(perfJson.report.headlineGreenCohort.n, 0);
+  assert.strictEqual(perfJson.report.headlineGreenCohort.sampleStatus, 'INSUFFICIENT SAMPLE');
+  assert.strictEqual(perfJson.report.headlineGreenCohort.insufficientSampleLabel, 'Insufficient sample (0/100)');
+  assert.strictEqual(perfJson.report.headlineGreenCohort.roi, null);
+  assert.strictEqual(perfJson.report.headlineGreenCohort.avgClvPct, null);
+  assert.strictEqual(perfJson.report.headlineGreenCohort.clvHeadlinePct, null);
+  assert.strictEqual(perfJson.report.headlineGreenCohort.clvGateStatus, 'NOT_COMPUTABLE_YET');
+
+  assert.strictEqual(perfJson.report.controlFullCohort.n, 12);
+  assert.strictEqual(perfJson.report.controlFullCohort.sampleStatus, 'INSUFFICIENT SAMPLE');
+  assert.strictEqual(perfJson.report.controlFullCohort.insufficientSampleLabel, 'Insufficient sample (12/100)');
+  assert.strictEqual(perfJson.report.controlFullCohort.clvHeadlinePct, null);
+  assert.strictEqual(perfJson.report.controlFullCohort.clvGateStatus, 'NOT_COMPUTABLE_YET');
+  assert.strictEqual(perfJson.report.controlFullCohort.marketBaselineStatus, 'NOT_COMPUTABLE_YET');
+  assert.strictEqual(perfJson.report.controlFullCohort.marketBaselineBrier, null);
+
+  // 3. API level: /api/v1/research
+  const resResponse = await getResearch({
+    headers: new Map([['x-request-id', 'test_h8_12_research']]),
+    url: 'http://localhost:3000/api/v1/research',
+  });
+  const resJson = await resResponse.json();
+
+  assert.strictEqual(resJson.registeredGates.headlineCohortMinSettledPositions, 100);
+  assert.strictEqual(resJson.settlementSummary.minSampleRequired, 100);
+  assert.strictEqual(resJson.settlementSummary.insufficientSampleLabel, 'Insufficient sample (12/100)');
+  const eplMatrix = resJson.metricComputabilityMatrix.find(m => m.league === 'Premier League');
+  assert.strictEqual(eplMatrix.referenceBenchmarkBookmaker, 'pinnacle');
+  assert.strictEqual(eplMatrix.clvGateStatus, 'NOT_COMPUTABLE_YET');
+  assert.strictEqual(eplMatrix.clvInsufficientSampleLabel, 'Insufficient sample (0/100)');
+  assert.strictEqual(eplMatrix.marketBaselineStatus, 'NOT_COMPUTABLE_YET');
+  assert.strictEqual(eplMatrix.marketBaselineBrier, null);
+  assert.strictEqual(eplMatrix.brierDiffVsMarketCi95Upper, null);
+  assert.strictEqual(eplMatrix.bootstrap95CI.clv, null);
+});

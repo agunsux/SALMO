@@ -6,7 +6,7 @@
 // C2: Upcoming LAYAK without valid market odds is excluded from public picks
 // D: Empty state distinction: ODDS NOT YET AVAILABLE vs NO QUALIFIED PICKS
 // E: Monetization flag controls /pricing and Footer navigation
-// F: /performance enforces sample < 30 gate and zero CLV calculation
+// F: /performance enforces HEADLINE_COHORT_MIN_SETTLED_POSITIONS (100) gate and zero CLV calculation
 // G: Eligibility determinism: Evaluated with reference timestamp produces identical results regardless of system clock
 // H: Daily picks empty-state regression: Historical rows with odds do NOT suppress ODDS NOT YET AVAILABLE for current actionable rows without odds
 // I: Daily picks state classification: Genuinely no qualified picks vs available picks
@@ -203,19 +203,19 @@ test('E. Monetization flag controls /pricing and Footer navigation', async () =>
   );
 });
 
-test('F. /performance enforces sample < 30 gate and zero CLV calculation', async () => {
+test('F. /performance enforces HEADLINE_COHORT_MIN_SETTLED_POSITIONS (100) gate and zero CLV calculation', async () => {
   const performanceSource = fs.readFileSync(
     path.resolve(__dirname, '..', 'src', 'app', 'performance', 'page.tsx'),
     'utf8'
   );
 
   assert.ok(
-    performanceSource.includes('settledCount < 30'),
-    'Performance page must enforce settledCount < 30 minimum sample gate'
+    performanceSource.includes('settledCount < HEADLINE_COHORT_MIN_SETTLED_POSITIONS'),
+    'Performance page must enforce settledCount < HEADLINE_COHORT_MIN_SETTLED_POSITIONS minimum sample gate'
   );
   assert.ok(
     performanceSource.includes('INSUFFICIENT SAMPLE'),
-    'Performance page must render INSUFFICIENT SAMPLE badge when under 30 samples'
+    'Performance page must render INSUFFICIENT SAMPLE badge when under minimum sample'
   );
   assert.ok(
     !performanceSource.includes('clvPercent') && !performanceSource.includes('roiPercent'),

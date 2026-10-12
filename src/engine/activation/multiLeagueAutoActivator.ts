@@ -35,6 +35,10 @@ import { ProductionPredictionEngine, FixtureInput } from '../pipeline/production
 import { OddsPapiProvider } from '../../services/providers/oddsPapiProvider';
 import { LiveOddsDTO, LiveFixtureDTO } from '../../services/providers/types';
 import { Logger } from '../../lib/logger';
+import {
+  BRIER_COIN_FLIP_SANITY_FLOOR,
+  BRIER_VS_MARKET_MIN_LEGS,
+} from '../performance/gates';
 
 export interface MarketEvaluationDetail {
   market: MarketKey;
@@ -167,11 +171,11 @@ export interface AutoActivationOptions {
 }
 
 export class MultiLeagueAutoActivator {
-  public static readonly BRIER_THRESHOLD = 0.2500;
+  public static readonly BRIER_THRESHOLD = BRIER_COIN_FLIP_SANITY_FLOOR;
   public static readonly LOG_LOSS_THRESHOLD = 0.6931;
   public static readonly MIN_CALIBRATION_SLOPE = 0.5000;
   public static readonly MAX_DISPERSION_RATIO = 1.1500;
-  public static readonly MIN_EVAL_SAMPLE = 300;
+  public static readonly MIN_EVAL_SAMPLE = BRIER_VS_MARKET_MIN_LEGS;
   public static readonly DEFAULT_MAX_CANONICAL_FIXTURE_AGE_HOURS = 168; // 7 days
 
   /**
@@ -836,7 +840,7 @@ export class MultiLeagueAutoActivator {
     const backtest = backtestOverride || MULTI_LEAGUE_BACKTEST_SUMMARY[lid];
 
     const historicalMatchesTotal = Number(leagueProf?.sampleMatches ?? (isEpl ? 1329 : 0));
-    const evalSampleSize = Number(backtest?.nEval ?? (isEpl ? 300 : 0));
+    const evalSampleSize = Number(backtest?.nEval ?? (isEpl ? this.MIN_EVAL_SAMPLE : 0));
     const maxHistoricalDate: string | null = leagueProf?.maxDate || null;
     const dispersionRatio: number | null = leagueProf?.dispersionRatio ?? null;
     const chronologicalWalkForwardVerified = Boolean(backtest?.chronologicalWalkForwardVerified ?? true);

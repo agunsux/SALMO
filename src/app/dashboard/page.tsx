@@ -6,6 +6,10 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { ExplainPopover } from '@/components/common/ExplainPopover';
 import {
+  HEADLINE_COHORT_MIN_SETTLED_POSITIONS,
+  formatInsufficientSampleLabel,
+} from '@/engine/performance/gates';
+import {
   Compass,
   CheckCircle2,
   Bookmark,
@@ -633,10 +637,10 @@ export default function DashboardPage() {
               <div className="rounded-md border border-[#EDE8E0] bg-[#F6F3EE] p-4 text-xs font-mono space-y-1">
                 <div className="font-semibold text-[#14110F] flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-[#B06000]"></span>
-                  <span>Building track record.</span>
+                  <span>Building track record — {formatInsufficientSampleLabel(performance.sampleSize, HEADLINE_COHORT_MIN_SETTLED_POSITIONS)}.</span>
                 </div>
                 <div className="text-[#6B645C] font-sans">
-                  {performance.sampleSize} positions logged in verification ledger. Minimum threshold of 30 settled positions required before publishing aggregate win rate and yield metrics.
+                  {performance.sampleSize} positions logged in verification ledger. Minimum threshold of {HEADLINE_COHORT_MIN_SETTLED_POSITIONS} settled positions required before publishing aggregate win rate and yield metrics.
                 </div>
               </div>
             ) : performance ? (

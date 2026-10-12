@@ -5,6 +5,10 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ShieldCheck, AlertTriangle, Database, Activity, Clock, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import {
+  HEADLINE_COHORT_MIN_SETTLED_POSITIONS,
+  formatInsufficientSampleLabel,
+} from '@/engine/performance/gates';
 
 interface ResearchApiResponse {
   success: boolean;
@@ -103,8 +107,8 @@ export default function PerformancePage() {
               Authoritative research ledger is temporarily unreachable. SALMO strictly refuses to fabricate fallback metrics.
             </p>
           </div>
-        ) : ((perfReport?.controlFullCohort?.settled ?? settledCount) < 30 || perfReport?.controlFullCohort?.sampleStatus === 'INSUFFICIENT SAMPLE' || settledCount < 30) ? (
-          /* Minimum sample size rule: Zero frontend CLV or ROI calculation when sample < 30 */
+        ) : ((perfReport?.controlFullCohort?.settled ?? settledCount) < HEADLINE_COHORT_MIN_SETTLED_POSITIONS || perfReport?.controlFullCohort?.sampleStatus === 'INSUFFICIENT SAMPLE' || settledCount < HEADLINE_COHORT_MIN_SETTLED_POSITIONS) ? (
+          /* Minimum sample size rule: Zero frontend CLV or ROI headline calculation when below HEADLINE_COHORT_MIN_SETTLED_POSITIONS */
           <div className="space-y-6">
             <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-12 text-center">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10 text-amber-400 mb-4">
@@ -113,6 +117,13 @@ export default function PerformancePage() {
               <h2 className="text-xl sm:text-2xl font-extrabold text-amber-300 tracking-tight">
                 INSUFFICIENT SAMPLE
               </h2>
+              <p className="mt-1 text-xs font-mono text-amber-400/90">
+                {perfReport?.controlFullCohort?.insufficientSampleLabel ||
+                  formatInsufficientSampleLabel(
+                    perfReport?.controlFullCohort?.settled ?? settledCount,
+                    HEADLINE_COHORT_MIN_SETTLED_POSITIONS
+                  )}
+              </p>
               <p className="mt-2 text-sm text-[#8A93A0] max-w-md mx-auto">
                 Track record is still being established. Live fixtures remain pending ahead of kickoff.
               </p>
@@ -131,7 +142,7 @@ export default function PerformancePage() {
                   <span className="block text-[10px] uppercase text-[#8A93A0]">Diagnostic Settled</span>
                   <span className="font-tabular font-bold text-white text-sm">
                     {perfReport?.controlFullCohort?.settled ?? settledCount}{' '}
-                    <span className="text-zinc-500 text-xs font-normal">/ 30 min</span>
+                    <span className="text-zinc-500 text-xs font-normal">/ {HEADLINE_COHORT_MIN_SETTLED_POSITIONS} min</span>
                   </span>
                   <span className="block text-[10px] text-amber-400 mt-0.5">
                     NOT PUBLIC PICKS
@@ -165,7 +176,7 @@ export default function PerformancePage() {
 
               <div className="mt-8 pt-6 border-t border-[#232830] max-w-md mx-auto">
                 <p className="text-xs text-[#8A93A0] mb-4">
-                  Per research invariants, closing line value (CLV) and model calibration curves require a minimum sample of 30 independently settled fixtures before public reporting.
+                  Per pre-registered governance gates, closing line value (CLV) and headline performance metrics require a minimum sample of {HEADLINE_COHORT_MIN_SETTLED_POSITIONS} independently settled positions before public reporting.
                 </p>
                 <Link
                   href="/research"

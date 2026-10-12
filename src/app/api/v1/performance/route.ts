@@ -1,7 +1,7 @@
 // SALMO.DEV — GET /api/v1/performance
 // Production Performance & Evidence Metrics Endpoint.
 // Returns Green Cohort headline metrics, control cohort metrics, settled position audit trail, and dimensional breakdowns.
-// Strictly enforces sample size gate (n < 30 -> INSUFFICIENT SAMPLE).
+// Strictly enforces pre-registered sample size gate (HEADLINE_COHORT_MIN_SETTLED_POSITIONS = 100 -> INSUFFICIENT SAMPLE).
 
 import { NextRequest, NextResponse } from 'next/server';
 import {
@@ -11,6 +11,11 @@ import {
   DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,
   QUALIFIED_PUBLIC_PICKS_COHORT_LABEL,
 } from '@/engine/performance/performanceMetrics';
+import {
+  PRE_REGISTERED_GATES,
+  REFERENCE_BENCHMARK_BOOKMAKER,
+  isValidBenchmarkBookmaker,
+} from '@/engine/performance/gates';
 import { evaluatePositionBrierLegs } from '@/engine/performance/brierScoring';
 import { CanonicalMatchArchiveService } from '@/engine/archive/canonicalMatchArchiveService';
 import { Logger } from '@/lib/logger';
@@ -93,6 +98,10 @@ export async function GET(request: NextRequest) {
                 })
               : null;
 
+            const rawBookmaker = row.bookmaker || REFERENCE_BENCHMARK_BOOKMAKER;
+            const validClvBookmaker = isValidBenchmarkBookmaker(rawBookmaker);
+            const rawClv = row.clvPct !== undefined ? row.clvPct : row.CLV !== undefined ? row.CLV : null;
+
             const snap: LedgerPositionSnapshot = {
               ledgerPositionId: row.ledgerPositionId || row.predictionId,
               fixtureId,
@@ -114,7 +123,8 @@ export async function GET(request: NextRequest) {
               settlementStatus: isSettled ? 'SETTLED' : 'PENDING',
               result: row.result || null,
               profitUnits: Number(row.profitUnits ?? row.profitLoss ?? 0),
-              clvPct: (row.clvPct !== undefined) ? row.clvPct : (row.CLV !== undefined ? row.CLV : null),
+              clvPct: validClvBookmaker ? rawClv : null,
+              clvBookmaker: validClvBookmaker ? REFERENCE_BENCHMARK_BOOKMAKER : null,
               brierDecomposition,
               brierLegs: brierDecomposition?.legs || [],
               settledAt: row.settledAt || null,
@@ -154,7 +164,7 @@ export async function GET(request: NextRequest) {
                 brierPositionMean: brierDecomposition?.positionBrierMean ?? null,
                 brierLegs: brierDecomposition?.legs || [],
                 settledAt: snap.settledAt,
-                bookmaker: row.bookmaker || 'pinnacle',
+                bookmaker: row.bookmaker || REFERENCE_BENCHMARK_BOOKMAKER,
               });
             }
           } catch {}
@@ -194,6 +204,7 @@ export async function GET(request: NextRequest) {
             result: sr.outcome,
             profitUnits: Number(sr.profit_units ?? 0),
             clvPct: null,
+            clvBookmaker: REFERENCE_BENCHMARK_BOOKMAKER,
             settledAt: sr.settled_at,
             createdAt: sr.created_at,
           });
@@ -208,6 +219,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       version: 'v1',
+      registeredGates: PRE_REGISTERED_GATES,
       cohortLabels: {
         publicPicksCohort: QUALIFIED_PUBLIC_PICKS_COHORT_LABEL,
         allRowsDiagnosticCohort: DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,

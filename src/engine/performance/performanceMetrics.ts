@@ -1,6 +1,6 @@
 // SALMO.DEV — Production Performance & Evidence Metrics Engine
 // Implements strict settlement accounting, qualified public pick cohort isolation,
-// binary no-push per-leg Brier scoring, and statistical sample size thresholds (n < 30 labeled INSUFFICIENT SAMPLE).
+// binary no-push per-leg Brier scoring, and pre-registered sample size gates (governed by ./gates).
 // Invariants:
 // 1. Headline cohort (greenCohort): strictly rows with is_pick === true AND verdict === 'LAYAK' (no confidence > 70 fallback).
 // 2. All-rows flat-stake diagnostic cohort: explicitly labeled MODEL_ALL_ROWS_DIAGNOSTIC (NOT PUBLIC PICKS).
@@ -9,11 +9,21 @@
 // 5. ROI: (profit_units / units_staked) * 100. If units_staked === 0 -> ROI = null ("No settled bets").
 // 6. Brier: binary no-push scoring per leg; quarter-lines decomposed into two half-stake legs, push legs excluded.
 // 7. Never conflate predicted EV with realized ROI.
-// 8. Average CLV computed strictly over non-null observations.
+// 8. Average CLV computed strictly over non-null Pinnacle observations; headline CLV requires n >= CLV_HEADLINE_MIN_POSITIONS.
 
 import { SettlementOutcome } from '../../types/index';
 import { SettlementStatus } from '../settlement/settlementEngine';
 import { BrierLegEvaluation, PositionBrierDecomposition } from './brierScoring';
+import {
+  HEADLINE_COHORT_MIN_SETTLED_POSITIONS,
+  CLV_HEADLINE_MIN_POSITIONS,
+  GATE_STATUS_NOT_COMPUTABLE_YET,
+  REFERENCE_BENCHMARK_BOOKMAKER,
+  PRE_REGISTERED_GATES,
+  isValidBenchmarkBookmaker,
+  assertBenchmarkBookmaker,
+  formatInsufficientSampleLabel,
+} from './gates';
 
 export const DIAGNOSTIC_ALL_ROWS_COHORT_LABEL = 'MODEL_ALL_ROWS_DIAGNOSTIC (NOT PUBLIC PICKS)' as const;
 export const QUALIFIED_PUBLIC_PICKS_COHORT_LABEL = 'QUALIFIED_PUBLIC_PICKS' as const;
@@ -42,6 +52,7 @@ export interface LedgerPositionSnapshot {
   result: SettlementOutcome | null;
   profitUnits: number;
   clvPct: number | null; // null if moved or missing
+  clvBookmaker?: string | null; // must be 'pinnacle' when provided
   brierDecomposition?: PositionBrierDecomposition | null;
   brierLegs?: BrierLegEvaluation[];
   settledAt?: string | null;
@@ -75,7 +86,9 @@ export function isQualifiedPublicPickCohort(row: {
 export interface MetricSummary {
   cohortLabel?: string;
   n: number;
+  minSampleRequired: number;
   sampleStatus: 'SUFFICIENT' | 'INSUFFICIENT SAMPLE';
+  insufficientSampleLabel: string | null;
   unitsStaked: number;
   profitUnits: number;
   roi: number | null; // Percentage e.g. 5.2%, or null if unitsStaked === 0
@@ -92,15 +105,24 @@ export interface MetricSummary {
   avgPredictedEvPct: number | null;
   avgConfidence: number | null;
   avgClvPct: number | null;
+  clvHeadlinePct: number | null;
   nClv: number;
+  clvGateStatus: typeof GATE_STATUS_NOT_COMPUTABLE_YET | 'INSUFFICIENT_SAMPLE' | 'COMPUTABLE';
+  clvInsufficientSampleLabel: string | null;
   brierScore?: number | null;
   brierStakeWeighted?: number | null;
   nBrierLegsTotal?: number;
   nBrierLegsResolved?: number;
   nBrierLegsExcludedPush?: number;
+  marketBaselineStatus: typeof GATE_STATUS_NOT_COMPUTABLE_YET;
+  marketBaselineBrier: number | null;
+  brierDiffVsMarket: number | null;
+  brierDiffVsMarketCi95Upper: number | null;
+  referenceBenchmarkBookmaker: typeof REFERENCE_BENCHMARK_BOOKMAKER;
 }
 
 export interface FullPerformanceReport {
+  registeredGates: typeof PRE_REGISTERED_GATES;
   headlineGreenCohort: MetricSummary;
   greenCohortHeadline?: MetricSummary;
   controlFullCohort: MetricSummary;
@@ -132,7 +154,16 @@ export interface FullPerformanceReport {
 }
 
 export class PerformanceMetricsEngine {
-  public static readonly MIN_SAMPLE_SIZE = 30;
+  public static readonly MIN_SAMPLE_SIZE = HEADLINE_COHORT_MIN_SETTLED_POSITIONS;
+  public static readonly CLV_MIN_SAMPLE_SIZE = CLV_HEADLINE_MIN_POSITIONS;
+
+  /**
+   * Validates that a CLV or baseline reference bookmaker is strictly 'pinnacle'.
+   * Rejects '1xbet' and all soft books.
+   */
+  public static validateBenchmarkBookmaker(bookmaker: unknown): typeof REFERENCE_BENCHMARK_BOOKMAKER {
+    return assertBenchmarkBookmaker(bookmaker);
+  }
 
   /**
    * Aggregate metrics for an arbitrary list of positions.
@@ -178,7 +209,16 @@ export class PerformanceMetricsEngine {
       totalEv += pos.expectedValuePct;
       totalConf += pos.confidence;
 
-      if (pos.clvPct !== null && pos.clvPct !== undefined && Number.isFinite(pos.clvPct)) {
+      if (pos.clvBookmaker !== undefined && pos.clvBookmaker !== null) {
+        assertBenchmarkBookmaker(pos.clvBookmaker);
+      }
+
+      if (
+        pos.clvPct !== null &&
+        pos.clvPct !== undefined &&
+        Number.isFinite(pos.clvPct) &&
+        (pos.clvBookmaker === undefined || isValidBenchmarkBookmaker(pos.clvBookmaker))
+      ) {
         totalClv += pos.clvPct;
         nClv++;
       }
@@ -245,6 +285,8 @@ export class PerformanceMetricsEngine {
     const n = settled;
     const sampleStatus: 'SUFFICIENT' | 'INSUFFICIENT SAMPLE' =
       n >= this.MIN_SAMPLE_SIZE ? 'SUFFICIENT' : 'INSUFFICIENT SAMPLE';
+    const insufficientSampleLabel =
+      n < this.MIN_SAMPLE_SIZE ? formatInsufficientSampleLabel(n, this.MIN_SAMPLE_SIZE) : null;
 
     let roi: number | null = null;
     let displayStatus = 'No settled bets';
@@ -259,6 +301,17 @@ export class PerformanceMetricsEngine {
     const avgConfidence =
       uniquePositions.length > 0 ? Number((totalConf / uniquePositions.length).toFixed(1)) : null;
     const avgClvPct = nClv > 0 ? Number((totalClv / nClv).toFixed(2)) : null;
+    const clvHeadlinePct = nClv >= this.CLV_MIN_SAMPLE_SIZE ? avgClvPct : null;
+    const clvGateStatus =
+      nClv === 0
+        ? GATE_STATUS_NOT_COMPUTABLE_YET
+        : nClv < this.CLV_MIN_SAMPLE_SIZE
+        ? 'INSUFFICIENT_SAMPLE'
+        : 'COMPUTABLE';
+    const clvInsufficientSampleLabel =
+      nClv < this.CLV_MIN_SAMPLE_SIZE
+        ? formatInsufficientSampleLabel(nClv, this.CLV_MIN_SAMPLE_SIZE)
+        : null;
 
     const brierScore =
       nBrierLegsResolved > 0 ? Number((brierLegSqErrorSum / nBrierLegsResolved).toFixed(4)) : null;
@@ -268,7 +321,9 @@ export class PerformanceMetricsEngine {
     return {
       ...(cohortLabel ? { cohortLabel } : {}),
       n,
+      minSampleRequired: this.MIN_SAMPLE_SIZE,
       sampleStatus,
+      insufficientSampleLabel,
       unitsStaked: Number(unitsStaked.toFixed(2)),
       profitUnits: Number(profitUnits.toFixed(4)),
       roi,
@@ -285,12 +340,20 @@ export class PerformanceMetricsEngine {
       avgPredictedEvPct,
       avgConfidence,
       avgClvPct,
+      clvHeadlinePct,
       nClv,
+      clvGateStatus,
+      clvInsufficientSampleLabel,
       brierScore,
       brierStakeWeighted,
       nBrierLegsTotal,
       nBrierLegsResolved,
       nBrierLegsExcludedPush,
+      marketBaselineStatus: GATE_STATUS_NOT_COMPUTABLE_YET,
+      marketBaselineBrier: null,
+      brierDiffVsMarket: null,
+      brierDiffVsMarketCi95Upper: null,
+      referenceBenchmarkBookmaker: REFERENCE_BENCHMARK_BOOKMAKER,
     };
   }
 
@@ -338,6 +401,7 @@ export class PerformanceMetricsEngine {
     };
 
     return {
+      registeredGates: PRE_REGISTERED_GATES,
       headlineGreenCohort,
       greenCohortHeadline: headlineGreenCohort,
       controlFullCohort,

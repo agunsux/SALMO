@@ -22,6 +22,15 @@ import {
   DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,
   QUALIFIED_PUBLIC_PICKS_COHORT_LABEL,
 } from '@/engine/performance/performanceMetrics';
+import {
+  PRE_REGISTERED_GATES,
+  REFERENCE_BENCHMARK_BOOKMAKER,
+  GATE_STATUS_NOT_COMPUTABLE_YET,
+  CLV_HEADLINE_MIN_POSITIONS,
+  HEADLINE_COHORT_MIN_SETTLED_POSITIONS,
+  isValidBenchmarkBookmaker,
+  formatInsufficientSampleLabel,
+} from '@/engine/performance/gates';
 
 function bootstrapConfidenceInterval(values: number[], iterations = 2000): {
   n: number;
@@ -549,6 +558,11 @@ export async function GET(request: NextRequest) {
     const settlementSummary = {
       cohortLabel: DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,
       settledCount,
+      minSampleRequired: HEADLINE_COHORT_MIN_SETTLED_POSITIONS,
+      insufficientSampleLabel:
+        settledCount < HEADLINE_COHORT_MIN_SETTLED_POSITIONS
+          ? formatInsufficientSampleLabel(settledCount, HEADLINE_COHORT_MIN_SETTLED_POSITIONS)
+          : null,
       pendingCount,
       winsCount: settledRows.filter((r: any) => r.result === 'WIN').length,
       halfWinsCount: settledRows.filter((r: any) => r.result === 'HALF_WIN').length,
@@ -621,15 +635,17 @@ export async function GET(request: NextRequest) {
       }
 
       entry.nEligiblePreMatch++;
-      const hasPickOdds = typeof p.market_odds === 'number' && p.market_odds > 1.0;
+      const rawBookmaker = p.bookmaker || REFERENCE_BENCHMARK_BOOKMAKER;
+      const isPinnacleBenchmark = isValidBenchmarkBookmaker(rawBookmaker);
+      const hasPickOdds = typeof p.market_odds === 'number' && p.market_odds > 1.0 && isPinnacleBenchmark;
       if (hasPickOdds) {
         entry.nWithPickOdds++;
-        entry.oddsProvider = p.bookmaker || 'PINNACLE';
+        entry.oddsProvider = REFERENCE_BENCHMARK_BOOKMAKER.toUpperCase();
         entry.oddsTimestampSample = p.predictionTimestamp || null;
       } else {
         entry.nExcludedMissingOdds++;
       }
-      if (p.closingOdds !== null && p.closingOdds !== undefined) {
+      if (p.closingOdds !== null && p.closingOdds !== undefined && isPinnacleBenchmark) {
         entry.nWithClosingSnapshot++;
       }
       if (p.scoreVerified) {
@@ -669,6 +685,7 @@ export async function GET(request: NextRequest) {
         informative: entry.informative,
         yieldCohortLabel: DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,
         brierScoringMethod: 'BINARY_NO_PUSH_PER_LEG',
+        referenceBenchmarkBookmaker: REFERENCE_BENCHMARK_BOOKMAKER,
         nPredictions: entry.nPredictions,
         nEligiblePreMatch: entry.nEligiblePreMatch,
         nConfirmedRetrospectiveExcluded: entry.nConfirmedRetrospectiveExcluded,
@@ -687,6 +704,20 @@ export async function GET(request: NextRequest) {
         nBrierLegsResolved: entry.nBrierLegsResolved,
         nBrierLegsExcludedPush: entry.nBrierLegsExcludedPush,
         brierStakeWeighted,
+        clvGateStatus:
+          entry.nWithClosingSnapshot === 0
+            ? GATE_STATUS_NOT_COMPUTABLE_YET
+            : entry.nWithClosingSnapshot < CLV_HEADLINE_MIN_POSITIONS
+            ? 'INSUFFICIENT_SAMPLE'
+            : 'COMPUTABLE',
+        clvInsufficientSampleLabel:
+          entry.nWithClosingSnapshot < CLV_HEADLINE_MIN_POSITIONS
+            ? formatInsufficientSampleLabel(entry.nWithClosingSnapshot, CLV_HEADLINE_MIN_POSITIONS)
+            : null,
+        marketBaselineStatus: GATE_STATUS_NOT_COMPUTABLE_YET,
+        marketBaselineBrier: null,
+        brierDiffVsMarket: null,
+        brierDiffVsMarketCi95Upper: null,
         computableNow: {
           roi: entry.nSettledWithOdds > 0,
           yield: entry.nSettledWithOdds > 0,
@@ -812,6 +843,7 @@ export async function GET(request: NextRequest) {
       success: true,
       version: 'v1',
       modelVersion: 'dixon-coles-multi-league-v2.1',
+      registeredGates: PRE_REGISTERED_GATES,
       tierFilter: tierParam,
       dataState,
       counts,
