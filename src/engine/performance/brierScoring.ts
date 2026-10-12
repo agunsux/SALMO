@@ -9,7 +9,12 @@
 
 import { buildScoreGrid, SCORE_GRID_MAX_GOALS } from '../probability/scoreGrid';
 import { CompetitionProfileEngine } from '../features/competitionProfile';
-import { resolveTeamRating } from '../features/teamRatings';
+import {
+  resolveTeamRating,
+  CANONICAL_EPL_RATINGS,
+  isTeamMatch,
+  TeamRating,
+} from '../features/teamRatings';
 import { QuarterLineSettler } from '../ah/quarterLineSettler';
 
 export interface BrierLegEvaluation {
@@ -60,6 +65,7 @@ export interface EvaluatePositionBrierInput {
   lambdaHome?: number;
   lambdaAway?: number;
   rho?: number;
+  useCanonicalEplOnly?: boolean;
   fallbackProbability?: number | null;
   fallbackModelProbDecimal?: number | null;
 }
@@ -74,6 +80,7 @@ export function resolveFixtureScoreGrid(params: {
   lambdaHome?: number;
   lambdaAway?: number;
   rho?: number;
+  useCanonicalEplOnly?: boolean;
 }): { grid: number[][]; lambdaHome: number; lambdaAway: number; rho: number } {
   if (
     typeof params.lambdaHome === 'number' &&
@@ -92,10 +99,23 @@ export function resolveFixtureScoreGrid(params: {
 
   const leagueName = params.league || 'Premier League';
   const profile = CompetitionProfileEngine.getProfileForLeague(leagueName);
-  const homeRating = params.homeTeam
+
+  const resolveStrictCanonicalEpl = (teamName?: string): TeamRating | null => {
+    if (!teamName) return null;
+    for (const [name, rating] of Object.entries(CANONICAL_EPL_RATINGS)) {
+      if (isTeamMatch(name, teamName)) return rating;
+    }
+    return null;
+  };
+
+  const homeRating = params.useCanonicalEplOnly
+    ? resolveStrictCanonicalEpl(params.homeTeam)
+    : params.homeTeam
     ? resolveTeamRating(params.homeTeam, undefined, false, leagueName)
     : null;
-  const awayRating = params.awayTeam
+  const awayRating = params.useCanonicalEplOnly
+    ? resolveStrictCanonicalEpl(params.awayTeam)
+    : params.awayTeam
     ? resolveTeamRating(params.awayTeam, undefined, false, leagueName)
     : null;
 
@@ -198,16 +218,24 @@ export function evaluateSingleLegOnGrid(params: {
   }
 
   const nonPushMass = pWinRaw + pLossRaw;
-  let pLegNoPush =
+  let validFallbackDecimal: number | null = null;
+  if (typeof params.fallbackProbability === 'number' && Number.isFinite(params.fallbackProbability)) {
+    if (params.fallbackProbability > 0 && params.fallbackProbability < 1) {
+      validFallbackDecimal = params.fallbackProbability;
+    } else if (params.fallbackProbability > 1 && params.fallbackProbability < 100) {
+      validFallbackDecimal = params.fallbackProbability / 100;
+    }
+  }
+
+  const rawLegProb =
     nonPushMass > 1e-9
       ? pWinRaw / nonPushMass
-      : typeof params.fallbackProbability === 'number' && params.fallbackProbability > 0
-      ? params.fallbackProbability > 1
-        ? params.fallbackProbability / 100
-        : params.fallbackProbability
-      : 0.5;
+      : validFallbackDecimal;
 
-  pLegNoPush = Number(Math.max(0.0001, Math.min(0.9999, pLegNoPush)).toFixed(4));
+  const hasValidProb = typeof rawLegProb === 'number' && Number.isFinite(rawLegProb) && rawLegProb > 0 && rawLegProb < 1;
+  const pLegNoPush = hasValidProb
+    ? Number(Math.max(0.0001, Math.min(0.9999, rawLegProb)).toFixed(4))
+    : NaN;
 
   // Settle actual outcome of this single non-quarter leg
   let actualMargin: number;
@@ -246,7 +274,9 @@ export function evaluateSingleLegOnGrid(params: {
   }
 
   const binaryOutcome: 0 | 1 = legOutcome === 'WIN' ? 1 : 0;
-  const brierSqError = Number(Math.pow(pLegNoPush - binaryOutcome, 2).toFixed(6));
+  const brierSqError = hasValidProb
+    ? Number(Math.pow(pLegNoPush - binaryOutcome, 2).toFixed(6))
+    : null;
 
   return {
     legIndex,
@@ -290,6 +320,29 @@ export function evaluatePositionBrierLegs(
     return null;
   }
 
+  if (input.fallbackModelProbDecimal !== undefined && input.fallbackModelProbDecimal !== null) {
+    if (
+      typeof input.fallbackModelProbDecimal !== 'number' ||
+      !Number.isFinite(input.fallbackModelProbDecimal) ||
+      input.fallbackModelProbDecimal <= 0 ||
+      input.fallbackModelProbDecimal >= 1
+    ) {
+      return null;
+    }
+  }
+
+  if (input.fallbackProbability !== undefined && input.fallbackProbability !== null) {
+    if (
+      typeof input.fallbackProbability !== 'number' ||
+      !Number.isFinite(input.fallbackProbability) ||
+      input.fallbackProbability <= 0 ||
+      input.fallbackProbability === 1 ||
+      input.fallbackProbability >= 100
+    ) {
+      return null;
+    }
+  }
+
   const grid =
     input.scoreGrid ||
     resolveFixtureScoreGrid({
@@ -299,6 +352,7 @@ export function evaluatePositionBrierLegs(
       lambdaHome: input.lambdaHome,
       lambdaAway: input.lambdaAway,
       rho: input.rho,
+      useCanonicalEplOnly: input.useCanonicalEplOnly,
     }).grid;
 
   const line = Number(input.line);
@@ -324,6 +378,11 @@ export function evaluatePositionBrierLegs(
       fallbackProbability: fallbackProb,
     })
   );
+
+  // If the score grid had zero mass and no valid fallback probability was available, reject position
+  if (legs.some(l => !Number.isFinite(l.pLegNoPush))) {
+    return null;
+  }
 
   const resolvedLegs = legs.filter(l => !l.excludedPush && l.brierSqError !== null);
   const excludedPushLegs = legs.filter(l => l.excludedPush);

@@ -102,6 +102,7 @@ export interface MetricSummary {
 
 export interface FullPerformanceReport {
   headlineGreenCohort: MetricSummary;
+  greenCohortHeadline?: MetricSummary;
   controlFullCohort: MetricSummary;
   modelAllRowsDiagnostic?: MetricSummary;
   breakdowns: {
@@ -140,6 +141,16 @@ export class PerformanceMetricsEngine {
     positions: LedgerPositionSnapshot[],
     cohortLabel?: string
   ): MetricSummary {
+    const seenPositionIds = new Set<string>();
+    const uniquePositions: LedgerPositionSnapshot[] = [];
+    for (const pos of positions) {
+      if (pos.ledgerPositionId) {
+        if (seenPositionIds.has(pos.ledgerPositionId)) continue;
+        seenPositionIds.add(pos.ledgerPositionId);
+      }
+      uniquePositions.push(pos);
+    }
+
     let unitsStaked = 0;
     let profitUnits = 0;
     let wins = 0;
@@ -163,7 +174,7 @@ export class PerformanceMetricsEngine {
     let brierWeightedSqErrorSum = 0;
     let brierWeightSum = 0;
 
-    for (const pos of positions) {
+    for (const pos of uniquePositions) {
       totalEv += pos.expectedValuePct;
       totalConf += pos.confidence;
 
@@ -188,9 +199,21 @@ export class PerformanceMetricsEngine {
       profitUnits += pos.profitUnits;
 
       const legs = pos.brierDecomposition?.legs || pos.brierLegs || [];
+      const seenLegKeys = new Set<string>();
       for (const leg of legs) {
+        const legKey = `${leg.legIndex ?? 0}_${Number(leg.legLine ?? 0).toFixed(2)}`;
+        if (seenLegKeys.has(legKey)) continue;
+        seenLegKeys.add(legKey);
+
         nBrierLegsTotal++;
-        if (leg.excludedPush || leg.brierSqError === null || !Number.isFinite(leg.brierSqError)) {
+        if (
+          leg.excludedPush ||
+          leg.brierSqError === null ||
+          !Number.isFinite(leg.brierSqError) ||
+          !Number.isFinite(leg.pLegNoPush) ||
+          leg.pLegNoPush <= 0 ||
+          leg.pLegNoPush >= 1
+        ) {
           nBrierLegsExcludedPush++;
         } else {
           nBrierLegsResolved++;
@@ -232,9 +255,9 @@ export class PerformanceMetricsEngine {
     }
 
     const avgPredictedEvPct =
-      positions.length > 0 ? Number((totalEv / positions.length).toFixed(2)) : null;
+      uniquePositions.length > 0 ? Number((totalEv / uniquePositions.length).toFixed(2)) : null;
     const avgConfidence =
-      positions.length > 0 ? Number((totalConf / positions.length).toFixed(1)) : null;
+      uniquePositions.length > 0 ? Number((totalConf / uniquePositions.length).toFixed(1)) : null;
     const avgClvPct = nClv > 0 ? Number((totalClv / nClv).toFixed(2)) : null;
 
     const brierScore =
@@ -316,6 +339,7 @@ export class PerformanceMetricsEngine {
 
     return {
       headlineGreenCohort,
+      greenCohortHeadline: headlineGreenCohort,
       controlFullCohort,
       modelAllRowsDiagnostic: controlFullCohort,
       breakdowns: {

@@ -364,3 +364,157 @@ test('H8.6: Incident log entries INC-H8-01 and INC-H8-02 exist in docs/INCIDENT_
   assert.ok(content.includes('INC-H8-02'), 'Must contain INC-H8-02');
   assert.ok(content.includes('HALF_WIN=0.75'), 'Must document fractional Brier artifact');
 });
+
+test('H8.7: Brier & PerformanceMetricsEngine edge-case guards (wins, losses, pushes, half lines, quarter lines, missing/invalid probabilities, duplicate legs/positions, empty samples)', () => {
+  // 1. Half-line WIN and LOSS
+  const halfLineWin = evaluatePositionBrierLegs({
+    positionId: 'edge_half_win',
+    marketType: 'OU',
+    selection: 'Over 2.5',
+    line: 2.5,
+    homeGoals: 2,
+    awayGoals: 1,
+    lambdaHome: 1.5,
+    lambdaAway: 1.2,
+  });
+  assert.strictEqual(halfLineWin.isQuarterLine, false);
+  assert.strictEqual(halfLineWin.nTotalLegs, 1);
+  assert.strictEqual(halfLineWin.nResolvedLegs, 1);
+  assert.strictEqual(halfLineWin.legs[0].legOutcome, 'WIN');
+  assert.strictEqual(halfLineWin.legs[0].binaryOutcome, 1);
+
+  const halfLineLoss = evaluatePositionBrierLegs({
+    positionId: 'edge_half_loss',
+    marketType: 'OU',
+    selection: 'Over 2.5',
+    line: 2.5,
+    homeGoals: 1,
+    awayGoals: 0,
+    lambdaHome: 1.5,
+    lambdaAway: 1.2,
+  });
+  assert.strictEqual(halfLineLoss.legs[0].legOutcome, 'LOSS');
+  assert.strictEqual(halfLineLoss.legs[0].binaryOutcome, 0);
+
+  // 2. Missing probability on zero-mass grid must NOT fabricate 0.5 coin-flip Brier
+  const missingProbZeroGrid = evaluatePositionBrierLegs({
+    positionId: 'edge_missing_prob',
+    marketType: 'AH',
+    selection: 'Home -0.5',
+    line: -0.5,
+    homeGoals: 2,
+    awayGoals: 0,
+    scoreGrid: [[0, 0], [0, 0]],
+    fallbackModelProbDecimal: null,
+  });
+  assert.strictEqual(missingProbZeroGrid, null, 'Zero-mass grid with missing fallback probability must return null instead of 0.5 coin-flip');
+
+  // 3. Invalid probabilities (NaN, <= 0, >= 1 decimal, >= 100 pct) must be rejected
+  for (const invalidDecimal of [NaN, -0.25, 0, 1, 1.35, Infinity]) {
+    const res = evaluatePositionBrierLegs({
+      positionId: 'edge_invalid_dec',
+      marketType: 'AH',
+      selection: 'Home -0.5',
+      line: -0.5,
+      homeGoals: 2,
+      awayGoals: 0,
+      fallbackModelProbDecimal: invalidDecimal,
+    });
+    assert.strictEqual(res, null, `Invalid fallbackModelProbDecimal ${invalidDecimal} must be rejected`);
+  }
+
+  for (const invalidPct of [NaN, -10, 0, 1, 100, 120]) {
+    const res = evaluatePositionBrierLegs({
+      positionId: 'edge_invalid_pct',
+      marketType: 'OU',
+      selection: 'Over 2.5',
+      line: 2.5,
+      homeGoals: 2,
+      awayGoals: 1,
+      fallbackProbability: invalidPct,
+    });
+    assert.strictEqual(res, null, `Invalid fallbackProbability ${invalidPct} must be rejected`);
+  }
+
+  // 4. Empty sample in PerformanceMetricsEngine
+  const emptySummary = PerformanceMetricsEngine.aggregateMetrics([]);
+  assert.strictEqual(emptySummary.n, 0);
+  assert.strictEqual(emptySummary.sampleStatus, 'INSUFFICIENT SAMPLE');
+  assert.strictEqual(emptySummary.roi, null);
+  assert.strictEqual(emptySummary.brierScore, null);
+  assert.strictEqual(emptySummary.brierStakeWeighted, null);
+  assert.strictEqual(emptySummary.displayStatus, 'No settled bets');
+
+  // 5. Duplicate legs & duplicate positions deduplicated in PerformanceMetricsEngine
+  const leg1 = halfLineWin.legs[0];
+  const posWithDuplicateLegs = {
+    ledgerPositionId: 'dup_pos_1',
+    fixtureId: 'fix_1',
+    marketType: 'OU',
+    selection: 'Over 2.5',
+    line: 2.5,
+    stakeUnits: 1.0,
+    marketOdds: 2.0,
+    fairOdds: 1.9,
+    pWin: leg1.pLegNoPush,
+    pPush: 0,
+    pLoss: 1 - leg1.pLegNoPush,
+    confidence: 75,
+    edge: 3.5,
+    expectedValuePct: 5.0,
+    greenCohort: true,
+    is_pick: true,
+    verdict: 'LAYAK',
+    settlementStatus: 'SETTLED',
+    result: 'WIN',
+    profitUnits: 1.0,
+    clvPct: null,
+    brierLegs: [leg1, { ...leg1 }], // duplicate leg with same legIndex & legLine
+  };
+  const dedupSummary = PerformanceMetricsEngine.aggregateMetrics([
+    posWithDuplicateLegs,
+    { ...posWithDuplicateLegs }, // duplicate position with same ledgerPositionId
+  ]);
+  assert.strictEqual(dedupSummary.settled, 1, 'Duplicate ledgerPositionId must be deduplicated');
+  assert.strictEqual(dedupSummary.nBrierLegsTotal, 1, 'Duplicate leg within position must be deduplicated');
+  assert.strictEqual(dedupSummary.nBrierLegsResolved, 1);
+});
+
+test('H8.8: /api/v1/research serves authoritative live_prediction_ledger.jsonl probabilities (18.5% for Arsenal AH -1.25) matching /api/v1/performance and exposes ledgerDiscrepancyAudit', async () => {
+  const resReq = {
+    headers: new Map([['x-request-id', 'test_h8_auth_prob']]),
+    url: 'http://localhost:3000/api/v1/research?tier=PRODUCTION',
+  };
+  const resResponse = await getResearch(resReq);
+  const resJson = await resResponse.json();
+
+  const perfReq = {
+    headers: new Map([['x-request-id', 'test_h8_auth_perf']]),
+  };
+  const perfResponse = await getPerformance(perfReq);
+  const perfJson = await perfResponse.json();
+
+  assert.strictEqual(resJson.predictions.length, 20);
+  const arsenalAhResearch = resJson.predictions.find(
+    p => String(p.fixtureId) === '1557417' && p.market === 'AH'
+  );
+  const arsenalAhPerf = perfJson.settledPositions.find(
+    p => String(p.fixtureId) === '1557417' && p.market === 'AH'
+  );
+  assert.ok(arsenalAhResearch && arsenalAhPerf);
+  assert.strictEqual(arsenalAhResearch.modelProbability, 18.5);
+  assert.strictEqual(arsenalAhPerf.modelProbability, 18.5);
+  assert.strictEqual(arsenalAhResearch.ledgerDiscrepancyAudit.hasRegeneratedDiscrepancy, true);
+  assert.strictEqual(arsenalAhResearch.ledgerDiscrepancyAudit.authoritativeModelProbabilityPct, 18.5);
+  assert.strictEqual(arsenalAhResearch.ledgerDiscrepancyAudit.regeneratedResearchLedgerProbabilityPct, 32.7);
+
+  // Verify all 12 settled EPL rows have identical modelProbability and fairOdds across both endpoints
+  for (const sp of perfJson.settledPositions) {
+    const rp = resJson.predictions.find(
+      p => String(p.fixtureId) === String(sp.fixtureId) && p.market === sp.market
+    );
+    assert.ok(rp, `Research row must exist for settled position ${sp.fixtureId} ${sp.market}`);
+    assert.strictEqual(rp.modelProbability, sp.modelProbability);
+    assert.strictEqual(rp.fairOdds, sp.fairOdds);
+  }
+});

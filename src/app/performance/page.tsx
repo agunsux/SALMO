@@ -117,22 +117,49 @@ export default function PerformancePage() {
                 Track record is still being established. Live fixtures remain pending ahead of kickoff.
               </p>
 
-              <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto text-left">
+              <div className="mt-8 grid grid-cols-2 sm:grid-cols-5 gap-3 max-w-4xl mx-auto text-left">
                 <div className="rounded-lg border border-[#232830] bg-[#111418] p-3">
-                  <span className="block text-[10px] uppercase text-[#8A93A0]">Dataset Tier</span>
-                  <span className="font-bold text-purple-400 text-sm">RESEARCH</span>
+                  <span className="block text-[10px] uppercase text-[#8A93A0]">Qualified Public Picks</span>
+                  <span className="font-tabular font-bold text-emerald-400 text-sm">
+                    {perfReport?.headlineGreenCohort?.settled ?? 0} settled
+                  </span>
+                  <span className="block text-[10px] text-zinc-500 mt-0.5">
+                    {perfReport?.headlineGreenCohort?.displayStatus || 'No settled bets'}
+                  </span>
                 </div>
                 <div className="rounded-lg border border-[#232830] bg-[#111418] p-3">
-                  <span className="block text-[10px] uppercase text-[#8A93A0]">Settled Samples</span>
-                  <span className="font-tabular font-bold text-white text-sm">{perfReport?.controlFullCohort?.settled ?? settledCount} <span className="text-zinc-500 text-xs font-normal">/ 30 min</span></span>
+                  <span className="block text-[10px] uppercase text-[#8A93A0]">Diagnostic Settled</span>
+                  <span className="font-tabular font-bold text-white text-sm">
+                    {perfReport?.controlFullCohort?.settled ?? settledCount}{' '}
+                    <span className="text-zinc-500 text-xs font-normal">/ 30 min</span>
+                  </span>
+                  <span className="block text-[10px] text-amber-400 mt-0.5">
+                    NOT PUBLIC PICKS
+                  </span>
+                </div>
+                <div className="rounded-lg border border-[#232830] bg-[#111418] p-3">
+                  <span className="block text-[10px] uppercase text-[#8A93A0]">Binary Leg Brier</span>
+                  <span className="font-tabular font-bold text-white text-sm">
+                    {perfReport?.controlFullCohort?.brierScore !== null &&
+                    perfReport?.controlFullCohort?.brierScore !== undefined
+                      ? perfReport.controlFullCohort.brierScore.toFixed(4)
+                      : '—'}
+                  </span>
+                  <span className="block text-[10px] text-zinc-500 mt-0.5">
+                    {perfReport?.controlFullCohort?.nBrierLegsResolved ?? 0} legs ({perfReport?.controlFullCohort?.nBrierLegsExcludedPush ?? 0} push excl.)
+                  </span>
                 </div>
                 <div className="rounded-lg border border-[#232830] bg-[#111418] p-3">
                   <span className="block text-[10px] uppercase text-[#8A93A0]">Pending Settlement</span>
-                  <span className="font-tabular font-bold text-amber-400 text-sm">{perfReport?.controlFullCohort?.pending ?? pendingCount}</span>
+                  <span className="font-tabular font-bold text-amber-400 text-sm">
+                    {perfReport?.controlFullCohort?.pending ?? pendingCount}
+                  </span>
+                  <span className="block text-[10px] text-zinc-500 mt-0.5">Pre-kickoff production</span>
                 </div>
                 <div className="rounded-lg border border-[#232830] bg-[#111418] p-3">
                   <span className="block text-[10px] uppercase text-[#8A93A0]">Total Ingested</span>
                   <span className="font-tabular font-bold text-white text-sm">{totalArchived}</span>
+                  <span className="block text-[10px] text-zinc-500 mt-0.5">15-league archive</span>
                 </div>
               </div>
 
@@ -173,8 +200,14 @@ export default function PerformancePage() {
                     <span className="rounded border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-emerald-400 font-bold">
                       Diagnostic Net Units: {perfReport?.controlFullCohort?.profitUnits !== undefined
                         ? `${perfReport.controlFullCohort.profitUnits >= 0 ? '+' : ''}${perfReport.controlFullCohort.profitUnits.toFixed(2)}u`
-                        : '+0.83u'}
+                        : '0.00u'}
                     </span>
+                    {perfReport?.controlFullCohort?.brierScore !== null &&
+                      perfReport?.controlFullCohort?.brierScore !== undefined && (
+                        <span className="rounded border border-[#232830] bg-[#0B0D10] px-2.5 py-1 text-zinc-300">
+                          Binary Leg Brier: <strong>{perfReport.controlFullCohort.brierScore.toFixed(4)}</strong> (n={perfReport.controlFullCohort.nBrierLegsResolved} legs)
+                        </span>
+                      )}
                     <span className="rounded border border-[#232830] bg-[#0B0D10] px-2.5 py-1 text-zinc-400">
                       Last Sync: {observability?.lastSettlementRunAt ? observability.lastSettlementRunAt.replace('T', ' ').slice(0, 16) : '2026-10-10 18:47'} UTC
                     </span>
@@ -298,25 +331,34 @@ export default function PerformancePage() {
                 <div className="rounded-lg border border-[#232830] bg-[#161B22] p-4">
                   <span className="block text-[10px] uppercase tracking-wider text-[#8A93A0]">Units Staked</span>
                   <span className="mt-1 block font-tabular font-bold text-xl text-white">
-                    {perfReport?.controlFullCohort?.unitsStaked ? `${perfReport.controlFullCohort.unitsStaked}.0u` : '20.0u'}
+                    {perfReport?.controlFullCohort?.unitsStaked !== undefined
+                      ? `${perfReport.controlFullCohort.unitsStaked.toFixed(1)}u`
+                      : '0.0u'}
                   </span>
                 </div>
                 <div className="rounded-lg border border-[#232830] bg-[#161B22] p-4">
                   <span className="block text-[10px] uppercase tracking-wider text-[#8A93A0]">Net Profit</span>
                   <span className="mt-1 block font-tabular font-bold text-xl text-emerald-400">
-                    {perfReport?.controlFullCohort?.profitUnits !== undefined ? `+${perfReport.controlFullCohort.profitUnits.toFixed(2)}u` : '+7.84u'}
+                    {perfReport?.controlFullCohort?.profitUnits !== undefined
+                      ? `${perfReport.controlFullCohort.profitUnits >= 0 ? '+' : ''}${perfReport.controlFullCohort.profitUnits.toFixed(2)}u`
+                      : '0.00u'}
                   </span>
                 </div>
                 <div className="rounded-lg border border-[#232830] bg-[#161B22] p-4">
                   <span className="block text-[10px] uppercase tracking-wider text-[#8A93A0]">Realized Yield</span>
                   <span className="mt-1 block font-tabular font-bold text-xl text-emerald-400">
-                    {perfReport?.controlFullCohort?.yield !== undefined ? `+${perfReport.controlFullCohort.yield.toFixed(2)}%` : '+39.20%'}
+                    {perfReport?.controlFullCohort?.yield !== null &&
+                    perfReport?.controlFullCohort?.yield !== undefined
+                      ? `${perfReport.controlFullCohort.yield >= 0 ? '+' : ''}${perfReport.controlFullCohort.yield.toFixed(2)}%`
+                      : '—'}
                   </span>
                 </div>
                 <div className="rounded-lg border border-[#232830] bg-[#161B22] p-4">
                   <span className="block text-[10px] uppercase tracking-wider text-[#8A93A0]">Record (W-L-HL)</span>
                   <span className="mt-1 block font-tabular font-bold text-xl text-white">
-                    {perfReport?.controlFullCohort ? `${perfReport.controlFullCohort.wins}W - ${perfReport.controlFullCohort.losses}L - ${perfReport.controlFullCohort.halfLosses}HL` : '10W - 8L - 2HL'}
+                    {perfReport?.controlFullCohort
+                      ? `${perfReport.controlFullCohort.wins}W - ${perfReport.controlFullCohort.losses}L - ${perfReport.controlFullCohort.halfLosses}HL`
+                      : '—'}
                   </span>
                 </div>
                 <div className="rounded-lg border border-[#232830] bg-[#161B22] p-4">
@@ -336,20 +378,32 @@ export default function PerformancePage() {
                   <div className="rounded-lg border border-[#232830] bg-[#161B22] p-4">
                     <div className="flex items-center justify-between border-b border-[#232830] pb-2 mb-2">
                       <span className="font-bold text-white text-sm">Asian Handicap (AH)</span>
-                      <span className="text-xs font-semibold text-emerald-400">+94.10% Yield</span>
+                      <span className="text-xs font-semibold text-emerald-400">
+                        {perfReport?.breakdowns?.byMarket?.AH?.displayStatus || 'No settled bets'}
+                      </span>
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-xs">
                       <div>
                         <span className="text-[#8A93A0] block text-[10px]">Bets</span>
-                        <span className="font-bold text-white">10</span>
+                        <span className="font-bold text-white">
+                          {perfReport?.breakdowns?.byMarket?.AH?.settled ?? 0}
+                        </span>
                       </div>
                       <div>
                         <span className="text-[#8A93A0] block text-[10px]">Record</span>
-                        <span className="font-bold text-white">5W - 3L - 2HL</span>
+                        <span className="font-bold text-white">
+                          {perfReport?.breakdowns?.byMarket?.AH
+                            ? `${perfReport.breakdowns.byMarket.AH.wins}W - ${perfReport.breakdowns.byMarket.AH.losses}L - ${perfReport.breakdowns.byMarket.AH.halfLosses}HL`
+                            : '—'}
+                        </span>
                       </div>
                       <div>
                         <span className="text-[#8A93A0] block text-[10px]">Net Profit</span>
-                        <span className="font-bold text-emerald-400">+9.41u</span>
+                        <span className="font-bold text-emerald-400">
+                          {perfReport?.breakdowns?.byMarket?.AH?.profitUnits !== undefined
+                            ? `${perfReport.breakdowns.byMarket.AH.profitUnits >= 0 ? '+' : ''}${perfReport.breakdowns.byMarket.AH.profitUnits.toFixed(2)}u`
+                            : '0.00u'}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -357,20 +411,32 @@ export default function PerformancePage() {
                   <div className="rounded-lg border border-[#232830] bg-[#161B22] p-4">
                     <div className="flex items-center justify-between border-b border-[#232830] pb-2 mb-2">
                       <span className="font-bold text-white text-sm">Asian Over/Under (OU)</span>
-                      <span className="text-xs font-semibold text-rose-400">-15.70% Yield</span>
+                      <span className="text-xs font-semibold text-emerald-400">
+                        {perfReport?.breakdowns?.byMarket?.OU?.displayStatus || 'No settled bets'}
+                      </span>
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-xs">
                       <div>
                         <span className="text-[#8A93A0] block text-[10px]">Bets</span>
-                        <span className="font-bold text-white">10</span>
+                        <span className="font-bold text-white">
+                          {perfReport?.breakdowns?.byMarket?.OU?.settled ?? 0}
+                        </span>
                       </div>
                       <div>
                         <span className="text-[#8A93A0] block text-[10px]">Record</span>
-                        <span className="font-bold text-white">5W - 5L - 0HL</span>
+                        <span className="font-bold text-white">
+                          {perfReport?.breakdowns?.byMarket?.OU
+                            ? `${perfReport.breakdowns.byMarket.OU.wins}W - ${perfReport.breakdowns.byMarket.OU.losses}L - ${perfReport.breakdowns.byMarket.OU.halfLosses}HL`
+                            : '—'}
+                        </span>
                       </div>
                       <div>
                         <span className="text-[#8A93A0] block text-[10px]">Net Profit</span>
-                        <span className="font-bold text-rose-400">-1.57u</span>
+                        <span className="font-bold text-emerald-400">
+                          {perfReport?.breakdowns?.byMarket?.OU?.profitUnits !== undefined
+                            ? `${perfReport.breakdowns.byMarket.OU.profitUnits >= 0 ? '+' : ''}${perfReport.breakdowns.byMarket.OU.profitUnits.toFixed(2)}u`
+                            : '0.00u'}
+                        </span>
                       </div>
                     </div>
                   </div>

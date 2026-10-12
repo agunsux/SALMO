@@ -77,27 +77,48 @@ function normalizeResearchRow(
   const line = raw.line !== undefined ? raw.line : null;
   const selection = raw.selection || raw.prediction || '—';
 
-  // Normalize model_probability to 0..1 decimal for UI while preserving modelProbability (0..100) for API consumers
-  const rawProb = raw.model_probability ?? raw.modelProbability ?? null;
-  const modelProbabilityDecimal =
-    typeof rawProb === 'number'
-      ? rawProb > 1
-        ? Number((rawProb / 100).toFixed(4))
-        : Number(rawProb.toFixed(4))
-      : 0;
-  const modelProbabilityPct =
+  const fixtureId = String(raw.fixture_id || raw.fixtureId || `fix_${index}`);
+  const id = raw.id || raw.predictionId || `${fixtureId}_${market}_${index}`;
+
+  // Enrich PRODUCTION rows with verified pre-match provenance & settlement P&L from live_prediction_ledger.jsonl
+  // Authoritative rule (Phase 1D): live_prediction_ledger.jsonl (recorded 2026-10-06T21:36Z before kickoff) is the
+  // canonical immutable pre-match record for the 20 EPL PRODUCTION rows.
+  const liveSettled =
+    ledgerTier === 'PRODUCTION'
+      ? liveSettledMap.get(`${fixtureId}_${market}`) ||
+        (raw.canonicalMatchId ? liveSettledMap.get(`${raw.canonicalMatchId}_${market}`) : undefined)
+      : undefined;
+
+  const regeneratedProbPct =
     typeof raw.modelProbability === 'number'
       ? raw.modelProbability
-      : typeof rawProb === 'number'
-      ? rawProb <= 1
-        ? Number((rawProb * 100).toFixed(1))
-        : rawProb
+      : typeof raw.model_probability === 'number'
+      ? raw.model_probability <= 1
+        ? Number((raw.model_probability * 100).toFixed(1))
+        : raw.model_probability
       : null;
 
-  const fairOdds = raw.fair_odds ?? raw.fairOdds ?? null;
-  const marketOdds = raw.market_odds ?? raw.marketOdds ?? null;
+  const authoritativeProbSource =
+    typeof liveSettled?.modelProbability === 'number'
+      ? liveSettled.modelProbability
+      : raw.model_probability ?? raw.modelProbability ?? null;
 
-  const rawEv = raw.expected_value ?? raw.expectedValue ?? null;
+  // Normalize model_probability to 0..1 decimal for UI while preserving modelProbability (0..100) for API consumers
+  const modelProbabilityDecimal =
+    typeof authoritativeProbSource === 'number'
+      ? authoritativeProbSource > 1
+        ? Number((authoritativeProbSource / 100).toFixed(4))
+        : Number(authoritativeProbSource.toFixed(4))
+      : 0;
+  const modelProbabilityPct =
+    typeof liveSettled?.modelProbability === 'number'
+      ? liveSettled.modelProbability
+      : regeneratedProbPct;
+
+  const fairOdds = liveSettled?.fairOdds ?? raw.fair_odds ?? raw.fairOdds ?? null;
+  const marketOdds = liveSettled?.oddsAtPrediction ?? liveSettled?.marketOdds ?? raw.market_odds ?? raw.marketOdds ?? null;
+
+  const rawEv = liveSettled?.EV ?? raw.expected_value ?? raw.expectedValue ?? null;
   const expectedValueDecimal =
     typeof rawEv === 'number'
       ? Math.abs(rawEv) > 1
@@ -105,11 +126,30 @@ function normalizeResearchRow(
         : Number(rawEv.toFixed(4))
       : null;
 
-  const edgePct = raw.edge_pct ?? raw.edge ?? null;
-  const confidenceScore = Number(raw.confidence_score ?? raw.confidence ?? 0);
+  const edgePct = liveSettled?.edge ?? raw.edge_pct ?? raw.edge ?? null;
+  const confidenceScore = Number(liveSettled?.confidence ?? raw.confidence_score ?? raw.confidence ?? 0);
+
+  const ledgerDiscrepancyAudit = liveSettled
+    ? {
+        authoritativeLedger: 'live_prediction_ledger.jsonl',
+        authoritativePredictionTimestamp: liveSettled.predictionTimestamp || null,
+        authoritativeModelProbabilityPct: liveSettled.modelProbability ?? null,
+        regeneratedResearchLedgerProbabilityPct: regeneratedProbPct,
+        hasRegeneratedDiscrepancy:
+          typeof liveSettled.modelProbability === 'number' &&
+          typeof regeneratedProbPct === 'number' &&
+          liveSettled.modelProbability !== regeneratedProbPct,
+        discrepancyRootCause:
+          typeof liveSettled.modelProbability === 'number' &&
+          typeof regeneratedProbPct === 'number' &&
+          liveSettled.modelProbability !== regeneratedProbPct
+            ? '2026-10-06 pre-match snapshot used CANONICAL_EPL_RATINGS (1.35/1.20 fallback for club absent from 20-club baseline); 2026-10-11 research export used multi_league_team_ratings_v1.0.json'
+            : null,
+      }
+    : null;
 
   let confidenceTier = raw.confidence_tier || '';
-  if (!confidenceTier) {
+  if (!confidenceTier || liveSettled) {
     if (market === 'BTTS' || ledgerTier !== 'PRODUCTION') {
       confidenceTier = 'RESEARCH_ONLY';
     } else if (confidenceScore >= 70) {
@@ -120,16 +160,6 @@ function normalizeResearchRow(
       confidenceTier = 'LOW';
     }
   }
-
-  const fixtureId = String(raw.fixture_id || raw.fixtureId || `fix_${index}`);
-  const id = raw.id || raw.predictionId || `${fixtureId}_${market}_${index}`;
-
-  // Enrich PRODUCTION rows with verified pre-match provenance & settlement P&L from live_prediction_ledger.jsonl
-  const liveSettled =
-    ledgerTier === 'PRODUCTION'
-      ? liveSettledMap.get(`${fixtureId}_${market}`) ||
-        (raw.canonicalMatchId ? liveSettledMap.get(`${raw.canonicalMatchId}_${market}`) : undefined)
-      : undefined;
 
   // Evaluate strict temporal integrity & provenance (Hotfix H7 P1)
   // Never assume created_at / createdAt is a genuine prediction timestamp unless verified by canonical ledger provenance.
@@ -263,7 +293,10 @@ function normalizeResearchRow(
           line: Number(line),
           homeGoals: homeGoals as number,
           awayGoals: awayGoals as number,
-          fallbackModelProbDecimal: modelProbabilityDecimal,
+          fallbackModelProbDecimal:
+            modelProbabilityDecimal > 0 && modelProbabilityDecimal < 1
+              ? modelProbabilityDecimal
+              : null,
         })
       : null;
 
@@ -319,7 +352,7 @@ function normalizeResearchRow(
     marketOdds,
     edge_pct: edgePct,
     expected_value: expectedValueDecimal,
-    expectedValue: raw.expectedValue ?? expectedValueDecimal,
+    expectedValue: liveSettled?.EV ?? raw.expectedValue ?? expectedValueDecimal,
     confidence_tier: confidenceTier,
     confidence_score: confidenceScore,
     confidence: confidenceScore,
@@ -330,6 +363,7 @@ function normalizeResearchRow(
       ? QUALIFIED_PUBLIC_PICKS_COHORT_LABEL
       : DIAGNOSTIC_ALL_ROWS_COHORT_LABEL,
     ledgerTier,
+    ledgerDiscrepancyAudit,
     settlement,
     homeGoals,
     awayGoals,

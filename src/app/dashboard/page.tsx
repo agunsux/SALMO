@@ -102,17 +102,19 @@ export default function DashboardPage() {
       }
 
       if (perfRes?.success && perfRes.report) {
-        const headline = perfRes.report.greenCohortHeadline || {};
-        const sample = headline.totalPositions || 0;
+        const headline = perfRes.report.headlineGreenCohort || perfRes.report.greenCohortHeadline || {};
+        const sample = headline.settled ?? headline.n ?? headline.totalPositions ?? 0;
+        const hasSufficient =
+          headline.sampleStatus === 'SUFFICIENT' || headline.hasSufficientSample === true;
         setPerformance({
           sampleSize: sample,
-          hasSufficientSample: headline.hasSufficientSample || false,
+          hasSufficientSample: hasSufficient,
           winRatePct: headline.winRatePct !== undefined ? headline.winRatePct : null,
-          yieldPct: headline.yieldPct !== undefined ? headline.yieldPct : null,
+          yieldPct: headline.yield ?? headline.yieldPct ?? null,
           maxDrawdownPct: headline.maxDrawdownPct !== undefined ? headline.maxDrawdownPct : null,
-          status: headline.status || 'INSUFFICIENT_SAMPLE',
-          note: headline.note,
-          timestampUtc: perfRes.timestampUtc,
+          status: headline.sampleStatus || headline.status || 'INSUFFICIENT_SAMPLE',
+          note: headline.displayStatus || headline.note,
+          timestampUtc: perfRes.report.generatedAt || perfRes.timestampUtc,
         });
       }
 
