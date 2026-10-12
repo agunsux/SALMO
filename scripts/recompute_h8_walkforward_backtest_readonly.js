@@ -1210,8 +1210,14 @@ if (require.main === module) {
 
 module.exports = {
   runReadOnlyH8BacktestRecompute,
+  loadAllMatchesByLeague,
+  fitLeagueModel,
   buildGrid,
+  evalSingleAhLineOnGrid,
+  evalAhBinaryNoPushLegs,
+  evalQuarterLineAhFractionalOld,
   evalSingleOuLineOnGrid,
   evalOuBinaryNoPushLegs,
+  normalizeEplTeamForJoin,
   OU_MULTI_LINES,
 };

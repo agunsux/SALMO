@@ -348,3 +348,23 @@ test('P5.1: Immutable SHA-256 verification of historical ledgers, canonical rati
   const vercelJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'vercel.json'), 'utf8'));
   assert.deepStrictEqual(vercelJson.crons, [], 'vercel.json crons must remain empty []');
 });
+
+test('P5.2: Step 2 paired Pinnacle benchmark artifact verifies identical-leg Brier/Log-Loss, opening vs closing, stacking test, and exploratory walk-forward', () => {
+  const step2Path = path.join(process.cwd(), 'data/verification/paired_pinnacle_benchmark_step2.json');
+  assert.ok(fs.existsSync(step2Path), 'paired_pinnacle_benchmark_step2.json must exist');
+  const step2 = JSON.parse(fs.readFileSync(step2Path, 'utf8'));
+
+  assert.ok(step2.bootstrapResamples >= 5000, 'bootstrapResamples must be >= 5000');
+  assert.strictEqual(step2.preRegisteredExploratoryWarmupN, 380);
+  assert.strictEqual(step2.primary80FixtureBenchmark.matchedPinnacleFixtures, 80);
+  assert.strictEqual(step2.primary80FixtureBenchmark.ahAllBinaryNoPushLegs.nLegsTotal, 121);
+  assert.strictEqual(step2.primary80FixtureBenchmark.ahAllBinaryNoPushLegs.nLegsExcludedPush, 16);
+  assert.strictEqual(step2.primary80FixtureBenchmark.ahAllBinaryNoPushLegs.nLegsResolved, 105);
+  assert.strictEqual(step2.primary80FixtureBenchmark.ahAllBinaryNoPushLegs.beatsPinnacleAt95Ci, false);
+  assert.strictEqual(step2.primary80FixtureBenchmark.ou25IdenticalLegs.nLegsResolved, 80);
+  assert.strictEqual(step2.primary80FixtureBenchmark.ou25IdenticalLegs.beatsPinnacleAt95Ci, false);
+  assert.strictEqual(step2.exploratoryExpandedWalkForward.label, 'EXPLORATORY');
+  assert.strictEqual(step2.exploratoryExpandedWalkForward.matchedPinnacleFixtures, 719);
+  assert.strictEqual(step2.exploratoryExpandedWalkForward.ahAllBinaryNoPushLegs.beatsPinnacleAt95Ci, false);
+  assert.strictEqual(step2.exploratoryExpandedWalkForward.ou25IdenticalLegs.beatsPinnacleAt95Ci, false);
+});
