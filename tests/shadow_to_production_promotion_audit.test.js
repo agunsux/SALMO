@@ -155,8 +155,9 @@ test('P2.1: Multi-line OU binary no-push per-leg evaluation covers all 8 lines (
   assert.ok(nedH8.ouBalancedQuarterBinaryNoPushCi95[1] >= 0.25, 'NED-ERE dynamic balanced OU CI95 upper >= 0.25');
 });
 
-test('P3.1: evaluateMarketPromotionGates enforces all 7 canonical statuses and selects the most restrictive applicable status', () => {
-  assert.strictEqual(SHADOW_PROMOTION_MATRIX_STATUSES.length, 7);
+test('P3.1: evaluateMarketPromotionGates enforces all 8 canonical statuses (including UNTESTED_VS_MARKET) and selects the most restrictive applicable status', () => {
+  assert.strictEqual(SHADOW_PROMOTION_MATRIX_STATUSES.length, 8);
+  assert.ok(SHADOW_PROMOTION_MATRIX_STATUSES.includes('UNTESTED_VS_MARKET'));
 
   // 1. Data integrity failure overrides model validation and missing odds
   const dataIntRes = evaluateMarketPromotionGates({
@@ -214,8 +215,8 @@ test('P3.1: evaluateMarketPromotionGates enforces all 7 canonical statuses and s
   assert.strictEqual(modelValRes.primaryStatus, 'BLOCKED_MODEL_VALIDATION');
   assert.strictEqual(modelValRes.shadowValidationEligibility, 'BLOCKED_MODEL_VALIDATION');
 
-  // 3. Statistical pass without Pinnacle odds resolves to primaryStatus = BLOCKED_MISSING_ODDS and shadowValidationEligibility = ELIGIBLE_FOR_SHADOW_VALIDATION
-  const shadowEligRes = evaluateMarketPromotionGates({
+  // 3. Statistical pass (< 0.25 sanity floor) without paired Pinnacle market test resolves to primaryStatus = BLOCKED_MISSING_ODDS and shadowValidationEligibility = UNTESTED_VS_MARKET
+  const shadowUntestedRes = evaluateMarketPromotionGates({
     leagueId: 'BEL-PRO',
     market: 'AH',
     historicalMatchesTotal: 1087,
@@ -238,9 +239,40 @@ test('P3.1: evaluateMarketPromotionGates enforces all 7 canonical statuses and s
     quotaAvailable: false,
     smokeTestPassed: false,
   });
-  assert.strictEqual(shadowEligRes.primaryStatus, 'BLOCKED_MISSING_ODDS');
-  assert.strictEqual(shadowEligRes.shadowValidationEligibility, 'ELIGIBLE_FOR_SHADOW_VALIDATION');
-  assert.strictEqual(shadowEligRes.allPreRegisteredPromotionGatesPass, false);
+  assert.strictEqual(shadowUntestedRes.primaryStatus, 'BLOCKED_MISSING_ODDS');
+  assert.strictEqual(shadowUntestedRes.shadowValidationEligibility, 'UNTESTED_VS_MARKET');
+  assert.strictEqual(shadowUntestedRes.allPreRegisteredPromotionGatesPass, false);
+
+  // 4. Only when paired Pinnacle market test exists (n >= 300 identical legs, pairedBrierDiffCi95Upper < 0, pairedLogLossDiffCi95Upper < 0) does shadowValidationEligibility become ELIGIBLE_FOR_SHADOW_VALIDATION
+  const shadowEligWithMarketTest = evaluateMarketPromotionGates({
+    leagueId: 'BEL-PRO',
+    market: 'AH',
+    historicalMatchesTotal: 1087,
+    evalSampleSize: 300,
+    maxHistoricalDate: '2026-09-20',
+    ratedTeamsCount: 24,
+    coldStartTeamsCount: 4,
+    unratedTeamsCount: 0,
+    chronologicalWalkForwardVerified: true,
+    dispersionRatio: 1.0332,
+    primaryBrier: 0.2366,
+    primaryBrierCi95: [0.2278, 0.2456],
+    beatsConstant05At95Ci: true,
+    logLoss: 0.6661,
+    calibrationSlope: 1.3849,
+    isMarketCalibrated: true,
+    pinnacleBenchmarkAvailable: true,
+    pinnacleBenchmarkMatchedFixtures: 300,
+    pinnacleModelBrierOnMatched: 0.221,
+    pinnacleMarketBrierOnMatched: 0.228,
+    pairedBrierDiffCi95Upper: -0.002,
+    pairedLogLossDiffCi95Upper: -0.004,
+    liveFixturesWithOddsCount: 0,
+    quotaAvailable: false,
+    smokeTestPassed: false,
+  });
+  assert.strictEqual(shadowEligWithMarketTest.primaryStatus, 'BLOCKED_MISSING_ODDS');
+  assert.strictEqual(shadowEligWithMarketTest.shadowValidationEligibility, 'ELIGIBLE_FOR_SHADOW_VALIDATION');
 });
 
 test('P4.1: MultiLeagueAutoActivator.evaluateAllShadowLeagues() uses H8 binary no-push quarter-line Brier and promotes 0 SHADOW leagues', () => {
@@ -276,13 +308,20 @@ test('P4.1: MultiLeagueAutoActivator.evaluateAllShadowLeagues() uses H8 binary n
     );
   }
 
-  // Verify the 3 AH markets and 2 OU markets eligible for shadow validation once live Pinnacle odds are ingested
+  // Verify the 3 AH markets and 2 OU markets that passed the < 0.25 sanity floor without a paired Pinnacle market test emit UNTESTED_VS_MARKET (not ELIGIBLE_FOR_SHADOW_VALIDATION)
   const byCode = Object.fromEntries(report.decisions.map(d => [d.leagueCode, d]));
   for (const lid of ['BEL-PRO', 'ITA-SERIEA', 'NED-ERE']) {
     assert.strictEqual(byCode[lid].marketEvaluations.AH.promotionMatrixStatus, 'BLOCKED_MISSING_ODDS');
     assert.strictEqual(
       byCode[lid].marketEvaluations.AH.shadowValidationEligibility,
-      'ELIGIBLE_FOR_SHADOW_VALIDATION'
+      'UNTESTED_VS_MARKET'
+    );
+  }
+  for (const lid of ['DEU-BUNDESLIGA', 'NED-ERE']) {
+    assert.strictEqual(byCode[lid].marketEvaluations.OU.promotionMatrixStatus, 'BLOCKED_MISSING_ODDS');
+    assert.strictEqual(
+      byCode[lid].marketEvaluations.OU.shadowValidationEligibility,
+      'UNTESTED_VS_MARKET'
     );
   }
   for (const lid of ['ESP-LALIGA', 'DEU-BUNDESLIGA', 'FRA-LIGUE1', 'POR-PRIMEIRA', 'USA-MLS', 'SAU-PRO']) {

@@ -535,7 +535,61 @@ test('H8.9: gates.ts exports match documented values in docs/governance/promotio
   assert.strictEqual(gatesModule.HEADLINE_COHORT_MIN_SETTLED_POSITIONS, 100);
   assert.strictEqual(gatesModule.BRIER_VS_MARKET_MIN_LEGS, 300);
   assert.strictEqual(gatesModule.BRIER_DIFF_VS_MARKET_CI95_UPPER_MAX, 0);
+  assert.strictEqual(gatesModule.LOG_LOSS_DIFF_VS_MARKET_CI95_UPPER_MAX, 0);
   assert.strictEqual(gatesModule.BRIER_COIN_FLIP_SANITY_FLOOR, 0.25);
+  assert.strictEqual(gatesModule.LOG_LOSS_COIN_FLIP_SANITY_FLOOR, 0.6931);
+  assert.strictEqual(gatesModule.MIN_CALIBRATION_SLOPE_FLOOR, 0.5);
+  assert.strictEqual(gatesModule.MAX_DISPERSION_RATIO_CEILING, 1.15);
+  assert.strictEqual(gatesModule.MULTIPLE_COMPARISON_CORRECTION_METHOD, 'HOLM_STEP_DOWN');
+  assert.strictEqual(gatesModule.HOLM_FAMILYWISE_ALPHA, 0.05);
+  assert.strictEqual(gatesModule.DEMOTION_TARGET_STATUS, 'SHADOW');
+  assert.strictEqual(gatesModule.DEMOTION_PAIRED_BRIER_DIFF_CI95_LOWER_MIN, 0);
+  assert.strictEqual(gatesModule.DEMOTION_CLV_CI95_UPPER_MAX, 0);
+  assert.strictEqual(gatesModule.SHADOW_VALIDATION_UNTESTED_VS_MARKET, 'UNTESTED_VS_MARKET');
+  assert.strictEqual(gatesModule.DRIBBLE360_EXPIRATION_DATE, '2026-12-01');
+
+  // Verify closing selection rule: last active=true tick with createdAt <= kickoffUtc on exact market+line
+  const series = [
+    { bookmaker: 'pinnacle', market: 'AH', outcome: 'HOME', line: -0.5, price: 1.92, active: true, createdAt: '2026-10-10T12:00:00Z' },
+    { bookmaker: 'pinnacle', market: 'AH', outcome: 'HOME', line: -0.5, price: 1.96, active: true, createdAt: '2026-10-10T13:59:00Z' },
+    { bookmaker: 'pinnacle', market: 'AH', outcome: 'HOME', line: -0.5, price: 2.02, active: false, createdAt: '2026-10-10T13:59:30Z' },
+    { bookmaker: 'pinnacle', market: 'AH', outcome: 'HOME', line: -0.5, price: 2.05, active: true, createdAt: '2026-10-10T14:01:00Z' }, // post-kickoff
+  ];
+  const closeRes = gatesModule.selectPinnacleClosingFromSeries(series, '2026-10-10T14:00:00Z', 'AH', 'HOME', -0.5);
+  assert.strictEqual(closeRes.closingPrice, 1.96);
+  assert.strictEqual(closeRes.reason, 'LAST_ACTIVE_AT_OR_BEFORE_KICKOFF');
+
+  // Missing line -> null + 'line_not_in_series'
+  const missingLineRes = gatesModule.selectPinnacleClosingFromSeries(series, '2026-10-10T14:00:00Z', 'AH', 'HOME', -0.75);
+  assert.strictEqual(missingLineRes.closingPrice, null);
+  assert.strictEqual(missingLineRes.reason, 'line_not_in_series');
+
+  // Proportional two-way devig
+  const devig = gatesModule.computeProportionalTwoWayDevig(1.95, 1.95);
+  assert.ok(devig);
+  assert.strictEqual(devig.probSideA, 0.5);
+  assert.strictEqual(devig.probSideB, 0.5);
+
+  // Holm step-down multiple comparison correction
+  const holm = gatesModule.applyHolmStepDownCorrection([
+    { id: 'H1', pValue: 0.01 },
+    { id: 'H2', pValue: 0.02 },
+    { id: 'H3', pValue: 0.04 },
+  ], 0.05);
+  assert.strictEqual(holm.length, 3);
+  assert.strictEqual(holm[0].rejectedNull, true);
+
+  // Demotion rule (ACTIVE -> SHADOW)
+  const demoteBrier = gatesModule.evaluateActiveMarketDemotionGate({
+    leagueId: 'ENG-PL',
+    market: 'OU',
+    nPairedMarketLegs: 80,
+    pairedBrierDiffCi95Lower: 0.0002,
+    nSettledClvPositions: 0,
+    clvCi95Upper: null,
+  });
+  assert.strictEqual(demoteBrier.shouldDemoteToShadow, true);
+  assert.strictEqual(demoteBrier.targetStatusIfDemoted, 'SHADOW');
 
   const govDocPath = path.resolve(process.cwd(), 'docs/governance/promotion_gates.md');
   assert.strictEqual(fs.existsSync(govDocPath), true, 'docs/governance/promotion_gates.md must exist');
@@ -545,13 +599,18 @@ test('H8.9: gates.ts exports match documented values in docs/governance/promotio
   assert.ok(govDoc.includes('soft book, not a benchmark'), 'Must document soft-book line-shopping label');
   assert.ok(govDoc.includes('line_not_in_series'), 'Must document missing-line rule');
   assert.ok(govDoc.includes('PROPORTIONAL_TWO_WAY'), 'Must document proportional two-way devig');
+  assert.ok(govDoc.includes('UNTESTED_VS_MARKET'), 'Must document UNTESTED_VS_MARKET status');
+  assert.ok(govDoc.includes('HOLM_STEP_DOWN'), 'Must document Holm step-down correction');
+  assert.ok(govDoc.includes('2026-12-01'), 'Must document Dribble360 expiration 2026-12-01');
+  assert.ok(govDoc.includes('11/14') || govDoc.includes('11 of 14'), 'Must cite H8 11/14 quarter-line binary flip rationale');
+  assert.ok(govDoc.includes('61%') || govDoc.includes('61.3%'), 'Must cite DEU/NED OU 2.5 ~61% Over base-rate skew rationale');
   assert.ok(govDoc.includes('Insufficient sample (n/100)'), 'Must document Insufficient sample (n/100) rule');
   assert.ok(govDoc.includes('NOT_COMPUTABLE_YET'), 'Must document NOT_COMPUTABLE_YET rule');
   assert.ok(govDoc.includes('2026-01'), 'Must document OddsPapi historical depth constraint (since 2026-01)');
   assert.ok(govDoc.includes('Football-Data.co.uk'), 'Must document Football-Data.co.uk prior-season closing source');
 });
 
-test('H8.10: Static scan confirms no hardcoded 30 sample-size or 0.25 pass-criterion literals remain in src/ outside gates.ts', () => {
+test('H8.10: Static scan confirms no hardcoded 30 sample-size or gate threshold literals remain in src/ outside gates.ts', () => {
   const gatesFullPath = path.resolve(process.cwd(), 'src/engine/performance/gates.ts');
 
   function walkTsFiles(dir, out = []) {
@@ -587,6 +646,18 @@ test('H8.10: Static scan confirms no hardcoded 30 sample-size or 0.25 pass-crite
     assert.ok(
       !content.includes('BRIER_THRESHOLD = 0.25'),
       `${relPath} must not hardcode BRIER_THRESHOLD = 0.25 outside gates.ts`
+    );
+    assert.ok(
+      !content.includes('LOG_LOSS_THRESHOLD = 0.6931'),
+      `${relPath} must not hardcode LOG_LOSS_THRESHOLD = 0.6931 outside gates.ts`
+    );
+    assert.ok(
+      !content.includes('MIN_CALIBRATION_SLOPE = 0.5'),
+      `${relPath} must not hardcode MIN_CALIBRATION_SLOPE = 0.5 outside gates.ts`
+    );
+    assert.ok(
+      !content.includes('MAX_DISPERSION_RATIO = 1.15'),
+      `${relPath} must not hardcode MAX_DISPERSION_RATIO = 1.15 outside gates.ts`
     );
     assert.ok(
       !content.includes('MIN_EVAL_SAMPLE = 300'),

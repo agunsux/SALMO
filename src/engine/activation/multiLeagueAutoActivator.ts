@@ -37,8 +37,16 @@ import { LiveOddsDTO, LiveFixtureDTO } from '../../services/providers/types';
 import { Logger } from '../../lib/logger';
 import {
   BRIER_COIN_FLIP_SANITY_FLOOR,
+  LOG_LOSS_COIN_FLIP_SANITY_FLOOR,
+  MIN_CALIBRATION_SLOPE_FLOOR,
+  MAX_DISPERSION_RATIO_CEILING,
+  MIN_CURRENT_SEASON_MAX_DATE,
+  MAX_COLD_START_TEAM_SHARE,
+  COLD_START_MIN_MATCHES_PER_TEAM,
+  UNRATED_MAX_MATCHES_PER_TEAM,
   BRIER_VS_MARKET_MIN_LEGS,
   PRE_REGISTERED_GATES,
+  SHADOW_VALIDATION_UNTESTED_VS_MARKET,
   ShadowPromotionMatrixStatus,
   OU_EVALUATED_LINES,
   H8_WALKFORWARD_BINARY_NO_PUSH_BY_LEAGUE,
@@ -49,7 +57,10 @@ export interface MarketEvaluationDetail {
   market: MarketKey;
   readinessState: MarketReadinessState;
   promotionMatrixStatus?: ShadowPromotionMatrixStatus;
-  shadowValidationEligibility?: 'ELIGIBLE_FOR_SHADOW_VALIDATION' | ShadowPromotionMatrixStatus;
+  shadowValidationEligibility?:
+    | typeof SHADOW_VALIDATION_UNTESTED_VS_MARKET
+    | 'ELIGIBLE_FOR_SHADOW_VALIDATION'
+    | ShadowPromotionMatrixStatus;
   failingGates?: string[];
   productionEnabled: boolean;
   modelValidated: boolean;
@@ -203,9 +214,9 @@ export interface AutoActivationOptions {
 
 export class MultiLeagueAutoActivator {
   public static readonly BRIER_THRESHOLD = BRIER_COIN_FLIP_SANITY_FLOOR;
-  public static readonly LOG_LOSS_THRESHOLD = 0.6931;
-  public static readonly MIN_CALIBRATION_SLOPE = 0.5000;
-  public static readonly MAX_DISPERSION_RATIO = 1.1500;
+  public static readonly LOG_LOSS_THRESHOLD = LOG_LOSS_COIN_FLIP_SANITY_FLOOR;
+  public static readonly MIN_CALIBRATION_SLOPE = MIN_CALIBRATION_SLOPE_FLOOR;
+  public static readonly MAX_DISPERSION_RATIO = MAX_DISPERSION_RATIO_CEILING;
   public static readonly MIN_EVAL_SAMPLE = BRIER_VS_MARKET_MIN_LEGS;
   public static readonly DEFAULT_MAX_CANONICAL_FIXTURE_AGE_HOURS = 168; // 7 days
 
@@ -974,8 +985,12 @@ export class MultiLeagueAutoActivator {
       : (CANONICAL_MULTI_LEAGUE_RATINGS[lid] || {});
     const ratingList = Object.values(ratingsMap);
     const ratedTeamsCount = ratingList.length;
-    const coldStartTeamsCount = ratingList.filter(r => r.cold_start || r.matches_played < 10).length;
-    const unratedTeamsCount = ratingList.filter(r => r.matches_played <= 2).length;
+    const coldStartTeamsCount = ratingList.filter(
+      r => r.cold_start || r.matches_played < COLD_START_MIN_MATCHES_PER_TEAM
+    ).length;
+    const unratedTeamsCount = ratingList.filter(
+      r => r.matches_played <= UNRATED_MAX_MATCHES_PER_TEAM
+    ).length;
 
     const leagueProf = MULTI_LEAGUE_PROFILES[lid];
     const backtest = backtestOverride || MULTI_LEAGUE_BACKTEST_SUMMARY[lid];
@@ -999,13 +1014,16 @@ export class MultiLeagueAutoActivator {
         leagueDataBlockerReason = `Data quality blocker: missing current autumn 2026/2027 season match coverage (maxHistoricalDate=${maxHistoricalDate}, nEval=${evalSampleSize}, coldStartTeams=${coldStartTeamsCount}).`;
       } else if (lid === 'JPN-J1' || lid === 'KOR-K1') {
         leagueDataBlockerState = 'BLOCKED_COLD_START';
-        leagueDataBlockerReason = `Cold-start & season coverage blocker: ${coldStartTeamsCount}/${ratedTeamsCount} teams have < 10 historical matches and ${unratedTeamsCount} teams have <= 2 matches (maxHistoricalDate=${maxHistoricalDate}, nEval=${evalSampleSize}).`;
-      } else if (evalSampleSize < this.MIN_EVAL_SAMPLE || (maxHistoricalDate && maxHistoricalDate < '2026-08-01')) {
+        leagueDataBlockerReason = `Cold-start & season coverage blocker: ${coldStartTeamsCount}/${ratedTeamsCount} teams have < ${COLD_START_MIN_MATCHES_PER_TEAM} historical matches and ${unratedTeamsCount} teams have <= ${UNRATED_MAX_MATCHES_PER_TEAM} matches (maxHistoricalDate=${maxHistoricalDate}, nEval=${evalSampleSize}).`;
+      } else if (
+        evalSampleSize < this.MIN_EVAL_SAMPLE ||
+        (maxHistoricalDate && maxHistoricalDate < MIN_CURRENT_SEASON_MAX_DATE)
+      ) {
         leagueDataBlockerState = 'BLOCKED_DATA_QUALITY';
         leagueDataBlockerReason = `Data quality blocker: out-of-sample evaluation size nEval=${evalSampleSize} (< ${this.MIN_EVAL_SAMPLE}) or stale maxHistoricalDate=${maxHistoricalDate}.`;
-      } else if (coldStartTeamsCount > ratedTeamsCount * 0.25) {
+      } else if (coldStartTeamsCount > ratedTeamsCount * MAX_COLD_START_TEAM_SHARE) {
         leagueDataBlockerState = 'BLOCKED_COLD_START';
-        leagueDataBlockerReason = `Cold-start blocker: ${coldStartTeamsCount}/${ratedTeamsCount} active teams have < 10 historical matches (${unratedTeamsCount} with <= 2 matches).`;
+        leagueDataBlockerReason = `Cold-start blocker: ${coldStartTeamsCount}/${ratedTeamsCount} active teams have < ${COLD_START_MIN_MATCHES_PER_TEAM} historical matches (${unratedTeamsCount} with <= ${UNRATED_MAX_MATCHES_PER_TEAM} matches).`;
       }
     }
 

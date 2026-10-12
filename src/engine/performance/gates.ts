@@ -40,19 +40,40 @@ export const BRIER_VS_MARKET_MIN_LEGS = 300 as const;
 
 // Pass / sanity thresholds
 export const BRIER_DIFF_VS_MARKET_CI95_UPPER_MAX = 0 as const; // (modelBrier - marketBrier) CI95 upper < 0
+export const LOG_LOSS_DIFF_VS_MARKET_CI95_UPPER_MAX = 0 as const; // (modelLogLoss - marketLogLoss) CI95 upper < 0
 export const BRIER_COIN_FLIP_SANITY_FLOOR = 0.25 as const; // Sanity floor only, NEVER a promotion pass criterion
+export const LOG_LOSS_COIN_FLIP_SANITY_FLOOR = 0.6931 as const; // Sanity floor only (-ln(0.5))
+export const MIN_CALIBRATION_SLOPE_FLOOR = 0.5 as const;
+export const MAX_DISPERSION_RATIO_CEILING = 1.15 as const;
+export const MIN_HISTORICAL_MATCHES_FOR_EVAL = 120 as const;
+export const MIN_CURRENT_SEASON_MAX_DATE = '2026-08-01' as const;
+export const MAX_COLD_START_TEAM_SHARE = 0.25 as const;
+export const COLD_START_MIN_MATCHES_PER_TEAM = 10 as const;
+export const UNRATED_MAX_MATCHES_PER_TEAM = 2 as const;
 
-// SHADOW -> ACTIVE promotion & ACTIVE -> PAUSED demotion rules
+// Pre-registered multiple-comparison correction across tested league x market x line
+export const MULTIPLE_COMPARISON_CORRECTION_METHOD = 'HOLM_STEP_DOWN' as const;
+export const HOLM_FAMILYWISE_ALPHA = 0.05 as const;
+
+// SHADOW -> ACTIVE promotion & ACTIVE -> SHADOW demotion rules
 export const PROMOTION_CLV_CI95_LOWER_MIN = 0 as const; // CLV mean CI95 lower bound > 0 at n >= 100
 export const PROMOTION_MAX_LEAKAGE_SUSPECT_ROWS = 0 as const; // Zero leakage_suspect rows allowed in window
-export const DEMOTION_CLV_CI95_UPPER_MAX = 0 as const; // ACTIVE -> PAUSED if CLV CI95 upper < 0 at n >= 100
+export const DEMOTION_TARGET_STATUS = 'SHADOW' as const;
+export const DEMOTION_PAIRED_BRIER_DIFF_CI95_LOWER_MIN = 0 as const; // ACTIVE -> SHADOW if paired (modelBrier - pinnacleBrier) CI95 lower > 0
+export const DEMOTION_CLV_CI95_UPPER_MAX = 0 as const; // ACTIVE -> SHADOW if CLV CI95 upper < 0 at n >= 100
 
 // Data-source & licensing constraints
 export const ODDSPAPI_HISTORICAL_START_MONTH = '2026-01' as const;
 export const ODDSPAPI_HISTORICAL_COOLDOWN_SECONDS = 5 as const;
 export const EXPOSE_RAW_BOOKMAKER_ODDS_SERIES_PUBLICLY = false as const;
+export const EXPOSE_DRIBBLE360_RAW_CAPTURES_PUBLICLY = false as const;
+export const DRIBBLE360_EXPIRATION_DATE = '2026-12-01' as const;
+export const FOOTBALL_DATA_PINNACLE_CLOSING_SOURCE_ID = 'FOOTBALL_DATA_CO_UK_PINNACLE_CLOSING' as const;
+export const ODDSPAPI_HISTORICAL_PINNACLE_SOURCE_ID = 'ODDSPAPI_HISTORICAL_PINNACLE_SERIES' as const;
 export const FROZEN_RATINGS_ARTIFACT_SHA256 =
   '53466f88ae63f5246f8756f8873f71c472669b0912f09979cfc5e77b82050984' as const;
+
+export const SHADOW_VALIDATION_UNTESTED_VS_MARKET = 'UNTESTED_VS_MARKET' as const;
 
 export interface PreRegisteredGatesConfig {
   readonly referenceBenchmarkBookmaker: typeof REFERENCE_BENCHMARK_BOOKMAKER;
@@ -66,16 +87,27 @@ export interface PreRegisteredGatesConfig {
   readonly headlineCohortMinSettledPositions: typeof HEADLINE_COHORT_MIN_SETTLED_POSITIONS;
   readonly brierVsMarketMinLegs: typeof BRIER_VS_MARKET_MIN_LEGS;
   readonly brierDiffVsMarketCi95UpperMax: typeof BRIER_DIFF_VS_MARKET_CI95_UPPER_MAX;
+  readonly logLossDiffVsMarketCi95UpperMax: typeof LOG_LOSS_DIFF_VS_MARKET_CI95_UPPER_MAX;
   readonly brierCoinFlipSanityFloor: typeof BRIER_COIN_FLIP_SANITY_FLOOR;
+  readonly logLossCoinFlipSanityFloor: typeof LOG_LOSS_COIN_FLIP_SANITY_FLOOR;
+  readonly minCalibrationSlopeFloor: typeof MIN_CALIBRATION_SLOPE_FLOOR;
+  readonly maxDispersionRatioCeiling: typeof MAX_DISPERSION_RATIO_CEILING;
+  readonly multipleComparisonCorrectionMethod: typeof MULTIPLE_COMPARISON_CORRECTION_METHOD;
+  readonly holmFamilywiseAlpha: typeof HOLM_FAMILYWISE_ALPHA;
   readonly promotionRules: {
     readonly minClvPositions: typeof CLV_HEADLINE_MIN_POSITIONS;
     readonly clvCi95LowerMin: typeof PROMOTION_CLV_CI95_LOWER_MIN;
     readonly minBrierLegs: typeof BRIER_VS_MARKET_MIN_LEGS;
     readonly brierDiffVsMarketCi95UpperMax: typeof BRIER_DIFF_VS_MARKET_CI95_UPPER_MAX;
+    readonly logLossDiffVsMarketCi95UpperMax: typeof LOG_LOSS_DIFF_VS_MARKET_CI95_UPPER_MAX;
+    readonly multipleComparisonCorrectionMethod: typeof MULTIPLE_COMPARISON_CORRECTION_METHOD;
+    readonly holmFamilywiseAlpha: typeof HOLM_FAMILYWISE_ALPHA;
     readonly maxLeakageSuspectRows: typeof PROMOTION_MAX_LEAKAGE_SUSPECT_ROWS;
     readonly requireFrozenModelAndRatingsHash: true;
   };
   readonly demotionRules: {
+    readonly targetStatus: typeof DEMOTION_TARGET_STATUS;
+    readonly pairedBrierDiffCi95LowerMin: typeof DEMOTION_PAIRED_BRIER_DIFF_CI95_LOWER_MIN;
     readonly minClvPositions: typeof CLV_HEADLINE_MIN_POSITIONS;
     readonly clvCi95UpperMax: typeof DEMOTION_CLV_CI95_UPPER_MAX;
   };
@@ -83,6 +115,10 @@ export interface PreRegisteredGatesConfig {
     readonly oddsPapiHistoricalStartMonth: typeof ODDSPAPI_HISTORICAL_START_MONTH;
     readonly oddsPapiHistoricalCooldownSeconds: typeof ODDSPAPI_HISTORICAL_COOLDOWN_SECONDS;
     readonly exposeRawBookmakerOddsSeriesPublicly: typeof EXPOSE_RAW_BOOKMAKER_ODDS_SERIES_PUBLICLY;
+    readonly exposeDribble360RawCapturesPublicly: typeof EXPOSE_DRIBBLE360_RAW_CAPTURES_PUBLICLY;
+    readonly dribble360ExpirationDate: typeof DRIBBLE360_EXPIRATION_DATE;
+    readonly footballDataPinnacleClosingSourceId: typeof FOOTBALL_DATA_PINNACLE_CLOSING_SOURCE_ID;
+    readonly oddsPapiHistoricalPinnacleSourceId: typeof ODDSPAPI_HISTORICAL_PINNACLE_SOURCE_ID;
     readonly frozenRatingsArtifactSha256: typeof FROZEN_RATINGS_ARTIFACT_SHA256;
   };
 }
@@ -99,16 +135,27 @@ export const PRE_REGISTERED_GATES: PreRegisteredGatesConfig = Object.freeze({
   headlineCohortMinSettledPositions: HEADLINE_COHORT_MIN_SETTLED_POSITIONS,
   brierVsMarketMinLegs: BRIER_VS_MARKET_MIN_LEGS,
   brierDiffVsMarketCi95UpperMax: BRIER_DIFF_VS_MARKET_CI95_UPPER_MAX,
+  logLossDiffVsMarketCi95UpperMax: LOG_LOSS_DIFF_VS_MARKET_CI95_UPPER_MAX,
   brierCoinFlipSanityFloor: BRIER_COIN_FLIP_SANITY_FLOOR,
+  logLossCoinFlipSanityFloor: LOG_LOSS_COIN_FLIP_SANITY_FLOOR,
+  minCalibrationSlopeFloor: MIN_CALIBRATION_SLOPE_FLOOR,
+  maxDispersionRatioCeiling: MAX_DISPERSION_RATIO_CEILING,
+  multipleComparisonCorrectionMethod: MULTIPLE_COMPARISON_CORRECTION_METHOD,
+  holmFamilywiseAlpha: HOLM_FAMILYWISE_ALPHA,
   promotionRules: Object.freeze({
     minClvPositions: CLV_HEADLINE_MIN_POSITIONS,
     clvCi95LowerMin: PROMOTION_CLV_CI95_LOWER_MIN,
     minBrierLegs: BRIER_VS_MARKET_MIN_LEGS,
     brierDiffVsMarketCi95UpperMax: BRIER_DIFF_VS_MARKET_CI95_UPPER_MAX,
+    logLossDiffVsMarketCi95UpperMax: LOG_LOSS_DIFF_VS_MARKET_CI95_UPPER_MAX,
+    multipleComparisonCorrectionMethod: MULTIPLE_COMPARISON_CORRECTION_METHOD,
+    holmFamilywiseAlpha: HOLM_FAMILYWISE_ALPHA,
     maxLeakageSuspectRows: PROMOTION_MAX_LEAKAGE_SUSPECT_ROWS,
     requireFrozenModelAndRatingsHash: true as const,
   }),
   demotionRules: Object.freeze({
+    targetStatus: DEMOTION_TARGET_STATUS,
+    pairedBrierDiffCi95LowerMin: DEMOTION_PAIRED_BRIER_DIFF_CI95_LOWER_MIN,
     minClvPositions: CLV_HEADLINE_MIN_POSITIONS,
     clvCi95UpperMax: DEMOTION_CLV_CI95_UPPER_MAX,
   }),
@@ -116,6 +163,10 @@ export const PRE_REGISTERED_GATES: PreRegisteredGatesConfig = Object.freeze({
     oddsPapiHistoricalStartMonth: ODDSPAPI_HISTORICAL_START_MONTH,
     oddsPapiHistoricalCooldownSeconds: ODDSPAPI_HISTORICAL_COOLDOWN_SECONDS,
     exposeRawBookmakerOddsSeriesPublicly: EXPOSE_RAW_BOOKMAKER_ODDS_SERIES_PUBLICLY,
+    exposeDribble360RawCapturesPublicly: EXPOSE_DRIBBLE360_RAW_CAPTURES_PUBLICLY,
+    dribble360ExpirationDate: DRIBBLE360_EXPIRATION_DATE,
+    footballDataPinnacleClosingSourceId: FOOTBALL_DATA_PINNACLE_CLOSING_SOURCE_ID,
+    oddsPapiHistoricalPinnacleSourceId: ODDSPAPI_HISTORICAL_PINNACLE_SOURCE_ID,
     frozenRatingsArtifactSha256: FROZEN_RATINGS_ARTIFACT_SHA256,
   }),
 });
@@ -155,9 +206,141 @@ export function formatInsufficientSampleLabel(
   return `Insufficient sample (${safeN}/${minRequired})`;
 }
 
-// ─── SHADOW-TO-PRODUCTION PROMOTION MATRIX TAXONOMY (PHASE 3) ────────────────
+export interface PinnacleOddsSeriesEntry {
+  readonly bookmaker: string;
+  readonly market: string;
+  readonly outcome: string;
+  readonly line: number;
+  readonly price: number;
+  readonly active: boolean;
+  readonly createdAt: string;
+}
+
+/**
+ * Selects the last active Pinnacle odds entry at or before kickoffUtc for the exact target market, outcome, and line.
+ * Never interpolates or imputes missing lines; returns null + 'line_not_in_series' if absent.
+ */
+export function selectPinnacleClosingFromSeries(
+  entries: ReadonlyArray<PinnacleOddsSeriesEntry>,
+  kickoffUtc: string,
+  targetMarket: string,
+  targetOutcome: string,
+  targetLine: number
+): {
+  closingPrice: number | null;
+  closingCreatedAt: string | null;
+  reason: typeof CLOSING_PRICE_RULE_ID | typeof MISSING_CLOSING_LINE_REASON;
+} {
+  const kickoffMs = Date.parse(kickoffUtc);
+  let bestEntry: PinnacleOddsSeriesEntry | null = null;
+  let bestCreatedMs = -Infinity;
+
+  for (const e of entries) {
+    assertBenchmarkBookmaker(e.bookmaker);
+    if (!e.active) continue;
+    if (e.market !== targetMarket || e.outcome !== targetOutcome) continue;
+    if (Math.abs(e.line - targetLine) > 1e-9) continue;
+    if (!Number.isFinite(e.price) || e.price <= 1.0) continue;
+    const createdMs = Date.parse(e.createdAt);
+    if (!Number.isFinite(createdMs) || createdMs > kickoffMs) continue;
+    if (createdMs >= bestCreatedMs) {
+      bestCreatedMs = createdMs;
+      bestEntry = e;
+    }
+  }
+
+  if (!bestEntry) {
+    return {
+      closingPrice: null,
+      closingCreatedAt: null,
+      reason: MISSING_CLOSING_LINE_REASON,
+    };
+  }
+
+  return {
+    closingPrice: bestEntry.price,
+    closingCreatedAt: bestEntry.createdAt,
+    reason: CLOSING_PRICE_RULE_ID,
+  };
+}
+
+/**
+ * Proportional two-way devigging (PRIMARY_DEVIG_METHOD_ID).
+ */
+export function computeProportionalTwoWayDevig(
+  oddsSideA: number,
+  oddsSideB: number
+): {
+  probSideA: number;
+  probSideB: number;
+  fairOddsSideA: number;
+  fairOddsSideB: number;
+} {
+  if (!Number.isFinite(oddsSideA) || !Number.isFinite(oddsSideB) || oddsSideA <= 1.0 || oddsSideB <= 1.0) {
+    throw new Error(`Invalid two-way odds (${oddsSideA}, ${oddsSideB})`);
+  }
+  const qA = 1 / oddsSideA;
+  const qB = 1 / oddsSideB;
+  const sumQ = qA + qB;
+  const probSideA = qA / sumQ;
+  const probSideB = qB / sumQ;
+  return {
+    probSideA,
+    probSideB,
+    fairOddsSideA: 1 / probSideA,
+    fairOddsSideB: 1 / probSideB,
+  };
+}
+
+/**
+ * Computes CLV% = (oddsTaken / closingFairOdds - 1) * 100 for a resolved non-push leg.
+ */
+export function computeLegClvPct(
+  oddsTaken: number,
+  closingFairOdds: number | null
+): number | null {
+  if (
+    closingFairOdds === null ||
+    !Number.isFinite(oddsTaken) ||
+    !Number.isFinite(closingFairOdds) ||
+    oddsTaken <= 1.0 ||
+    closingFairOdds <= 1.0
+  ) {
+    return null;
+  }
+  return (oddsTaken / closingFairOdds - 1) * 100;
+}
+
+/**
+ * Applies Holm step-down familywise error rate correction across m tested (league x market x line) hypotheses.
+ */
+export function applyHolmStepDownCorrection(
+  hypotheses: ReadonlyArray<{ readonly id: string; readonly pValue: number }>,
+  alpha: number = HOLM_FAMILYWISE_ALPHA
+): Array<{
+  readonly id: string;
+  readonly pValue: number;
+  readonly rank: number;
+  readonly holmThreshold: number;
+  readonly rejectedNull: boolean;
+}> {
+  const m = hypotheses.length;
+  const sorted = [...hypotheses].sort((a, b) => a.pValue - b.pValue);
+  let stopRejecting = false;
+  return sorted.map((h, idx) => {
+    const holmThreshold = alpha / (m - idx);
+    if (!stopRejecting && h.pValue < holmThreshold) {
+      return { id: h.id, pValue: h.pValue, rank: idx + 1, holmThreshold, rejectedNull: true };
+    }
+    stopRejecting = true;
+    return { id: h.id, pValue: h.pValue, rank: idx + 1, holmThreshold, rejectedNull: false };
+  });
+}
+
+// ─── SHADOW-TO-PRODUCTION PROMOTION MATRIX TAXONOMY (PHASE 3 & PHASE 2B) ─────
 
 export const SHADOW_PROMOTION_MATRIX_STATUSES = [
+  'UNTESTED_VS_MARKET',
   'ELIGIBLE_FOR_SHADOW_VALIDATION',
   'ELIGIBLE_FOR_MANUAL_PROMOTION_REVIEW',
   'BLOCKED_MISSING_ODDS',
@@ -646,6 +829,8 @@ export interface MarketPromotionGateInput {
   pinnacleBenchmarkMatchedFixtures: number;
   pinnacleModelBrierOnMatched?: number | null;
   pinnacleMarketBrierOnMatched?: number | null;
+  pairedBrierDiffCi95Upper?: number | null;
+  pairedLogLossDiffCi95Upper?: number | null;
   nClvPositions?: number;
   clvCi95Lower?: number | null;
   liveFixturesWithOddsCount: number;
@@ -655,7 +840,10 @@ export interface MarketPromotionGateInput {
 
 export interface MarketPromotionGateEvaluation {
   primaryStatus: ShadowPromotionMatrixStatus;
-  shadowValidationEligibility: 'ELIGIBLE_FOR_SHADOW_VALIDATION' | ShadowPromotionMatrixStatus;
+  shadowValidationEligibility:
+    | typeof SHADOW_VALIDATION_UNTESTED_VS_MARKET
+    | 'ELIGIBLE_FOR_SHADOW_VALIDATION'
+    | ShadowPromotionMatrixStatus;
   failingGates: string[];
   allPreRegisteredPromotionGatesPass: boolean;
 }
@@ -663,6 +851,8 @@ export interface MarketPromotionGateEvaluation {
 /**
  * Evaluates a league-market (AH or OU) against all pre-registered promotion gates in gates.ts
  * and assigns the most restrictive ShadowPromotionMatrixStatus when multiple gates fail.
+ * Retires `< 0.25` as an eligibility rule: emits `UNTESTED_VS_MARKET` instead of
+ * `ELIGIBLE_FOR_SHADOW_VALIDATION` until the paired market test (`n >= 300`, CI95 upper < 0) exists.
  */
 export function evaluateMarketPromotionGates(
   input: MarketPromotionGateInput
@@ -675,7 +865,7 @@ export function evaluateMarketPromotionGates(
   let hasOperationalRiskFailure = false;
 
   // 1. Data Integrity & Cold-Start Checks
-  if (input.historicalMatchesTotal < 120 || input.ratedTeamsCount === 0) {
+  if (input.historicalMatchesTotal < MIN_HISTORICAL_MATCHES_FOR_EVAL || input.ratedTeamsCount === 0) {
     hasDataIntegrityFailure = true;
     failingGates.push(
       `DATA_INTEGRITY_MISSING_HISTORICAL_BASELINE (historicalMatches=${input.historicalMatchesTotal}, ratedTeams=${input.ratedTeamsCount})`
@@ -685,16 +875,18 @@ export function evaluateMarketPromotionGates(
     input.leagueId === 'SCO-PREM' ||
     input.leagueId === 'ENG-CHAMP' ||
     input.leagueId === 'JPN-J1' ||
-    (input.maxHistoricalDate && input.maxHistoricalDate < '2026-08-01')
+    (input.maxHistoricalDate && input.maxHistoricalDate < MIN_CURRENT_SEASON_MAX_DATE)
   ) {
     hasDataIntegrityFailure = true;
     failingGates.push(
-      `DATA_INTEGRITY_STALE_SEASON_COVERAGE (maxHistoricalDate=${input.maxHistoricalDate ?? 'null'} < 2026-08-01)`
+      `DATA_INTEGRITY_STALE_SEASON_COVERAGE (maxHistoricalDate=${input.maxHistoricalDate ?? 'null'} < ${MIN_CURRENT_SEASON_MAX_DATE})`
     );
   }
-  const isStaleSeasonCoverage = !input.maxHistoricalDate || input.maxHistoricalDate < '2026-08-01';
+  const isStaleSeasonCoverage =
+    !input.maxHistoricalDate || input.maxHistoricalDate < MIN_CURRENT_SEASON_MAX_DATE;
   if (
-    (input.ratedTeamsCount > 0 && input.coldStartTeamsCount > input.ratedTeamsCount * 0.25) ||
+    (input.ratedTeamsCount > 0 &&
+      input.coldStartTeamsCount > input.ratedTeamsCount * MAX_COLD_START_TEAM_SHARE) ||
     (isStaleSeasonCoverage && input.unratedTeamsCount > 0) ||
     input.leagueId === 'KOR-K1'
   ) {
@@ -724,11 +916,11 @@ export function evaluateMarketPromotionGates(
     );
   }
 
-  // 3. Model Validation Checks (Dispersion, Brier Sanity Floor, Multi-Line OU, Calibration Slope)
-  if (input.dispersionRatio === null || input.dispersionRatio > 1.15) {
+  // 3. Model Validation Checks (Dispersion, Coin-Flip Sanity Floor, Multi-Line OU, Calibration Slope)
+  if (input.dispersionRatio === null || input.dispersionRatio > MAX_DISPERSION_RATIO_CEILING) {
     hasModelValidationFailure = true;
     failingGates.push(
-      `MODEL_VALIDATION_OVERDISPERSION (dispersionRatio=${input.dispersionRatio ?? 'null'} > 1.1500)`
+      `MODEL_VALIDATION_OVERDISPERSION (dispersionRatio=${input.dispersionRatio ?? 'null'} > ${MAX_DISPERSION_RATIO_CEILING.toFixed(4)})`
     );
   }
   if (
@@ -736,9 +928,9 @@ export function evaluateMarketPromotionGates(
     input.primaryBrier >= BRIER_COIN_FLIP_SANITY_FLOOR ||
     !input.beatsConstant05At95Ci ||
     input.logLoss === null ||
-    input.logLoss >= 0.6931 ||
+    input.logLoss >= LOG_LOSS_COIN_FLIP_SANITY_FLOOR ||
     input.calibrationSlope === null ||
-    input.calibrationSlope < 0.5 ||
+    input.calibrationSlope < MIN_CALIBRATION_SLOPE_FLOOR ||
     !input.isMarketCalibrated
   ) {
     hasModelValidationFailure = true;
@@ -767,7 +959,7 @@ export function evaluateMarketPromotionGates(
     );
   }
 
-  // 4. Odds & Pinnacle Benchmark Checks
+  // 4. Odds & Paired Pinnacle Benchmark Checks
   if (!input.pinnacleBenchmarkAvailable || input.pinnacleBenchmarkMatchedFixtures === 0) {
     hasMissingOddsFailure = true;
     failingGates.push(
@@ -782,6 +974,24 @@ export function evaluateMarketPromotionGates(
       hasModelValidationFailure = true;
       failingGates.push(
         `MODEL_DOES_NOT_BEAT_PINNACLE_CLOSING_BRIER (model=${input.pinnacleModelBrierOnMatched} >= pinnacle=${input.pinnacleMarketBrierOnMatched})`
+      );
+    }
+    if (
+      typeof input.pairedBrierDiffCi95Upper === 'number' &&
+      input.pairedBrierDiffCi95Upper >= BRIER_DIFF_VS_MARKET_CI95_UPPER_MAX
+    ) {
+      hasModelValidationFailure = true;
+      failingGates.push(
+        `PAIRED_BRIER_DIFF_CI95_UPPER_NOT_NEGATIVE (ci95Upper=${input.pairedBrierDiffCi95Upper} >= ${BRIER_DIFF_VS_MARKET_CI95_UPPER_MAX})`
+      );
+    }
+    if (
+      typeof input.pairedLogLossDiffCi95Upper === 'number' &&
+      input.pairedLogLossDiffCi95Upper >= LOG_LOSS_DIFF_VS_MARKET_CI95_UPPER_MAX
+    ) {
+      hasModelValidationFailure = true;
+      failingGates.push(
+        `PAIRED_LOG_LOSS_DIFF_CI95_UPPER_NOT_NEGATIVE (ci95Upper=${input.pairedLogLossDiffCi95Upper} >= ${LOG_LOSS_DIFF_VS_MARKET_CI95_UPPER_MAX})`
       );
     }
     if (input.pinnacleBenchmarkMatchedFixtures < BRIER_VS_MARKET_MIN_LEGS) {
@@ -836,14 +1046,27 @@ export function evaluateMarketPromotionGates(
     primaryStatus = 'ELIGIBLE_FOR_MANUAL_PROMOTION_REVIEW';
   }
 
-  // Shadow validation eligibility: a league-market that passes data integrity, nEval >= 300,
-  // and primary statistical calibration is ELIGIBLE_FOR_SHADOW_VALIDATION once live odds are collected,
-  // even while its production promotion status is BLOCKED_MISSING_ODDS.
-  const shadowValidationEligibility: 'ELIGIBLE_FOR_SHADOW_VALIDATION' | ShadowPromotionMatrixStatus =
+  // Phase 2B Step 1: Retire `< 0.25` as an eligibility rule.
+  // Stop emitting ELIGIBLE_FOR_SHADOW_VALIDATION from the 0.25 coin-flip sanity floor alone;
+  // emit UNTESTED_VS_MARKET until the paired market test (n >= 300 identical legs, CI95 upper < 0) exists.
+  const hasVerifiedPairedMarketTest =
+    input.pinnacleBenchmarkAvailable &&
+    input.pinnacleBenchmarkMatchedFixtures >= BRIER_VS_MARKET_MIN_LEGS &&
+    typeof input.pairedBrierDiffCi95Upper === 'number' &&
+    input.pairedBrierDiffCi95Upper < BRIER_DIFF_VS_MARKET_CI95_UPPER_MAX &&
+    typeof input.pairedLogLossDiffCi95Upper === 'number' &&
+    input.pairedLogLossDiffCi95Upper < LOG_LOSS_DIFF_VS_MARKET_CI95_UPPER_MAX;
+
+  const shadowValidationEligibility:
+    | typeof SHADOW_VALIDATION_UNTESTED_VS_MARKET
+    | 'ELIGIBLE_FOR_SHADOW_VALIDATION'
+    | ShadowPromotionMatrixStatus =
     !hasDataIntegrityFailure &&
     input.evalSampleSize >= BRIER_VS_MARKET_MIN_LEGS &&
     !hasModelValidationFailure
-      ? 'ELIGIBLE_FOR_SHADOW_VALIDATION'
+      ? hasVerifiedPairedMarketTest
+        ? 'ELIGIBLE_FOR_SHADOW_VALIDATION'
+        : SHADOW_VALIDATION_UNTESTED_VS_MARKET
       : primaryStatus;
 
   const allPreRegisteredPromotionGatesPass =
@@ -854,5 +1077,56 @@ export function evaluateMarketPromotionGates(
     shadowValidationEligibility,
     failingGates,
     allPreRegisteredPromotionGatesPass,
+  };
+}
+
+export interface ActiveMarketDemotionInput {
+  leagueId: string;
+  market: 'AH' | 'OU';
+  nPairedMarketLegs: number;
+  pairedBrierDiffCi95Lower: number | null;
+  nSettledClvPositions: number;
+  clvCi95Upper: number | null;
+}
+
+export interface ActiveMarketDemotionEvaluation {
+  targetStatusIfDemoted: typeof DEMOTION_TARGET_STATUS;
+  shouldDemoteToShadow: boolean;
+  demotionTriggers: string[];
+}
+
+/**
+ * Evaluates whether an ACTIVE league-market must be demoted to SHADOW:
+ * - Paired Brier diff (Brier_model - Brier_Pinnacle_close) CI95 lower > 0, OR
+ * - CLV CI95 upper < 0 at n >= 100 settled positions.
+ */
+export function evaluateActiveMarketDemotionGate(
+  input: ActiveMarketDemotionInput
+): ActiveMarketDemotionEvaluation {
+  const demotionTriggers: string[] = [];
+
+  if (
+    typeof input.pairedBrierDiffCi95Lower === 'number' &&
+    input.pairedBrierDiffCi95Lower > DEMOTION_PAIRED_BRIER_DIFF_CI95_LOWER_MIN
+  ) {
+    demotionTriggers.push(
+      `DEMOTION_PAIRED_BRIER_DIFF_CI95_LOWER_POSITIVE (nLegs=${input.nPairedMarketLegs}, ci95Lower=${input.pairedBrierDiffCi95Lower} > ${DEMOTION_PAIRED_BRIER_DIFF_CI95_LOWER_MIN})`
+    );
+  }
+
+  if (
+    input.nSettledClvPositions >= CLV_HEADLINE_MIN_POSITIONS &&
+    typeof input.clvCi95Upper === 'number' &&
+    input.clvCi95Upper < DEMOTION_CLV_CI95_UPPER_MAX
+  ) {
+    demotionTriggers.push(
+      `DEMOTION_CLV_CI95_UPPER_NEGATIVE (nClv=${input.nSettledClvPositions}, clvCi95Upper=${input.clvCi95Upper} < ${DEMOTION_CLV_CI95_UPPER_MAX})`
+    );
+  }
+
+  return {
+    targetStatusIfDemoted: DEMOTION_TARGET_STATUS,
+    shouldDemoteToShadow: demotionTriggers.length > 0,
+    demotionTriggers,
   };
 }
