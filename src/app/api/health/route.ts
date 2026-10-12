@@ -70,6 +70,9 @@ export async function GET() {
     reason: l.activation_reason,
   }));
 
+  const { CanonicalMatchArchiveService } = await import('@/engine/archive/canonicalMatchArchiveService');
+  const pipelineObservability = await CanonicalMatchArchiveService.getPipelineObservabilityState();
+
   const payload = {
     status: overallStatus,
     service: 'salmo',
@@ -78,6 +81,7 @@ export async function GET() {
     uptimeSeconds: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
     latencyMs,
+    pipelineObservability,
     multiLeagueActivation: {
       activeLeaguesCount: activeLeagues.length,
       shadowLeaguesCount: shadowLeagues.length,

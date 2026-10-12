@@ -261,6 +261,43 @@ export async function runProductionSettlement(options: SettlementRunnerOptions =
             error: ledgerError.message,
           });
         }
+
+        // Also persist to canonical settlement_results table idempotently
+        const srMarketType = snap.marketType === 'AH' ? 'asian_handicap' : 'over_under';
+        const { data: existingSr } = await sb
+          .from('settlement_results')
+          .select('id')
+          .eq('fixture_id', snap.fixtureId)
+          .eq('market_type', srMarketType)
+          .limit(1);
+
+        if (!existingSr || existingSr.length === 0) {
+          const matchedMatch = dbScoreMap.get(snap.fixtureId);
+          const rawSel = String(snap.selection || '').toLowerCase();
+          const awayFirstWord = String(matchedMatch?.awayTeam || '').toLowerCase().split(' ')[0];
+          const normSel =
+            snap.marketType === 'OU'
+              ? rawSel.includes('under')
+                ? 'under'
+                : 'over'
+              : awayFirstWord && rawSel.includes(awayFirstWord)
+              ? 'away'
+              : 'home';
+
+          await sb.from('settlement_results').insert({
+            fixture_id: snap.fixtureId,
+            market_type: srMarketType,
+            selection: normSel,
+            line: snap.line,
+            odds: snap.marketOdds,
+            outcome: snap.result || 'VOID',
+            profit_units: snap.profitUnits,
+            home_goals: matchedMatch?.homeGoals ?? 0,
+            away_goals: matchedMatch?.awayGoals ?? 0,
+            voided: snap.result === 'VOID',
+            settled_at: snap.settledAt || new Date().toISOString(),
+          });
+        }
       } catch (err) {
         Logger.warn('[SettlementRunner] Error updating Supabase:', { error: String(err) });
       }

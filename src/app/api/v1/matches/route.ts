@@ -51,6 +51,44 @@ export async function GET(request: NextRequest) {
   const requestId = request.headers.get('x-request-id') || `req_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
   try {
+    const { searchParams } = new URL(request.url);
+    const view = (searchParams.get('view') || 'upcoming').toLowerCase();
+
+    if (view === 'archive') {
+      const { CanonicalMatchArchiveService } = await import('@/engine/archive/canonicalMatchArchiveService');
+      const archiveResult = await CanonicalMatchArchiveService.queryMatchArchive({
+        page: Number(searchParams.get('page') || 1),
+        pageSize: Number(searchParams.get('pageSize') || 25),
+        league: searchParams.get('league') || undefined,
+        season: searchParams.get('season') || undefined,
+        status: (searchParams.get('status') as any) || 'ALL',
+        source: (searchParams.get('source') as any) || 'ALL',
+        search: searchParams.get('search') || undefined,
+        dateFrom: searchParams.get('dateFrom') || undefined,
+        dateTo: searchParams.get('dateTo') || undefined,
+      });
+
+      const latencyMs = Date.now() - start;
+      return NextResponse.json({
+        success: true,
+        version: 'v1',
+        view: 'archive',
+        data: {
+          archiveMatches: archiveResult.matches,
+          totalMatches: archiveResult.totalCount,
+          page: archiveResult.page,
+          pageSize: archiveResult.pageSize,
+          totalPages: archiveResult.totalPages,
+          archiveSummary: archiveResult.summary,
+        },
+        meta: {
+          requestId,
+          timestamp: new Date().toISOString(),
+          latencyMs,
+        },
+      }, { headers: { 'x-request-id': requestId } });
+    }
+
     const matches = await MatchIntelligenceService.getTodaysMatches();
 
     // SALMO native dataset summary (zero blocking remote HandicapLab calls)

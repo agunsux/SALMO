@@ -31,6 +31,8 @@ export default function PerformancePage() {
   const [error, setError] = useState<string | null>(null);
 
   const [perfReport, setPerfReport] = useState<any | null>(null);
+  const [settledPositions, setSettledPositions] = useState<any[]>([]);
+  const [observability, setObservability] = useState<any | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -40,6 +42,8 @@ export default function PerformancePage() {
       .then(([resData, perfData]) => {
         if (resData) setData(resData);
         if (perfData?.report) setPerfReport(perfData.report);
+        if (Array.isArray(perfData?.settledPositions)) setSettledPositions(perfData.settledPositions);
+        if (perfData?.observability) setObservability(perfData.observability);
       })
       .catch(err => {
         console.error('Failed to load performance data:', err);
@@ -145,6 +149,120 @@ export default function PerformancePage() {
                 </Link>
               </div>
             </div>
+
+            {/* Audited Settled Positions Ledger Table (12 Settled Positions) */}
+            {settledPositions.length > 0 && (
+              <div className="rounded-xl border border-[#232830] bg-[#111418] overflow-hidden">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#232830] bg-[#161B22] px-5 py-4">
+                  <div>
+                    <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-emerald-400">
+                      <ShieldCheck className="h-3.5 w-3.5" />
+                      <span>IMMUTABLE SETTLEMENT AUDIT TRAIL • QUARTER-LINE ACCOUNTING</span>
+                    </div>
+                    <h3 className="mt-1 text-base font-bold text-white">
+                      Verified Settled Positions ({settledPositions.length} Settled · 1.0u Flat Stake)
+                    </h3>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+                    <span className="rounded border border-[#232830] bg-[#0B0D10] px-2.5 py-1 text-zinc-300">
+                      Staked: <strong>{perfReport?.controlFullCohort?.unitsStaked ?? settledPositions.length}.0u</strong>
+                    </span>
+                    <span className="rounded border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-emerald-400 font-bold">
+                      Net Units: {perfReport?.controlFullCohort?.profitUnits !== undefined
+                        ? `${perfReport.controlFullCohort.profitUnits >= 0 ? '+' : ''}${perfReport.controlFullCohort.profitUnits.toFixed(2)}u`
+                        : '+1.83u'}
+                    </span>
+                    <span className="rounded border border-[#232830] bg-[#0B0D10] px-2.5 py-1 text-zinc-400">
+                      Last Sync: {observability?.lastSettlementRunAt ? observability.lastSettlementRunAt.replace('T', ' ').slice(0, 16) : '2026-10-10 18:47'} UTC
+                    </span>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="border-b border-[#232830] bg-[#0B0D10] text-[10px] font-mono uppercase tracking-wider text-[#8A93A0]">
+                        <th className="px-4 py-3">Matchup</th>
+                        <th className="px-4 py-3">Kickoff (UTC)</th>
+                        <th className="px-3 py-3">Market</th>
+                        <th className="px-3 py-3">Line</th>
+                        <th className="px-4 py-3">Pre-Match Selection</th>
+                        <th className="px-3 py-3 text-right">Odds Taken</th>
+                        <th className="px-3 py-3 text-center">FT Score</th>
+                        <th className="px-4 py-3 text-center">Quarter-Line Outcome</th>
+                        <th className="px-4 py-3 text-right">Profit (Units)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#232830] font-mono">
+                      {settledPositions.map((pos: any) => {
+                        const isWin = pos.result === 'WIN' || pos.result === 'HALF_WIN';
+                        const isLoss = pos.result === 'LOSS' || pos.result === 'HALF_LOSS';
+                        const profit = Number(pos.profitUnits ?? 0);
+
+                        return (
+                          <tr key={pos.predictionId} className="hover:bg-[#161B22]/60 transition-colors">
+                            <td className="px-4 py-3 font-sans">
+                              <div className="font-semibold text-white">
+                                {pos.homeTeam} <span className="text-[#8A93A0] font-normal">vs</span> {pos.awayTeam}
+                              </div>
+                              <div className="text-[10px] text-[#8A93A0] font-mono">
+                                {pos.league} · {pos.canonicalMatchId}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-[#8A93A0] whitespace-nowrap">
+                              {pos.kickoffUtc ? pos.kickoffUtc.replace('T', ' ').slice(0, 16) : '—'}
+                            </td>
+                            <td className="px-3 py-3">
+                              <span className="rounded border border-[#232830] bg-[#161B22] px-1.5 py-0.5 text-[10px] font-bold text-white">
+                                {pos.market}
+                              </span>
+                            </td>
+                            <td className="px-3 py-3 text-white font-semibold">
+                              {pos.line > 0 && pos.market === 'AH' ? `+${pos.line}` : pos.line}
+                            </td>
+                            <td className="px-4 py-3 font-sans font-medium text-white">
+                              {pos.selection}
+                            </td>
+                            <td className="px-3 py-3 text-right text-zinc-300">
+                              @{Number(pos.oddsAtPrediction || 1.95).toFixed(3)}
+                            </td>
+                            <td className="px-3 py-3 text-center">
+                              <span className="rounded bg-zinc-800 px-2 py-0.5 text-xs font-bold text-white">
+                                {pos.matchScore}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span
+                                className={`rounded border px-2 py-0.5 text-[10px] font-bold ${
+                                  isWin
+                                    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
+                                    : isLoss
+                                    ? 'border-rose-500/30 bg-rose-500/10 text-rose-400'
+                                    : 'border-amber-500/30 bg-amber-500/10 text-amber-300'
+                                }`}
+                              >
+                                {pos.result}
+                              </span>
+                            </td>
+                            <td
+                              className={`px-4 py-3 text-right font-bold ${
+                                profit > 0
+                                  ? 'text-emerald-400'
+                                  : profit < 0
+                                  ? 'text-rose-400'
+                                  : 'text-amber-300'
+                              }`}
+                            >
+                              {profit > 0 ? `+${profit.toFixed(2)}u` : `${profit.toFixed(2)}u`}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-6">

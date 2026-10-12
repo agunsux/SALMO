@@ -32,6 +32,7 @@ const { CANONICAL_15_LEAGUES, getLeagueByNameOrSlug } = require('../src/config/m
 const { CompetitionProfileEngine } = require('../src/engine/features/competitionProfile.ts');
 
 const EVIDENCE_CANDIDATES = [
+  path.resolve(__dirname, '../data/verification/stage_b1_fixture_evidence.json'),
   path.resolve(process.env.USERPROFILE || 'C:/Users/RYZEN', '.gemini/antigravity/brain/a0bf40a6-284a-4dbf-9026-c0c6c3b8172e/scratch/stage_b1_fixture_evidence.json'),
   path.resolve(__dirname, '../scratch/stage_b1_fixture_evidence.json'),
 ];

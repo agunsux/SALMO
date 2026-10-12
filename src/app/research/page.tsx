@@ -48,6 +48,9 @@ interface PredictionRecord {
   settlement?: string;
   matchScore?: string | null;
   result?: string | null;
+  profitLossUnits?: number | null;
+  stakeUnits?: number | null;
+  settledAt?: string | null;
   odds_snapshot: {
     bookmaker: string;
     line: number;
@@ -64,12 +67,15 @@ export default function ResearchPage() {
   const [error, setError] = useState<string | null>(null);
   const [dataTimestamp, setDataTimestamp] = useState<string>('');
   const [modelVersion, setModelVersion] = useState<string>('poisson_v1_rescue');
+  const [settlementSummary, setSettlementSummary] = useState<any | null>(null);
 
   // Filters
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
   const [selectedDate, setSelectedDate] = useState<string>('ALL');
   const [selectedMarket, setSelectedMarket] = useState<string>('ALL');
   const [selectedTier, setSelectedTier] = useState<string>('ALL');
+  const [selectedLedgerTier, setSelectedLedgerTier] = useState<string>('ALL');
+  const [selectedSettlement, setSelectedSettlement] = useState<string>('ALL');
   const [selectedLeague, setSelectedLeague] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -87,6 +93,7 @@ export default function ResearchPage() {
           setPredictions(data.predictions);
           if (data.timestampUtc) setDataTimestamp(data.timestampUtc);
           if (data.modelVersion) setModelVersion(data.modelVersion);
+          if (data.settlementSummary) setSettlementSummary(data.settlementSummary);
         } else {
           setError('Research is temporarily unavailable. Please try again.');
         }
@@ -156,6 +163,19 @@ export default function ResearchPage() {
         return false;
       }
 
+      // Ledger Tier filter (PRODUCTION / SHADOW / NONE)
+      if (selectedLedgerTier !== 'ALL' && p.ledgerTier !== selectedLedgerTier) {
+        return false;
+      }
+
+      // Settlement status filter (SETTLED / PENDING)
+      if (selectedSettlement === 'SETTLED' && p.settlement !== 'SETTLED') {
+        return false;
+      }
+      if (selectedSettlement === 'PENDING' && p.settlement === 'SETTLED') {
+        return false;
+      }
+
       // Tier filter
       if (selectedTier !== 'ALL') {
         if (selectedTier === 'RESEARCH_ONLY') {
@@ -188,7 +208,7 @@ export default function ResearchPage() {
 
       return true;
     });
-  }, [predictions, selectedDate, todayStr, selectedMarket, selectedTier, selectedLeague, searchQuery]);
+  }, [predictions, selectedDate, todayStr, selectedMarket, selectedLedgerTier, selectedSettlement, selectedTier, selectedLeague, searchQuery]);
 
   // Counts by market
   const countsByMarket = useMemo(() => {
@@ -386,7 +406,7 @@ export default function ResearchPage() {
           </div>
 
           {/* Secondary filter inputs */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
             {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#9E968D]" />
@@ -429,6 +449,33 @@ export default function ResearchPage() {
                     {lg}
                   </option>
                 ))}
+              </select>
+            </div>
+
+            {/* Ledger Tier filter */}
+            <div>
+              <select
+                value={selectedLedgerTier}
+                onChange={(e) => setSelectedLedgerTier(e.target.value)}
+                className="w-full rounded-md border border-[#E4DED4] bg-white px-3 py-1.5 text-xs text-[#14110F] font-mono focus:border-[#3B1515] focus:outline-none focus:ring-1 focus:ring-[#3B1515]"
+              >
+                <option value="ALL">All Ledger Tiers (336)</option>
+                <option value="PRODUCTION">PRODUCTION (EPL · 20)</option>
+                <option value="SHADOW">SHADOW (13 Leagues · 294)</option>
+                <option value="NONE">PAUSED (Liga 1 · 22)</option>
+              </select>
+            </div>
+
+            {/* Settlement Status filter */}
+            <div>
+              <select
+                value={selectedSettlement}
+                onChange={(e) => setSelectedSettlement(e.target.value)}
+                className="w-full rounded-md border border-[#E4DED4] bg-white px-3 py-1.5 text-xs text-[#14110F] font-mono focus:border-[#3B1515] focus:outline-none focus:ring-1 focus:ring-[#3B1515]"
+              >
+                <option value="ALL">All Settlement States</option>
+                <option value="SETTLED">SETTLED ({settlementSummary?.settledCount ?? 12})</option>
+                <option value="PENDING">PENDING ({predictions.length - (settlementSummary?.settledCount ?? 12)})</option>
               </select>
             </div>
 
@@ -486,20 +533,20 @@ export default function ResearchPage() {
                   ? 'No model output for this date matching the selected filter criteria. Select another date or view all recorded ledger entries.'
                   : 'Adjust your date, league, or market criteria to view recorded analytical model rows from the active ledger.'}
               </p>
-              {selectedDate !== 'ALL' && (
-                <button
-                  onClick={() => {
-                    setSelectedDate('ALL');
-                    setSelectedMarket('ALL');
-                    setSelectedTier('ALL');
-                    setSelectedLeague('ALL');
-                    setSearchQuery('');
-                  }}
-                  className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#3B1515] text-white text-xs font-mono font-medium hover:bg-[#2A0E0E] transition-colors"
-                >
-                  Reset all filters ({predictions.length} total)
-                </button>
-              )}
+              <button
+                onClick={() => {
+                  setSelectedDate('ALL');
+                  setSelectedMarket('ALL');
+                  setSelectedLedgerTier('ALL');
+                  setSelectedSettlement('ALL');
+                  setSelectedTier('ALL');
+                  setSelectedLeague('ALL');
+                  setSearchQuery('');
+                }}
+                className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#3B1515] text-white text-xs font-mono font-medium hover:bg-[#2A0E0E] transition-colors"
+              >
+                Reset all filters ({predictions.length} total)
+              </button>
             </div>
           ) : (
             <>
@@ -517,6 +564,7 @@ export default function ResearchPage() {
                       <th className="px-4 py-3 text-center">Confidence</th>
                       <th className="px-3 py-3 text-right">Market Price</th>
                       <th className="px-3 py-3 text-right">EV</th>
+                      <th className="px-3 py-3 text-center">Settlement & P&L</th>
                       <th className="px-4 py-3">Model Version</th>
                     </tr>
                   </thead>
@@ -533,6 +581,9 @@ export default function ResearchPage() {
                         row.confidence_tier === 'WATCH' || row.confidence_tier === 'MEDIUM';
                       const isResearchOnly =
                         row.market === 'BTTS' || row.confidence_tier === 'RESEARCH_ONLY' || row.ledgerTier !== 'PRODUCTION';
+
+                      const pnl = row.profitLossUnits;
+                      const hasPnl = typeof pnl === 'number';
 
                       return (
                         <tr key={row.id} className="hover:bg-[#F6F3EE]/60 transition-colors">
@@ -637,6 +688,26 @@ export default function ResearchPage() {
                               <span className="text-[#9E968D]">—</span>
                             )}
                           </td>
+                          <td className="px-3 py-3 text-center whitespace-nowrap">
+                            {row.settlement === 'SETTLED' ? (
+                              <div className="inline-flex flex-col items-center">
+                                <span
+                                  className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                                    row.result === 'WIN' || row.result === 'HALF_WIN'
+                                      ? 'bg-[#EAF7EE] text-[#137333]'
+                                      : row.result === 'LOSS' || row.result === 'HALF_LOSS'
+                                      ? 'bg-[#FCE8E6] text-[#C5221F]'
+                                      : 'bg-[#FEF7E0] text-[#B06000]'
+                                  }`}
+                                >
+                                  {row.result || 'SETTLED'}{' '}
+                                  {hasPnl ? `(${pnl! > 0 ? '+' : ''}${pnl!.toFixed(2)}u)` : ''}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-[10px] text-[#9E968D]">PENDING</span>
+                            )}
+                          </td>
                           <td className="px-4 py-3 text-[10px] text-[#9E968D] whitespace-nowrap">
                             {row.model_version}
                           </td>
@@ -667,6 +738,9 @@ export default function ResearchPage() {
                             {row.settlement === 'SETTLED' && row.matchScore && (
                               <span className="rounded bg-[#EAF7EE] border border-[#BFE7CA] px-1.5 py-0.5 text-[9px] font-mono font-bold text-[#137333]">
                                 FT {row.matchScore} · {row.result || 'SETTLED'}
+                                {typeof row.profitLossUnits === 'number'
+                                  ? ` (${row.profitLossUnits > 0 ? '+' : ''}${row.profitLossUnits.toFixed(2)}u)`
+                                  : ''}
                               </span>
                             )}
                           </div>

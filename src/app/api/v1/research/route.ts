@@ -6,11 +6,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { NextRequest, NextResponse } from 'next/server';
 import { HandicapLabAdapterFactory } from '@/contracts/handicapLabAdapter';
+import { CanonicalMatchArchiveService } from '@/engine/archive/canonicalMatchArchiveService';
 import { Logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
-function normalizeResearchRow(raw: any, index: number) {
+function normalizeResearchRow(raw: any, index: number, liveSettledMap: Map<string, any>) {
   const ledgerTier: 'PRODUCTION' | 'SHADOW' | 'NONE' =
     raw.ledgerTier || (raw.league === 'Premier League' || raw.competition === 'Premier League' ? 'PRODUCTION' : 'SHADOW');
 
@@ -72,9 +73,35 @@ function normalizeResearchRow(raw: any, index: number) {
     ledgerTier === 'PRODUCTION' &&
     Boolean(raw.is_pick || raw.isDailyPick || raw.verdict === 'LAYAK');
 
-  const settlement = raw.settlement || raw.settlementStatus || raw.status || 'PENDING';
-  const fixtureId = raw.fixture_id || raw.fixtureId || `fix_${index}`;
+  const fixtureId = String(raw.fixture_id || raw.fixtureId || `fix_${index}`);
   const id = raw.id || raw.predictionId || `${fixtureId}_${market}_${index}`;
+
+  // Enrich PRODUCTION rows with verified settlement P&L from live_prediction_ledger.jsonl
+  const liveSettled =
+    ledgerTier === 'PRODUCTION'
+      ? liveSettledMap.get(`${fixtureId}_${market}`) ||
+        (raw.canonicalMatchId ? liveSettledMap.get(`${raw.canonicalMatchId}_${market}`) : undefined)
+      : undefined;
+
+  const settlement =
+    liveSettled?.settlementStatus ||
+    liveSettled?.settlement ||
+    raw.settlement ||
+    raw.settlementStatus ||
+    raw.status ||
+    'PENDING';
+
+  const matchScore = liveSettled?.matchScore || raw.matchScore || null;
+  const result = liveSettled?.result || raw.result || null;
+  const profitLossUnits =
+    ledgerTier === 'PRODUCTION' && settlement === 'SETTLED'
+      ? Number(liveSettled?.profitUnits ?? liveSettled?.profitLoss ?? raw.profitLossUnits ?? 0)
+      : null;
+  const stakeUnits =
+    ledgerTier === 'PRODUCTION' && settlement === 'SETTLED'
+      ? Number(liveSettled?.stakeUnits ?? 1)
+      : 0;
+  const settledAt = liveSettled?.settledAt || raw.settledAt || null;
 
   return {
     ...raw,
@@ -112,10 +139,11 @@ function normalizeResearchRow(raw: any, index: number) {
     is_pick: isPick,
     ledgerTier,
     settlement,
-    matchScore: raw.matchScore || null,
-    result: raw.result || null,
-    profitLossUnits: raw.profitLossUnits ?? null,
-    settledAt: raw.settledAt || null,
+    matchScore,
+    result,
+    profitLossUnits,
+    stakeUnits,
+    settledAt,
   };
 }
 
@@ -126,6 +154,25 @@ export async function GET(request: NextRequest) {
   try {
     let rawPredictions: any[] = [];
     let syncRes: any = null;
+
+    // Load live_prediction_ledger.jsonl for exact settled EPL P&L enrichment
+    const liveSettledMap = new Map<string, any>();
+    const liveLedgerPath = path.resolve(process.cwd(), 'data', 'verification', 'live_prediction_ledger.jsonl');
+    if (fs.existsSync(liveLedgerPath)) {
+      try {
+        const lines = fs.readFileSync(liveLedgerPath, 'utf8').trim().split('\n').filter(Boolean);
+        for (const l of lines) {
+          const parsed = JSON.parse(l);
+          const apiId = parsed.providerProvenance?.apiFootballFixtureId || parsed.fixtureId;
+          if (apiId && parsed.market) {
+            liveSettledMap.set(`${apiId}_${parsed.market}`, parsed);
+          }
+          if (parsed.canonicalMatchId && parsed.market) {
+            liveSettledMap.set(`${parsed.canonicalMatchId}_${parsed.market}`, parsed);
+          }
+        }
+      } catch {}
+    }
 
     // 1. Primary Canonical Multi-League Research Ledger (336 rows across 15 leagues + settled EPL matches)
     // Direct static path resolution so @vercel/nft bundles the file into the serverless function
@@ -147,7 +194,34 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 2. Fallback to adapter if local verification ledger was not found
+    // 2. Fallback to durable Supabase forecast_archive or adapter if local verification ledger was not found
+    if (rawPredictions.length === 0) {
+      try {
+        const { getDbClient } = await import('@/lib/db');
+        const sb = getDbClient();
+        const { data: faRows } = await sb.from('forecast_archive').select('*').limit(500);
+        if (faRows && faRows.length > 0) {
+          rawPredictions = faRows.map((r: any) => ({
+            id: r.id,
+            fixtureId: r.fixture_id,
+            league: r.league,
+            competition: r.league,
+            market: r.market === 'ASIAN_HANDICAP' ? 'AH' : 'OU',
+            selection: r.selection,
+            model_probability: Number(r.probability),
+            fair_odds: r.model_fair_odds ? Number(r.model_fair_odds) : null,
+            market_odds: r.bookmaker_odds ? Number(r.bookmaker_odds) : null,
+            prob_edge: r.prob_edge ? Number(r.prob_edge) : null,
+            expected_value: r.expected_value ? Number(r.expected_value) : null,
+            verdict: r.recommendation || 'LEWATI',
+            confidence: Number(r.confidence || 0),
+            model_version: r.model_version,
+            ledgerTier: r.league === 'Premier League' ? 'PRODUCTION' : r.league === 'Liga 1' ? 'NONE' : 'SHADOW',
+          }));
+        }
+      } catch {}
+    }
+
     if (rawPredictions.length === 0) {
       try {
         const adapter = HandicapLabAdapterFactory.getAdapter();
@@ -158,23 +232,107 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const predictions = rawPredictions.map((row, idx) => normalizeResearchRow(row, idx));
+    const predictions = rawPredictions.map((row, idx) => normalizeResearchRow(row, idx, liveSettledMap));
 
-    const tierParam = (request.nextUrl?.searchParams?.get('tier') || 'ALL').toUpperCase();
+    const searchParams = request.nextUrl?.searchParams;
+    const tierParam = (searchParams?.get('tier') || 'ALL').toUpperCase();
+    const leagueParam = searchParams?.get('league') || 'ALL';
+    const marketParam = (searchParams?.get('market') || 'ALL').toUpperCase();
+    const settlementParam = (searchParams?.get('settlement') || 'ALL').toUpperCase();
+    const searchParam = (searchParams?.get('search') || '').trim().toLowerCase();
+    const dateFromParam = searchParams?.get('dateFrom') || '';
+    const dateToParam = searchParams?.get('dateTo') || '';
+    const pageParam = searchParams?.get('page');
+    const pageSizeParam = searchParams?.get('pageSize');
 
     const productionRows = predictions.filter((p: any) => p.ledgerTier === 'PRODUCTION');
     const shadowRows = predictions.filter((p: any) => p.ledgerTier === 'SHADOW');
     const unsupportedRows = predictions.filter((p: any) => p.ledgerTier === 'NONE');
 
-    const settledCount = productionRows.filter((p: any) => p.settlement === 'SETTLED').length;
+    const settledRows = productionRows.filter((p: any) => p.settlement === 'SETTLED');
+    const settledCount = settledRows.length;
     const pendingCount = productionRows.filter((p: any) => p.settlement !== 'SETTLED').length;
     const dailyPicksCount = productionRows.filter((p: any) => p.is_pick).length;
 
-    const filteredPredictions =
-      tierParam === 'PRODUCTION' ? productionRows :
-      tierParam === 'SHADOW' ? shadowRows :
-      tierParam === 'NONE' ? unsupportedRows :
-      predictions;
+    const netProfitUnits = Number(
+      settledRows.reduce((acc: number, r: any) => acc + Number(r.profitLossUnits || 0), 0).toFixed(3)
+    );
+    const totalStakedUnits = Number(
+      settledRows.reduce((acc: number, r: any) => acc + Number(r.stakeUnits || 1), 0).toFixed(2)
+    );
+
+    const settlementSummary = {
+      settledCount,
+      pendingCount,
+      winsCount: settledRows.filter((r: any) => r.result === 'WIN').length,
+      halfWinsCount: settledRows.filter((r: any) => r.result === 'HALF_WIN').length,
+      pushesCount: settledRows.filter((r: any) => r.result === 'PUSH').length,
+      halfLossesCount: settledRows.filter((r: any) => r.result === 'HALF_LOSS').length,
+      lossesCount: settledRows.filter((r: any) => r.result === 'LOSS').length,
+      totalStakedUnits,
+      netProfitUnits,
+    };
+
+    let filteredPredictions = predictions;
+    if (tierParam === 'PRODUCTION') filteredPredictions = productionRows;
+    else if (tierParam === 'SHADOW') filteredPredictions = shadowRows;
+    else if (tierParam === 'NONE') filteredPredictions = unsupportedRows;
+
+    if (leagueParam && leagueParam !== 'ALL') {
+      const q = leagueParam.toLowerCase();
+      filteredPredictions = filteredPredictions.filter(
+        (p: any) => (p.competition || p.league || '').toLowerCase() === q
+      );
+    }
+
+    if (marketParam && marketParam !== 'ALL') {
+      filteredPredictions = filteredPredictions.filter(
+        (p: any) => (p.market || '').toUpperCase() === marketParam
+      );
+    }
+
+    if (settlementParam === 'SETTLED') {
+      filteredPredictions = filteredPredictions.filter((p: any) => p.settlement === 'SETTLED');
+    } else if (settlementParam === 'PENDING') {
+      filteredPredictions = filteredPredictions.filter((p: any) => p.settlement !== 'SETTLED');
+    }
+
+    if (searchParam) {
+      filteredPredictions = filteredPredictions.filter((p: any) => {
+        const hay = `${p.match} ${p.home_team} ${p.away_team} ${p.competition} ${p.selection}`.toLowerCase();
+        return hay.includes(searchParam);
+      });
+    }
+
+    if (dateFromParam) {
+      filteredPredictions = filteredPredictions.filter(
+        (p: any) => (p.kickoff_utc || '').slice(0, 10) >= dateFromParam.slice(0, 10)
+      );
+    }
+    if (dateToParam) {
+      filteredPredictions = filteredPredictions.filter(
+        (p: any) => (p.kickoff_utc || '').slice(0, 10) <= dateToParam.slice(0, 10)
+      );
+    }
+
+    const totalFiltered = filteredPredictions.length;
+    let outputPredictions = filteredPredictions;
+    let pagination: any = null;
+
+    if (pageParam || pageSizeParam) {
+      const page = Math.max(1, Number(pageParam || 1));
+      const pageSize = Math.min(500, Math.max(1, Number(pageSizeParam || 50)));
+      const totalPages = Math.max(1, Math.ceil(totalFiltered / pageSize));
+      const safePage = Math.min(page, totalPages);
+      const offset = (safePage - 1) * pageSize;
+      outputPredictions = filteredPredictions.slice(offset, offset + pageSize);
+      pagination = {
+        page: safePage,
+        pageSize,
+        totalFiltered,
+        totalPages,
+      };
+    }
 
     const counts = {
       totalArchived: predictions.length,
@@ -191,9 +349,10 @@ export async function GET(request: NextRequest) {
       },
     };
     const dataState = predictions.length > 0 ? 'REAL' : (syncRes?.dataState || 'NO_QUALIFIED_PICKS');
+    const observability = await CanonicalMatchArchiveService.getPipelineObservabilityState();
 
     const latencyMs = Date.now() - start;
-    Logger.info('GET /api/v1/research success', { requestId, totalPredictions: filteredPredictions.length, tier: tierParam, latencyMs });
+    Logger.info('GET /api/v1/research success', { requestId, totalPredictions: outputPredictions.length, tier: tierParam, latencyMs });
 
     return NextResponse.json({
       success: true,
@@ -202,7 +361,10 @@ export async function GET(request: NextRequest) {
       tierFilter: tierParam,
       dataState,
       counts,
-      predictions: filteredPredictions,
+      settlementSummary,
+      observability,
+      pagination,
+      predictions: outputPredictions,
       timestampUtc: syncRes?.timestampUtc || new Date().toISOString(),
       meta: {
         requestId,
