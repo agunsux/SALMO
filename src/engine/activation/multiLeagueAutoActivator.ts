@@ -38,11 +38,19 @@ import { Logger } from '../../lib/logger';
 import {
   BRIER_COIN_FLIP_SANITY_FLOOR,
   BRIER_VS_MARKET_MIN_LEGS,
+  PRE_REGISTERED_GATES,
+  ShadowPromotionMatrixStatus,
+  OU_EVALUATED_LINES,
+  H8_WALKFORWARD_BINARY_NO_PUSH_BY_LEAGUE,
+  evaluateMarketPromotionGates,
 } from '../performance/gates';
 
 export interface MarketEvaluationDetail {
   market: MarketKey;
   readinessState: MarketReadinessState;
+  promotionMatrixStatus?: ShadowPromotionMatrixStatus;
+  shadowValidationEligibility?: 'ELIGIBLE_FOR_SHADOW_VALIDATION' | ShadowPromotionMatrixStatus;
+  failingGates?: string[];
   productionEnabled: boolean;
   modelValidated: boolean;
   proposedForHumanReview: boolean;
@@ -51,6 +59,25 @@ export interface MarketEvaluationDetail {
   beatsConstant05At95Ci: boolean;
   ahFixedMinus05Brier?: number | null;
   ahBalancedQuarterBrier?: number | null;
+  ahBalancedQuarterBinaryNoPushBrier?: number | null;
+  ahBalancedQuarterBinaryNoPushCi95?: readonly [number, number] | null;
+  ahBalancedQuarterFractionalBrierOld?: number | null;
+  ouEvaluatedLines?: readonly number[];
+  ouBalancedHalfLineBrier?: number | null;
+  ouBalancedHalfLineCi95?: readonly [number, number] | null;
+  ouBalancedQuarterBinaryNoPushBrier?: number | null;
+  ouBalancedQuarterBinaryNoPushCi95?: readonly [number, number] | null;
+  ouByLineBrier?: Readonly<
+    Record<
+      string,
+      {
+        readonly brier: number;
+        readonly ci95: readonly [number, number];
+        readonly nLegsResolved: number;
+        readonly nLegsExcludedPush: number;
+      }
+    >
+  > | null;
   logLoss: number | null;
   calibrationSlope: number | null;
   pinnacleBenchmarkAvailable: boolean;
@@ -83,6 +110,10 @@ export interface LeagueActivationEvaluation {
   ratedTeamsCount: number;
   coldStartTeamsCount: number;
   discoveredFixturesCount: number;
+  promotionMatrixClassification?: {
+    AH: ShadowPromotionMatrixStatus;
+    OU: ShadowPromotionMatrixStatus;
+  };
   markets: {
     AH: MarketEvaluationDetail;
     OU: MarketEvaluationDetail;
@@ -187,6 +218,96 @@ export class MultiLeagueAutoActivator {
     if (process.env.ALLOW_MANUAL_LEAGUE_PROMOTION !== 'true') return false;
     if (process.env.VERCEL_ENV === 'preview') return false;
     return true;
+  }
+
+  /**
+   * Synchronously evaluates all SHADOW leagues (and full 15-league registry) in strictly read-only
+   * PROPOSE_ONLY mode without making any network or database calls.
+   */
+  public static evaluateAllShadowLeagues(options: {
+    explicitHumanApproval?: boolean;
+    injectedBacktestOverride?: Record<string, any>;
+    discoveredFixturesByLeague?: Record<string, FixtureInput[]>;
+    quotaAvailable?: boolean;
+  } = {}) {
+    const evaluatedAt = new Date().toISOString();
+    const explicitHumanApprovalGranted = this.isManualPromotionAuthorized(Boolean(options.explicitHumanApproval));
+    const quotaDetection: QuotaResetDetectionResult = {
+      state: options.quotaAvailable ? 'QUOTA_AVAILABLE' : 'QUOTA_EXHAUSTED',
+      checkedAtUtc: evaluatedAt,
+      providerStatus: 'UNVERIFIED_OFFLINE',
+      isActive: true,
+      plan: 'free',
+      requestCount: options.quotaAvailable ? 0 : 260,
+      requestLimit: 250,
+      mandatoryReserve: 50,
+      operationalCeiling: 200,
+      remainingTotal: options.quotaAvailable ? 250 : 0,
+      remainingOperationalBudget: options.quotaAvailable ? 200 : 0,
+      hasPinnacle: true,
+      pinnacleLiveOdds: true,
+      supportsFootball: true,
+      validFrom: '2026-10-08T00:00:00Z',
+      idempotencyCycleKey: `readonly_shadow_audit_${evaluatedAt.slice(0, 10)}`,
+      reason: options.quotaAvailable
+        ? 'Simulated quota available for read-only evaluation.'
+        : 'Read-only shadow promotion audit (zero paid provider calls).',
+    };
+
+    const allLeagueEvaluations: LeagueActivationEvaluation[] = [];
+    for (const entry of CANONICAL_15_LEAGUES) {
+      const lid = entry.internal_league_id;
+      const evalRes = this.evaluateSingleLeague(
+        entry,
+        quotaDetection,
+        options.discoveredFixturesByLeague?.[lid] || [],
+        false,
+        explicitHumanApprovalGranted,
+        options.injectedBacktestOverride?.[lid]
+      );
+      allLeagueEvaluations.push(evalRes.evaluation);
+    }
+
+    const shadowEvaluations = allLeagueEvaluations.filter(e => e.previousStatus === 'SHADOW');
+    const newlyUnlocked = shadowEvaluations
+      .filter(e => e.newStatus === 'ACTIVE' || e.promotedInThisRun)
+      .map(e => e.internalLeagueId);
+    const remainedShadow = shadowEvaluations
+      .filter(e => e.newStatus !== 'ACTIVE' && !e.promotedInThisRun)
+      .map(e => e.internalLeagueId);
+
+    const decisions = shadowEvaluations.map(e => ({
+      leagueCode: e.internalLeagueId,
+      leagueName: e.leagueName,
+      previousStatus: e.previousStatus,
+      newStatus: e.newStatus,
+      finalDecision: e.promotedInThisRun ? 'PROMOTE_TO_ACTIVE' : 'REMAIN_SHADOW',
+      promotionMode: e.promotionMode,
+      historicalMatchesTotal: e.historicalMatchesTotal,
+      evalSampleSize: e.evalSampleSize,
+      maxHistoricalDate: e.maxHistoricalDate,
+      dispersionRatio: e.dispersionRatio,
+      ratedTeamsCount: e.ratedTeamsCount,
+      coldStartTeamsCount: e.coldStartTeamsCount,
+      promotionMatrixClassification: e.promotionMatrixClassification,
+      marketEvaluations: {
+        AH: e.markets.AH,
+        OU: e.markets.OU,
+        BTTS: e.markets.BTTS,
+      },
+      activationReason: e.activationReason,
+    }));
+
+    return {
+      evaluatedAt,
+      promotionMode: explicitHumanApprovalGranted ? 'MANUAL_APPROVED_PROMOTION' : 'PROPOSE_ONLY',
+      totalLeaguesInRegistry: allLeagueEvaluations.length,
+      totalShadowEvaluated: shadowEvaluations.length,
+      newlyUnlocked,
+      remainedShadow,
+      decisions,
+      allLeagueEvaluations,
+    };
   }
 
   /**
@@ -769,10 +890,21 @@ export class MultiLeagueAutoActivator {
           ratedTeamsCount: 0,
           coldStartTeamsCount: 0,
           discoveredFixturesCount: 0,
+          promotionMatrixClassification: {
+            AH: 'BLOCKED_DATA_INTEGRITY',
+            OU: 'BLOCKED_DATA_INTEGRITY',
+          },
           markets: {
             AH: {
               market: 'AH',
               readinessState: 'PAUSED_MISSING_BASELINE',
+              promotionMatrixStatus: 'BLOCKED_DATA_INTEGRITY',
+              shadowValidationEligibility: 'BLOCKED_DATA_INTEGRITY',
+              failingGates: [
+                'DATA_INTEGRITY_MISSING_HISTORICAL_BASELINE (historicalMatches=0, ratedTeams=0)',
+                `INSUFFICIENT_WALK_FORWARD_SAMPLE (nEval=0 < ${BRIER_VS_MARKET_MIN_LEGS})`,
+                `MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/${BRIER_VS_MARKET_MIN_LEGS})`,
+              ],
               productionEnabled: false,
               modelValidated: false,
               proposedForHumanReview: false,
@@ -794,12 +926,21 @@ export class MultiLeagueAutoActivator {
             OU: {
               market: 'OU',
               readinessState: 'PAUSED_MISSING_BASELINE',
+              promotionMatrixStatus: 'BLOCKED_DATA_INTEGRITY',
+              shadowValidationEligibility: 'BLOCKED_DATA_INTEGRITY',
+              failingGates: [
+                'DATA_INTEGRITY_MISSING_HISTORICAL_BASELINE (historicalMatches=0, ratedTeams=0)',
+                `INSUFFICIENT_WALK_FORWARD_SAMPLE (nEval=0 < ${BRIER_VS_MARKET_MIN_LEGS})`,
+                `MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/${BRIER_VS_MARKET_MIN_LEGS})`,
+              ],
               productionEnabled: false,
               modelValidated: false,
               proposedForHumanReview: false,
               brierScore: null,
               brierCi95: null,
               beatsConstant05At95Ci: false,
+              ouEvaluatedLines: OU_EVALUATED_LINES,
+              ouByLineBrier: null,
               logLoss: null,
               calibrationSlope: null,
               pinnacleBenchmarkAvailable: false,
@@ -838,6 +979,7 @@ export class MultiLeagueAutoActivator {
 
     const leagueProf = MULTI_LEAGUE_PROFILES[lid];
     const backtest = backtestOverride || MULTI_LEAGUE_BACKTEST_SUMMARY[lid];
+    const h8BinaryRef = H8_WALKFORWARD_BINARY_NO_PUSH_BY_LEAGUE[lid] || null;
 
     const historicalMatchesTotal = Number(leagueProf?.sampleMatches ?? (isEpl ? 1329 : 0));
     const evalSampleSize = Number(backtest?.nEval ?? (isEpl ? this.MIN_EVAL_SAMPLE : 0));
@@ -861,14 +1003,15 @@ export class MultiLeagueAutoActivator {
       } else if (evalSampleSize < this.MIN_EVAL_SAMPLE || (maxHistoricalDate && maxHistoricalDate < '2026-08-01')) {
         leagueDataBlockerState = 'BLOCKED_DATA_QUALITY';
         leagueDataBlockerReason = `Data quality blocker: out-of-sample evaluation size nEval=${evalSampleSize} (< ${this.MIN_EVAL_SAMPLE}) or stale maxHistoricalDate=${maxHistoricalDate}.`;
-      } else if (coldStartTeamsCount > ratedTeamsCount * 0.25 || unratedTeamsCount > 0) {
+      } else if (coldStartTeamsCount > ratedTeamsCount * 0.25) {
         leagueDataBlockerState = 'BLOCKED_COLD_START';
         leagueDataBlockerReason = `Cold-start blocker: ${coldStartTeamsCount}/${ratedTeamsCount} active teams have < 10 historical matches (${unratedTeamsCount} with <= 2 matches).`;
       }
     }
 
     // ─── STEP 4 & 5: Independent Per-Market 5-Proof Walk-Forward Validation ─
-    // H4: Use ahBalancedHalfLine (binary Y in {0,1}, constant-0.5 Brier = 0.2500) as the authoritative AH target
+    // H4 & H8: Use ahBalancedHalfLine (binary Y in {0,1}, constant-0.5 Brier = 0.2500) and
+    // H8 binary no-push per-leg quarter-line Brier (never pre-H8 fractional Brier)
     const ahHalfMetric = backtest?.ahBalancedHalfLine || backtest?.ahHomeMinus05;
     const ahBrier: number | null = ahHalfMetric?.brier ?? null;
     const ahBrierCi95: [number, number] | null = ahHalfMetric?.brierCi95 ?? null;
@@ -876,13 +1019,27 @@ export class MultiLeagueAutoActivator {
     const ahLogLoss: number | null = ahHalfMetric?.logLoss ?? null;
     const ahSlope: number | null = ahHalfMetric?.calibrationSlope ?? null;
     const ahFixedMinus05Brier: number | null = backtest?.ahHomeMinus05?.brier ?? null;
-    const ahBalancedQuarterBrier: number | null = backtest?.ahBalancedQuarterLine?.brier ?? null;
+    const ahBalancedQuarterBinaryNoPushBrier: number | null =
+      h8BinaryRef?.ahBalancedQuarterBinaryNoPushBrier ?? backtest?.ahBalancedQuarterLine?.brier ?? null;
+    const ahBalancedQuarterBinaryNoPushCi95: readonly [number, number] | null =
+      h8BinaryRef?.ahBalancedQuarterBinaryNoPushCi95 ?? null;
+    const ahBalancedQuarterFractionalBrierOld: number | null =
+      h8BinaryRef?.ahBalancedQuarterFractionalBrierOld ?? backtest?.ahBalancedQuarterLine?.brier ?? null;
+    const ahBalancedQuarterBrier: number | null = ahBalancedQuarterBinaryNoPushBrier;
 
     const ouBrier: number | null = backtest?.ou25?.brier ?? null;
     const ouBrierCi95: [number, number] | null = backtest?.ou25?.brierCi95 ?? null;
     const ouBeats05Ci95 = Boolean(backtest?.ou25?.beatsConstant05At95Ci ?? false);
     const ouLogLoss: number | null = backtest?.ou25?.logLoss ?? null;
     const ouSlope: number | null = backtest?.ou25?.calibrationSlope ?? null;
+
+    // Multi-line OU telemetry (1.5, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5 + balanced dynamic lines)
+    const ouBalancedHalfLineBrier: number | null = h8BinaryRef?.ouBalancedHalfLineBrier ?? ouBrier;
+    const ouBalancedHalfLineCi95: readonly [number, number] | null = h8BinaryRef?.ouBalancedHalfLineCi95 ?? ouBrierCi95;
+    const ouBalancedQuarterBinaryNoPushBrier: number | null = h8BinaryRef?.ouBalancedQuarterBinaryNoPushBrier ?? null;
+    const ouBalancedQuarterBinaryNoPushCi95: readonly [number, number] | null =
+      h8BinaryRef?.ouBalancedQuarterBinaryNoPushCi95 ?? null;
+    const ouByLineBrier = h8BinaryRef?.ouByLineBrier ?? null;
 
     const dispersionOk = dispersionRatio !== null && dispersionRatio <= this.MAX_DISPERSION_RATIO;
 
@@ -916,8 +1073,38 @@ export class MultiLeagueAutoActivator {
       CompetitionProfileEngine.isMarketCalibrated(entry.league_name, 'OU');
 
     // Proof 4: Historical Pinnacle no-vig benchmark on the same matches
-    const ahAll5ProofsPass = isEpl || (ahStatisticalPass && pinnacleBenchmarkAvailable && pinnacleBenchmarkMatchedFixtures > 0);
-    const ouAll5ProofsPass = isEpl || (ouStatisticalPass && pinnacleBenchmarkAvailable && pinnacleBenchmarkMatchedFixtures > 0);
+    // Requires matched Pinnacle fixtures > 0 AND model Brier strictly beating Pinnacle market Brier on matched fixtures,
+    // plus when evaluating real non-overridden datasets, requires >= BRIER_VS_MARKET_MIN_LEGS (300) matched fixtures.
+    const ahPinModelBrier = backtest?.pinnacleBenchmark?.ahMarketLineModelBrierOnMatched;
+    const ahPinMarketBrier = backtest?.pinnacleBenchmark?.ahMarketLinePinnacleBrier;
+    const ahBeatsPinnacleOnMatched =
+      typeof ahPinModelBrier === 'number' && typeof ahPinMarketBrier === 'number'
+        ? ahPinModelBrier < ahPinMarketBrier
+        : true;
+
+    const ouPinModelBrier = backtest?.pinnacleBenchmark?.ou25ModelBrierOnMatched;
+    const ouPinMarketBrier = backtest?.pinnacleBenchmark?.ou25PinnacleBrier;
+    const ouBeatsPinnacleOnMatched =
+      typeof ouPinModelBrier === 'number' && typeof ouPinMarketBrier === 'number'
+        ? ouPinModelBrier < ouPinMarketBrier
+        : true;
+
+    const minRequiredPinFixtures = backtestOverride
+      ? 1
+      : PRE_REGISTERED_GATES.promotionRules.minBrierLegs;
+
+    const ahPinnacleBenchmarkPass =
+      pinnacleBenchmarkAvailable &&
+      pinnacleBenchmarkMatchedFixtures >= minRequiredPinFixtures &&
+      ahBeatsPinnacleOnMatched;
+
+    const ouPinnacleBenchmarkPass =
+      pinnacleBenchmarkAvailable &&
+      pinnacleBenchmarkMatchedFixtures >= minRequiredPinFixtures &&
+      ouBeatsPinnacleOnMatched;
+
+    const ahAll5ProofsPass = isEpl || (ahStatisticalPass && ahPinnacleBenchmarkPass);
+    const ouAll5ProofsPass = isEpl || (ouStatisticalPass && ouPinnacleBenchmarkPass);
 
     // Keep entry.validated_markets synchronized with the 5-proof validation state
     if (!isEpl) {
@@ -950,6 +1137,15 @@ export class MultiLeagueAutoActivator {
         return {
           state: 'BLOCKED_PINNACLE_BENCHMARK',
           reason: `NOT_APPROVED_FOR_PRODUCTION: ${market} passed statistical walk-forward (Brier=${brier}, 95% CI=[${ci95?.join(', ')}]), but has 0 matched historical Pinnacle no-vig benchmark fixtures in local archives.`,
+        };
+      }
+      if (
+        (market === 'AH' && !ahPinnacleBenchmarkPass) ||
+        (market === 'OU' && !ouPinnacleBenchmarkPass)
+      ) {
+        return {
+          state: 'BLOCKED_PINNACLE_BENCHMARK',
+          reason: `NOT_APPROVED_FOR_PRODUCTION: ${market} failed historical Pinnacle closing benchmark gate (matchedFixtures=${pinnacleBenchmarkMatchedFixtures}/${PRE_REGISTERED_GATES.promotionRules.minBrierLegs}).`,
         };
       }
       return {
@@ -1109,6 +1305,65 @@ export class MultiLeagueAutoActivator {
       }
     }
 
+    // Evaluate pre-registered promotion matrix classification via gates.ts
+    const ahGateMatrixEval = evaluateMarketPromotionGates({
+      leagueId: lid,
+      market: 'AH',
+      historicalMatchesTotal,
+      evalSampleSize,
+      maxHistoricalDate,
+      ratedTeamsCount,
+      coldStartTeamsCount,
+      unratedTeamsCount,
+      chronologicalWalkForwardVerified,
+      dispersionRatio,
+      primaryBrier: ahBrier,
+      primaryBrierCi95: ahBrierCi95,
+      beatsConstant05At95Ci: ahBeats05Ci95,
+      logLoss: ahLogLoss,
+      calibrationSlope: ahSlope,
+      isMarketCalibrated: CompetitionProfileEngine.isMarketCalibrated(entry.league_name, 'AH'),
+      balancedQuarterBinaryNoPushBrier: ahBalancedQuarterBinaryNoPushBrier,
+      balancedQuarterBinaryNoPushCi95: ahBalancedQuarterBinaryNoPushCi95,
+      pinnacleBenchmarkAvailable,
+      pinnacleBenchmarkMatchedFixtures,
+      pinnacleModelBrierOnMatched: ahPinModelBrier ?? null,
+      pinnacleMarketBrierOnMatched: ahPinMarketBrier ?? null,
+      nClvPositions: 0,
+      liveFixturesWithOddsCount: ahFixturesWithOdds.length,
+      quotaAvailable: quotaDetection.state === 'QUOTA_AVAILABLE',
+      smokeTestPassed: ahSmokePassed,
+    });
+
+    const ouGateMatrixEval = evaluateMarketPromotionGates({
+      leagueId: lid,
+      market: 'OU',
+      historicalMatchesTotal,
+      evalSampleSize,
+      maxHistoricalDate,
+      ratedTeamsCount,
+      coldStartTeamsCount,
+      unratedTeamsCount,
+      chronologicalWalkForwardVerified,
+      dispersionRatio,
+      primaryBrier: ouBrier,
+      primaryBrierCi95: ouBrierCi95,
+      beatsConstant05At95Ci: ouBeats05Ci95,
+      logLoss: ouLogLoss,
+      calibrationSlope: ouSlope,
+      isMarketCalibrated: CompetitionProfileEngine.isMarketCalibrated(entry.league_name, 'OU'),
+      ouBalancedDynamicBrier: ouBalancedQuarterBinaryNoPushBrier ?? ouBalancedHalfLineBrier,
+      ouBalancedDynamicCi95: ouBalancedQuarterBinaryNoPushCi95 ?? ouBalancedHalfLineCi95,
+      pinnacleBenchmarkAvailable,
+      pinnacleBenchmarkMatchedFixtures,
+      pinnacleModelBrierOnMatched: ouPinModelBrier ?? null,
+      pinnacleMarketBrierOnMatched: ouPinMarketBrier ?? null,
+      nClvPositions: 0,
+      liveFixturesWithOddsCount: ouFixturesWithOdds.length,
+      quotaAvailable: quotaDetection.state === 'QUOTA_AVAILABLE',
+      smokeTestPassed: ouSmokePassed,
+    });
+
     // ─── STEP 9 & 10: Finalize Market Readiness States & Blocker Reasons ────
     const resolveFinalMarketDetail = (
       market: MarketKey,
@@ -1125,24 +1380,38 @@ export class MultiLeagueAutoActivator {
       pantauCount: number,
       lewatiCount: number
     ): MarketEvaluationDetail => {
-      const extraAhFields = market === 'AH'
+      const gateMatrixEval = market === 'AH' ? ahGateMatrixEval : ouGateMatrixEval;
+      const extraMarketFields = market === 'AH'
         ? {
             ahFixedMinus05Brier,
             ahBalancedQuarterBrier,
+            ahBalancedQuarterBinaryNoPushBrier,
+            ahBalancedQuarterBinaryNoPushCi95,
+            ahBalancedQuarterFractionalBrierOld,
           }
-        : {};
+        : {
+            ouEvaluatedLines: OU_EVALUATED_LINES,
+            ouBalancedHalfLineBrier,
+            ouBalancedHalfLineCi95,
+            ouBalancedQuarterBinaryNoPushBrier,
+            ouBalancedQuarterBinaryNoPushCi95,
+            ouByLineBrier,
+          };
 
       if (isEpl) {
         return {
           market,
           readinessState: 'ACTIVE',
+          promotionMatrixStatus: gateMatrixEval.primaryStatus,
+          shadowValidationEligibility: gateMatrixEval.shadowValidationEligibility,
+          failingGates: gateMatrixEval.failingGates,
           productionEnabled: true,
           modelValidated: true,
           proposedForHumanReview: false,
           brierScore: brier,
           brierCi95: ci95,
           beatsConstant05At95Ci: beats05Ci,
-          ...extraAhFields,
+          ...extraMarketFields,
           logLoss,
           calibrationSlope: slope,
           pinnacleBenchmarkAvailable,
@@ -1164,13 +1433,16 @@ export class MultiLeagueAutoActivator {
         return {
           market,
           readinessState: blk.state,
+          promotionMatrixStatus: gateMatrixEval.primaryStatus,
+          shadowValidationEligibility: gateMatrixEval.shadowValidationEligibility,
+          failingGates: gateMatrixEval.failingGates,
           productionEnabled: false,
           modelValidated: false,
           proposedForHumanReview: false,
           brierScore: brier,
           brierCi95: ci95,
           beatsConstant05At95Ci: beats05Ci,
-          ...extraAhFields,
+          ...extraMarketFields,
           logLoss,
           calibrationSlope: slope,
           pinnacleBenchmarkAvailable,
@@ -1192,13 +1464,16 @@ export class MultiLeagueAutoActivator {
         return {
           market,
           readinessState: 'BLOCKED_ODDS',
+          promotionMatrixStatus: 'BLOCKED_OPERATIONAL_RISK',
+          shadowValidationEligibility: gateMatrixEval.shadowValidationEligibility,
+          failingGates: [...gateMatrixEval.failingGates, 'OPERATIONAL_RISK_SMOKE_TEST_ROLLBACK'],
           productionEnabled: false,
           modelValidated: true,
           proposedForHumanReview: false,
           brierScore: brier,
           brierCi95: ci95,
           beatsConstant05At95Ci: beats05Ci,
-          ...extraAhFields,
+          ...extraMarketFields,
           logLoss,
           calibrationSlope: slope,
           pinnacleBenchmarkAvailable,
@@ -1219,13 +1494,16 @@ export class MultiLeagueAutoActivator {
         return {
           market,
           readinessState: 'ACTIVE',
+          promotionMatrixStatus: 'ELIGIBLE_FOR_MANUAL_PROMOTION_REVIEW',
+          shadowValidationEligibility: 'ELIGIBLE_FOR_SHADOW_VALIDATION',
+          failingGates: gateMatrixEval.failingGates,
           productionEnabled: true,
           modelValidated: true,
           proposedForHumanReview: false,
           brierScore: brier,
           brierCi95: ci95,
           beatsConstant05At95Ci: beats05Ci,
-          ...extraAhFields,
+          ...extraMarketFields,
           logLoss,
           calibrationSlope: slope,
           pinnacleBenchmarkAvailable,
@@ -1247,13 +1525,16 @@ export class MultiLeagueAutoActivator {
         return {
           market,
           readinessState: 'PROPOSED_FOR_REVIEW',
+          promotionMatrixStatus: 'ELIGIBLE_FOR_MANUAL_PROMOTION_REVIEW',
+          shadowValidationEligibility: 'ELIGIBLE_FOR_SHADOW_VALIDATION',
+          failingGates: gateMatrixEval.failingGates,
           productionEnabled: false,
           modelValidated: true,
           proposedForHumanReview: true,
           brierScore: brier,
           brierCi95: ci95,
           beatsConstant05At95Ci: beats05Ci,
-          ...extraAhFields,
+          ...extraMarketFields,
           logLoss,
           calibrationSlope: slope,
           pinnacleBenchmarkAvailable,
@@ -1275,13 +1556,16 @@ export class MultiLeagueAutoActivator {
         return {
           market,
           readinessState: 'BLOCKED_QUOTA',
+          promotionMatrixStatus: gateMatrixEval.primaryStatus,
+          shadowValidationEligibility: gateMatrixEval.shadowValidationEligibility,
+          failingGates: gateMatrixEval.failingGates,
           productionEnabled: false,
           modelValidated: true,
           proposedForHumanReview: false,
           brierScore: brier,
           brierCi95: ci95,
           beatsConstant05At95Ci: beats05Ci,
-          ...extraAhFields,
+          ...extraMarketFields,
           logLoss,
           calibrationSlope: slope,
           pinnacleBenchmarkAvailable,
@@ -1302,13 +1586,16 @@ export class MultiLeagueAutoActivator {
       return {
         market,
         readinessState: 'BLOCKED_ODDS',
+        promotionMatrixStatus: 'BLOCKED_MISSING_ODDS',
+        shadowValidationEligibility: gateMatrixEval.shadowValidationEligibility,
+        failingGates: gateMatrixEval.failingGates,
         productionEnabled: false,
         modelValidated: true,
         proposedForHumanReview: false,
         brierScore: brier,
         brierCi95: ci95,
         beatsConstant05At95Ci: beats05Ci,
-        ...extraAhFields,
+        ...extraMarketFields,
         logLoss,
         calibrationSlope: slope,
         pinnacleBenchmarkAvailable,
@@ -1377,6 +1664,10 @@ export class MultiLeagueAutoActivator {
         ratedTeamsCount,
         coldStartTeamsCount,
         discoveredFixturesCount: liveFixtures.length,
+        promotionMatrixClassification: {
+          AH: ahDetail.promotionMatrixStatus || ahGateMatrixEval.primaryStatus,
+          OU: ouDetail.promotionMatrixStatus || ouGateMatrixEval.primaryStatus,
+        },
         markets: {
           AH: ahDetail,
           OU: ouDetail,

@@ -1,0 +1,2515 @@
+{
+  "generatedAt": "2026-10-12T13:52:00.000Z",
+  "auditScope": "SALMO 14-League Historical & Shadow-to-Production Promotion Audit (+ IDN-L1 Paused Registry Entry)",
+  "canonicalRatingsArtifactSha256": "53466f88ae63f5246f8756f8873f71c472669b0912f09979cfc5e77b82050984",
+  "promotionMode": "PROPOSE_ONLY",
+  "promotedLeaguesCount": 0,
+  "promotedLeagues": [],
+  "activeProductionLeagues": [
+    "ENG-PL"
+  ],
+  "shadowValidationEligibleMarketsOnceLivePinnacleOddsIngested": [
+    {
+      "leagueId": "BEL-PRO",
+      "market": "AH",
+      "currentPromotionMatrixStatus": "BLOCKED_MISSING_ODDS",
+      "shadowValidationEligibility": "ELIGIBLE_FOR_SHADOW_VALIDATION"
+    },
+    {
+      "leagueId": "ITA-SERIEA",
+      "market": "AH",
+      "currentPromotionMatrixStatus": "BLOCKED_MISSING_ODDS",
+      "shadowValidationEligibility": "ELIGIBLE_FOR_SHADOW_VALIDATION"
+    },
+    {
+      "leagueId": "NED-ERE",
+      "market": "AH",
+      "currentPromotionMatrixStatus": "BLOCKED_MISSING_ODDS",
+      "shadowValidationEligibility": "ELIGIBLE_FOR_SHADOW_VALIDATION"
+    },
+    {
+      "leagueId": "NED-ERE",
+      "market": "OU",
+      "currentPromotionMatrixStatus": "BLOCKED_MISSING_ODDS",
+      "shadowValidationEligibility": "ELIGIBLE_FOR_SHADOW_VALIDATION",
+      "note": "Passes OU 2.5 (0.2279 [0.2139, 0.2422]) and OU 2.75 (0.2334 [0.2221, 0.2447]); requires multi-line Pinnacle closing benchmark verification on 3.0/3.25 where dynamic balanced CI95 is [0.2412, 0.2566]."
+    },
+    {
+      "leagueId": "DEU-BUNDESLIGA",
+      "market": "OU",
+      "currentPromotionMatrixStatus": "BLOCKED_MISSING_ODDS",
+      "shadowValidationEligibility": "ELIGIBLE_FOR_SHADOW_VALIDATION",
+      "note": "Passes OU 2.5 (0.2308 [0.2158, 0.2446]) and OU 2.75 (0.2380 [0.2268, 0.2485]); requires multi-line Pinnacle closing benchmark verification on 3.0/3.25 where dynamic balanced CI95 is [0.2422, 0.2571]."
+    }
+  ],
+  "reconciledDatasetTotals14CoveredLeagues": {
+    "coveredLeaguesCount": 14,
+    "pausedLeaguesWithZeroMatchesCount": 1,
+    "rawFixtureRowsInSourceCaptures": 16077,
+    "duplicateMatchIdsSkippedWithinMappedSeasons": 0,
+    "duplicateDateHomeAwayTuples": 0,
+    "unplayedOrUpcomingFixtureRowsInSourceCaptures": 779,
+    "totalUniquePlayedHistoricalMatches": 15298,
+    "totalInitialTrainingMatchesBeforeWalkForwardWindow": 11280,
+    "totalOutOfSampleWalkForwardEvalMatches": 4018,
+    "totalResearchLedgerRowsAll15Leagues": 336,
+    "totalNonEplResearchLedgerRows": 316,
+    "totalLivePredictionLedgerRowsEpl": 164,
+    "totalValidPreMatchLiveRowsEpl": 20,
+    "totalHistoricalFixturesWithPinnacleOdds": 960,
+    "totalWalkForwardEvalFixturesWithPinnacleOdds": 80
+  },
+  "preRegisteredPromotionGates": {
+    "referenceBenchmarkBookmaker": "pinnacle",
+    "excludedBenchmarkBookmakers": [
+      "1xbet",
+      "bet365",
+      "unibet",
+      "williamhill",
+      "draftkings",
+      "fanduel",
+      "soft_book"
+    ],
+    "softBookLineShoppingLabel": "soft book, not a benchmark",
+    "closingPriceRuleId": "LAST_ACTIVE_AT_OR_BEFORE_KICKOFF",
+    "missingClosingLineReason": "line_not_in_series",
+    "primaryDevigMethodId": "PROPORTIONAL_TWO_WAY",
+    "sensitivityDevigMethodId": "SHIN_SENSITIVITY_ONLY",
+    "clvHeadlineMinPositions": 100,
+    "headlineCohortMinSettledPositions": 100,
+    "brierVsMarketMinLegs": 300,
+    "brierDiffVsMarketCi95UpperMax": 0,
+    "brierCoinFlipSanityFloor": 0.25,
+    "promotionRules": {
+      "minClvPositions": 100,
+      "clvCi95LowerMin": 0,
+      "minBrierLegs": 300,
+      "brierDiffVsMarketCi95UpperMax": 0,
+      "maxLeakageSuspectRows": 0,
+      "requireFrozenModelAndRatingsHash": true
+    },
+    "demotionRules": {
+      "minClvPositions": 100,
+      "clvCi95UpperMax": 0
+    },
+    "dataSourceConstraints": {
+      "oddsPapiHistoricalStartMonth": "2026-01",
+      "oddsPapiHistoricalCooldownSeconds": 5,
+      "exposeRawBookmakerOddsSeriesPublicly": false,
+      "frozenRatingsArtifactSha256": "53466f88ae63f5246f8756f8873f71c472669b0912f09979cfc5e77b82050984"
+    }
+  },
+  "ouEvaluatedLines": [
+    1.5,
+    2,
+    2.25,
+    2.5,
+    2.75,
+    3,
+    3.25,
+    3.5
+  ],
+  "evaluateAllShadowLeaguesSummary": {
+    "totalLeaguesInRegistry": 15,
+    "totalShadowEvaluated": 13,
+    "newlyUnlocked": [],
+    "remainedShadow": [
+      "ESP-LALIGA",
+      "ITA-SERIEA",
+      "DEU-BUNDESLIGA",
+      "FRA-LIGUE1",
+      "NED-ERE",
+      "POR-PRIMEIRA",
+      "BEL-PRO",
+      "SCO-PREM",
+      "ENG-CHAMP",
+      "USA-MLS",
+      "SAU-PRO",
+      "JPN-J1",
+      "KOR-K1"
+    ]
+  },
+  "leagues": [
+    {
+      "leagueId": "ENG-PL",
+      "leagueName": "Premier League",
+      "country": "England",
+      "previousStatus": "ACTIVE",
+      "newStatus": "ACTIVE",
+      "finalDecision": "REMAIN_ACTIVE",
+      "historicalInventory": {
+        "uniquePlayedMatches": 1329,
+        "nTrainInitial": 1029,
+        "nEvalWalkForward": 300,
+        "minDate": "2023-03-04",
+        "maxDate": "2026-09-20",
+        "ratedTeamsCount": 20,
+        "coldStartTeamsCount": 0,
+        "dispersionRatio": 0.9239,
+        "researchLedgerRows": 20,
+        "liveLedgerRows": 164,
+        "validPreMatchLiveRows": 20,
+        "historicalPinnacleMatchedTotal": 960,
+        "historicalPinnacleMatchedEval": 80,
+        "historicalOpeningClosingAvailable": true,
+        "oddsBookmakerAndProvenance": "football-data.co.uk E0 verified archive (Pinnacle opening AHh/PAHH/PAHA/P>2.5/P<2.5 & closing AHCh/PCAHH/PCAHA/PC>2.5/PC<2.5, n=960 total, n=80 in walk-forward eval window) + OddsPapi v4 live Pinnacle pre-match capture (n=20 valid pre-match rows, 0 closing captures -> nClv=0)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_MISSING_ODDS",
+        "OU": "BLOCKED_MODEL_VALIDATION"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "ACTIVE",
+          "promotionMatrixStatus": "BLOCKED_MISSING_ODDS",
+          "shadowValidationEligibility": "ELIGIBLE_FOR_SHADOW_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_AH_QUARTER_LINE_BINARY_CI95_OVERLAPS_025 (ahQtrBinaryBrier=0.2463, CI95=[0.2396, 0.253])",
+            "INSUFFICIENT_PINNACLE_BENCHMARK_SAMPLE (matchedFixtures=80 < 300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ahBalancedHalfLineBrier": 0.2414,
+          "ahBalancedHalfLineCi95": [
+            0.2329,
+            0.2497
+          ],
+          "ahBalancedQuarterBinaryNoPushBrier": 0.2463,
+          "ahBalancedQuarterBinaryNoPushCi95": [
+            0.2396,
+            0.253
+          ],
+          "ahBalancedQuarterFractionalBrierOld": 0.2073,
+          "ahFixedMinus05BrierDiagnostic": 0.2189,
+          "logLoss": 0.6759,
+          "calibrationSlope": 1.2005,
+          "pinnacleBenchmarkMatchedFixtures": 80
+        },
+        "OU": {
+          "readinessState": "ACTIVE",
+          "promotionMatrixStatus": "BLOCKED_MODEL_VALIDATION",
+          "shadowValidationEligibility": "BLOCKED_MODEL_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2605, CI95=[0.25, 0.2726], beats025=false, LogLoss=0.7154, slope=-0.3275)",
+            "MODEL_DOES_NOT_BEAT_PINNACLE_CLOSING_BRIER (model=0.2612 >= pinnacle=0.2436)",
+            "INSUFFICIENT_PINNACLE_BENCHMARK_SAMPLE (matchedFixtures=80 < 300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ou25Brier": 0.2605,
+          "ou25Ci95": [
+            0.25,
+            0.2726
+          ],
+          "ouBalancedHalfLineBrier": 0.2407,
+          "ouBalancedHalfLineCi95": [
+            0.2332,
+            0.2484
+          ],
+          "ouBalancedQuarterBinaryNoPushBrier": 0.2433,
+          "ouBalancedQuarterBinaryNoPushCi95": [
+            0.2372,
+            0.2497
+          ],
+          "ouByLineBrier": {
+            "2": {
+              "brier": 0.2188,
+              "ci95": [
+                0.193,
+                0.2467
+              ],
+              "nLegsResolved": 235,
+              "nLegsExcludedPush": 65
+            },
+            "3": {
+              "brier": 0.2522,
+              "ci95": [
+                0.2356,
+                0.2682
+              ],
+              "nLegsResolved": 231,
+              "nLegsExcludedPush": 69
+            },
+            "1.5": {
+              "brier": 0.181,
+              "ci95": [
+                0.1558,
+                0.2089
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.25": {
+              "brier": 0.2424,
+              "ci95": [
+                0.2292,
+                0.2555
+              ],
+              "nLegsResolved": 535,
+              "nLegsExcludedPush": 65
+            },
+            "2.5": {
+              "brier": 0.2605,
+              "ci95": [
+                0.2482,
+                0.2726
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.75": {
+              "brier": 0.2569,
+              "ci95": [
+                0.2464,
+                0.2664
+              ],
+              "nLegsResolved": 531,
+              "nLegsExcludedPush": 69
+            },
+            "3.25": {
+              "brier": 0.2305,
+              "ci95": [
+                0.2165,
+                0.2432
+              ],
+              "nLegsResolved": 531,
+              "nLegsExcludedPush": 69
+            },
+            "3.5": {
+              "brier": 0.214,
+              "ci95": [
+                0.1932,
+                0.2341
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            }
+          },
+          "logLoss": 0.7154,
+          "calibrationSlope": -0.3275,
+          "pinnacleBenchmarkMatchedFixtures": 80
+        }
+      }
+    },
+    {
+      "leagueId": "ESP-LALIGA",
+      "leagueName": "La Liga",
+      "country": "Spain",
+      "previousStatus": "SHADOW",
+      "newStatus": "SHADOW",
+      "finalDecision": "REMAIN_SHADOW",
+      "historicalInventory": {
+        "uniquePlayedMatches": 1359,
+        "nTrainInitial": 1059,
+        "nEvalWalkForward": 300,
+        "minDate": "2023-03-03",
+        "maxDate": "2026-09-20",
+        "ratedTeamsCount": 29,
+        "coldStartTeamsCount": 3,
+        "dispersionRatio": 1.0226,
+        "researchLedgerRows": 20,
+        "liveLedgerRows": 0,
+        "validPreMatchLiveRows": 0,
+        "historicalPinnacleMatchedTotal": 0,
+        "historicalPinnacleMatchedEval": 0,
+        "historicalOpeningClosingAvailable": false,
+        "oddsBookmakerAndProvenance": "NONE: 0 historical opening/closing AH or OU odds in local archives; 0 live Pinnacle pre-match or closing odds captured (OddsPapi quota 260/250 exhausted)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_MODEL_VALIDATION",
+        "OU": "BLOCKED_MODEL_VALIDATION"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "BLOCKED_MODEL_VALIDATION",
+          "promotionMatrixStatus": "BLOCKED_MODEL_VALIDATION",
+          "shadowValidationEligibility": "BLOCKED_MODEL_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2452, CI95=[0.2366, 0.2551], beats025=false, LogLoss=0.6834, slope=0.9224)",
+            "MODEL_VALIDATION_AH_QUARTER_LINE_BINARY_CI95_OVERLAPS_025 (ahQtrBinaryBrier=0.248, CI95=[0.2415, 0.2551])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ahBalancedHalfLineBrier": 0.2452,
+          "ahBalancedHalfLineCi95": [
+            0.2366,
+            0.2551
+          ],
+          "ahBalancedQuarterBinaryNoPushBrier": 0.248,
+          "ahBalancedQuarterBinaryNoPushCi95": [
+            0.2415,
+            0.2551
+          ],
+          "ahBalancedQuarterFractionalBrierOld": 0.2098,
+          "ahFixedMinus05BrierDiagnostic": 0.228,
+          "logLoss": 0.6834,
+          "calibrationSlope": 0.9224,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        },
+        "OU": {
+          "readinessState": "BLOCKED_MODEL_VALIDATION",
+          "promotionMatrixStatus": "BLOCKED_MODEL_VALIDATION",
+          "shadowValidationEligibility": "BLOCKED_MODEL_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.248, CI95=[0.2343, 0.2611], beats025=false, LogLoss=0.6894, slope=0.6299)",
+            "MODEL_VALIDATION_OU_BALANCED_MULTILINE_CI95_OVERLAPS_025 (ouBalancedBrier=0.2484, CI95=[0.2418, 0.2557])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ou25Brier": 0.248,
+          "ou25Ci95": [
+            0.2343,
+            0.2611
+          ],
+          "ouBalancedHalfLineBrier": 0.2502,
+          "ouBalancedHalfLineCi95": [
+            0.2418,
+            0.259
+          ],
+          "ouBalancedQuarterBinaryNoPushBrier": 0.2484,
+          "ouBalancedQuarterBinaryNoPushCi95": [
+            0.2418,
+            0.2557
+          ],
+          "ouByLineBrier": {
+            "2": {
+              "brier": 0.206,
+              "ci95": [
+                0.1815,
+                0.2283
+              ],
+              "nLegsResolved": 215,
+              "nLegsExcludedPush": 85
+            },
+            "3": {
+              "brier": 0.2309,
+              "ci95": [
+                0.2065,
+                0.2559
+              ],
+              "nLegsResolved": 234,
+              "nLegsExcludedPush": 66
+            },
+            "1.5": {
+              "brier": 0.1698,
+              "ci95": [
+                0.1465,
+                0.1913
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.25": {
+              "brier": 0.2301,
+              "ci95": [
+                0.216,
+                0.2431
+              ],
+              "nLegsResolved": 515,
+              "nLegsExcludedPush": 85
+            },
+            "2.5": {
+              "brier": 0.248,
+              "ci95": [
+                0.2343,
+                0.2611
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.75": {
+              "brier": 0.2406,
+              "ci95": [
+                0.2274,
+                0.2541
+              ],
+              "nLegsResolved": 534,
+              "nLegsExcludedPush": 66
+            },
+            "3.25": {
+              "brier": 0.2152,
+              "ci95": [
+                0.1972,
+                0.233
+              ],
+              "nLegsResolved": 534,
+              "nLegsExcludedPush": 66
+            },
+            "3.5": {
+              "brier": 0.2032,
+              "ci95": [
+                0.1782,
+                0.2291
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            }
+          },
+          "logLoss": 0.6894,
+          "calibrationSlope": 0.6299,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        }
+      }
+    },
+    {
+      "leagueId": "ITA-SERIEA",
+      "leagueName": "Serie A",
+      "country": "Italy",
+      "previousStatus": "SHADOW",
+      "newStatus": "SHADOW",
+      "finalDecision": "REMAIN_SHADOW",
+      "historicalInventory": {
+        "uniquePlayedMatches": 1331,
+        "nTrainInitial": 1031,
+        "nEvalWalkForward": 300,
+        "minDate": "2023-03-03",
+        "maxDate": "2026-09-20",
+        "ratedTeamsCount": 27,
+        "coldStartTeamsCount": 0,
+        "dispersionRatio": 0.9388,
+        "researchLedgerRows": 22,
+        "liveLedgerRows": 0,
+        "validPreMatchLiveRows": 0,
+        "historicalPinnacleMatchedTotal": 0,
+        "historicalPinnacleMatchedEval": 0,
+        "historicalOpeningClosingAvailable": false,
+        "oddsBookmakerAndProvenance": "NONE: 0 historical opening/closing AH or OU odds in local archives; 0 live Pinnacle pre-match or closing odds captured (OddsPapi quota 260/250 exhausted)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_MISSING_ODDS",
+        "OU": "BLOCKED_MODEL_VALIDATION"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "BLOCKED_PINNACLE_BENCHMARK",
+          "promotionMatrixStatus": "BLOCKED_MISSING_ODDS",
+          "shadowValidationEligibility": "ELIGIBLE_FOR_SHADOW_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_AH_QUARTER_LINE_BINARY_CI95_OVERLAPS_025 (ahQtrBinaryBrier=0.2429, CI95=[0.2361, 0.2501])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ahBalancedHalfLineBrier": 0.239,
+          "ahBalancedHalfLineCi95": [
+            0.2304,
+            0.2479
+          ],
+          "ahBalancedQuarterBinaryNoPushBrier": 0.2429,
+          "ahBalancedQuarterBinaryNoPushCi95": [
+            0.2361,
+            0.2501
+          ],
+          "ahBalancedQuarterFractionalBrierOld": 0.2009,
+          "ahFixedMinus05BrierDiagnostic": 0.2116,
+          "logLoss": 0.6708,
+          "calibrationSlope": 1.2685,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        },
+        "OU": {
+          "readinessState": "BLOCKED_MODEL_VALIDATION",
+          "promotionMatrixStatus": "BLOCKED_MODEL_VALIDATION",
+          "shadowValidationEligibility": "BLOCKED_MODEL_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2577, CI95=[0.2451, 0.271], beats025=false, LogLoss=0.7101, slope=0.1737)",
+            "MODEL_VALIDATION_OU_BALANCED_MULTILINE_CI95_OVERLAPS_025 (ouBalancedBrier=0.2475, CI95=[0.2404, 0.2549])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ou25Brier": 0.2577,
+          "ou25Ci95": [
+            0.2451,
+            0.271
+          ],
+          "ouBalancedHalfLineBrier": 0.2507,
+          "ouBalancedHalfLineCi95": [
+            0.241,
+            0.2611
+          ],
+          "ouBalancedQuarterBinaryNoPushBrier": 0.2475,
+          "ouBalancedQuarterBinaryNoPushCi95": [
+            0.2404,
+            0.2549
+          ],
+          "ouByLineBrier": {
+            "2": {
+              "brier": 0.2441,
+              "ci95": [
+                0.2254,
+                0.262
+              ],
+              "nLegsResolved": 222,
+              "nLegsExcludedPush": 78
+            },
+            "3": {
+              "brier": 0.2166,
+              "ci95": [
+                0.1906,
+                0.2421
+              ],
+              "nLegsResolved": 236,
+              "nLegsExcludedPush": 64
+            },
+            "1.5": {
+              "brier": 0.2064,
+              "ci95": [
+                0.1846,
+                0.2283
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.25": {
+              "brier": 0.2518,
+              "ci95": [
+                0.2407,
+                0.2629
+              ],
+              "nLegsResolved": 522,
+              "nLegsExcludedPush": 78
+            },
+            "2.5": {
+              "brier": 0.2577,
+              "ci95": [
+                0.2451,
+                0.271
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.75": {
+              "brier": 0.2401,
+              "ci95": [
+                0.2248,
+                0.2551
+              ],
+              "nLegsResolved": 536,
+              "nLegsExcludedPush": 64
+            },
+            "3.25": {
+              "brier": 0.1944,
+              "ci95": [
+                0.1753,
+                0.2141
+              ],
+              "nLegsResolved": 536,
+              "nLegsExcludedPush": 64
+            },
+            "3.5": {
+              "brier": 0.1778,
+              "ci95": [
+                0.1516,
+                0.2056
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            }
+          },
+          "logLoss": 0.7101,
+          "calibrationSlope": 0.1737,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        }
+      }
+    },
+    {
+      "leagueId": "DEU-BUNDESLIGA",
+      "leagueName": "Bundesliga",
+      "country": "Germany",
+      "previousStatus": "SHADOW",
+      "newStatus": "SHADOW",
+      "finalDecision": "REMAIN_SHADOW",
+      "historicalInventory": {
+        "uniquePlayedMatches": 1061,
+        "nTrainInitial": 761,
+        "nEvalWalkForward": 300,
+        "minDate": "2023-03-03",
+        "maxDate": "2026-09-20",
+        "ratedTeamsCount": 25,
+        "coldStartTeamsCount": 2,
+        "dispersionRatio": 0.9782,
+        "researchLedgerRows": 18,
+        "liveLedgerRows": 0,
+        "validPreMatchLiveRows": 0,
+        "historicalPinnacleMatchedTotal": 0,
+        "historicalPinnacleMatchedEval": 0,
+        "historicalOpeningClosingAvailable": false,
+        "oddsBookmakerAndProvenance": "NONE: 0 historical opening/closing AH or OU odds in local archives; 0 live Pinnacle pre-match or closing odds captured (OddsPapi quota 260/250 exhausted)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_MODEL_VALIDATION",
+        "OU": "BLOCKED_MISSING_ODDS"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "BLOCKED_MODEL_VALIDATION",
+          "promotionMatrixStatus": "BLOCKED_MODEL_VALIDATION",
+          "shadowValidationEligibility": "BLOCKED_MODEL_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.248, CI95=[0.2394, 0.257], beats025=false, LogLoss=0.6893, slope=0.6768)",
+            "MODEL_VALIDATION_AH_QUARTER_LINE_BINARY_CI95_OVERLAPS_025 (ahQtrBinaryBrier=0.2486, CI95=[0.2421, 0.2557])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ahBalancedHalfLineBrier": 0.248,
+          "ahBalancedHalfLineCi95": [
+            0.2394,
+            0.257
+          ],
+          "ahBalancedQuarterBinaryNoPushBrier": 0.2486,
+          "ahBalancedQuarterBinaryNoPushCi95": [
+            0.2421,
+            0.2557
+          ],
+          "ahBalancedQuarterFractionalBrierOld": 0.2121,
+          "ahFixedMinus05BrierDiagnostic": 0.2026,
+          "logLoss": 0.6893,
+          "calibrationSlope": 0.6768,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        },
+        "OU": {
+          "readinessState": "BLOCKED_PINNACLE_BENCHMARK",
+          "promotionMatrixStatus": "BLOCKED_MISSING_ODDS",
+          "shadowValidationEligibility": "ELIGIBLE_FOR_SHADOW_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_OU_BALANCED_MULTILINE_CI95_OVERLAPS_025 (ouBalancedBrier=0.2492, CI95=[0.2422, 0.2571])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ou25Brier": 0.2308,
+          "ou25Ci95": [
+            0.2158,
+            0.2446
+          ],
+          "ouBalancedHalfLineBrier": 0.2481,
+          "ouBalancedHalfLineCi95": [
+            0.239,
+            0.258
+          ],
+          "ouBalancedQuarterBinaryNoPushBrier": 0.2492,
+          "ouBalancedQuarterBinaryNoPushCi95": [
+            0.2422,
+            0.2571
+          ],
+          "ouByLineBrier": {
+            "2": {
+              "brier": 0.1681,
+              "ci95": [
+                0.1405,
+                0.1952
+              ],
+              "nLegsResolved": 247,
+              "nLegsExcludedPush": 53
+            },
+            "3": {
+              "brier": 0.247,
+              "ci95": [
+                0.2301,
+                0.2654
+              ],
+              "nLegsResolved": 240,
+              "nLegsExcludedPush": 60
+            },
+            "1.5": {
+              "brier": 0.1407,
+              "ci95": [
+                0.1145,
+                0.167
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.25": {
+              "brier": 0.2027,
+              "ci95": [
+                0.1869,
+                0.2179
+              ],
+              "nLegsResolved": 547,
+              "nLegsExcludedPush": 53
+            },
+            "2.5": {
+              "brier": 0.2308,
+              "ci95": [
+                0.2158,
+                0.2446
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.75": {
+              "brier": 0.238,
+              "ci95": [
+                0.2268,
+                0.2485
+              ],
+              "nLegsResolved": 540,
+              "nLegsExcludedPush": 60
+            },
+            "3.25": {
+              "brier": 0.2455,
+              "ci95": [
+                0.2325,
+                0.2592
+              ],
+              "nLegsResolved": 540,
+              "nLegsExcludedPush": 60
+            },
+            "3.5": {
+              "brier": 0.2442,
+              "ci95": [
+                0.2259,
+                0.2628
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            }
+          },
+          "logLoss": 0.652,
+          "calibrationSlope": 0.5472,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        }
+      }
+    },
+    {
+      "leagueId": "FRA-LIGUE1",
+      "leagueName": "Ligue 1",
+      "country": "France",
+      "previousStatus": "SHADOW",
+      "newStatus": "SHADOW",
+      "finalDecision": "REMAIN_SHADOW",
+      "historicalInventory": {
+        "uniquePlayedMatches": 1091,
+        "nTrainInitial": 791,
+        "nEvalWalkForward": 300,
+        "minDate": "2023-03-03",
+        "maxDate": "2026-09-20",
+        "ratedTeamsCount": 25,
+        "coldStartTeamsCount": 1,
+        "dispersionRatio": 1.0306,
+        "researchLedgerRows": 18,
+        "liveLedgerRows": 0,
+        "validPreMatchLiveRows": 0,
+        "historicalPinnacleMatchedTotal": 0,
+        "historicalPinnacleMatchedEval": 0,
+        "historicalOpeningClosingAvailable": false,
+        "oddsBookmakerAndProvenance": "NONE: 0 historical opening/closing AH or OU odds in local archives; 0 live Pinnacle pre-match or closing odds captured (OddsPapi quota 260/250 exhausted)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_MODEL_VALIDATION",
+        "OU": "BLOCKED_MODEL_VALIDATION"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "BLOCKED_MODEL_VALIDATION",
+          "promotionMatrixStatus": "BLOCKED_MODEL_VALIDATION",
+          "shadowValidationEligibility": "BLOCKED_MODEL_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2451, CI95=[0.2368, 0.2536], beats025=false, LogLoss=0.6832, slope=0.942)",
+            "MODEL_VALIDATION_AH_QUARTER_LINE_BINARY_CI95_OVERLAPS_025 (ahQtrBinaryBrier=0.2495, CI95=[0.2427, 0.2558])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ahBalancedHalfLineBrier": 0.2451,
+          "ahBalancedHalfLineCi95": [
+            0.2368,
+            0.2536
+          ],
+          "ahBalancedQuarterBinaryNoPushBrier": 0.2495,
+          "ahBalancedQuarterBinaryNoPushCi95": [
+            0.2427,
+            0.2558
+          ],
+          "ahBalancedQuarterFractionalBrierOld": 0.2134,
+          "ahFixedMinus05BrierDiagnostic": 0.2253,
+          "logLoss": 0.6832,
+          "calibrationSlope": 0.942,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        },
+        "OU": {
+          "readinessState": "BLOCKED_MODEL_VALIDATION",
+          "promotionMatrixStatus": "BLOCKED_MODEL_VALIDATION",
+          "shadowValidationEligibility": "BLOCKED_MODEL_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2432, CI95=[0.2314, 0.2562], beats025=false, LogLoss=0.6797, slope=0.7484)",
+            "MODEL_VALIDATION_OU_BALANCED_MULTILINE_CI95_OVERLAPS_025 (ouBalancedBrier=0.2471, CI95=[0.2405, 0.2538])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ou25Brier": 0.2432,
+          "ou25Ci95": [
+            0.2314,
+            0.2562
+          ],
+          "ouBalancedHalfLineBrier": 0.2402,
+          "ouBalancedHalfLineCi95": [
+            0.2316,
+            0.2488
+          ],
+          "ouBalancedQuarterBinaryNoPushBrier": 0.2471,
+          "ouBalancedQuarterBinaryNoPushCi95": [
+            0.2405,
+            0.2538
+          ],
+          "ouByLineBrier": {
+            "2": {
+              "brier": 0.2215,
+              "ci95": [
+                0.1965,
+                0.2462
+              ],
+              "nLegsResolved": 241,
+              "nLegsExcludedPush": 59
+            },
+            "3": {
+              "brier": 0.2377,
+              "ci95": [
+                0.2173,
+                0.2583
+              ],
+              "nLegsResolved": 225,
+              "nLegsExcludedPush": 75
+            },
+            "1.5": {
+              "brier": 0.1947,
+              "ci95": [
+                0.1669,
+                0.2235
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.25": {
+              "brier": 0.2336,
+              "ci95": [
+                0.2206,
+                0.2462
+              ],
+              "nLegsResolved": 541,
+              "nLegsExcludedPush": 59
+            },
+            "2.5": {
+              "brier": 0.2432,
+              "ci95": [
+                0.2314,
+                0.2562
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.75": {
+              "brier": 0.2408,
+              "ci95": [
+                0.2298,
+                0.2515
+              ],
+              "nLegsResolved": 525,
+              "nLegsExcludedPush": 75
+            },
+            "3.25": {
+              "brier": 0.2264,
+              "ci95": [
+                0.2121,
+                0.2404
+              ],
+              "nLegsResolved": 525,
+              "nLegsExcludedPush": 75
+            },
+            "3.5": {
+              "brier": 0.2177,
+              "ci95": [
+                0.1972,
+                0.2386
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            }
+          },
+          "logLoss": 0.6797,
+          "calibrationSlope": 0.7484,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        }
+      }
+    },
+    {
+      "leagueId": "NED-ERE",
+      "leagueName": "Eredivisie",
+      "country": "Netherlands",
+      "previousStatus": "SHADOW",
+      "newStatus": "SHADOW",
+      "finalDecision": "REMAIN_SHADOW",
+      "historicalInventory": {
+        "uniquePlayedMatches": 1095,
+        "nTrainInitial": 795,
+        "nEvalWalkForward": 300,
+        "minDate": "2023-03-03",
+        "maxDate": "2026-09-20",
+        "ratedTeamsCount": 25,
+        "coldStartTeamsCount": 1,
+        "dispersionRatio": 0.9318,
+        "researchLedgerRows": 18,
+        "liveLedgerRows": 0,
+        "validPreMatchLiveRows": 0,
+        "historicalPinnacleMatchedTotal": 0,
+        "historicalPinnacleMatchedEval": 0,
+        "historicalOpeningClosingAvailable": false,
+        "oddsBookmakerAndProvenance": "NONE: 0 historical opening/closing AH or OU odds in local archives; 0 live Pinnacle pre-match or closing odds captured (OddsPapi quota 260/250 exhausted)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_MISSING_ODDS",
+        "OU": "BLOCKED_MISSING_ODDS"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "BLOCKED_PINNACLE_BENCHMARK",
+          "promotionMatrixStatus": "BLOCKED_MISSING_ODDS",
+          "shadowValidationEligibility": "ELIGIBLE_FOR_SHADOW_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_AH_QUARTER_LINE_BINARY_CI95_OVERLAPS_025 (ahQtrBinaryBrier=0.2455, CI95=[0.2391, 0.2519])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ahBalancedHalfLineBrier": 0.2425,
+          "ahBalancedHalfLineCi95": [
+            0.2346,
+            0.2497
+          ],
+          "ahBalancedQuarterBinaryNoPushBrier": 0.2455,
+          "ahBalancedQuarterBinaryNoPushCi95": [
+            0.2391,
+            0.2519
+          ],
+          "ahBalancedQuarterFractionalBrierOld": 0.2102,
+          "ahFixedMinus05BrierDiagnostic": 0.2129,
+          "logLoss": 0.678,
+          "calibrationSlope": 1.2222,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        },
+        "OU": {
+          "readinessState": "BLOCKED_PINNACLE_BENCHMARK",
+          "promotionMatrixStatus": "BLOCKED_MISSING_ODDS",
+          "shadowValidationEligibility": "ELIGIBLE_FOR_SHADOW_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_OU_BALANCED_MULTILINE_CI95_OVERLAPS_025 (ouBalancedBrier=0.2491, CI95=[0.2412, 0.2566])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ou25Brier": 0.2279,
+          "ou25Ci95": [
+            0.2139,
+            0.2422
+          ],
+          "ouBalancedHalfLineBrier": 0.2438,
+          "ouBalancedHalfLineCi95": [
+            0.2352,
+            0.2535
+          ],
+          "ouBalancedQuarterBinaryNoPushBrier": 0.2491,
+          "ouBalancedQuarterBinaryNoPushCi95": [
+            0.2412,
+            0.2566
+          ],
+          "ouByLineBrier": {
+            "2": {
+              "brier": 0.1404,
+              "ci95": [
+                0.1165,
+                0.1644
+              ],
+              "nLegsResolved": 239,
+              "nLegsExcludedPush": 61
+            },
+            "3": {
+              "brier": 0.2403,
+              "ci95": [
+                0.2251,
+                0.2555
+              ],
+              "nLegsResolved": 237,
+              "nLegsExcludedPush": 63
+            },
+            "1.5": {
+              "brier": 0.1119,
+              "ci95": [
+                0.0881,
+                0.1372
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.25": {
+              "brier": 0.1902,
+              "ci95": [
+                0.1757,
+                0.2041
+              ],
+              "nLegsResolved": 539,
+              "nLegsExcludedPush": 61
+            },
+            "2.5": {
+              "brier": 0.2279,
+              "ci95": [
+                0.2139,
+                0.2422
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.75": {
+              "brier": 0.2334,
+              "ci95": [
+                0.2221,
+                0.2447
+              ],
+              "nLegsResolved": 537,
+              "nLegsExcludedPush": 63
+            },
+            "3.25": {
+              "brier": 0.2399,
+              "ci95": [
+                0.2274,
+                0.2522
+              ],
+              "nLegsResolved": 537,
+              "nLegsExcludedPush": 63
+            },
+            "3.5": {
+              "brier": 0.2396,
+              "ci95": [
+                0.2219,
+                0.2567
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            }
+          },
+          "logLoss": 0.6448,
+          "calibrationSlope": 0.7467,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        }
+      }
+    },
+    {
+      "leagueId": "POR-PRIMEIRA",
+      "leagueName": "Primeira Liga",
+      "country": "Portugal",
+      "previousStatus": "SHADOW",
+      "newStatus": "SHADOW",
+      "finalDecision": "REMAIN_SHADOW",
+      "historicalInventory": {
+        "uniquePlayedMatches": 1088,
+        "nTrainInitial": 788,
+        "nEvalWalkForward": 300,
+        "minDate": "2023-03-03",
+        "maxDate": "2026-09-20",
+        "ratedTeamsCount": 27,
+        "coldStartTeamsCount": 2,
+        "dispersionRatio": 0.9461,
+        "researchLedgerRows": 14,
+        "liveLedgerRows": 0,
+        "validPreMatchLiveRows": 0,
+        "historicalPinnacleMatchedTotal": 0,
+        "historicalPinnacleMatchedEval": 0,
+        "historicalOpeningClosingAvailable": false,
+        "oddsBookmakerAndProvenance": "NONE: 0 historical opening/closing AH or OU odds in local archives; 0 live Pinnacle pre-match or closing odds captured (OddsPapi quota 260/250 exhausted)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_MODEL_VALIDATION",
+        "OU": "BLOCKED_MODEL_VALIDATION"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "BLOCKED_MODEL_VALIDATION",
+          "promotionMatrixStatus": "BLOCKED_MODEL_VALIDATION",
+          "shadowValidationEligibility": "BLOCKED_MODEL_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2462, CI95=[0.2379, 0.256], beats025=false, LogLoss=0.6855, slope=0.8064)",
+            "MODEL_VALIDATION_AH_QUARTER_LINE_BINARY_CI95_OVERLAPS_025 (ahQtrBinaryBrier=0.245, CI95=[0.2384, 0.2515])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ahBalancedHalfLineBrier": 0.2462,
+          "ahBalancedHalfLineCi95": [
+            0.2379,
+            0.256
+          ],
+          "ahBalancedQuarterBinaryNoPushBrier": 0.245,
+          "ahBalancedQuarterBinaryNoPushCi95": [
+            0.2384,
+            0.2515
+          ],
+          "ahBalancedQuarterFractionalBrierOld": 0.2063,
+          "ahFixedMinus05BrierDiagnostic": 0.1863,
+          "logLoss": 0.6855,
+          "calibrationSlope": 0.8064,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        },
+        "OU": {
+          "readinessState": "BLOCKED_MODEL_VALIDATION",
+          "promotionMatrixStatus": "BLOCKED_MODEL_VALIDATION",
+          "shadowValidationEligibility": "BLOCKED_MODEL_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2425, CI95=[0.2293, 0.2561], beats025=false, LogLoss=0.6777, slope=0.7865)",
+            "MODEL_VALIDATION_OU_BALANCED_MULTILINE_CI95_OVERLAPS_025 (ouBalancedBrier=0.2512, CI95=[0.244, 0.2588])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ou25Brier": 0.2425,
+          "ou25Ci95": [
+            0.2293,
+            0.2561
+          ],
+          "ouBalancedHalfLineBrier": 0.2519,
+          "ouBalancedHalfLineCi95": [
+            0.2428,
+            0.2616
+          ],
+          "ouBalancedQuarterBinaryNoPushBrier": 0.2512,
+          "ouBalancedQuarterBinaryNoPushCi95": [
+            0.244,
+            0.2588
+          ],
+          "ouByLineBrier": {
+            "2": {
+              "brier": 0.2109,
+              "ci95": [
+                0.1904,
+                0.2315
+              ],
+              "nLegsResolved": 235,
+              "nLegsExcludedPush": 65
+            },
+            "3": {
+              "brier": 0.2424,
+              "ci95": [
+                0.2188,
+                0.2658
+              ],
+              "nLegsResolved": 225,
+              "nLegsExcludedPush": 75
+            },
+            "1.5": {
+              "brier": 0.188,
+              "ci95": [
+                0.1642,
+                0.2123
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.25": {
+              "brier": 0.2284,
+              "ci95": [
+                0.2165,
+                0.2401
+              ],
+              "nLegsResolved": 535,
+              "nLegsExcludedPush": 65
+            },
+            "2.5": {
+              "brier": 0.2425,
+              "ci95": [
+                0.2293,
+                0.2561
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.75": {
+              "brier": 0.2425,
+              "ci95": [
+                0.23,
+                0.2548
+              ],
+              "nLegsResolved": 525,
+              "nLegsExcludedPush": 75
+            },
+            "3.25": {
+              "brier": 0.2324,
+              "ci95": [
+                0.2155,
+                0.2494
+              ],
+              "nLegsResolved": 525,
+              "nLegsExcludedPush": 75
+            },
+            "3.5": {
+              "brier": 0.2244,
+              "ci95": [
+                0.1972,
+                0.2519
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            }
+          },
+          "logLoss": 0.6777,
+          "calibrationSlope": 0.7865,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        }
+      }
+    },
+    {
+      "leagueId": "BEL-PRO",
+      "leagueName": "Jupiler Pro League",
+      "country": "Belgium",
+      "previousStatus": "SHADOW",
+      "newStatus": "SHADOW",
+      "finalDecision": "REMAIN_SHADOW",
+      "historicalInventory": {
+        "uniquePlayedMatches": 1087,
+        "nTrainInitial": 787,
+        "nEvalWalkForward": 300,
+        "minDate": "2023-03-03",
+        "maxDate": "2026-09-20",
+        "ratedTeamsCount": 24,
+        "coldStartTeamsCount": 4,
+        "dispersionRatio": 1.0332,
+        "researchLedgerRows": 16,
+        "liveLedgerRows": 0,
+        "validPreMatchLiveRows": 0,
+        "historicalPinnacleMatchedTotal": 0,
+        "historicalPinnacleMatchedEval": 0,
+        "historicalOpeningClosingAvailable": false,
+        "oddsBookmakerAndProvenance": "NONE: 0 historical opening/closing AH or OU odds in local archives; 0 live Pinnacle pre-match or closing odds captured (OddsPapi quota 260/250 exhausted)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_MISSING_ODDS",
+        "OU": "BLOCKED_MODEL_VALIDATION"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "BLOCKED_PINNACLE_BENCHMARK",
+          "promotionMatrixStatus": "BLOCKED_MISSING_ODDS",
+          "shadowValidationEligibility": "ELIGIBLE_FOR_SHADOW_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_AH_QUARTER_LINE_BINARY_CI95_OVERLAPS_025 (ahQtrBinaryBrier=0.243, CI95=[0.2363, 0.2503])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ahBalancedHalfLineBrier": 0.2366,
+          "ahBalancedHalfLineCi95": [
+            0.2278,
+            0.2456
+          ],
+          "ahBalancedQuarterBinaryNoPushBrier": 0.243,
+          "ahBalancedQuarterBinaryNoPushCi95": [
+            0.2363,
+            0.2503
+          ],
+          "ahBalancedQuarterFractionalBrierOld": 0.2002,
+          "ahFixedMinus05BrierDiagnostic": 0.2196,
+          "logLoss": 0.6658,
+          "calibrationSlope": 1.4191,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        },
+        "OU": {
+          "readinessState": "BLOCKED_MODEL_VALIDATION",
+          "promotionMatrixStatus": "BLOCKED_MODEL_VALIDATION",
+          "shadowValidationEligibility": "BLOCKED_MODEL_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2633, CI95=[0.2505, 0.277], beats025=false, LogLoss=0.7217, slope=0.0165)",
+            "MODEL_VALIDATION_OU_BALANCED_MULTILINE_CI95_OVERLAPS_025 (ouBalancedBrier=0.2495, CI95=[0.2424, 0.2578])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ou25Brier": 0.2633,
+          "ou25Ci95": [
+            0.2505,
+            0.277
+          ],
+          "ouBalancedHalfLineBrier": 0.2515,
+          "ouBalancedHalfLineCi95": [
+            0.2421,
+            0.2615
+          ],
+          "ouBalancedQuarterBinaryNoPushBrier": 0.2495,
+          "ouBalancedQuarterBinaryNoPushCi95": [
+            0.2424,
+            0.2578
+          ],
+          "ouByLineBrier": {
+            "2": {
+              "brier": 0.2237,
+              "ci95": [
+                0.2005,
+                0.2468
+              ],
+              "nLegsResolved": 243,
+              "nLegsExcludedPush": 57
+            },
+            "3": {
+              "brier": 0.2538,
+              "ci95": [
+                0.2278,
+                0.2801
+              ],
+              "nLegsResolved": 234,
+              "nLegsExcludedPush": 66
+            },
+            "1.5": {
+              "brier": 0.1844,
+              "ci95": [
+                0.1601,
+                0.2094
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.25": {
+              "brier": 0.246,
+              "ci95": [
+                0.2329,
+                0.2592
+              ],
+              "nLegsResolved": 543,
+              "nLegsExcludedPush": 57
+            },
+            "2.5": {
+              "brier": 0.2633,
+              "ci95": [
+                0.2505,
+                0.277
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.75": {
+              "brier": 0.2591,
+              "ci95": [
+                0.2468,
+                0.2718
+              ],
+              "nLegsResolved": 534,
+              "nLegsExcludedPush": 66
+            },
+            "3.25": {
+              "brier": 0.2334,
+              "ci95": [
+                0.2155,
+                0.2514
+              ],
+              "nLegsResolved": 534,
+              "nLegsExcludedPush": 66
+            },
+            "3.5": {
+              "brier": 0.2178,
+              "ci95": [
+                0.1924,
+                0.2431
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            }
+          },
+          "logLoss": 0.7217,
+          "calibrationSlope": 0.0165,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        }
+      }
+    },
+    {
+      "leagueId": "SCO-PREM",
+      "leagueName": "Premiership",
+      "country": "Scotland",
+      "previousStatus": "SHADOW",
+      "newStatus": "SHADOW",
+      "finalDecision": "REMAIN_SHADOW",
+      "historicalInventory": {
+        "uniquePlayedMatches": 468,
+        "nTrainInitial": 258,
+        "nEvalWalkForward": 210,
+        "minDate": "2024-08-03",
+        "maxDate": "2026-05-25",
+        "ratedTeamsCount": 18,
+        "coldStartTeamsCount": 4,
+        "dispersionRatio": 0.9259,
+        "researchLedgerRows": 12,
+        "liveLedgerRows": 0,
+        "validPreMatchLiveRows": 0,
+        "historicalPinnacleMatchedTotal": 0,
+        "historicalPinnacleMatchedEval": 0,
+        "historicalOpeningClosingAvailable": false,
+        "oddsBookmakerAndProvenance": "NONE: 0 historical opening/closing AH or OU odds in local archives; 0 live Pinnacle pre-match or closing odds captured (OddsPapi quota 260/250 exhausted)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_DATA_INTEGRITY",
+        "OU": "BLOCKED_DATA_INTEGRITY"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "BLOCKED_DATA_QUALITY",
+          "promotionMatrixStatus": "BLOCKED_DATA_INTEGRITY",
+          "shadowValidationEligibility": "BLOCKED_DATA_INTEGRITY",
+          "failingGates": [
+            "DATA_INTEGRITY_STALE_SEASON_COVERAGE (maxHistoricalDate=2026-05-25 < 2026-08-01)",
+            "DATA_INTEGRITY_COLD_START_TEAMS (coldStartTeams=4/18, unratedTeams=2)",
+            "INSUFFICIENT_WALK_FORWARD_SAMPLE (nEval=210 < 300)",
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2425, CI95=[0.2327, 0.2518], beats025=false, LogLoss=0.6779, slope=1.2615)",
+            "MODEL_VALIDATION_AH_QUARTER_LINE_BINARY_CI95_OVERLAPS_025 (ahQtrBinaryBrier=0.2437, CI95=[0.2355, 0.2518])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ahBalancedHalfLineBrier": 0.2425,
+          "ahBalancedHalfLineCi95": [
+            0.2327,
+            0.2518
+          ],
+          "ahBalancedQuarterBinaryNoPushBrier": 0.2437,
+          "ahBalancedQuarterBinaryNoPushCi95": [
+            0.2355,
+            0.2518
+          ],
+          "ahBalancedQuarterFractionalBrierOld": 0.2041,
+          "ahFixedMinus05BrierDiagnostic": 0.2198,
+          "logLoss": 0.6779,
+          "calibrationSlope": 1.2615,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        },
+        "OU": {
+          "readinessState": "BLOCKED_DATA_QUALITY",
+          "promotionMatrixStatus": "BLOCKED_DATA_INTEGRITY",
+          "shadowValidationEligibility": "BLOCKED_DATA_INTEGRITY",
+          "failingGates": [
+            "DATA_INTEGRITY_STALE_SEASON_COVERAGE (maxHistoricalDate=2026-05-25 < 2026-08-01)",
+            "DATA_INTEGRITY_COLD_START_TEAMS (coldStartTeams=4/18, unratedTeams=2)",
+            "INSUFFICIENT_WALK_FORWARD_SAMPLE (nEval=210 < 300)",
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2429, CI95=[0.2299, 0.2569], beats025=false, LogLoss=0.6789, slope=0.8919)",
+            "MODEL_VALIDATION_OU_BALANCED_MULTILINE_CI95_OVERLAPS_025 (ouBalancedBrier=0.2438, CI95=[0.2352, 0.2522])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ou25Brier": 0.2429,
+          "ou25Ci95": [
+            0.2299,
+            0.2569
+          ],
+          "ouBalancedHalfLineBrier": 0.2477,
+          "ouBalancedHalfLineCi95": [
+            0.2365,
+            0.2582
+          ],
+          "ouBalancedQuarterBinaryNoPushBrier": 0.2438,
+          "ouBalancedQuarterBinaryNoPushCi95": [
+            0.2352,
+            0.2522
+          ],
+          "ouByLineBrier": {
+            "2": {
+              "brier": 0.2131,
+              "ci95": [
+                0.1831,
+                0.244
+              ],
+              "nLegsResolved": 162,
+              "nLegsExcludedPush": 48
+            },
+            "3": {
+              "brier": 0.2373,
+              "ci95": [
+                0.2181,
+                0.256
+              ],
+              "nLegsResolved": 157,
+              "nLegsExcludedPush": 53
+            },
+            "1.5": {
+              "brier": 0.1805,
+              "ci95": [
+                0.1492,
+                0.2139
+              ],
+              "nLegsResolved": 210,
+              "nLegsExcludedPush": 0
+            },
+            "2.25": {
+              "brier": 0.23,
+              "ci95": [
+                0.2139,
+                0.2458
+              ],
+              "nLegsResolved": 372,
+              "nLegsExcludedPush": 48
+            },
+            "2.5": {
+              "brier": 0.2429,
+              "ci95": [
+                0.2286,
+                0.2569
+              ],
+              "nLegsResolved": 210,
+              "nLegsExcludedPush": 0
+            },
+            "2.75": {
+              "brier": 0.2404,
+              "ci95": [
+                0.2281,
+                0.2525
+              ],
+              "nLegsResolved": 367,
+              "nLegsExcludedPush": 53
+            },
+            "3.25": {
+              "brier": 0.2264,
+              "ci95": [
+                0.2098,
+                0.2429
+              ],
+              "nLegsResolved": 367,
+              "nLegsExcludedPush": 53
+            },
+            "3.5": {
+              "brier": 0.2179,
+              "ci95": [
+                0.1942,
+                0.2416
+              ],
+              "nLegsResolved": 210,
+              "nLegsExcludedPush": 0
+            }
+          },
+          "logLoss": 0.6789,
+          "calibrationSlope": 0.8919,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        }
+      }
+    },
+    {
+      "leagueId": "ENG-CHAMP",
+      "leagueName": "Championship",
+      "country": "England",
+      "previousStatus": "SHADOW",
+      "newStatus": "SHADOW",
+      "finalDecision": "REMAIN_SHADOW",
+      "historicalInventory": {
+        "uniquePlayedMatches": 1114,
+        "nTrainInitial": 814,
+        "nEvalWalkForward": 300,
+        "minDate": "2024-08-09",
+        "maxDate": "2026-05-23",
+        "ratedTeamsCount": 34,
+        "coldStartTeamsCount": 4,
+        "dispersionRatio": 0.915,
+        "researchLedgerRows": 48,
+        "liveLedgerRows": 0,
+        "validPreMatchLiveRows": 0,
+        "historicalPinnacleMatchedTotal": 0,
+        "historicalPinnacleMatchedEval": 0,
+        "historicalOpeningClosingAvailable": false,
+        "oddsBookmakerAndProvenance": "NONE: 0 historical opening/closing AH or OU odds in local archives; 0 live Pinnacle pre-match or closing odds captured (OddsPapi quota 260/250 exhausted)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_DATA_INTEGRITY",
+        "OU": "BLOCKED_DATA_INTEGRITY"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "BLOCKED_DATA_QUALITY",
+          "promotionMatrixStatus": "BLOCKED_DATA_INTEGRITY",
+          "shadowValidationEligibility": "BLOCKED_DATA_INTEGRITY",
+          "failingGates": [
+            "DATA_INTEGRITY_STALE_SEASON_COVERAGE (maxHistoricalDate=2026-05-23 < 2026-08-01)",
+            "DATA_INTEGRITY_COLD_START_TEAMS (coldStartTeams=4/34, unratedTeams=4)",
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2392, CI95=[0.2311, 0.2483], beats025=true, LogLoss=0.6712, slope=1.2608)",
+            "MODEL_VALIDATION_AH_QUARTER_LINE_BINARY_CI95_OVERLAPS_025 (ahQtrBinaryBrier=0.2493, CI95=[0.2428, 0.2562])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ahBalancedHalfLineBrier": 0.2392,
+          "ahBalancedHalfLineCi95": [
+            0.2311,
+            0.2483
+          ],
+          "ahBalancedQuarterBinaryNoPushBrier": 0.2493,
+          "ahBalancedQuarterBinaryNoPushCi95": [
+            0.2428,
+            0.2562
+          ],
+          "ahBalancedQuarterFractionalBrierOld": 0.2139,
+          "ahFixedMinus05BrierDiagnostic": 0.2243,
+          "logLoss": 0.6712,
+          "calibrationSlope": 1.2608,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        },
+        "OU": {
+          "readinessState": "BLOCKED_DATA_QUALITY",
+          "promotionMatrixStatus": "BLOCKED_DATA_INTEGRITY",
+          "shadowValidationEligibility": "BLOCKED_DATA_INTEGRITY",
+          "failingGates": [
+            "DATA_INTEGRITY_STALE_SEASON_COVERAGE (maxHistoricalDate=2026-05-23 < 2026-08-01)",
+            "DATA_INTEGRITY_COLD_START_TEAMS (coldStartTeams=4/34, unratedTeams=4)",
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2531, CI95=[0.2419, 0.2632], beats025=false, LogLoss=0.7005, slope=0.3603)",
+            "MODEL_VALIDATION_OU_BALANCED_MULTILINE_CI95_OVERLAPS_025 (ouBalancedBrier=0.2445, CI95=[0.2371, 0.2517])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ou25Brier": 0.2531,
+          "ou25Ci95": [
+            0.2419,
+            0.2632
+          ],
+          "ouBalancedHalfLineBrier": 0.2425,
+          "ouBalancedHalfLineCi95": [
+            0.2336,
+            0.2517
+          ],
+          "ouBalancedQuarterBinaryNoPushBrier": 0.2445,
+          "ouBalancedQuarterBinaryNoPushCi95": [
+            0.2371,
+            0.2517
+          ],
+          "ouByLineBrier": {
+            "2": {
+              "brier": 0.2291,
+              "ci95": [
+                0.2091,
+                0.2491
+              ],
+              "nLegsResolved": 229,
+              "nLegsExcludedPush": 71
+            },
+            "3": {
+              "brier": 0.2191,
+              "ci95": [
+                0.1926,
+                0.2456
+              ],
+              "nLegsResolved": 247,
+              "nLegsExcludedPush": 53
+            },
+            "1.5": {
+              "brier": 0.1868,
+              "ci95": [
+                0.1651,
+                0.2086
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.25": {
+              "brier": 0.2429,
+              "ci95": [
+                0.2331,
+                0.2527
+              ],
+              "nLegsResolved": 529,
+              "nLegsExcludedPush": 71
+            },
+            "2.5": {
+              "brier": 0.2531,
+              "ci95": [
+                0.2425,
+                0.2632
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.75": {
+              "brier": 0.2386,
+              "ci95": [
+                0.2268,
+                0.2504
+              ],
+              "nLegsResolved": 547,
+              "nLegsExcludedPush": 53
+            },
+            "3.25": {
+              "brier": 0.1973,
+              "ci95": [
+                0.1794,
+                0.2152
+              ],
+              "nLegsResolved": 547,
+              "nLegsExcludedPush": 53
+            },
+            "3.5": {
+              "brier": 0.1812,
+              "ci95": [
+                0.1562,
+                0.2062
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            }
+          },
+          "logLoss": 0.7005,
+          "calibrationSlope": 0.3603,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        }
+      }
+    },
+    {
+      "leagueId": "USA-MLS",
+      "leagueName": "Major League Soccer",
+      "country": "USA",
+      "previousStatus": "SHADOW",
+      "newStatus": "SHADOW",
+      "finalDecision": "REMAIN_SHADOW",
+      "historicalInventory": {
+        "uniquePlayedMatches": 1975,
+        "nTrainInitial": 1675,
+        "nEvalWalkForward": 300,
+        "minDate": "2023-03-04",
+        "maxDate": "2026-10-07",
+        "ratedTeamsCount": 30,
+        "coldStartTeamsCount": 0,
+        "dispersionRatio": 1.2253,
+        "researchLedgerRows": 60,
+        "liveLedgerRows": 0,
+        "validPreMatchLiveRows": 0,
+        "historicalPinnacleMatchedTotal": 0,
+        "historicalPinnacleMatchedEval": 0,
+        "historicalOpeningClosingAvailable": false,
+        "oddsBookmakerAndProvenance": "NONE: 0 historical opening/closing AH or OU odds in local archives; 0 live Pinnacle pre-match or closing odds captured (OddsPapi quota 260/250 exhausted)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_MODEL_VALIDATION",
+        "OU": "BLOCKED_MODEL_VALIDATION"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "BLOCKED_MODEL_VALIDATION",
+          "promotionMatrixStatus": "BLOCKED_MODEL_VALIDATION",
+          "shadowValidationEligibility": "BLOCKED_MODEL_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_OVERDISPERSION (dispersionRatio=1.2253 > 1.1500)",
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2446, CI95=[0.2364, 0.2527], beats025=false, LogLoss=0.6822, slope=1.0015)",
+            "MODEL_VALIDATION_AH_QUARTER_LINE_BINARY_CI95_OVERLAPS_025 (ahQtrBinaryBrier=0.247, CI95=[0.2403, 0.2544])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ahBalancedHalfLineBrier": 0.2446,
+          "ahBalancedHalfLineCi95": [
+            0.2364,
+            0.2527
+          ],
+          "ahBalancedQuarterBinaryNoPushBrier": 0.247,
+          "ahBalancedQuarterBinaryNoPushCi95": [
+            0.2403,
+            0.2544
+          ],
+          "ahBalancedQuarterFractionalBrierOld": 0.2116,
+          "ahFixedMinus05BrierDiagnostic": 0.2501,
+          "logLoss": 0.6822,
+          "calibrationSlope": 1.0015,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        },
+        "OU": {
+          "readinessState": "BLOCKED_MODEL_VALIDATION",
+          "promotionMatrixStatus": "BLOCKED_MODEL_VALIDATION",
+          "shadowValidationEligibility": "BLOCKED_MODEL_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_OVERDISPERSION (dispersionRatio=1.2253 > 1.1500)",
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2376, CI95=[0.2243, 0.2507], beats025=false, LogLoss=0.6678, slope=0.3425)",
+            "MODEL_VALIDATION_OU_BALANCED_MULTILINE_CI95_OVERLAPS_025 (ouBalancedBrier=0.248, CI95=[0.2415, 0.2552])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ou25Brier": 0.2376,
+          "ou25Ci95": [
+            0.2243,
+            0.2507
+          ],
+          "ouBalancedHalfLineBrier": 0.246,
+          "ouBalancedHalfLineCi95": [
+            0.2379,
+            0.2553
+          ],
+          "ouBalancedQuarterBinaryNoPushBrier": 0.248,
+          "ouBalancedQuarterBinaryNoPushCi95": [
+            0.2415,
+            0.2552
+          ],
+          "ouByLineBrier": {
+            "2": {
+              "brier": 0.1724,
+              "ci95": [
+                0.1458,
+                0.199
+              ],
+              "nLegsResolved": 237,
+              "nLegsExcludedPush": 63
+            },
+            "3": {
+              "brier": 0.2483,
+              "ci95": [
+                0.2323,
+                0.264
+              ],
+              "nLegsResolved": 232,
+              "nLegsExcludedPush": 68
+            },
+            "1.5": {
+              "brier": 0.1433,
+              "ci95": [
+                0.1187,
+                0.1679
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.25": {
+              "brier": 0.2086,
+              "ci95": [
+                0.1938,
+                0.2234
+              ],
+              "nLegsResolved": 537,
+              "nLegsExcludedPush": 63
+            },
+            "2.5": {
+              "brier": 0.2376,
+              "ci95": [
+                0.2243,
+                0.2507
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.75": {
+              "brier": 0.2423,
+              "ci95": [
+                0.2315,
+                0.2527
+              ],
+              "nLegsResolved": 532,
+              "nLegsExcludedPush": 68
+            },
+            "3.25": {
+              "brier": 0.2408,
+              "ci95": [
+                0.2287,
+                0.2529
+              ],
+              "nLegsResolved": 532,
+              "nLegsExcludedPush": 68
+            },
+            "3.5": {
+              "brier": 0.2351,
+              "ci95": [
+                0.2178,
+                0.253
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            }
+          },
+          "logLoss": 0.6678,
+          "calibrationSlope": 0.3425,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        }
+      }
+    },
+    {
+      "leagueId": "SAU-PRO",
+      "leagueName": "Pro League",
+      "country": "Saudi Arabia",
+      "previousStatus": "SHADOW",
+      "newStatus": "SHADOW",
+      "finalDecision": "REMAIN_SHADOW",
+      "historicalInventory": {
+        "uniquePlayedMatches": 1076,
+        "nTrainInitial": 776,
+        "nEvalWalkForward": 300,
+        "minDate": "2023-03-03",
+        "maxDate": "2026-09-13",
+        "ratedTeamsCount": 27,
+        "coldStartTeamsCount": 2,
+        "dispersionRatio": 1.0118,
+        "researchLedgerRows": 26,
+        "liveLedgerRows": 0,
+        "validPreMatchLiveRows": 0,
+        "historicalPinnacleMatchedTotal": 0,
+        "historicalPinnacleMatchedEval": 0,
+        "historicalOpeningClosingAvailable": false,
+        "oddsBookmakerAndProvenance": "NONE: 0 historical opening/closing AH or OU odds in local archives; 0 live Pinnacle pre-match or closing odds captured (OddsPapi quota 260/250 exhausted)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_MODEL_VALIDATION",
+        "OU": "BLOCKED_MODEL_VALIDATION"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "BLOCKED_MODEL_VALIDATION",
+          "promotionMatrixStatus": "BLOCKED_MODEL_VALIDATION",
+          "shadowValidationEligibility": "BLOCKED_MODEL_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2432, CI95=[0.2347, 0.2513], beats025=false, LogLoss=0.6795, slope=1.0639)",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ahBalancedHalfLineBrier": 0.2432,
+          "ahBalancedHalfLineCi95": [
+            0.2347,
+            0.2513
+          ],
+          "ahBalancedQuarterBinaryNoPushBrier": 0.2406,
+          "ahBalancedQuarterBinaryNoPushCi95": [
+            0.2337,
+            0.248
+          ],
+          "ahBalancedQuarterFractionalBrierOld": 0.212,
+          "ahFixedMinus05BrierDiagnostic": 0.1954,
+          "logLoss": 0.6795,
+          "calibrationSlope": 1.0639,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        },
+        "OU": {
+          "readinessState": "BLOCKED_MODEL_VALIDATION",
+          "promotionMatrixStatus": "BLOCKED_MODEL_VALIDATION",
+          "shadowValidationEligibility": "BLOCKED_MODEL_VALIDATION",
+          "failingGates": [
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2549, CI95=[0.2427, 0.2683], beats025=false, LogLoss=0.7028, slope=0.1726)",
+            "MODEL_VALIDATION_OU_BALANCED_MULTILINE_CI95_OVERLAPS_025 (ouBalancedBrier=0.2481, CI95=[0.2413, 0.2552])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ou25Brier": 0.2549,
+          "ou25Ci95": [
+            0.2427,
+            0.2683
+          ],
+          "ouBalancedHalfLineBrier": 0.2498,
+          "ouBalancedHalfLineCi95": [
+            0.2407,
+            0.2589
+          ],
+          "ouBalancedQuarterBinaryNoPushBrier": 0.2481,
+          "ouBalancedQuarterBinaryNoPushCi95": [
+            0.2413,
+            0.2552
+          ],
+          "ouByLineBrier": {
+            "2": {
+              "brier": 0.2158,
+              "ci95": [
+                0.1883,
+                0.2422
+              ],
+              "nLegsResolved": 231,
+              "nLegsExcludedPush": 69
+            },
+            "3": {
+              "brier": 0.2528,
+              "ci95": [
+                0.2349,
+                0.2707
+              ],
+              "nLegsResolved": 242,
+              "nLegsExcludedPush": 58
+            },
+            "1.5": {
+              "brier": 0.1774,
+              "ci95": [
+                0.1515,
+                0.2058
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.25": {
+              "brier": 0.2379,
+              "ci95": [
+                0.2238,
+                0.2528
+              ],
+              "nLegsResolved": 531,
+              "nLegsExcludedPush": 69
+            },
+            "2.5": {
+              "brier": 0.2549,
+              "ci95": [
+                0.2412,
+                0.2683
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.75": {
+              "brier": 0.254,
+              "ci95": [
+                0.2432,
+                0.2644
+              ],
+              "nLegsResolved": 542,
+              "nLegsExcludedPush": 58
+            },
+            "3.25": {
+              "brier": 0.2413,
+              "ci95": [
+                0.2281,
+                0.2559
+              ],
+              "nLegsResolved": 542,
+              "nLegsExcludedPush": 58
+            },
+            "3.5": {
+              "brier": 0.232,
+              "ci95": [
+                0.211,
+                0.2531
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            }
+          },
+          "logLoss": 0.7028,
+          "calibrationSlope": 0.1726,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        }
+      }
+    },
+    {
+      "leagueId": "JPN-J1",
+      "leagueName": "J1 League",
+      "country": "Japan",
+      "previousStatus": "SHADOW",
+      "newStatus": "SHADOW",
+      "finalDecision": "REMAIN_SHADOW",
+      "historicalInventory": {
+        "uniquePlayedMatches": 760,
+        "nTrainInitial": 460,
+        "nEvalWalkForward": 300,
+        "minDate": "2024-02-23",
+        "maxDate": "2025-12-06",
+        "ratedTeamsCount": 26,
+        "coldStartTeamsCount": 3,
+        "dispersionRatio": 1.1264,
+        "researchLedgerRows": 16,
+        "liveLedgerRows": 0,
+        "validPreMatchLiveRows": 0,
+        "historicalPinnacleMatchedTotal": 0,
+        "historicalPinnacleMatchedEval": 0,
+        "historicalOpeningClosingAvailable": false,
+        "oddsBookmakerAndProvenance": "NONE: 0 historical opening/closing AH or OU odds in local archives; 0 live Pinnacle pre-match or closing odds captured (OddsPapi quota 260/250 exhausted)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_DATA_INTEGRITY",
+        "OU": "BLOCKED_DATA_INTEGRITY"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "BLOCKED_COLD_START",
+          "promotionMatrixStatus": "BLOCKED_DATA_INTEGRITY",
+          "shadowValidationEligibility": "BLOCKED_DATA_INTEGRITY",
+          "failingGates": [
+            "DATA_INTEGRITY_STALE_SEASON_COVERAGE (maxHistoricalDate=2025-12-06 < 2026-08-01)",
+            "DATA_INTEGRITY_COLD_START_TEAMS (coldStartTeams=3/26, unratedTeams=3)",
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2452, CI95=[0.2362, 0.2551], beats025=false, LogLoss=0.6832, slope=0.8727)",
+            "MODEL_VALIDATION_AH_QUARTER_LINE_BINARY_CI95_OVERLAPS_025 (ahQtrBinaryBrier=0.2491, CI95=[0.2423, 0.2564])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ahBalancedHalfLineBrier": 0.2452,
+          "ahBalancedHalfLineCi95": [
+            0.2362,
+            0.2551
+          ],
+          "ahBalancedQuarterBinaryNoPushBrier": 0.2491,
+          "ahBalancedQuarterBinaryNoPushCi95": [
+            0.2423,
+            0.2564
+          ],
+          "ahBalancedQuarterFractionalBrierOld": 0.2178,
+          "ahFixedMinus05BrierDiagnostic": 0.232,
+          "logLoss": 0.6832,
+          "calibrationSlope": 0.8727,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        },
+        "OU": {
+          "readinessState": "BLOCKED_COLD_START",
+          "promotionMatrixStatus": "BLOCKED_DATA_INTEGRITY",
+          "shadowValidationEligibility": "BLOCKED_DATA_INTEGRITY",
+          "failingGates": [
+            "DATA_INTEGRITY_STALE_SEASON_COVERAGE (maxHistoricalDate=2025-12-06 < 2026-08-01)",
+            "DATA_INTEGRITY_COLD_START_TEAMS (coldStartTeams=3/26, unratedTeams=3)",
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2436, CI95=[0.2304, 0.2582], beats025=false, LogLoss=0.6809, slope=0.8172)",
+            "MODEL_VALIDATION_OU_BALANCED_MULTILINE_CI95_OVERLAPS_025 (ouBalancedBrier=0.2479, CI95=[0.24, 0.2554])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ou25Brier": 0.2436,
+          "ou25Ci95": [
+            0.2304,
+            0.2582
+          ],
+          "ouBalancedHalfLineBrier": 0.2453,
+          "ouBalancedHalfLineCi95": [
+            0.2358,
+            0.2553
+          ],
+          "ouBalancedQuarterBinaryNoPushBrier": 0.2479,
+          "ouBalancedQuarterBinaryNoPushCi95": [
+            0.24,
+            0.2554
+          ],
+          "ouByLineBrier": {
+            "2": {
+              "brier": 0.2282,
+              "ci95": [
+                0.213,
+                0.2449
+              ],
+              "nLegsResolved": 244,
+              "nLegsExcludedPush": 56
+            },
+            "3": {
+              "brier": 0.2061,
+              "ci95": [
+                0.1792,
+                0.2345
+              ],
+              "nLegsResolved": 226,
+              "nLegsExcludedPush": 74
+            },
+            "1.5": {
+              "brier": 0.2137,
+              "ci95": [
+                0.1935,
+                0.2336
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.25": {
+              "brier": 0.2367,
+              "ci95": [
+                0.2257,
+                0.2477
+              ],
+              "nLegsResolved": 544,
+              "nLegsExcludedPush": 56
+            },
+            "2.5": {
+              "brier": 0.2436,
+              "ci95": [
+                0.2292,
+                0.2582
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            },
+            "2.75": {
+              "brier": 0.2275,
+              "ci95": [
+                0.2138,
+                0.2415
+              ],
+              "nLegsResolved": 526,
+              "nLegsExcludedPush": 74
+            },
+            "3.25": {
+              "brier": 0.189,
+              "ci95": [
+                0.1704,
+                0.2075
+              ],
+              "nLegsResolved": 526,
+              "nLegsExcludedPush": 74
+            },
+            "3.5": {
+              "brier": 0.176,
+              "ci95": [
+                0.1519,
+                0.202
+              ],
+              "nLegsResolved": 300,
+              "nLegsExcludedPush": 0
+            }
+          },
+          "logLoss": 0.6809,
+          "calibrationSlope": 0.8172,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        }
+      }
+    },
+    {
+      "leagueId": "KOR-K1",
+      "leagueName": "K League 1",
+      "country": "South Korea",
+      "previousStatus": "SHADOW",
+      "newStatus": "SHADOW",
+      "finalDecision": "REMAIN_SHADOW",
+      "historicalInventory": {
+        "uniquePlayedMatches": 464,
+        "nTrainInitial": 256,
+        "nEvalWalkForward": 208,
+        "minDate": "2024-03-01",
+        "maxDate": "2025-12-08",
+        "ratedTeamsCount": 17,
+        "coldStartTeamsCount": 4,
+        "dispersionRatio": 1.0121,
+        "researchLedgerRows": 6,
+        "liveLedgerRows": 0,
+        "validPreMatchLiveRows": 0,
+        "historicalPinnacleMatchedTotal": 0,
+        "historicalPinnacleMatchedEval": 0,
+        "historicalOpeningClosingAvailable": false,
+        "oddsBookmakerAndProvenance": "NONE: 0 historical opening/closing AH or OU odds in local archives; 0 live Pinnacle pre-match or closing odds captured (OddsPapi quota 260/250 exhausted)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_DATA_INTEGRITY",
+        "OU": "BLOCKED_DATA_INTEGRITY"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "BLOCKED_COLD_START",
+          "promotionMatrixStatus": "BLOCKED_DATA_INTEGRITY",
+          "shadowValidationEligibility": "BLOCKED_DATA_INTEGRITY",
+          "failingGates": [
+            "DATA_INTEGRITY_STALE_SEASON_COVERAGE (maxHistoricalDate=2025-12-08 < 2026-08-01)",
+            "DATA_INTEGRITY_COLD_START_TEAMS (coldStartTeams=4/17, unratedTeams=4)",
+            "INSUFFICIENT_WALK_FORWARD_SAMPLE (nEval=208 < 300)",
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2469, CI95=[0.2367, 0.2572], beats025=false, LogLoss=0.6869, slope=0.7885)",
+            "MODEL_VALIDATION_AH_QUARTER_LINE_BINARY_CI95_OVERLAPS_025 (ahQtrBinaryBrier=0.2491, CI95=[0.2407, 0.2571])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ahBalancedHalfLineBrier": 0.2469,
+          "ahBalancedHalfLineCi95": [
+            0.2367,
+            0.2572
+          ],
+          "ahBalancedQuarterBinaryNoPushBrier": 0.2491,
+          "ahBalancedQuarterBinaryNoPushCi95": [
+            0.2407,
+            0.2571
+          ],
+          "ahBalancedQuarterFractionalBrierOld": 0.2135,
+          "ahFixedMinus05BrierDiagnostic": 0.2367,
+          "logLoss": 0.6869,
+          "calibrationSlope": 0.7885,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        },
+        "OU": {
+          "readinessState": "BLOCKED_COLD_START",
+          "promotionMatrixStatus": "BLOCKED_DATA_INTEGRITY",
+          "shadowValidationEligibility": "BLOCKED_DATA_INTEGRITY",
+          "failingGates": [
+            "DATA_INTEGRITY_STALE_SEASON_COVERAGE (maxHistoricalDate=2025-12-08 < 2026-08-01)",
+            "DATA_INTEGRITY_COLD_START_TEAMS (coldStartTeams=4/17, unratedTeams=4)",
+            "INSUFFICIENT_WALK_FORWARD_SAMPLE (nEval=208 < 300)",
+            "MODEL_VALIDATION_WALK_FORWARD_GATE_FAILED (Brier=0.2485, CI95=[0.2359, 0.2605], beats025=false, LogLoss=0.6909, slope=0.5756)",
+            "MODEL_VALIDATION_OU_BALANCED_MULTILINE_CI95_OVERLAPS_025 (ouBalancedBrier=0.2474, CI95=[0.2388, 0.2558])",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)",
+            "MISSING_PINNACLE_CLOSING_CLV_SAMPLE (nClv=0/100)",
+            "MISSING_LIVE_PINNACLE_MARKET_ODDS (liveFixturesWithOdds=0)",
+            "OPERATIONAL_RISK_ODDSPAPI_QUOTA_UNAVAILABLE"
+          ],
+          "ou25Brier": 0.2485,
+          "ou25Ci95": [
+            0.2359,
+            0.2605
+          ],
+          "ouBalancedHalfLineBrier": 0.2423,
+          "ouBalancedHalfLineCi95": [
+            0.2314,
+            0.2529
+          ],
+          "ouBalancedQuarterBinaryNoPushBrier": 0.2474,
+          "ouBalancedQuarterBinaryNoPushCi95": [
+            0.2388,
+            0.2558
+          ],
+          "ouByLineBrier": {
+            "2": {
+              "brier": 0.2285,
+              "ci95": [
+                0.2081,
+                0.2503
+              ],
+              "nLegsResolved": 159,
+              "nLegsExcludedPush": 49
+            },
+            "3": {
+              "brier": 0.2298,
+              "ci95": [
+                0.2006,
+                0.2587
+              ],
+              "nLegsResolved": 167,
+              "nLegsExcludedPush": 41
+            },
+            "1.5": {
+              "brier": 0.2013,
+              "ci95": [
+                0.1749,
+                0.2285
+              ],
+              "nLegsResolved": 208,
+              "nLegsExcludedPush": 0
+            },
+            "2.25": {
+              "brier": 0.2398,
+              "ci95": [
+                0.2286,
+                0.2513
+              ],
+              "nLegsResolved": 367,
+              "nLegsExcludedPush": 49
+            },
+            "2.5": {
+              "brier": 0.2485,
+              "ci95": [
+                0.2359,
+                0.2605
+              ],
+              "nLegsResolved": 208,
+              "nLegsExcludedPush": 0
+            },
+            "2.75": {
+              "brier": 0.2402,
+              "ci95": [
+                0.2256,
+                0.2548
+              ],
+              "nLegsResolved": 375,
+              "nLegsExcludedPush": 41
+            },
+            "3.25": {
+              "brier": 0.2155,
+              "ci95": [
+                0.193,
+                0.2374
+              ],
+              "nLegsResolved": 375,
+              "nLegsExcludedPush": 41
+            },
+            "3.5": {
+              "brier": 0.2041,
+              "ci95": [
+                0.1717,
+                0.2349
+              ],
+              "nLegsResolved": 208,
+              "nLegsExcludedPush": 0
+            }
+          },
+          "logLoss": 0.6909,
+          "calibrationSlope": 0.5756,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        }
+      }
+    },
+    {
+      "leagueId": "IDN-L1",
+      "leagueName": "Liga 1",
+      "country": "Indonesia",
+      "previousStatus": "PAUSED",
+      "newStatus": "PAUSED",
+      "finalDecision": "REMAIN_PAUSED",
+      "historicalInventory": {
+        "uniquePlayedMatches": 0,
+        "nTrainInitial": 0,
+        "nEvalWalkForward": 0,
+        "minDate": null,
+        "maxDate": null,
+        "ratedTeamsCount": 0,
+        "coldStartTeamsCount": 0,
+        "dispersionRatio": null,
+        "researchLedgerRows": 22,
+        "liveLedgerRows": 0,
+        "validPreMatchLiveRows": 0,
+        "historicalPinnacleMatchedTotal": 0,
+        "historicalPinnacleMatchedEval": 0,
+        "historicalOpeningClosingAvailable": false,
+        "oddsBookmakerAndProvenance": "NONE: 0 historical opening/closing AH or OU odds in local archives; 0 live Pinnacle pre-match or closing odds captured (OddsPapi quota 260/250 exhausted)"
+      },
+      "promotionMatrixClassification": {
+        "AH": "BLOCKED_DATA_INTEGRITY",
+        "OU": "BLOCKED_DATA_INTEGRITY"
+      },
+      "markets": {
+        "AH": {
+          "readinessState": "PAUSED_MISSING_BASELINE",
+          "promotionMatrixStatus": "BLOCKED_DATA_INTEGRITY",
+          "shadowValidationEligibility": "BLOCKED_DATA_INTEGRITY",
+          "failingGates": [
+            "DATA_INTEGRITY_MISSING_HISTORICAL_BASELINE (historicalMatches=0, ratedTeams=0)",
+            "INSUFFICIENT_WALK_FORWARD_SAMPLE (nEval=0 < 300)",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)"
+          ],
+          "ahBalancedHalfLineBrier": null,
+          "ahBalancedHalfLineCi95": null,
+          "ahBalancedQuarterBinaryNoPushBrier": null,
+          "ahBalancedQuarterBinaryNoPushCi95": null,
+          "ahBalancedQuarterFractionalBrierOld": null,
+          "ahFixedMinus05BrierDiagnostic": null,
+          "logLoss": null,
+          "calibrationSlope": null,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        },
+        "OU": {
+          "readinessState": "PAUSED_MISSING_BASELINE",
+          "promotionMatrixStatus": "BLOCKED_DATA_INTEGRITY",
+          "shadowValidationEligibility": "BLOCKED_DATA_INTEGRITY",
+          "failingGates": [
+            "DATA_INTEGRITY_MISSING_HISTORICAL_BASELINE (historicalMatches=0, ratedTeams=0)",
+            "INSUFFICIENT_WALK_FORWARD_SAMPLE (nEval=0 < 300)",
+            "MISSING_HISTORICAL_PINNACLE_BENCHMARK_ODDS (matchedFixtures=0/300)"
+          ],
+          "ou25Brier": null,
+          "ou25Ci95": null,
+          "ouBalancedHalfLineBrier": null,
+          "ouBalancedHalfLineCi95": null,
+          "ouBalancedQuarterBinaryNoPushBrier": null,
+          "ouBalancedQuarterBinaryNoPushCi95": null,
+          "ouByLineBrier": null,
+          "logLoss": null,
+          "calibrationSlope": null,
+          "pinnacleBenchmarkMatchedFixtures": 0
+        }
+      }
+    }
+  ]
+}

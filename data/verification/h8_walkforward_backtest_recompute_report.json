@@ -1,0 +1,4406 @@
+{
+  "generatedAtUtc": "2026-10-12T13:21:15.674Z",
+  "readOnlyInvariant": {
+    "artifactPath": "data/artifacts/multi_league_team_ratings_v1.0.json",
+    "sha256Before": "53466f88ae63f5246f8756f8873f71c472669b0912f09979cfc5e77b82050984",
+    "sha256After": "53466f88ae63f5246f8756f8873f71c472669b0912f09979cfc5e77b82050984",
+    "mutated": false,
+    "existingArtifactVersion": "multi-league-ratings-v2.1-hardened"
+  },
+  "chronologicalWalkForwardGlobalProof": {
+    "totalLeaguesWithData": 14,
+    "totalEvaluatedMatches": 4018,
+    "totalRefitsVerified": 162,
+    "totalChronologicalViolations": 0,
+    "invariantRule": "For every evaluated match m[idx] and every training match x in cachedFit: kickoff(x) <= lastRefitCutoffMs < kickoff(m[idx])",
+    "allMatchesStrictlyPriorVerified": true
+  },
+  "promotionGateFlipSummary": {
+    "totalQuarterLineAhFlips": 11,
+    "flips": [
+      {
+        "leagueId": "ENG-PL",
+        "market": "AH (Balanced Quarter-Line vs 0.2500 Gate)",
+        "oldFractionalBrier": 0.2097,
+        "oldFractionalCi95": [
+          0.2003,
+          0.2187
+        ],
+        "oldPointGatePassLt025": true,
+        "oldCi95UpperPassLt025": true,
+        "newBinaryNoPushLegBrier": 0.2435,
+        "newBinaryNoPushStakeWeightedBrier": 0.2441,
+        "newBinaryNoPushCi95": [
+          0.2367,
+          0.25
+        ],
+        "newPointGatePassLt025": true,
+        "newCi95UpperPassLt025": false,
+        "flipSummary": "Old fractional Brier 0.2097 [0.2003, 0.2187] (point<0.25=true, ci95Upper<0.25=true) -> New binary no-push leg Brier 0.2435 [0.2367, 0.25] (point<0.25=true, ci95Upper<0.25=false)"
+      },
+      {
+        "leagueId": "ESP-LALIGA",
+        "market": "AH (Balanced Quarter-Line vs 0.2500 Gate)",
+        "oldFractionalBrier": 0.2033,
+        "oldFractionalCi95": [
+          0.1921,
+          0.2138
+        ],
+        "oldPointGatePassLt025": true,
+        "oldCi95UpperPassLt025": true,
+        "newBinaryNoPushLegBrier": 0.2476,
+        "newBinaryNoPushStakeWeightedBrier": 0.2482,
+        "newBinaryNoPushCi95": [
+          0.2409,
+          0.2547
+        ],
+        "newPointGatePassLt025": true,
+        "newCi95UpperPassLt025": false,
+        "flipSummary": "Old fractional Brier 0.2033 [0.1921, 0.2138] (point<0.25=true, ci95Upper<0.25=true) -> New binary no-push leg Brier 0.2476 [0.2409, 0.2547] (point<0.25=true, ci95Upper<0.25=false)"
+      },
+      {
+        "leagueId": "ITA-SERIEA",
+        "market": "AH (Balanced Quarter-Line vs 0.2500 Gate)",
+        "oldFractionalBrier": 0.2071,
+        "oldFractionalCi95": [
+          0.1972,
+          0.217
+        ],
+        "oldPointGatePassLt025": true,
+        "oldCi95UpperPassLt025": true,
+        "newBinaryNoPushLegBrier": 0.2462,
+        "newBinaryNoPushStakeWeightedBrier": 0.2474,
+        "newBinaryNoPushCi95": [
+          0.2391,
+          0.2522
+        ],
+        "newPointGatePassLt025": true,
+        "newCi95UpperPassLt025": false,
+        "flipSummary": "Old fractional Brier 0.2071 [0.1972, 0.217] (point<0.25=true, ci95Upper<0.25=true) -> New binary no-push leg Brier 0.2462 [0.2391, 0.2522] (point<0.25=true, ci95Upper<0.25=false)"
+      },
+      {
+        "leagueId": "NED-ERE",
+        "market": "AH (Balanced Quarter-Line vs 0.2500 Gate)",
+        "oldFractionalBrier": 0.2178,
+        "oldFractionalCi95": [
+          0.2082,
+          0.227
+        ],
+        "oldPointGatePassLt025": true,
+        "oldCi95UpperPassLt025": true,
+        "newBinaryNoPushLegBrier": 0.2495,
+        "newBinaryNoPushStakeWeightedBrier": 0.2498,
+        "newBinaryNoPushCi95": [
+          0.2436,
+          0.2555
+        ],
+        "newPointGatePassLt025": true,
+        "newCi95UpperPassLt025": false,
+        "flipSummary": "Old fractional Brier 0.2178 [0.2082, 0.227] (point<0.25=true, ci95Upper<0.25=true) -> New binary no-push leg Brier 0.2495 [0.2436, 0.2555] (point<0.25=true, ci95Upper<0.25=false)"
+      },
+      {
+        "leagueId": "BEL-PRO",
+        "market": "AH (Balanced Quarter-Line vs 0.2500 Gate)",
+        "oldFractionalBrier": 0.2027,
+        "oldFractionalCi95": [
+          0.1918,
+          0.2125
+        ],
+        "oldPointGatePassLt025": true,
+        "oldCi95UpperPassLt025": true,
+        "newBinaryNoPushLegBrier": 0.244,
+        "newBinaryNoPushStakeWeightedBrier": 0.2449,
+        "newBinaryNoPushCi95": [
+          0.237,
+          0.2517
+        ],
+        "newPointGatePassLt025": true,
+        "newCi95UpperPassLt025": false,
+        "flipSummary": "Old fractional Brier 0.2027 [0.1918, 0.2125] (point<0.25=true, ci95Upper<0.25=true) -> New binary no-push leg Brier 0.244 [0.237, 0.2517] (point<0.25=true, ci95Upper<0.25=false)"
+      },
+      {
+        "leagueId": "SCO-PREM",
+        "market": "AH (Balanced Quarter-Line vs 0.2500 Gate)",
+        "oldFractionalBrier": 0.2052,
+        "oldFractionalCi95": [
+          0.1931,
+          0.2166
+        ],
+        "oldPointGatePassLt025": true,
+        "oldCi95UpperPassLt025": true,
+        "newBinaryNoPushLegBrier": 0.2432,
+        "newBinaryNoPushStakeWeightedBrier": 0.2451,
+        "newBinaryNoPushCi95": [
+          0.2363,
+          0.2506
+        ],
+        "newPointGatePassLt025": true,
+        "newCi95UpperPassLt025": false,
+        "flipSummary": "Old fractional Brier 0.2052 [0.1931, 0.2166] (point<0.25=true, ci95Upper<0.25=true) -> New binary no-push leg Brier 0.2432 [0.2363, 0.2506] (point<0.25=true, ci95Upper<0.25=false)"
+      },
+      {
+        "leagueId": "ENG-CHAMP",
+        "market": "AH (Balanced Quarter-Line vs 0.2500 Gate)",
+        "oldFractionalBrier": 0.2099,
+        "oldFractionalCi95": [
+          0.2008,
+          0.2191
+        ],
+        "oldPointGatePassLt025": true,
+        "oldCi95UpperPassLt025": true,
+        "newBinaryNoPushLegBrier": 0.2443,
+        "newBinaryNoPushStakeWeightedBrier": 0.245,
+        "newBinaryNoPushCi95": [
+          0.2378,
+          0.2512
+        ],
+        "newPointGatePassLt025": true,
+        "newCi95UpperPassLt025": false,
+        "flipSummary": "Old fractional Brier 0.2099 [0.2008, 0.2191] (point<0.25=true, ci95Upper<0.25=true) -> New binary no-push leg Brier 0.2443 [0.2378, 0.2512] (point<0.25=true, ci95Upper<0.25=false)"
+      },
+      {
+        "leagueId": "USA-MLS",
+        "market": "AH (Balanced Quarter-Line vs 0.2500 Gate)",
+        "oldFractionalBrier": 0.2076,
+        "oldFractionalCi95": [
+          0.1973,
+          0.2169
+        ],
+        "oldPointGatePassLt025": true,
+        "oldCi95UpperPassLt025": true,
+        "newBinaryNoPushLegBrier": 0.2456,
+        "newBinaryNoPushStakeWeightedBrier": 0.2463,
+        "newBinaryNoPushCi95": [
+          0.2397,
+          0.2516
+        ],
+        "newPointGatePassLt025": true,
+        "newCi95UpperPassLt025": false,
+        "flipSummary": "Old fractional Brier 0.2076 [0.1973, 0.2169] (point<0.25=true, ci95Upper<0.25=true) -> New binary no-push leg Brier 0.2456 [0.2397, 0.2516] (point<0.25=true, ci95Upper<0.25=false)"
+      },
+      {
+        "leagueId": "SAU-PRO",
+        "market": "AH (Balanced Quarter-Line vs 0.2500 Gate)",
+        "oldFractionalBrier": 0.212,
+        "oldFractionalCi95": [
+          0.2011,
+          0.2214
+        ],
+        "oldPointGatePassLt025": true,
+        "oldCi95UpperPassLt025": true,
+        "newBinaryNoPushLegBrier": 0.2448,
+        "newBinaryNoPushStakeWeightedBrier": 0.2464,
+        "newBinaryNoPushCi95": [
+          0.2386,
+          0.2517
+        ],
+        "newPointGatePassLt025": true,
+        "newCi95UpperPassLt025": false,
+        "flipSummary": "Old fractional Brier 0.212 [0.2011, 0.2214] (point<0.25=true, ci95Upper<0.25=true) -> New binary no-push leg Brier 0.2448 [0.2386, 0.2517] (point<0.25=true, ci95Upper<0.25=false)"
+      },
+      {
+        "leagueId": "JPN-J1",
+        "market": "AH (Balanced Quarter-Line vs 0.2500 Gate)",
+        "oldFractionalBrier": 0.2026,
+        "oldFractionalCi95": [
+          0.1912,
+          0.2135
+        ],
+        "oldPointGatePassLt025": true,
+        "oldCi95UpperPassLt025": true,
+        "newBinaryNoPushLegBrier": 0.2439,
+        "newBinaryNoPushStakeWeightedBrier": 0.2455,
+        "newBinaryNoPushCi95": [
+          0.2372,
+          0.2509
+        ],
+        "newPointGatePassLt025": true,
+        "newCi95UpperPassLt025": false,
+        "flipSummary": "Old fractional Brier 0.2026 [0.1912, 0.2135] (point<0.25=true, ci95Upper<0.25=true) -> New binary no-push leg Brier 0.2439 [0.2372, 0.2509] (point<0.25=true, ci95Upper<0.25=false)"
+      },
+      {
+        "leagueId": "KOR-K1",
+        "market": "AH (Balanced Quarter-Line vs 0.2500 Gate)",
+        "oldFractionalBrier": 0.2075,
+        "oldFractionalCi95": [
+          0.196,
+          0.2187
+        ],
+        "oldPointGatePassLt025": true,
+        "oldCi95UpperPassLt025": true,
+        "newBinaryNoPushLegBrier": 0.2426,
+        "newBinaryNoPushStakeWeightedBrier": 0.2445,
+        "newBinaryNoPushCi95": [
+          0.2347,
+          0.2505
+        ],
+        "newPointGatePassLt025": true,
+        "newCi95UpperPassLt025": false,
+        "flipSummary": "Old fractional Brier 0.2075 [0.196, 0.2187] (point<0.25=true, ci95Upper<0.25=true) -> New binary no-push leg Brier 0.2426 [0.2347, 0.2505] (point<0.25=true, ci95Upper<0.25=false)"
+      }
+    ]
+  },
+  "perLeagueResults": {
+    "ENG-PL": {
+      "leagueId": "ENG-PL",
+      "nTotalMatches": 1329,
+      "nTrainInitial": 1029,
+      "nEvalMatches": 300,
+      "chronologicalProof": {
+        "strictOrderingVerified": true,
+        "chronologicalViolationsCount": 0,
+        "refitsExecutedCount": 12,
+        "minPositiveLeadTimeMinutes": 150,
+        "sampleRefitAuditTrail": [
+          {
+            "evalMatchIndex": 1029,
+            "evalMatchId": "2huqn7q2qf5wv5w6t7zntjh1w",
+            "evalKickoffUtc": "2025-12-02T19:30:00.000Z",
+            "trainMatchesCount": 1029,
+            "maxTrainKickoffUtc": "2025-11-30T16:30:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 1054,
+            "evalMatchId": "2rtvt6opul8reok9mj5nwtafo",
+            "evalKickoffUtc": "2025-12-14T14:00:00.000Z",
+            "trainMatchesCount": 1053,
+            "maxTrainKickoffUtc": "2025-12-13T20:00:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 1079,
+            "evalMatchId": "3388syfjeclm4i0tu0eonmk2c",
+            "evalKickoffUtc": "2025-12-30T19:30:00.000Z",
+            "trainMatchesCount": 1079,
+            "maxTrainKickoffUtc": "2025-12-28T16:30:00.000Z",
+            "strictlyPriorVerified": true
+          }
+        ]
+      },
+      "ah": {
+        "oldFixedMinus05": {
+          "brier": 0.2189,
+          "brierCi95": [
+            0.202,
+            0.2356
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2356,
+          "beatsConstant05At95Ci": true
+        },
+        "oldBalancedQuarterFractional": {
+          "brier": 0.2097,
+          "brierCi95": [
+            0.2003,
+            0.2187
+          ],
+          "constant05Brier": 0.2127,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "newBalancedQuarterBinaryNoPushPerLeg": {
+          "nLegsTotal": 461,
+          "nLegsResolved": 406,
+          "nLegsExcludedPush": 55,
+          "brierUnweightedLegMean": 0.2435,
+          "brierStakeWeightedMean": 0.2441,
+          "brierCi95": [
+            0.2367,
+            0.25
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2414,
+          "brierCi95": [
+            0.2329,
+            0.2497
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": true,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        }
+      },
+      "ou25": {
+        "nMatchesResolved": 300,
+        "oldBrier": 0.2605,
+        "newBinaryNoPushBrier": 0.2605,
+        "brierCi95": [
+          0.25,
+          0.2726
+        ],
+        "constant05Brier": 0.25,
+        "beatsConstant05At95Ci": false,
+        "pointPassLt025": false,
+        "ci95PassLt025": false
+      },
+      "ouMultiLine": {
+        "linesEvaluated": [
+          1.5,
+          2,
+          2.25,
+          2.5,
+          2.75,
+          3,
+          3.25,
+          3.5
+        ],
+        "byLine": {
+          "2": {
+            "line": 2,
+            "nLegsTotal": 300,
+            "nLegsResolved": 230,
+            "nLegsExcludedPush": 70,
+            "brierUnweightedLegMean": 0.2188,
+            "brierStakeWeightedMean": 0.2188,
+            "brierCi95": [
+              0.1923,
+              0.2467
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.21,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3": {
+            "line": 3,
+            "nLegsTotal": 300,
+            "nLegsResolved": 227,
+            "nLegsExcludedPush": 73,
+            "brierUnweightedLegMean": 0.2522,
+            "brierStakeWeightedMean": 0.2522,
+            "brierCi95": [
+              0.2356,
+              0.2682
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2374,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": false,
+            "ci95PassLt025": false
+          },
+          "1.5": {
+            "line": 1.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.181,
+            "brierStakeWeightedMean": 0.181,
+            "brierCi95": [
+              0.1557,
+              0.2089
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1771,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.25": {
+            "line": 2.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 530,
+            "nLegsExcludedPush": 70,
+            "brierUnweightedLegMean": 0.2424,
+            "brierStakeWeightedMean": 0.2424,
+            "brierCi95": [
+              0.2294,
+              0.2555
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2384,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "2.5": {
+            "line": 2.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2605,
+            "brierStakeWeightedMean": 0.2605,
+            "brierCi95": [
+              0.25,
+              0.2726
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2487,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": false,
+            "ci95PassLt025": false
+          },
+          "2.75": {
+            "line": 2.75,
+            "nLegsTotal": 600,
+            "nLegsResolved": 527,
+            "nLegsExcludedPush": 73,
+            "brierUnweightedLegMean": 0.2569,
+            "brierStakeWeightedMean": 0.2569,
+            "brierCi95": [
+              0.2476,
+              0.2664
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2492,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": false,
+            "ci95PassLt025": false
+          },
+          "3.25": {
+            "line": 3.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 527,
+            "nLegsExcludedPush": 73,
+            "brierUnweightedLegMean": 0.2305,
+            "brierStakeWeightedMean": 0.2305,
+            "brierCi95": [
+              0.2166,
+              0.2432
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2224,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3.5": {
+            "line": 3.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.214,
+            "brierStakeWeightedMean": 0.214,
+            "brierCi95": [
+              0.1949,
+              0.2341
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2073,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          }
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2407,
+          "brierCi95": [
+            0.2332,
+            0.2484
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2491,
+          "beatsConstant05At95Ci": true,
+          "pointPassLt025": true,
+          "ci95PassLt025": true,
+          "lineDistribution": {
+            "2.5": 189,
+            "3.5": 109,
+            "1.5": 2
+          }
+        },
+        "balancedQuarterLineBinaryNoPushPerLeg": {
+          "nLegsTotal": 440,
+          "nLegsResolved": 386,
+          "nLegsExcludedPush": 54,
+          "brierUnweightedLegMean": 0.2433,
+          "brierStakeWeightedMean": 0.2455,
+          "brierCi95": [
+            0.2372,
+            0.2497
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2464,
+          "beatsConstant05At95Ci": true,
+          "pointPassLt025": true,
+          "ci95PassLt025": true,
+          "lineDistribution": {
+            "2": 4,
+            "3": 74,
+            "2.75": 78,
+            "2.5": 49,
+            "3.5": 33,
+            "3.25": 39,
+            "2.25": 23
+          }
+        }
+      },
+      "pinnacleComparison": {
+        "matchedFixtures": 80,
+        "ou25": {
+          "pinnacleBrier": 0.2436,
+          "modelBrier": 0.2612,
+          "modelMinusPinnacleDiff": 0.0176
+        },
+        "ahMarketLineOldFractional": {
+          "pinnacleBrier": 0.2089,
+          "modelBrier": 0.2088
+        },
+        "ahMarketLineNewBinaryNoPushLegs": {
+          "nLegsTotal": 121,
+          "nLegsResolved": 105,
+          "nLegsExcludedPush": 16,
+          "pinnacleBrier": 0.2516,
+          "modelBrier": 0.2501,
+          "modelMinusPinnacleDiff": -0.0015
+        }
+      }
+    },
+    "ESP-LALIGA": {
+      "leagueId": "ESP-LALIGA",
+      "nTotalMatches": 1359,
+      "nTrainInitial": 1059,
+      "nEvalMatches": 300,
+      "chronologicalProof": {
+        "strictOrderingVerified": true,
+        "chronologicalViolationsCount": 0,
+        "refitsExecutedCount": 12,
+        "minPositiveLeadTimeMinutes": 30,
+        "sampleRefitAuditTrail": [
+          {
+            "evalMatchIndex": 1059,
+            "evalMatchId": "1g7ev92a4xzvmnte18e1h7thw",
+            "evalKickoffUtc": "2025-12-07T17:30:00.000Z",
+            "trainMatchesCount": 1059,
+            "maxTrainKickoffUtc": "2025-12-07T15:15:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 1084,
+            "evalMatchId": "1uit2aujexe8xc2izg1a2uyvo",
+            "evalKickoffUtc": "2026-01-03T17:30:00.000Z",
+            "trainMatchesCount": 1084,
+            "maxTrainKickoffUtc": "2026-01-03T15:15:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 1109,
+            "evalMatchId": "22jwwfu5djp7vwtjkvcujieqc",
+            "evalKickoffUtc": "2026-01-23T20:00:00.000Z",
+            "trainMatchesCount": 1109,
+            "maxTrainKickoffUtc": "2026-01-19T20:00:00.000Z",
+            "strictlyPriorVerified": true
+          }
+        ]
+      },
+      "ah": {
+        "oldFixedMinus05": {
+          "brier": 0.228,
+          "brierCi95": [
+            0.211,
+            0.2451
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2499,
+          "beatsConstant05At95Ci": true
+        },
+        "oldBalancedQuarterFractional": {
+          "brier": 0.2033,
+          "brierCi95": [
+            0.1921,
+            0.2138
+          ],
+          "constant05Brier": 0.2023,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "newBalancedQuarterBinaryNoPushPerLeg": {
+          "nLegsTotal": 445,
+          "nLegsResolved": 378,
+          "nLegsExcludedPush": 67,
+          "brierUnweightedLegMean": 0.2476,
+          "brierStakeWeightedMean": 0.2482,
+          "brierCi95": [
+            0.2409,
+            0.2547
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2452,
+          "brierCi95": [
+            0.2366,
+            0.2551
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        }
+      },
+      "ou25": {
+        "nMatchesResolved": 300,
+        "oldBrier": 0.248,
+        "newBinaryNoPushBrier": 0.248,
+        "brierCi95": [
+          0.2343,
+          0.2611
+        ],
+        "constant05Brier": 0.25,
+        "beatsConstant05At95Ci": false,
+        "pointPassLt025": true,
+        "ci95PassLt025": false
+      },
+      "ouMultiLine": {
+        "linesEvaluated": [
+          1.5,
+          2,
+          2.25,
+          2.5,
+          2.75,
+          3,
+          3.25,
+          3.5
+        ],
+        "byLine": {
+          "2": {
+            "line": 2,
+            "nLegsTotal": 300,
+            "nLegsResolved": 222,
+            "nLegsExcludedPush": 78,
+            "brierUnweightedLegMean": 0.206,
+            "brierStakeWeightedMean": 0.206,
+            "brierCi95": [
+              0.185,
+              0.2283
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2033,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3": {
+            "line": 3,
+            "nLegsTotal": 300,
+            "nLegsResolved": 228,
+            "nLegsExcludedPush": 72,
+            "brierUnweightedLegMean": 0.2309,
+            "brierStakeWeightedMean": 0.2309,
+            "brierCi95": [
+              0.2067,
+              0.2559
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.236,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "1.5": {
+            "line": 1.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.1698,
+            "brierStakeWeightedMean": 0.1698,
+            "brierCi95": [
+              0.1492,
+              0.1913
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1659,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.25": {
+            "line": 2.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 522,
+            "nLegsExcludedPush": 78,
+            "brierUnweightedLegMean": 0.2301,
+            "brierStakeWeightedMean": 0.2301,
+            "brierCi95": [
+              0.2182,
+              0.2431
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2381,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.5": {
+            "line": 2.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.248,
+            "brierStakeWeightedMean": 0.248,
+            "brierCi95": [
+              0.2343,
+              0.2611
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2491,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "2.75": {
+            "line": 2.75,
+            "nLegsTotal": 600,
+            "nLegsResolved": 528,
+            "nLegsExcludedPush": 72,
+            "brierUnweightedLegMean": 0.2406,
+            "brierStakeWeightedMean": 0.2406,
+            "brierCi95": [
+              0.2282,
+              0.2541
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2488,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3.25": {
+            "line": 3.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 528,
+            "nLegsExcludedPush": 72,
+            "brierUnweightedLegMean": 0.2152,
+            "brierStakeWeightedMean": 0.2152,
+            "brierCi95": [
+              0.1988,
+              0.233
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2209,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3.5": {
+            "line": 3.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2032,
+            "brierStakeWeightedMean": 0.2032,
+            "brierCi95": [
+              0.1798,
+              0.2291
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2059,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          }
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2502,
+          "brierCi95": [
+            0.2418,
+            0.259
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2491,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": false,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "1.5": 35,
+            "3.5": 54,
+            "2.5": 211
+          }
+        },
+        "balancedQuarterLineBinaryNoPushPerLeg": {
+          "nLegsTotal": 447,
+          "nLegsResolved": 393,
+          "nLegsExcludedPush": 54,
+          "brierUnweightedLegMean": 0.2484,
+          "brierStakeWeightedMean": 0.2514,
+          "brierCi95": [
+            0.2418,
+            0.2557
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2": 27,
+            "3": 37,
+            "3.5": 21,
+            "2.75": 67,
+            "2.5": 61,
+            "2.25": 44,
+            "1.75": 16,
+            "1.5": 7,
+            "3.25": 20
+          }
+        }
+      },
+      "pinnacleComparison": null
+    },
+    "ITA-SERIEA": {
+      "leagueId": "ITA-SERIEA",
+      "nTotalMatches": 1331,
+      "nTrainInitial": 1031,
+      "nEvalMatches": 300,
+      "chronologicalProof": {
+        "strictOrderingVerified": true,
+        "chronologicalViolationsCount": 0,
+        "refitsExecutedCount": 12,
+        "minPositiveLeadTimeMinutes": 150,
+        "sampleRefitAuditTrail": [
+          {
+            "evalMatchIndex": 1031,
+            "evalMatchId": "e123np88zmlm4u16ziyk1atqs",
+            "evalKickoffUtc": "2025-12-06T14:00:00.000Z",
+            "trainMatchesCount": 1031,
+            "maxTrainKickoffUtc": "2025-12-01T19:45:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 1056,
+            "evalMatchId": "e810e1xzrome2qehy43mv1edw",
+            "evalKickoffUtc": "2025-12-21T19:45:00.000Z",
+            "trainMatchesCount": 1056,
+            "maxTrainKickoffUtc": "2025-12-21T17:00:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 1081,
+            "evalMatchId": "ekyr1h6np9h1d6ooh6v1smlg4",
+            "evalKickoffUtc": "2026-01-07T17:30:00.000Z",
+            "trainMatchesCount": 1080,
+            "maxTrainKickoffUtc": "2026-01-06T19:45:00.000Z",
+            "strictlyPriorVerified": true
+          }
+        ]
+      },
+      "ah": {
+        "oldFixedMinus05": {
+          "brier": 0.2116,
+          "brierCi95": [
+            0.1916,
+            0.2328
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2407,
+          "beatsConstant05At95Ci": true
+        },
+        "oldBalancedQuarterFractional": {
+          "brier": 0.2071,
+          "brierCi95": [
+            0.1972,
+            0.217
+          ],
+          "constant05Brier": 0.2071,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "newBalancedQuarterBinaryNoPushPerLeg": {
+          "nLegsTotal": 448,
+          "nLegsResolved": 386,
+          "nLegsExcludedPush": 62,
+          "brierUnweightedLegMean": 0.2462,
+          "brierStakeWeightedMean": 0.2474,
+          "brierCi95": [
+            0.2391,
+            0.2522
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.239,
+          "brierCi95": [
+            0.2304,
+            0.2479
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": true,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        }
+      },
+      "ou25": {
+        "nMatchesResolved": 300,
+        "oldBrier": 0.2577,
+        "newBinaryNoPushBrier": 0.2577,
+        "brierCi95": [
+          0.2451,
+          0.271
+        ],
+        "constant05Brier": 0.25,
+        "beatsConstant05At95Ci": false,
+        "pointPassLt025": false,
+        "ci95PassLt025": false
+      },
+      "ouMultiLine": {
+        "linesEvaluated": [
+          1.5,
+          2,
+          2.25,
+          2.5,
+          2.75,
+          3,
+          3.25,
+          3.5
+        ],
+        "byLine": {
+          "2": {
+            "line": 2,
+            "nLegsTotal": 300,
+            "nLegsResolved": 227,
+            "nLegsExcludedPush": 73,
+            "brierUnweightedLegMean": 0.2441,
+            "brierStakeWeightedMean": 0.2441,
+            "brierCi95": [
+              0.2256,
+              0.262
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2307,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3": {
+            "line": 3,
+            "nLegsTotal": 300,
+            "nLegsResolved": 224,
+            "nLegsExcludedPush": 76,
+            "brierUnweightedLegMean": 0.2166,
+            "brierStakeWeightedMean": 0.2166,
+            "brierCi95": [
+              0.19,
+              0.2421
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2131,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "1.5": {
+            "line": 1.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2064,
+            "brierStakeWeightedMean": 0.2064,
+            "brierCi95": [
+              0.1848,
+              0.2283
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1986,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.25": {
+            "line": 2.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 527,
+            "nLegsExcludedPush": 73,
+            "brierUnweightedLegMean": 0.2518,
+            "brierStakeWeightedMean": 0.2518,
+            "brierCi95": [
+              0.2399,
+              0.2629
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2475,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": false,
+            "ci95PassLt025": false
+          },
+          "2.5": {
+            "line": 2.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2577,
+            "brierStakeWeightedMean": 0.2577,
+            "brierCi95": [
+              0.2451,
+              0.271
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2497,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": false,
+            "ci95PassLt025": false
+          },
+          "2.75": {
+            "line": 2.75,
+            "nLegsTotal": 600,
+            "nLegsResolved": 524,
+            "nLegsExcludedPush": 76,
+            "brierUnweightedLegMean": 0.2401,
+            "brierStakeWeightedMean": 0.2401,
+            "brierCi95": [
+              0.2256,
+              0.2551
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2416,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3.25": {
+            "line": 3.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 524,
+            "nLegsExcludedPush": 76,
+            "brierUnweightedLegMean": 0.1944,
+            "brierStakeWeightedMean": 0.1944,
+            "brierCi95": [
+              0.174,
+              0.2141
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.194,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3.5": {
+            "line": 3.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.1778,
+            "brierStakeWeightedMean": 0.1778,
+            "brierCi95": [
+              0.1532,
+              0.2056
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1771,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          }
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2507,
+          "brierCi95": [
+            0.241,
+            0.2611
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": false,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2.5": 249,
+            "1.5": 27,
+            "3.5": 24
+          }
+        },
+        "balancedQuarterLineBinaryNoPushPerLeg": {
+          "nLegsTotal": 443,
+          "nLegsResolved": 381,
+          "nLegsExcludedPush": 62,
+          "brierUnweightedLegMean": 0.2475,
+          "brierStakeWeightedMean": 0.2477,
+          "brierCi95": [
+            0.2404,
+            0.2549
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2499,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2": 41,
+            "3": 27,
+            "2.5": 84,
+            "2.25": 66,
+            "1.75": 20,
+            "3.25": 10,
+            "2.75": 47,
+            "1.5": 1,
+            "3.5": 4
+          }
+        }
+      },
+      "pinnacleComparison": null
+    },
+    "DEU-BUNDESLIGA": {
+      "leagueId": "DEU-BUNDESLIGA",
+      "nTotalMatches": 1061,
+      "nTrainInitial": 761,
+      "nEvalMatches": 300,
+      "chronologicalProof": {
+        "strictOrderingVerified": true,
+        "chronologicalViolationsCount": 0,
+        "refitsExecutedCount": 12,
+        "minPositiveLeadTimeMinutes": 120,
+        "sampleRefitAuditTrail": [
+          {
+            "evalMatchIndex": 761,
+            "evalMatchId": "d76yzyflinjbjue96ve9zekgk",
+            "evalKickoffUtc": "2025-09-28T13:30:00.000Z",
+            "trainMatchesCount": 761,
+            "maxTrainKickoffUtc": "2025-09-27T16:30:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 786,
+            "evalMatchId": "dk8j6m6bzdh1wrho4z6p3dous",
+            "evalKickoffUtc": "2025-10-25T13:30:00.000Z",
+            "trainMatchesCount": 783,
+            "maxTrainKickoffUtc": "2025-10-24T18:30:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 811,
+            "evalMatchId": "duphpfn76nnmm87fh3hkmobh0",
+            "evalKickoffUtc": "2025-11-22T14:30:00.000Z",
+            "trainMatchesCount": 810,
+            "maxTrainKickoffUtc": "2025-11-21T19:30:00.000Z",
+            "strictlyPriorVerified": true
+          }
+        ]
+      },
+      "ah": {
+        "oldFixedMinus05": {
+          "brier": 0.2026,
+          "brierCi95": [
+            0.1854,
+            0.2209
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2478,
+          "beatsConstant05At95Ci": true
+        },
+        "oldBalancedQuarterFractional": {
+          "brier": 0.2086,
+          "brierCi95": [
+            0.1987,
+            0.2184
+          ],
+          "constant05Brier": 0.2104,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "newBalancedQuarterBinaryNoPushPerLeg": {
+          "nLegsTotal": 441,
+          "nLegsResolved": 384,
+          "nLegsExcludedPush": 57,
+          "brierUnweightedLegMean": 0.2437,
+          "brierStakeWeightedMean": 0.2445,
+          "brierCi95": [
+            0.2375,
+            0.2494
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": true,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.248,
+          "brierCi95": [
+            0.2394,
+            0.257
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        }
+      },
+      "ou25": {
+        "nMatchesResolved": 300,
+        "oldBrier": 0.2308,
+        "newBinaryNoPushBrier": 0.2308,
+        "brierCi95": [
+          0.2158,
+          0.2446
+        ],
+        "constant05Brier": 0.25,
+        "beatsConstant05At95Ci": true,
+        "pointPassLt025": true,
+        "ci95PassLt025": true
+      },
+      "ouMultiLine": {
+        "linesEvaluated": [
+          1.5,
+          2,
+          2.25,
+          2.5,
+          2.75,
+          3,
+          3.25,
+          3.5
+        ],
+        "byLine": {
+          "2": {
+            "line": 2,
+            "nLegsTotal": 300,
+            "nLegsResolved": 243,
+            "nLegsExcludedPush": 57,
+            "brierUnweightedLegMean": 0.1681,
+            "brierStakeWeightedMean": 0.1681,
+            "brierCi95": [
+              0.1423,
+              0.1952
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.161,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3": {
+            "line": 3,
+            "nLegsTotal": 300,
+            "nLegsResolved": 238,
+            "nLegsExcludedPush": 62,
+            "brierUnweightedLegMean": 0.247,
+            "brierStakeWeightedMean": 0.247,
+            "brierCi95": [
+              0.2306,
+              0.2654
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.247,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "1.5": {
+            "line": 1.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.1407,
+            "brierStakeWeightedMean": 0.1407,
+            "brierCi95": [
+              0.116,
+              0.167
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1367,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.25": {
+            "line": 2.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 543,
+            "nLegsExcludedPush": 57,
+            "brierUnweightedLegMean": 0.2027,
+            "brierStakeWeightedMean": 0.2027,
+            "brierCi95": [
+              0.1894,
+              0.2179
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.204,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.5": {
+            "line": 2.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2308,
+            "brierStakeWeightedMean": 0.2308,
+            "brierCi95": [
+              0.2158,
+              0.2446
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2285,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.75": {
+            "line": 2.75,
+            "nLegsTotal": 600,
+            "nLegsResolved": 538,
+            "nLegsExcludedPush": 62,
+            "brierUnweightedLegMean": 0.238,
+            "brierStakeWeightedMean": 0.238,
+            "brierCi95": [
+              0.2269,
+              0.2485
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2388,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3.25": {
+            "line": 3.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 538,
+            "nLegsExcludedPush": 62,
+            "brierUnweightedLegMean": 0.2455,
+            "brierStakeWeightedMean": 0.2455,
+            "brierCi95": [
+              0.2334,
+              0.2592
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2499,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3.5": {
+            "line": 3.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2442,
+            "brierStakeWeightedMean": 0.2442,
+            "brierCi95": [
+              0.2264,
+              0.2628
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2464,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          }
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2481,
+          "brierCi95": [
+            0.239,
+            0.258
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2472,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "3.5": 160,
+            "2.5": 140
+          }
+        },
+        "balancedQuarterLineBinaryNoPushPerLeg": {
+          "nLegsTotal": 420,
+          "nLegsResolved": 371,
+          "nLegsExcludedPush": 49,
+          "brierUnweightedLegMean": 0.2492,
+          "brierStakeWeightedMean": 0.2481,
+          "brierCi95": [
+            0.2422,
+            0.2571
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2453,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2": 3,
+            "3": 62,
+            "3.5": 77,
+            "3.25": 51,
+            "2.75": 49,
+            "2.5": 38,
+            "2.25": 20
+          }
+        }
+      },
+      "pinnacleComparison": null
+    },
+    "FRA-LIGUE1": {
+      "leagueId": "FRA-LIGUE1",
+      "nTotalMatches": 1091,
+      "nTrainInitial": 791,
+      "nEvalMatches": 300,
+      "chronologicalProof": {
+        "strictOrderingVerified": true,
+        "chronologicalViolationsCount": 0,
+        "refitsExecutedCount": 12,
+        "minPositiveLeadTimeMinutes": 120,
+        "sampleRefitAuditTrail": [
+          {
+            "evalMatchIndex": 791,
+            "evalMatchId": "7kofummfmha2cguoivv9vyvbo",
+            "evalKickoffUtc": "2025-09-28T15:15:00.000Z",
+            "trainMatchesCount": 791,
+            "maxTrainKickoffUtc": "2025-09-28T13:00:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 816,
+            "evalMatchId": "7x1o058r9z5q36sidhpy4ot90",
+            "evalKickoffUtc": "2025-10-25T19:05:00.000Z",
+            "trainMatchesCount": 816,
+            "maxTrainKickoffUtc": "2025-10-25T17:00:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 841,
+            "evalMatchId": "84pk71yvb8kkl4rfrmqrudbmc",
+            "evalKickoffUtc": "2025-11-08T16:00:00.000Z",
+            "trainMatchesCount": 841,
+            "maxTrainKickoffUtc": "2025-11-07T19:45:00.000Z",
+            "strictlyPriorVerified": true
+          }
+        ]
+      },
+      "ah": {
+        "oldFixedMinus05": {
+          "brier": 0.2253,
+          "brierCi95": [
+            0.2075,
+            0.2435
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2441,
+          "beatsConstant05At95Ci": true
+        },
+        "oldBalancedQuarterFractional": {
+          "brier": 0.2084,
+          "brierCi95": [
+            0.1984,
+            0.2183
+          ],
+          "constant05Brier": 0.2083,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "newBalancedQuarterBinaryNoPushPerLeg": {
+          "nLegsTotal": 437,
+          "nLegsResolved": 376,
+          "nLegsExcludedPush": 61,
+          "brierUnweightedLegMean": 0.2437,
+          "brierStakeWeightedMean": 0.246,
+          "brierCi95": [
+            0.2384,
+            0.2496
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": true,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2451,
+          "brierCi95": [
+            0.2368,
+            0.2536
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        }
+      },
+      "ou25": {
+        "nMatchesResolved": 300,
+        "oldBrier": 0.2432,
+        "newBinaryNoPushBrier": 0.2432,
+        "brierCi95": [
+          0.2314,
+          0.2562
+        ],
+        "constant05Brier": 0.25,
+        "beatsConstant05At95Ci": false,
+        "pointPassLt025": true,
+        "ci95PassLt025": false
+      },
+      "ouMultiLine": {
+        "linesEvaluated": [
+          1.5,
+          2,
+          2.25,
+          2.5,
+          2.75,
+          3,
+          3.25,
+          3.5
+        ],
+        "byLine": {
+          "2": {
+            "line": 2,
+            "nLegsTotal": 300,
+            "nLegsResolved": 238,
+            "nLegsExcludedPush": 62,
+            "brierUnweightedLegMean": 0.2215,
+            "brierStakeWeightedMean": 0.2215,
+            "brierCi95": [
+              0.195,
+              0.2462
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2174,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3": {
+            "line": 3,
+            "nLegsTotal": 300,
+            "nLegsResolved": 234,
+            "nLegsExcludedPush": 66,
+            "brierUnweightedLegMean": 0.2377,
+            "brierStakeWeightedMean": 0.2377,
+            "brierCi95": [
+              0.218,
+              0.2583
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2419,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "1.5": {
+            "line": 1.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.1947,
+            "brierStakeWeightedMean": 0.1947,
+            "brierCi95": [
+              0.1687,
+              0.2235
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1892,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.25": {
+            "line": 2.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 538,
+            "nLegsExcludedPush": 62,
+            "brierUnweightedLegMean": 0.2336,
+            "brierStakeWeightedMean": 0.2336,
+            "brierCi95": [
+              0.2204,
+              0.2462
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2395,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.5": {
+            "line": 2.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2432,
+            "brierStakeWeightedMean": 0.2432,
+            "brierCi95": [
+              0.2314,
+              0.2562
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2484,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "2.75": {
+            "line": 2.75,
+            "nLegsTotal": 600,
+            "nLegsResolved": 534,
+            "nLegsExcludedPush": 66,
+            "brierUnweightedLegMean": 0.2408,
+            "brierStakeWeightedMean": 0.2408,
+            "brierCi95": [
+              0.2307,
+              0.2515
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2497,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3.25": {
+            "line": 3.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 534,
+            "nLegsExcludedPush": 66,
+            "brierUnweightedLegMean": 0.2264,
+            "brierStakeWeightedMean": 0.2264,
+            "brierCi95": [
+              0.2134,
+              0.2404
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2303,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3.5": {
+            "line": 3.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2177,
+            "brierStakeWeightedMean": 0.2177,
+            "brierCi95": [
+              0.1958,
+              0.2386
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2176,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          }
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2402,
+          "brierCi95": [
+            0.2316,
+            0.2488
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2484,
+          "beatsConstant05At95Ci": true,
+          "pointPassLt025": true,
+          "ci95PassLt025": true,
+          "lineDistribution": {
+            "2.5": 179,
+            "3.5": 112,
+            "1.5": 9
+          }
+        },
+        "balancedQuarterLineBinaryNoPushPerLeg": {
+          "nLegsTotal": 460,
+          "nLegsResolved": 403,
+          "nLegsExcludedPush": 57,
+          "brierUnweightedLegMean": 0.2471,
+          "brierStakeWeightedMean": 0.2479,
+          "brierCi95": [
+            0.2405,
+            0.2538
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2487,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2": 7,
+            "3": 62,
+            "2.5": 32,
+            "2.75": 70,
+            "3.25": 48,
+            "2.25": 38,
+            "3.5": 39,
+            "1.75": 4
+          }
+        }
+      },
+      "pinnacleComparison": null
+    },
+    "NED-ERE": {
+      "leagueId": "NED-ERE",
+      "nTotalMatches": 1095,
+      "nTrainInitial": 795,
+      "nEvalMatches": 300,
+      "chronologicalProof": {
+        "strictOrderingVerified": true,
+        "chronologicalViolationsCount": 0,
+        "refitsExecutedCount": 12,
+        "minPositiveLeadTimeMinutes": 60,
+        "sampleRefitAuditTrail": [
+          {
+            "evalMatchIndex": 795,
+            "evalMatchId": "6436wx3eeqvph521ys68rd1xw",
+            "evalKickoffUtc": "2025-10-18T14:45:00.000Z",
+            "trainMatchesCount": 795,
+            "maxTrainKickoffUtc": "2025-10-05T18:00:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 820,
+            "evalMatchId": "6aonvzrq4k2fgfwevknang3ro",
+            "evalKickoffUtc": "2025-11-02T13:30:00.000Z",
+            "trainMatchesCount": 819,
+            "maxTrainKickoffUtc": "2025-11-02T11:15:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 845,
+            "evalMatchId": "6nxqse6dlpue18acfatwha7mc",
+            "evalKickoffUtc": "2025-11-30T13:30:00.000Z",
+            "trainMatchesCount": 845,
+            "maxTrainKickoffUtc": "2025-11-30T11:15:00.000Z",
+            "strictlyPriorVerified": true
+          }
+        ]
+      },
+      "ah": {
+        "oldFixedMinus05": {
+          "brier": 0.2129,
+          "brierCi95": [
+            0.1945,
+            0.231
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2413,
+          "beatsConstant05At95Ci": true
+        },
+        "oldBalancedQuarterFractional": {
+          "brier": 0.2178,
+          "brierCi95": [
+            0.2082,
+            0.227
+          ],
+          "constant05Brier": 0.2169,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "newBalancedQuarterBinaryNoPushPerLeg": {
+          "nLegsTotal": 442,
+          "nLegsResolved": 395,
+          "nLegsExcludedPush": 47,
+          "brierUnweightedLegMean": 0.2495,
+          "brierStakeWeightedMean": 0.2498,
+          "brierCi95": [
+            0.2436,
+            0.2555
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2425,
+          "brierCi95": [
+            0.2346,
+            0.2497
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": true,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        }
+      },
+      "ou25": {
+        "nMatchesResolved": 300,
+        "oldBrier": 0.2279,
+        "newBinaryNoPushBrier": 0.2279,
+        "brierCi95": [
+          0.2139,
+          0.2422
+        ],
+        "constant05Brier": 0.25,
+        "beatsConstant05At95Ci": true,
+        "pointPassLt025": true,
+        "ci95PassLt025": true
+      },
+      "ouMultiLine": {
+        "linesEvaluated": [
+          1.5,
+          2,
+          2.25,
+          2.5,
+          2.75,
+          3,
+          3.25,
+          3.5
+        ],
+        "byLine": {
+          "2": {
+            "line": 2,
+            "nLegsTotal": 300,
+            "nLegsResolved": 227,
+            "nLegsExcludedPush": 73,
+            "brierUnweightedLegMean": 0.1404,
+            "brierStakeWeightedMean": 0.1404,
+            "brierCi95": [
+              0.1145,
+              0.1644
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1394,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3": {
+            "line": 3,
+            "nLegsTotal": 300,
+            "nLegsResolved": 239,
+            "nLegsExcludedPush": 61,
+            "brierUnweightedLegMean": 0.2403,
+            "brierStakeWeightedMean": 0.2403,
+            "brierCi95": [
+              0.2255,
+              0.2555
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2487,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "1.5": {
+            "line": 1.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.1119,
+            "brierStakeWeightedMean": 0.1119,
+            "brierCi95": [
+              0.0887,
+              0.1372
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1106,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.25": {
+            "line": 2.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 527,
+            "nLegsExcludedPush": 73,
+            "brierUnweightedLegMean": 0.1902,
+            "brierStakeWeightedMean": 0.1902,
+            "brierCi95": [
+              0.1759,
+              0.2041
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2028,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.5": {
+            "line": 2.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2279,
+            "brierStakeWeightedMean": 0.2279,
+            "brierCi95": [
+              0.2139,
+              0.2422
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2331,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.75": {
+            "line": 2.75,
+            "nLegsTotal": 600,
+            "nLegsResolved": 539,
+            "nLegsExcludedPush": 61,
+            "brierUnweightedLegMean": 0.2334,
+            "brierStakeWeightedMean": 0.2334,
+            "brierCi95": [
+              0.222,
+              0.2447
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2422,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3.25": {
+            "line": 3.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 539,
+            "nLegsExcludedPush": 61,
+            "brierUnweightedLegMean": 0.2399,
+            "brierStakeWeightedMean": 0.2399,
+            "brierCi95": [
+              0.2278,
+              0.2522
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2494,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3.5": {
+            "line": 3.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2396,
+            "brierStakeWeightedMean": 0.2396,
+            "brierCi95": [
+              0.2235,
+              0.2567
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2446,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          }
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2438,
+          "brierCi95": [
+            0.2352,
+            0.2535
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2498,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "3.5": 184,
+            "2.5": 116
+          }
+        },
+        "balancedQuarterLineBinaryNoPushPerLeg": {
+          "nLegsTotal": 429,
+          "nLegsResolved": 391,
+          "nLegsExcludedPush": 38,
+          "brierUnweightedLegMean": 0.2491,
+          "brierStakeWeightedMean": 0.248,
+          "brierCi95": [
+            0.2412,
+            0.2566
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2499,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "3": 57,
+            "3.5": 91,
+            "3.25": 59,
+            "2.25": 10,
+            "2.75": 60,
+            "2.5": 23
+          }
+        }
+      },
+      "pinnacleComparison": null
+    },
+    "POR-PRIMEIRA": {
+      "leagueId": "POR-PRIMEIRA",
+      "nTotalMatches": 1088,
+      "nTrainInitial": 788,
+      "nEvalMatches": 300,
+      "chronologicalProof": {
+        "strictOrderingVerified": true,
+        "chronologicalViolationsCount": 0,
+        "refitsExecutedCount": 12,
+        "minPositiveLeadTimeMinutes": 120,
+        "sampleRefitAuditTrail": [
+          {
+            "evalMatchIndex": 788,
+            "evalMatchId": "1pa57f5hdtwp6au0hl3ts8mxg",
+            "evalKickoffUtc": "2025-10-05T14:30:00.000Z",
+            "trainMatchesCount": 788,
+            "maxTrainKickoffUtc": "2025-10-04T19:30:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 813,
+            "evalMatchId": "1zo4oxxv3ijln5m5eyzj52hhw",
+            "evalKickoffUtc": "2025-11-08T20:30:00.000Z",
+            "trainMatchesCount": 813,
+            "maxTrainKickoffUtc": "2025-11-08T18:00:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 838,
+            "evalMatchId": "2au8w9kwwrbvkj7znecao1fro",
+            "evalKickoffUtc": "2025-12-13T18:00:00.000Z",
+            "trainMatchesCount": 838,
+            "maxTrainKickoffUtc": "2025-12-13T15:30:00.000Z",
+            "strictlyPriorVerified": true
+          }
+        ]
+      },
+      "ah": {
+        "oldFixedMinus05": {
+          "brier": 0.1863,
+          "brierCi95": [
+            0.1679,
+            0.2055
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2431,
+          "beatsConstant05At95Ci": true
+        },
+        "oldBalancedQuarterFractional": {
+          "brier": 0.2002,
+          "brierCi95": [
+            0.1903,
+            0.2105
+          ],
+          "constant05Brier": 0.2033,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "newBalancedQuarterBinaryNoPushPerLeg": {
+          "nLegsTotal": 448,
+          "nLegsResolved": 381,
+          "nLegsExcludedPush": 67,
+          "brierUnweightedLegMean": 0.2406,
+          "brierStakeWeightedMean": 0.2416,
+          "brierCi95": [
+            0.2341,
+            0.2469
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": true,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2462,
+          "brierCi95": [
+            0.2379,
+            0.256
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        }
+      },
+      "ou25": {
+        "nMatchesResolved": 300,
+        "oldBrier": 0.2425,
+        "newBinaryNoPushBrier": 0.2425,
+        "brierCi95": [
+          0.2293,
+          0.2561
+        ],
+        "constant05Brier": 0.25,
+        "beatsConstant05At95Ci": false,
+        "pointPassLt025": true,
+        "ci95PassLt025": false
+      },
+      "ouMultiLine": {
+        "linesEvaluated": [
+          1.5,
+          2,
+          2.25,
+          2.5,
+          2.75,
+          3,
+          3.25,
+          3.5
+        ],
+        "byLine": {
+          "2": {
+            "line": 2,
+            "nLegsTotal": 300,
+            "nLegsResolved": 242,
+            "nLegsExcludedPush": 58,
+            "brierUnweightedLegMean": 0.2109,
+            "brierStakeWeightedMean": 0.2109,
+            "brierCi95": [
+              0.192,
+              0.2315
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2184,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3": {
+            "line": 3,
+            "nLegsTotal": 300,
+            "nLegsResolved": 236,
+            "nLegsExcludedPush": 64,
+            "brierUnweightedLegMean": 0.2424,
+            "brierStakeWeightedMean": 0.2424,
+            "brierCi95": [
+              0.2196,
+              0.2658
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2442,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "1.5": {
+            "line": 1.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.188,
+            "brierStakeWeightedMean": 0.188,
+            "brierCi95": [
+              0.1649,
+              0.2123
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1924,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.25": {
+            "line": 2.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 542,
+            "nLegsExcludedPush": 58,
+            "brierUnweightedLegMean": 0.2284,
+            "brierStakeWeightedMean": 0.2284,
+            "brierCi95": [
+              0.2167,
+              0.2401
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2389,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.5": {
+            "line": 2.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2425,
+            "brierStakeWeightedMean": 0.2425,
+            "brierCi95": [
+              0.2293,
+              0.2561
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2478,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "2.75": {
+            "line": 2.75,
+            "nLegsTotal": 600,
+            "nLegsResolved": 536,
+            "nLegsExcludedPush": 64,
+            "brierUnweightedLegMean": 0.2425,
+            "brierStakeWeightedMean": 0.2425,
+            "brierCi95": [
+              0.2303,
+              0.2548
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2499,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3.25": {
+            "line": 3.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 536,
+            "nLegsExcludedPush": 64,
+            "brierUnweightedLegMean": 0.2324,
+            "brierStakeWeightedMean": 0.2324,
+            "brierCi95": [
+              0.2148,
+              0.2494
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2339,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3.5": {
+            "line": 3.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2244,
+            "brierStakeWeightedMean": 0.2244,
+            "brierCi95": [
+              0.1985,
+              0.2519
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2222,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          }
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2519,
+          "brierCi95": [
+            0.2428,
+            0.2616
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": false,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2.5": 213,
+            "3.5": 69,
+            "1.5": 18
+          }
+        },
+        "balancedQuarterLineBinaryNoPushPerLeg": {
+          "nLegsTotal": 444,
+          "nLegsResolved": 398,
+          "nLegsExcludedPush": 46,
+          "brierUnweightedLegMean": 0.2512,
+          "brierStakeWeightedMean": 0.252,
+          "brierCi95": [
+            0.244,
+            0.2588
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2498,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": false,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2": 34,
+            "3": 29,
+            "2.25": 54,
+            "2.5": 60,
+            "3.25": 27,
+            "2.75": 56,
+            "3.5": 33,
+            "1.75": 7
+          }
+        }
+      },
+      "pinnacleComparison": null
+    },
+    "BEL-PRO": {
+      "leagueId": "BEL-PRO",
+      "nTotalMatches": 1087,
+      "nTrainInitial": 787,
+      "nEvalMatches": 300,
+      "chronologicalProof": {
+        "strictOrderingVerified": true,
+        "chronologicalViolationsCount": 0,
+        "refitsExecutedCount": 12,
+        "minPositiveLeadTimeMinutes": 45,
+        "sampleRefitAuditTrail": [
+          {
+            "evalMatchIndex": 787,
+            "evalMatchId": "djmayua5y68f0qd6p7vahgu8k",
+            "evalKickoffUtc": "2025-10-05T11:30:00.000Z",
+            "trainMatchesCount": 787,
+            "maxTrainKickoffUtc": "2025-10-04T18:45:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 812,
+            "evalMatchId": "duivyh7ccvqb0o2ykwgvaq5uc",
+            "evalKickoffUtc": "2025-11-02T15:00:00.000Z",
+            "trainMatchesCount": 812,
+            "maxTrainKickoffUtc": "2025-11-02T12:30:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 837,
+            "evalMatchId": "e2fx8ogp28ye3j1mz052rpkb8",
+            "evalKickoffUtc": "2025-11-30T17:30:00.000Z",
+            "trainMatchesCount": 837,
+            "maxTrainKickoffUtc": "2025-11-30T15:00:00.000Z",
+            "strictlyPriorVerified": true
+          }
+        ]
+      },
+      "ah": {
+        "oldFixedMinus05": {
+          "brier": 0.2196,
+          "brierCi95": [
+            0.2035,
+            0.2357
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2456,
+          "beatsConstant05At95Ci": true
+        },
+        "oldBalancedQuarterFractional": {
+          "brier": 0.2027,
+          "brierCi95": [
+            0.1918,
+            0.2125
+          ],
+          "constant05Brier": 0.2048,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "newBalancedQuarterBinaryNoPushPerLeg": {
+          "nLegsTotal": 464,
+          "nLegsResolved": 399,
+          "nLegsExcludedPush": 65,
+          "brierUnweightedLegMean": 0.244,
+          "brierStakeWeightedMean": 0.2449,
+          "brierCi95": [
+            0.237,
+            0.2517
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2366,
+          "brierCi95": [
+            0.2278,
+            0.2456
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": true,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        }
+      },
+      "ou25": {
+        "nMatchesResolved": 300,
+        "oldBrier": 0.2633,
+        "newBinaryNoPushBrier": 0.2633,
+        "brierCi95": [
+          0.2505,
+          0.277
+        ],
+        "constant05Brier": 0.25,
+        "beatsConstant05At95Ci": false,
+        "pointPassLt025": false,
+        "ci95PassLt025": false
+      },
+      "ouMultiLine": {
+        "linesEvaluated": [
+          1.5,
+          2,
+          2.25,
+          2.5,
+          2.75,
+          3,
+          3.25,
+          3.5
+        ],
+        "byLine": {
+          "2": {
+            "line": 2,
+            "nLegsTotal": 300,
+            "nLegsResolved": 232,
+            "nLegsExcludedPush": 68,
+            "brierUnweightedLegMean": 0.2237,
+            "brierStakeWeightedMean": 0.2237,
+            "brierCi95": [
+              0.2002,
+              0.2468
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.214,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3": {
+            "line": 3,
+            "nLegsTotal": 300,
+            "nLegsResolved": 229,
+            "nLegsExcludedPush": 71,
+            "brierUnweightedLegMean": 0.2538,
+            "brierStakeWeightedMean": 0.2538,
+            "brierCi95": [
+              0.2317,
+              0.2801
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2376,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": false,
+            "ci95PassLt025": false
+          },
+          "1.5": {
+            "line": 1.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.1844,
+            "brierStakeWeightedMean": 0.1844,
+            "brierCi95": [
+              0.161,
+              0.2094
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1824,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.25": {
+            "line": 2.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 532,
+            "nLegsExcludedPush": 68,
+            "brierUnweightedLegMean": 0.246,
+            "brierStakeWeightedMean": 0.246,
+            "brierCi95": [
+              0.2341,
+              0.2592
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2397,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "2.5": {
+            "line": 2.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2633,
+            "brierStakeWeightedMean": 0.2633,
+            "brierCi95": [
+              0.2505,
+              0.277
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2489,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": false,
+            "ci95PassLt025": false
+          },
+          "2.75": {
+            "line": 2.75,
+            "nLegsTotal": 600,
+            "nLegsResolved": 529,
+            "nLegsExcludedPush": 71,
+            "brierUnweightedLegMean": 0.2591,
+            "brierStakeWeightedMean": 0.2591,
+            "brierCi95": [
+              0.2456,
+              0.2718
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2491,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": false,
+            "ci95PassLt025": false
+          },
+          "3.25": {
+            "line": 3.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 529,
+            "nLegsExcludedPush": 71,
+            "brierUnweightedLegMean": 0.2334,
+            "brierStakeWeightedMean": 0.2334,
+            "brierCi95": [
+              0.2167,
+              0.2514
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2233,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3.5": {
+            "line": 3.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2178,
+            "brierStakeWeightedMean": 0.2178,
+            "brierCi95": [
+              0.1947,
+              0.2431
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2087,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          }
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2515,
+          "brierCi95": [
+            0.2421,
+            0.2615
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": false,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "1.5": 25,
+            "2.5": 200,
+            "3.5": 75
+          }
+        },
+        "balancedQuarterLineBinaryNoPushPerLeg": {
+          "nLegsTotal": 452,
+          "nLegsResolved": 410,
+          "nLegsExcludedPush": 42,
+          "brierUnweightedLegMean": 0.2495,
+          "brierStakeWeightedMean": 0.2512,
+          "brierCi95": [
+            0.2424,
+            0.2578
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2": 28,
+            "3": 39,
+            "1.75": 11,
+            "2.75": 64,
+            "2.5": 59,
+            "3.5": 22,
+            "2.25": 46,
+            "3.25": 31
+          }
+        }
+      },
+      "pinnacleComparison": null
+    },
+    "SCO-PREM": {
+      "leagueId": "SCO-PREM",
+      "nTotalMatches": 468,
+      "nTrainInitial": 258,
+      "nEvalMatches": 210,
+      "chronologicalProof": {
+        "strictOrderingVerified": true,
+        "chronologicalViolationsCount": 0,
+        "refitsExecutedCount": 9,
+        "minPositiveLeadTimeMinutes": 1140,
+        "sampleRefitAuditTrail": [
+          {
+            "evalMatchIndex": 258,
+            "evalMatchId": "af_1382695",
+            "evalKickoffUtc": "2025-09-13T14:00:00+00:00",
+            "trainMatchesCount": 256,
+            "maxTrainKickoffUtc": "2025-08-31T14:00:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 283,
+            "evalMatchId": "af_1382718",
+            "evalKickoffUtc": "2025-10-25T14:00:00+00:00",
+            "trainMatchesCount": 283,
+            "maxTrainKickoffUtc": "2025-10-19T11:00:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 308,
+            "evalMatchId": "af_1382738",
+            "evalKickoffUtc": "2025-11-23T15:00:00+00:00",
+            "trainMatchesCount": 308,
+            "maxTrainKickoffUtc": "2025-11-22T20:00:00.000Z",
+            "strictlyPriorVerified": true
+          }
+        ]
+      },
+      "ah": {
+        "oldFixedMinus05": {
+          "brier": 0.2198,
+          "brierCi95": [
+            0.1986,
+            0.2403
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2496,
+          "beatsConstant05At95Ci": true
+        },
+        "oldBalancedQuarterFractional": {
+          "brier": 0.2052,
+          "brierCi95": [
+            0.1931,
+            0.2166
+          ],
+          "constant05Brier": 0.2057,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "newBalancedQuarterBinaryNoPushPerLeg": {
+          "nLegsTotal": 311,
+          "nLegsResolved": 266,
+          "nLegsExcludedPush": 45,
+          "brierUnweightedLegMean": 0.2432,
+          "brierStakeWeightedMean": 0.2451,
+          "brierCi95": [
+            0.2363,
+            0.2506
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 210,
+          "brier": 0.2425,
+          "brierCi95": [
+            0.2327,
+            0.2518
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        }
+      },
+      "ou25": {
+        "nMatchesResolved": 210,
+        "oldBrier": 0.2429,
+        "newBinaryNoPushBrier": 0.2429,
+        "brierCi95": [
+          0.2299,
+          0.2569
+        ],
+        "constant05Brier": 0.25,
+        "beatsConstant05At95Ci": false,
+        "pointPassLt025": true,
+        "ci95PassLt025": false
+      },
+      "ouMultiLine": {
+        "linesEvaluated": [
+          1.5,
+          2,
+          2.25,
+          2.5,
+          2.75,
+          3,
+          3.25,
+          3.5
+        ],
+        "byLine": {
+          "2": {
+            "line": 2,
+            "nLegsTotal": 210,
+            "nLegsResolved": 160,
+            "nLegsExcludedPush": 50,
+            "brierUnweightedLegMean": 0.2131,
+            "brierStakeWeightedMean": 0.2131,
+            "brierCi95": [
+              0.1824,
+              0.244
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.21,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3": {
+            "line": 3,
+            "nLegsTotal": 210,
+            "nLegsResolved": 165,
+            "nLegsExcludedPush": 45,
+            "brierUnweightedLegMean": 0.2373,
+            "brierStakeWeightedMean": 0.2373,
+            "brierCi95": [
+              0.2176,
+              0.256
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2412,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "1.5": {
+            "line": 1.5,
+            "nLegsTotal": 210,
+            "nLegsResolved": 210,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.1805,
+            "brierStakeWeightedMean": 0.1805,
+            "brierCi95": [
+              0.151,
+              0.2139
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1763,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.25": {
+            "line": 2.25,
+            "nLegsTotal": 420,
+            "nLegsResolved": 370,
+            "nLegsExcludedPush": 50,
+            "brierUnweightedLegMean": 0.23,
+            "brierStakeWeightedMean": 0.23,
+            "brierCi95": [
+              0.2147,
+              0.2458
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2389,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.5": {
+            "line": 2.5,
+            "nLegsTotal": 210,
+            "nLegsResolved": 210,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2429,
+            "brierStakeWeightedMean": 0.2429,
+            "brierCi95": [
+              0.2299,
+              0.2569
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2489,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "2.75": {
+            "line": 2.75,
+            "nLegsTotal": 420,
+            "nLegsResolved": 375,
+            "nLegsExcludedPush": 45,
+            "brierUnweightedLegMean": 0.2404,
+            "brierStakeWeightedMean": 0.2404,
+            "brierCi95": [
+              0.2291,
+              0.2525
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2495,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3.25": {
+            "line": 3.25,
+            "nLegsTotal": 420,
+            "nLegsResolved": 375,
+            "nLegsExcludedPush": 45,
+            "brierUnweightedLegMean": 0.2264,
+            "brierStakeWeightedMean": 0.2264,
+            "brierCi95": [
+              0.2105,
+              0.2429
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2296,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3.5": {
+            "line": 3.5,
+            "nLegsTotal": 210,
+            "nLegsResolved": 210,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2179,
+            "brierStakeWeightedMean": 0.2179,
+            "brierCi95": [
+              0.1926,
+              0.2416
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2173,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          }
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 210,
+          "brier": 0.2477,
+          "brierCi95": [
+            0.2365,
+            0.2582
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2427,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "3.5": 83,
+            "2.5": 127
+          }
+        },
+        "balancedQuarterLineBinaryNoPushPerLeg": {
+          "nLegsTotal": 311,
+          "nLegsResolved": 273,
+          "nLegsExcludedPush": 38,
+          "brierUnweightedLegMean": 0.2438,
+          "brierStakeWeightedMean": 0.2449,
+          "brierCi95": [
+            0.2352,
+            0.2522
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2459,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2": 3,
+            "3": 51,
+            "2.75": 50,
+            "3.25": 33,
+            "2.5": 36,
+            "3.5": 19,
+            "2.25": 18
+          }
+        }
+      },
+      "pinnacleComparison": null
+    },
+    "ENG-CHAMP": {
+      "leagueId": "ENG-CHAMP",
+      "nTotalMatches": 1114,
+      "nTrainInitial": 814,
+      "nEvalMatches": 300,
+      "chronologicalProof": {
+        "strictOrderingVerified": true,
+        "chronologicalViolationsCount": 0,
+        "refitsExecutedCount": 12,
+        "minPositiveLeadTimeMinutes": 105,
+        "sampleRefitAuditTrail": [
+          {
+            "evalMatchIndex": 814,
+            "evalMatchId": "af_1386812",
+            "evalKickoffUtc": "2025-12-20T15:00:00+00:00",
+            "trainMatchesCount": 811,
+            "maxTrainKickoffUtc": "2025-12-20T12:30:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 839,
+            "evalMatchId": "af_1386831",
+            "evalKickoffUtc": "2025-12-29T19:45:00+00:00",
+            "trainMatchesCount": 832,
+            "maxTrainKickoffUtc": "2025-12-29T18:00:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 864,
+            "evalMatchId": "af_1386871",
+            "evalKickoffUtc": "2026-01-16T20:00:00+00:00",
+            "trainMatchesCount": 864,
+            "maxTrainKickoffUtc": "2026-01-05T20:00:00.000Z",
+            "strictlyPriorVerified": true
+          }
+        ]
+      },
+      "ah": {
+        "oldFixedMinus05": {
+          "brier": 0.2243,
+          "brierCi95": [
+            0.2106,
+            0.238
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2407,
+          "beatsConstant05At95Ci": true
+        },
+        "oldBalancedQuarterFractional": {
+          "brier": 0.2099,
+          "brierCi95": [
+            0.2008,
+            0.2191
+          ],
+          "constant05Brier": 0.2123,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "newBalancedQuarterBinaryNoPushPerLeg": {
+          "nLegsTotal": 453,
+          "nLegsResolved": 399,
+          "nLegsExcludedPush": 54,
+          "brierUnweightedLegMean": 0.2443,
+          "brierStakeWeightedMean": 0.245,
+          "brierCi95": [
+            0.2378,
+            0.2512
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2392,
+          "brierCi95": [
+            0.2311,
+            0.2483
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": true,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        }
+      },
+      "ou25": {
+        "nMatchesResolved": 300,
+        "oldBrier": 0.2531,
+        "newBinaryNoPushBrier": 0.2531,
+        "brierCi95": [
+          0.2419,
+          0.2632
+        ],
+        "constant05Brier": 0.25,
+        "beatsConstant05At95Ci": false,
+        "pointPassLt025": false,
+        "ci95PassLt025": false
+      },
+      "ouMultiLine": {
+        "linesEvaluated": [
+          1.5,
+          2,
+          2.25,
+          2.5,
+          2.75,
+          3,
+          3.25,
+          3.5
+        ],
+        "byLine": {
+          "2": {
+            "line": 2,
+            "nLegsTotal": 300,
+            "nLegsResolved": 219,
+            "nLegsExcludedPush": 81,
+            "brierUnweightedLegMean": 0.2291,
+            "brierStakeWeightedMean": 0.2291,
+            "brierCi95": [
+              0.2103,
+              0.2491
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2191,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3": {
+            "line": 3,
+            "nLegsTotal": 300,
+            "nLegsResolved": 221,
+            "nLegsExcludedPush": 79,
+            "brierUnweightedLegMean": 0.2191,
+            "brierStakeWeightedMean": 0.2191,
+            "brierCi95": [
+              0.1956,
+              0.2456
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2147,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "1.5": {
+            "line": 1.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.1868,
+            "brierStakeWeightedMean": 0.1868,
+            "brierCi95": [
+              0.1663,
+              0.2086
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1807,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.25": {
+            "line": 2.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 519,
+            "nLegsExcludedPush": 81,
+            "brierUnweightedLegMean": 0.2429,
+            "brierStakeWeightedMean": 0.2429,
+            "brierCi95": [
+              0.2332,
+              0.2527
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2451,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "2.5": {
+            "line": 2.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2531,
+            "brierStakeWeightedMean": 0.2531,
+            "brierCi95": [
+              0.2419,
+              0.2632
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.25,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": false,
+            "ci95PassLt025": false
+          },
+          "2.75": {
+            "line": 2.75,
+            "nLegsTotal": 600,
+            "nLegsResolved": 521,
+            "nLegsExcludedPush": 79,
+            "brierUnweightedLegMean": 0.2386,
+            "brierStakeWeightedMean": 0.2386,
+            "brierCi95": [
+              0.227,
+              0.2504
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.243,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3.25": {
+            "line": 3.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 521,
+            "nLegsExcludedPush": 79,
+            "brierUnweightedLegMean": 0.1973,
+            "brierStakeWeightedMean": 0.1973,
+            "brierCi95": [
+              0.1799,
+              0.2152
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1947,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3.5": {
+            "line": 3.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.1812,
+            "brierStakeWeightedMean": 0.1812,
+            "brierCi95": [
+              0.1588,
+              0.2062
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1771,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          }
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2425,
+          "brierCi95": [
+            0.2336,
+            0.2517
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2497,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2.5": 261,
+            "3.5": 23,
+            "1.5": 16
+          }
+        },
+        "balancedQuarterLineBinaryNoPushPerLeg": {
+          "nLegsTotal": 449,
+          "nLegsResolved": 394,
+          "nLegsExcludedPush": 55,
+          "brierUnweightedLegMean": 0.2445,
+          "brierStakeWeightedMean": 0.2444,
+          "brierCi95": [
+            0.2371,
+            0.2517
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2498,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2": 25,
+            "3": 36,
+            "2.5": 86,
+            "2.75": 64,
+            "2.25": 72,
+            "3.25": 6,
+            "3.5": 4,
+            "1.75": 7
+          }
+        }
+      },
+      "pinnacleComparison": null
+    },
+    "USA-MLS": {
+      "leagueId": "USA-MLS",
+      "nTotalMatches": 1975,
+      "nTrainInitial": 1675,
+      "nEvalMatches": 300,
+      "chronologicalProof": {
+        "strictOrderingVerified": true,
+        "chronologicalViolationsCount": 0,
+        "refitsExecutedCount": 12,
+        "minPositiveLeadTimeMinutes": 15,
+        "sampleRefitAuditTrail": [
+          {
+            "evalMatchIndex": 1675,
+            "evalMatchId": "6y6r9lu2gpm0ebhpa44eh88ic",
+            "evalKickoffUtc": "2026-04-18T18:30:00.000Z",
+            "trainMatchesCount": 1675,
+            "maxTrainKickoffUtc": "2026-04-18T17:00:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 1700,
+            "evalMatchId": "7b9gzx4h41pv5hrerw8x0l990",
+            "evalKickoffUtc": "2026-04-25T18:30:00.000Z",
+            "trainMatchesCount": 1700,
+            "maxTrainKickoffUtc": "2026-04-25T17:00:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 1725,
+            "evalMatchId": "7oeck9roht8maq319od7g90d0",
+            "evalKickoffUtc": "2026-05-03T01:30:00.000Z",
+            "trainMatchesCount": 1725,
+            "maxTrainKickoffUtc": "2026-05-03T00:30:00.000Z",
+            "strictlyPriorVerified": true
+          }
+        ]
+      },
+      "ah": {
+        "oldFixedMinus05": {
+          "brier": 0.2501,
+          "brierCi95": [
+            0.2357,
+            0.2663
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2464,
+          "beatsConstant05At95Ci": false
+        },
+        "oldBalancedQuarterFractional": {
+          "brier": 0.2076,
+          "brierCi95": [
+            0.1973,
+            0.2169
+          ],
+          "constant05Brier": 0.2081,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "newBalancedQuarterBinaryNoPushPerLeg": {
+          "nLegsTotal": 445,
+          "nLegsResolved": 386,
+          "nLegsExcludedPush": 59,
+          "brierUnweightedLegMean": 0.2456,
+          "brierStakeWeightedMean": 0.2463,
+          "brierCi95": [
+            0.2397,
+            0.2516
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2446,
+          "brierCi95": [
+            0.2364,
+            0.2527
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        }
+      },
+      "ou25": {
+        "nMatchesResolved": 300,
+        "oldBrier": 0.2376,
+        "newBinaryNoPushBrier": 0.2376,
+        "brierCi95": [
+          0.2243,
+          0.2507
+        ],
+        "constant05Brier": 0.25,
+        "beatsConstant05At95Ci": false,
+        "pointPassLt025": true,
+        "ci95PassLt025": false
+      },
+      "ouMultiLine": {
+        "linesEvaluated": [
+          1.5,
+          2,
+          2.25,
+          2.5,
+          2.75,
+          3,
+          3.25,
+          3.5
+        ],
+        "byLine": {
+          "2": {
+            "line": 2,
+            "nLegsTotal": 300,
+            "nLegsResolved": 240,
+            "nLegsExcludedPush": 60,
+            "brierUnweightedLegMean": 0.1724,
+            "brierStakeWeightedMean": 0.1724,
+            "brierCi95": [
+              0.1474,
+              0.199
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1673,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3": {
+            "line": 3,
+            "nLegsTotal": 300,
+            "nLegsResolved": 232,
+            "nLegsExcludedPush": 68,
+            "brierUnweightedLegMean": 0.2483,
+            "brierStakeWeightedMean": 0.2483,
+            "brierCi95": [
+              0.2323,
+              0.264
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2495,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "1.5": {
+            "line": 1.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.1433,
+            "brierStakeWeightedMean": 0.1433,
+            "brierCi95": [
+              0.1188,
+              0.1679
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1411,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.25": {
+            "line": 2.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 540,
+            "nLegsExcludedPush": 60,
+            "brierUnweightedLegMean": 0.2086,
+            "brierStakeWeightedMean": 0.2086,
+            "brierCi95": [
+              0.1945,
+              0.2234
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.21,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.5": {
+            "line": 2.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2376,
+            "brierStakeWeightedMean": 0.2376,
+            "brierCi95": [
+              0.2243,
+              0.2507
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2331,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "2.75": {
+            "line": 2.75,
+            "nLegsTotal": 600,
+            "nLegsResolved": 532,
+            "nLegsExcludedPush": 68,
+            "brierUnweightedLegMean": 0.2423,
+            "brierStakeWeightedMean": 0.2423,
+            "brierCi95": [
+              0.2315,
+              0.2527
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2432,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3.25": {
+            "line": 3.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 532,
+            "nLegsExcludedPush": 68,
+            "brierUnweightedLegMean": 0.2408,
+            "brierStakeWeightedMean": 0.2408,
+            "brierCi95": [
+              0.2287,
+              0.2529
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.248,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3.5": {
+            "line": 3.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2351,
+            "brierStakeWeightedMean": 0.2351,
+            "brierCi95": [
+              0.2178,
+              0.253
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2407,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          }
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.246,
+          "brierCi95": [
+            0.2379,
+            0.2553
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2496,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2.5": 140,
+            "3.5": 160
+          }
+        },
+        "balancedQuarterLineBinaryNoPushPerLeg": {
+          "nLegsTotal": 435,
+          "nLegsResolved": 390,
+          "nLegsExcludedPush": 45,
+          "brierUnweightedLegMean": 0.248,
+          "brierStakeWeightedMean": 0.2479,
+          "brierCi95": [
+            0.2415,
+            0.2552
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2491,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "3": 74,
+            "3.5": 63,
+            "2.75": 63,
+            "3.25": 60,
+            "2.25": 12,
+            "2.5": 28
+          }
+        }
+      },
+      "pinnacleComparison": null
+    },
+    "SAU-PRO": {
+      "leagueId": "SAU-PRO",
+      "nTotalMatches": 1076,
+      "nTrainInitial": 776,
+      "nEvalMatches": 300,
+      "chronologicalProof": {
+        "strictOrderingVerified": true,
+        "chronologicalViolationsCount": 0,
+        "refitsExecutedCount": 12,
+        "minPositiveLeadTimeMinutes": 90,
+        "sampleRefitAuditTrail": [
+          {
+            "evalMatchIndex": 776,
+            "evalMatchId": "9zx26j84nc87k1bjxps80ueqc",
+            "evalKickoffUtc": "2025-11-08T13:50:00.000Z",
+            "trainMatchesCount": 776,
+            "maxTrainKickoffUtc": "2025-11-07T17:30:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 801,
+            "evalMatchId": "adg99r3os0lqg31ivu1gic4yc",
+            "evalKickoffUtc": "2025-12-30T17:30:00.000Z",
+            "trainMatchesCount": 801,
+            "maxTrainKickoffUtc": "2025-12-30T15:30:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 826,
+            "evalMatchId": "anp4etv2v0427plwz2r9wat5g",
+            "evalKickoffUtc": "2026-01-12T17:30:00.000Z",
+            "trainMatchesCount": 825,
+            "maxTrainKickoffUtc": "2026-01-12T15:10:00.000Z",
+            "strictlyPriorVerified": true
+          }
+        ]
+      },
+      "ah": {
+        "oldFixedMinus05": {
+          "brier": 0.1954,
+          "brierCi95": [
+            0.1757,
+            0.2173
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2464,
+          "beatsConstant05At95Ci": true
+        },
+        "oldBalancedQuarterFractional": {
+          "brier": 0.212,
+          "brierCi95": [
+            0.2011,
+            0.2214
+          ],
+          "constant05Brier": 0.2131,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "newBalancedQuarterBinaryNoPushPerLeg": {
+          "nLegsTotal": 449,
+          "nLegsResolved": 396,
+          "nLegsExcludedPush": 53,
+          "brierUnweightedLegMean": 0.2448,
+          "brierStakeWeightedMean": 0.2464,
+          "brierCi95": [
+            0.2386,
+            0.2517
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2432,
+          "brierCi95": [
+            0.2347,
+            0.2513
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        }
+      },
+      "ou25": {
+        "nMatchesResolved": 300,
+        "oldBrier": 0.2549,
+        "newBinaryNoPushBrier": 0.2549,
+        "brierCi95": [
+          0.2427,
+          0.2683
+        ],
+        "constant05Brier": 0.25,
+        "beatsConstant05At95Ci": false,
+        "pointPassLt025": false,
+        "ci95PassLt025": false
+      },
+      "ouMultiLine": {
+        "linesEvaluated": [
+          1.5,
+          2,
+          2.25,
+          2.5,
+          2.75,
+          3,
+          3.25,
+          3.5
+        ],
+        "byLine": {
+          "2": {
+            "line": 2,
+            "nLegsTotal": 300,
+            "nLegsResolved": 231,
+            "nLegsExcludedPush": 69,
+            "brierUnweightedLegMean": 0.2158,
+            "brierStakeWeightedMean": 0.2158,
+            "brierCi95": [
+              0.1883,
+              0.2422
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2022,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3": {
+            "line": 3,
+            "nLegsTotal": 300,
+            "nLegsResolved": 242,
+            "nLegsExcludedPush": 58,
+            "brierUnweightedLegMean": 0.2528,
+            "brierStakeWeightedMean": 0.2528,
+            "brierCi95": [
+              0.2349,
+              0.2707
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2471,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": false,
+            "ci95PassLt025": false
+          },
+          "1.5": {
+            "line": 1.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.1774,
+            "brierStakeWeightedMean": 0.1774,
+            "brierCi95": [
+              0.1515,
+              0.2058
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1697,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.25": {
+            "line": 2.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 531,
+            "nLegsExcludedPush": 69,
+            "brierUnweightedLegMean": 0.2379,
+            "brierStakeWeightedMean": 0.2379,
+            "brierCi95": [
+              0.2238,
+              0.2528
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2343,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "2.5": {
+            "line": 2.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2549,
+            "brierStakeWeightedMean": 0.2549,
+            "brierCi95": [
+              0.2427,
+              0.2683
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2472,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": false,
+            "ci95PassLt025": false
+          },
+          "2.75": {
+            "line": 2.75,
+            "nLegsTotal": 600,
+            "nLegsResolved": 542,
+            "nLegsExcludedPush": 58,
+            "brierUnweightedLegMean": 0.254,
+            "brierStakeWeightedMean": 0.254,
+            "brierCi95": [
+              0.2432,
+              0.2644
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.25,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": false,
+            "ci95PassLt025": false
+          },
+          "3.25": {
+            "line": 3.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 542,
+            "nLegsExcludedPush": 58,
+            "brierUnweightedLegMean": 0.2413,
+            "brierStakeWeightedMean": 0.2413,
+            "brierCi95": [
+              0.2281,
+              0.2559
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2397,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3.5": {
+            "line": 3.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.232,
+            "brierStakeWeightedMean": 0.232,
+            "brierCi95": [
+              0.211,
+              0.2531
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2304,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          }
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2498,
+          "brierCi95": [
+            0.2407,
+            0.2589
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2497,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "3.5": 134,
+            "2.5": 163,
+            "1.5": 3
+          }
+        },
+        "balancedQuarterLineBinaryNoPushPerLeg": {
+          "nLegsTotal": 447,
+          "nLegsResolved": 407,
+          "nLegsExcludedPush": 40,
+          "brierUnweightedLegMean": 0.2481,
+          "brierStakeWeightedMean": 0.2484,
+          "brierCi95": [
+            0.2413,
+            0.2552
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2": 8,
+            "3": 51,
+            "3.5": 49,
+            "2.5": 45,
+            "2.75": 60,
+            "3.25": 54,
+            "2.25": 31,
+            "1.75": 2
+          }
+        }
+      },
+      "pinnacleComparison": null
+    },
+    "JPN-J1": {
+      "leagueId": "JPN-J1",
+      "nTotalMatches": 760,
+      "nTrainInitial": 460,
+      "nEvalMatches": 300,
+      "chronologicalProof": {
+        "strictOrderingVerified": true,
+        "chronologicalViolationsCount": 0,
+        "refitsExecutedCount": 12,
+        "minPositiveLeadTimeMinutes": 30,
+        "sampleRefitAuditTrail": [
+          {
+            "evalMatchIndex": 460,
+            "evalMatchId": "af_1324038",
+            "evalKickoffUtc": "2025-04-06T05:00:00+00:00",
+            "trainMatchesCount": 460,
+            "maxTrainKickoffUtc": "2025-04-06T04:00:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 485,
+            "evalMatchId": "af_1324060",
+            "evalKickoffUtc": "2025-04-20T05:00:00+00:00",
+            "trainMatchesCount": 483,
+            "maxTrainKickoffUtc": "2025-04-19T05:03:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 510,
+            "evalMatchId": "af_1324084",
+            "evalKickoffUtc": "2025-05-03T05:00:00+00:00",
+            "trainMatchesCount": 509,
+            "maxTrainKickoffUtc": "2025-05-03T04:00:00.000Z",
+            "strictlyPriorVerified": true
+          }
+        ]
+      },
+      "ah": {
+        "oldFixedMinus05": {
+          "brier": 0.232,
+          "brierCi95": [
+            0.2181,
+            0.2476
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2475,
+          "beatsConstant05At95Ci": true
+        },
+        "oldBalancedQuarterFractional": {
+          "brier": 0.2026,
+          "brierCi95": [
+            0.1912,
+            0.2135
+          ],
+          "constant05Brier": 0.2025,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "newBalancedQuarterBinaryNoPushPerLeg": {
+          "nLegsTotal": 466,
+          "nLegsResolved": 398,
+          "nLegsExcludedPush": 68,
+          "brierUnweightedLegMean": 0.2439,
+          "brierStakeWeightedMean": 0.2455,
+          "brierCi95": [
+            0.2372,
+            0.2509
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2452,
+          "brierCi95": [
+            0.2362,
+            0.2551
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        }
+      },
+      "ou25": {
+        "nMatchesResolved": 300,
+        "oldBrier": 0.2436,
+        "newBinaryNoPushBrier": 0.2436,
+        "brierCi95": [
+          0.2304,
+          0.2582
+        ],
+        "constant05Brier": 0.25,
+        "beatsConstant05At95Ci": false,
+        "pointPassLt025": true,
+        "ci95PassLt025": false
+      },
+      "ouMultiLine": {
+        "linesEvaluated": [
+          1.5,
+          2,
+          2.25,
+          2.5,
+          2.75,
+          3,
+          3.25,
+          3.5
+        ],
+        "byLine": {
+          "2": {
+            "line": 2,
+            "nLegsTotal": 300,
+            "nLegsResolved": 244,
+            "nLegsExcludedPush": 56,
+            "brierUnweightedLegMean": 0.2282,
+            "brierStakeWeightedMean": 0.2282,
+            "brierCi95": [
+              0.213,
+              0.2449
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2426,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3": {
+            "line": 3,
+            "nLegsTotal": 300,
+            "nLegsResolved": 226,
+            "nLegsExcludedPush": 74,
+            "brierUnweightedLegMean": 0.2061,
+            "brierStakeWeightedMean": 0.2061,
+            "brierCi95": [
+              0.1792,
+              0.2345
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2121,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "1.5": {
+            "line": 1.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2137,
+            "brierStakeWeightedMean": 0.2137,
+            "brierCi95": [
+              0.1935,
+              0.2336
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2233,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.25": {
+            "line": 2.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 544,
+            "nLegsExcludedPush": 56,
+            "brierUnweightedLegMean": 0.2367,
+            "brierStakeWeightedMean": 0.2367,
+            "brierCi95": [
+              0.2257,
+              0.2477
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2493,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.5": {
+            "line": 2.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2436,
+            "brierStakeWeightedMean": 0.2436,
+            "brierCi95": [
+              0.2304,
+              0.2582
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2495,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "2.75": {
+            "line": 2.75,
+            "nLegsTotal": 600,
+            "nLegsResolved": 526,
+            "nLegsExcludedPush": 74,
+            "brierUnweightedLegMean": 0.2275,
+            "brierStakeWeightedMean": 0.2275,
+            "brierCi95": [
+              0.2138,
+              0.2415
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2406,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3.25": {
+            "line": 3.25,
+            "nLegsTotal": 600,
+            "nLegsResolved": 526,
+            "nLegsExcludedPush": 74,
+            "brierUnweightedLegMean": 0.189,
+            "brierStakeWeightedMean": 0.189,
+            "brierCi95": [
+              0.1704,
+              0.2075
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1935,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3.5": {
+            "line": 3.5,
+            "nLegsTotal": 300,
+            "nLegsResolved": 300,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.176,
+            "brierStakeWeightedMean": 0.176,
+            "brierCi95": [
+              0.1519,
+              0.202
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.1771,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          }
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 300,
+          "brier": 0.2453,
+          "brierCi95": [
+            0.2358,
+            0.2553
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2496,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2.5": 223,
+            "1.5": 47,
+            "3.5": 30
+          }
+        },
+        "balancedQuarterLineBinaryNoPushPerLeg": {
+          "nLegsTotal": 434,
+          "nLegsResolved": 380,
+          "nLegsExcludedPush": 54,
+          "brierUnweightedLegMean": 0.2479,
+          "brierStakeWeightedMean": 0.2486,
+          "brierCi95": [
+            0.24,
+            0.2554
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2492,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2": 52,
+            "3": 28,
+            "2.75": 43,
+            "1.75": 23,
+            "2.5": 73,
+            "3.25": 11,
+            "2.25": 57,
+            "3.5": 8,
+            "1.5": 5
+          }
+        }
+      },
+      "pinnacleComparison": null
+    },
+    "KOR-K1": {
+      "leagueId": "KOR-K1",
+      "nTotalMatches": 464,
+      "nTrainInitial": 256,
+      "nEvalMatches": 208,
+      "chronologicalProof": {
+        "strictOrderingVerified": true,
+        "chronologicalViolationsCount": 0,
+        "refitsExecutedCount": 9,
+        "minPositiveLeadTimeMinutes": 150,
+        "sampleRefitAuditTrail": [
+          {
+            "evalMatchIndex": 256,
+            "evalMatchId": "af_1340726",
+            "evalKickoffUtc": "2025-03-15T07:30:00+00:00",
+            "trainMatchesCount": 256,
+            "maxTrainKickoffUtc": "2025-03-15T05:00:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 281,
+            "evalMatchId": "af_1340747",
+            "evalKickoffUtc": "2025-04-13T07:30:00+00:00",
+            "trainMatchesCount": 280,
+            "maxTrainKickoffUtc": "2025-04-13T05:00:00.000Z",
+            "strictlyPriorVerified": true
+          },
+          {
+            "evalMatchIndex": 306,
+            "evalMatchId": "af_1340773",
+            "evalKickoffUtc": "2025-05-10T07:30:00+00:00",
+            "trainMatchesCount": 306,
+            "maxTrainKickoffUtc": "2025-05-06T10:00:00.000Z",
+            "strictlyPriorVerified": true
+          }
+        ]
+      },
+      "ah": {
+        "oldFixedMinus05": {
+          "brier": 0.2367,
+          "brierCi95": [
+            0.2225,
+            0.252
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2433,
+          "beatsConstant05At95Ci": false
+        },
+        "oldBalancedQuarterFractional": {
+          "brier": 0.2075,
+          "brierCi95": [
+            0.196,
+            0.2187
+          ],
+          "constant05Brier": 0.2085,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": true
+        },
+        "newBalancedQuarterBinaryNoPushPerLeg": {
+          "nLegsTotal": 314,
+          "nLegsResolved": 272,
+          "nLegsExcludedPush": 42,
+          "brierUnweightedLegMean": 0.2426,
+          "brierStakeWeightedMean": 0.2445,
+          "brierCi95": [
+            0.2347,
+            0.2505
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 208,
+          "brier": 0.2469,
+          "brierCi95": [
+            0.2367,
+            0.2572
+          ],
+          "constant05Brier": 0.25,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false
+        }
+      },
+      "ou25": {
+        "nMatchesResolved": 208,
+        "oldBrier": 0.2485,
+        "newBinaryNoPushBrier": 0.2485,
+        "brierCi95": [
+          0.2359,
+          0.2605
+        ],
+        "constant05Brier": 0.25,
+        "beatsConstant05At95Ci": false,
+        "pointPassLt025": true,
+        "ci95PassLt025": false
+      },
+      "ouMultiLine": {
+        "linesEvaluated": [
+          1.5,
+          2,
+          2.25,
+          2.5,
+          2.75,
+          3,
+          3.25,
+          3.5
+        ],
+        "byLine": {
+          "2": {
+            "line": 2,
+            "nLegsTotal": 208,
+            "nLegsResolved": 159,
+            "nLegsExcludedPush": 49,
+            "brierUnweightedLegMean": 0.2285,
+            "brierStakeWeightedMean": 0.2285,
+            "brierCi95": [
+              0.2081,
+              0.2503
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.235,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3": {
+            "line": 3,
+            "nLegsTotal": 208,
+            "nLegsResolved": 167,
+            "nLegsExcludedPush": 41,
+            "brierUnweightedLegMean": 0.2298,
+            "brierStakeWeightedMean": 0.2298,
+            "brierCi95": [
+              0.2006,
+              0.2587
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2267,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "1.5": {
+            "line": 1.5,
+            "nLegsTotal": 208,
+            "nLegsResolved": 208,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2013,
+            "brierStakeWeightedMean": 0.2013,
+            "brierCi95": [
+              0.1749,
+              0.2285
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2053,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "2.25": {
+            "line": 2.25,
+            "nLegsTotal": 416,
+            "nLegsResolved": 367,
+            "nLegsExcludedPush": 49,
+            "brierUnweightedLegMean": 0.2398,
+            "brierStakeWeightedMean": 0.2398,
+            "brierCi95": [
+              0.2286,
+              0.2513
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2484,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "2.5": {
+            "line": 2.5,
+            "nLegsTotal": 208,
+            "nLegsResolved": 208,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2485,
+            "brierStakeWeightedMean": 0.2485,
+            "brierCi95": [
+              0.2359,
+              0.2605
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2494,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "2.75": {
+            "line": 2.75,
+            "nLegsTotal": 416,
+            "nLegsResolved": 375,
+            "nLegsExcludedPush": 41,
+            "brierUnweightedLegMean": 0.2402,
+            "brierStakeWeightedMean": 0.2402,
+            "brierCi95": [
+              0.2256,
+              0.2548
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2434,
+            "beatsConstant05At95Ci": false,
+            "pointPassLt025": true,
+            "ci95PassLt025": false
+          },
+          "3.25": {
+            "line": 3.25,
+            "nLegsTotal": 416,
+            "nLegsResolved": 375,
+            "nLegsExcludedPush": 41,
+            "brierUnweightedLegMean": 0.2155,
+            "brierStakeWeightedMean": 0.2155,
+            "brierCi95": [
+              0.193,
+              0.2374
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2136,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          },
+          "3.5": {
+            "line": 3.5,
+            "nLegsTotal": 208,
+            "nLegsResolved": 208,
+            "nLegsExcludedPush": 0,
+            "brierUnweightedLegMean": 0.2041,
+            "brierStakeWeightedMean": 0.2041,
+            "brierCi95": [
+              0.1717,
+              0.2349
+            ],
+            "constant05Brier": 0.25,
+            "baseRateBrier": 0.2011,
+            "beatsConstant05At95Ci": true,
+            "pointPassLt025": true,
+            "ci95PassLt025": true
+          }
+        },
+        "balancedHalfLineBinaryNoPush": {
+          "nMatchesResolved": 208,
+          "brier": 0.2423,
+          "brierCi95": [
+            0.2314,
+            0.2529
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2481,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2.5": 187,
+            "3.5": 16,
+            "1.5": 5
+          }
+        },
+        "balancedQuarterLineBinaryNoPushPerLeg": {
+          "nLegsTotal": 319,
+          "nLegsResolved": 287,
+          "nLegsExcludedPush": 32,
+          "brierUnweightedLegMean": 0.2474,
+          "brierStakeWeightedMean": 0.2491,
+          "brierCi95": [
+            0.2388,
+            0.2558
+          ],
+          "constant05Brier": 0.25,
+          "baseRateBrier": 0.2487,
+          "beatsConstant05At95Ci": false,
+          "pointPassLt025": true,
+          "ci95PassLt025": false,
+          "lineDistribution": {
+            "2": 14,
+            "3": 25,
+            "2.25": 56,
+            "2.5": 54,
+            "2.75": 48,
+            "3.25": 5,
+            "1.75": 2,
+            "3.5": 4
+          }
+        }
+      },
+      "pinnacleComparison": null
+    },
+    "IDN-L1": {
+      "leagueId": "IDN-L1",
+      "nTotalMatches": 0,
+      "nEvalMatches": 0,
+      "status": "PAUSED_INSUFFICIENT_DATA"
+    }
+  }
+}

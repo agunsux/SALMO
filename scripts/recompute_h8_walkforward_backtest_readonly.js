@@ -440,6 +440,65 @@ function evalAhBinaryNoPushLegs(grid, line, homeGoals, awayGoals) {
   return legs;
 }
 
+function evalSingleOuLineOnGrid(grid, line) {
+  let pOver = 0;
+  let pPush = 0;
+  let pUnder = 0;
+  for (let i = 0; i <= 10; i++) {
+    for (let j = 0; j <= 10; j++) {
+      const diff = (i + j) - line;
+      if (diff > 1e-9) pOver += grid[i][j];
+      else if (Math.abs(diff) <= 1e-9) pPush += grid[i][j];
+      else pUnder += grid[i][j];
+    }
+  }
+  const nonPushMass = pOver + pUnder;
+  const pCondNoPush = nonPushMass > 1e-9 ? Math.max(0.01, Math.min(0.99, pOver / nonPushMass)) : 0.5;
+  return { pOver, pPush, pUnder, expectedScore: pOver + 0.5 * pPush, pCondNoPush };
+}
+
+/**
+ * Binary No-Push Per-Leg OU evaluator across any half, whole, or quarter total goals line
+ * (e.g., 1.5, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5).
+ * Quarter lines (.25 / .75) decompose into two half-stake legs `[line - 0.25, line + 0.25]`.
+ * Each leg is scored against its own conditional non-push Over probability `pCondNoPush = pOver / (pOver + pUnder)`.
+ * Any leg that settles as PUSH (`homeGoals + awayGoals == subLine`) is excluded.
+ */
+function evalOuBinaryNoPushLegs(grid, line, homeGoals, awayGoals) {
+  const mod = Math.abs(line % 0.5);
+  const isQuarter = Math.abs(mod - 0.25) < 1e-6;
+  const subLines = isQuarter ? [line - 0.25, line + 0.25] : [line];
+  const stakeWeight = isQuarter ? 0.5 : 1.0;
+  const totalGoals = homeGoals + awayGoals;
+
+  const legs = [];
+  for (const subLine of subLines) {
+    const g = evalSingleOuLineOnGrid(grid, subLine);
+    const diff = totalGoals - subLine;
+    if (Math.abs(diff) <= 1e-9) {
+      legs.push({
+        legLine: subLine,
+        stakeWeight,
+        pLegNoPush: g.pCondNoPush,
+        binaryOutcome: null,
+        excludedPush: true,
+        sqError: null,
+      });
+    } else {
+      const y = diff > 1e-9 ? 1 : 0;
+      legs.push({
+        legLine: subLine,
+        stakeWeight,
+        pLegNoPush: g.pCondNoPush,
+        binaryOutcome: y,
+        excludedPush: false,
+        sqError: Math.pow(g.pCondNoPush - y, 2),
+      });
+    }
+  }
+  return legs;
+}
+
 function computeBootstrapBrierCi95(preds, actuals, nBoot = 1000) {
   const n = preds.length;
   if (n === 0) {
@@ -581,6 +640,8 @@ function loadEplPinnacleHistoricalOddsMap() {
   return map;
 }
 
+const OU_MULTI_LINES = [1.5, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5];
+
 function runReadOnlyH8BacktestRecompute(options = { writeReportFile: false }) {
   const ratingsArtifactPath = path.resolve(process.cwd(), 'data/artifacts/multi_league_team_ratings_v1.0.json');
   const beforeBytes = fs.readFileSync(ratingsArtifactPath);
@@ -631,6 +692,34 @@ function runReadOnlyH8BacktestRecompute(options = { writeReportFile: false }) {
     let ahQtrLegsExcludedPush = 0;
     let ahQtrWeightedSqSum = 0;
     let ahQtrWeightSum = 0;
+
+    // Multi-line OU arrays (1.5, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5)
+    const ouLineAccum = {};
+    for (const ln of OU_MULTI_LINES) {
+      ouLineAccum[String(ln)] = {
+        line: ln,
+        preds: [],
+        actuals: [],
+        legsTotal: 0,
+        legsResolved: 0,
+        legsExcludedPush: 0,
+        weightedSqSum: 0,
+        weightSum: 0,
+      };
+    }
+
+    // Balanced Dynamic OU Half-Line & Quarter-Line arrays
+    const ouBalancedHalfPreds = [];
+    const ouBalancedHalfActuals = [];
+    const ouBalancedHalfLineDist = {};
+    const ouBalancedQtrLegPreds = [];
+    const ouBalancedQtrLegActuals = [];
+    const ouBalancedQtrLineDist = {};
+    let ouQtrLegsTotal = 0;
+    let ouQtrLegsResolved = 0;
+    let ouQtrLegsExcludedPush = 0;
+    let ouQtrWeightedSqSum = 0;
+    let ouQtrWeightSum = 0;
 
     // Pinnacle benchmark arrays (ENG-PL)
     const pinOuPreds = [];
@@ -727,6 +816,54 @@ function runReadOnlyH8BacktestRecompute(options = { writeReportFile: false }) {
       ahMinus05Preds.push(pHomeWin);
       ahMinus05Actuals.push(yHomeWin);
 
+      // Evaluate Multi-Line OU across all 8 lines: 1.5, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5
+      for (const ln of OU_MULTI_LINES) {
+        const acc = ouLineAccum[String(ln)];
+        const ouLegs = evalOuBinaryNoPushLegs(grid, ln, m.home_goals, m.away_goals);
+        for (const leg of ouLegs) {
+          acc.legsTotal++;
+          if (leg.excludedPush) {
+            acc.legsExcludedPush++;
+          } else {
+            acc.legsResolved++;
+            acc.preds.push(leg.pLegNoPush);
+            acc.actuals.push(leg.binaryOutcome);
+            acc.weightedSqSum += leg.stakeWeight * leg.sqError;
+            acc.weightSum += leg.stakeWeight;
+          }
+        }
+      }
+
+      // Balanced Dynamic OU Half-Line & Quarter-Line
+      const rawExpectedTotal = lH + lA;
+      const candidateOuHalfLines = [1.5, 2.5, 3.5];
+      const balancedOuHalfLine = candidateOuHalfLines.reduce(
+        (best, cand) => (Math.abs(cand - rawExpectedTotal) < Math.abs(best - rawExpectedTotal) ? cand : best),
+        2.5
+      );
+      ouBalancedHalfLineDist[String(balancedOuHalfLine)] = (ouBalancedHalfLineDist[String(balancedOuHalfLine)] || 0) + 1;
+      const ouHalfEval = evalSingleOuLineOnGrid(grid, balancedOuHalfLine);
+      const pOuHalfCover = Math.max(0.01, Math.min(0.99, ouHalfEval.pOver));
+      const yOuHalfCover = (m.home_goals + m.away_goals) > balancedOuHalfLine ? 1 : 0;
+      ouBalancedHalfPreds.push(pOuHalfCover);
+      ouBalancedHalfActuals.push(yOuHalfCover);
+
+      const balancedOuQuarterLine = Math.max(1.5, Math.min(3.5, Math.round(rawExpectedTotal * 4) / 4));
+      ouBalancedQtrLineDist[String(balancedOuQuarterLine)] = (ouBalancedQtrLineDist[String(balancedOuQuarterLine)] || 0) + 1;
+      const ouQtrLegs = evalOuBinaryNoPushLegs(grid, balancedOuQuarterLine, m.home_goals, m.away_goals);
+      for (const leg of ouQtrLegs) {
+        ouQtrLegsTotal++;
+        if (leg.excludedPush) {
+          ouQtrLegsExcludedPush++;
+        } else {
+          ouQtrLegsResolved++;
+          ouBalancedQtrLegPreds.push(leg.pLegNoPush);
+          ouBalancedQtrLegActuals.push(leg.binaryOutcome);
+          ouQtrWeightedSqSum += leg.stakeWeight * leg.sqError;
+          ouQtrWeightSum += leg.stakeWeight;
+        }
+      }
+
       // Balanced Half-Line AH
       const rawFairHandicap = -(lH - lA);
       const candidateHalfLines = [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5];
@@ -798,6 +935,32 @@ function runReadOnlyH8BacktestRecompute(options = { writeReportFile: false }) {
     const ahQtrNewStakeWeightedBrier =
       ahQtrWeightSum > 0 ? Number((ahQtrWeightedSqSum / ahQtrWeightSum).toFixed(4)) : null;
 
+    // Compute multi-line OU bootstrap summaries
+    const ouByLineResults = {};
+    for (const ln of OU_MULTI_LINES) {
+      const acc = ouLineAccum[String(ln)];
+      const boot = computeBootstrapBrierCi95(acc.preds, acc.actuals, 1000);
+      ouByLineResults[String(ln)] = {
+        line: ln,
+        nLegsTotal: acc.legsTotal,
+        nLegsResolved: acc.legsResolved,
+        nLegsExcludedPush: acc.legsExcludedPush,
+        brierUnweightedLegMean: boot.brier,
+        brierStakeWeightedMean: acc.weightSum > 0 ? Number((acc.weightedSqSum / acc.weightSum).toFixed(4)) : null,
+        brierCi95: boot.brierCi95,
+        constant05Brier: 0.25,
+        baseRateBrier: boot.baseRateBrier,
+        beatsConstant05At95Ci: boot.beatsConstant05At95Ci,
+        pointPassLt025: boot.brier !== null && boot.brier < 0.25,
+        ci95PassLt025: boot.brierCi95[1] !== null && boot.brierCi95[1] < 0.25,
+      };
+    }
+
+    const ouBalancedHalfBoot = computeBootstrapBrierCi95(ouBalancedHalfPreds, ouBalancedHalfActuals, 1000);
+    const ouBalancedQtrBoot = computeBootstrapBrierCi95(ouBalancedQtrLegPreds, ouBalancedQtrLegActuals, 1000);
+    const ouBalancedQtrStakeWeightedBrier =
+      ouQtrWeightSum > 0 ? Number((ouQtrWeightedSqSum / ouQtrWeightSum).toFixed(4)) : null;
+
     // Compare promotion-gate results against the 0.2500 binary coin-flip threshold:
     //   - Point Brier < 0.2500
     //   - Upper 95% CI < 0.2500
@@ -861,6 +1024,7 @@ function runReadOnlyH8BacktestRecompute(options = { writeReportFile: false }) {
         ou25: {
           pinnacleBrier: pinOuBrier,
           modelBrier: modOuBrier,
+          modelMinusPinnacleDiff: Number((modOuBrier - pinOuBrier).toFixed(4)),
         },
         ahMarketLineOldFractional: {
           pinnacleBrier: pinAhOldBrier,
@@ -872,6 +1036,7 @@ function runReadOnlyH8BacktestRecompute(options = { writeReportFile: false }) {
           nLegsExcludedPush: pinAhLegsExcludedPush,
           pinnacleBrier: pinAhNewLegBrier,
           modelBrier: modAhNewLegBrier,
+          modelMinusPinnacleDiff: Number((modAhNewLegBrier - pinAhNewLegBrier).toFixed(4)),
         },
       };
     }
@@ -935,6 +1100,35 @@ function runReadOnlyH8BacktestRecompute(options = { writeReportFile: false }) {
         beatsConstant05At95Ci: ouBoot.beatsConstant05At95Ci,
         pointPassLt025: ouPointPass,
         ci95PassLt025: ouCi95Pass,
+      },
+      ouMultiLine: {
+        linesEvaluated: OU_MULTI_LINES,
+        byLine: ouByLineResults,
+        balancedHalfLineBinaryNoPush: {
+          nMatchesResolved: ouBalancedHalfBoot.n,
+          brier: ouBalancedHalfBoot.brier,
+          brierCi95: ouBalancedHalfBoot.brierCi95,
+          constant05Brier: 0.25,
+          baseRateBrier: ouBalancedHalfBoot.baseRateBrier,
+          beatsConstant05At95Ci: ouBalancedHalfBoot.beatsConstant05At95Ci,
+          pointPassLt025: ouBalancedHalfBoot.brier !== null && ouBalancedHalfBoot.brier < 0.25,
+          ci95PassLt025: ouBalancedHalfBoot.brierCi95[1] !== null && ouBalancedHalfBoot.brierCi95[1] < 0.25,
+          lineDistribution: ouBalancedHalfLineDist,
+        },
+        balancedQuarterLineBinaryNoPushPerLeg: {
+          nLegsTotal: ouQtrLegsTotal,
+          nLegsResolved: ouQtrLegsResolved,
+          nLegsExcludedPush: ouQtrLegsExcludedPush,
+          brierUnweightedLegMean: ouBalancedQtrBoot.brier,
+          brierStakeWeightedMean: ouBalancedQtrStakeWeightedBrier,
+          brierCi95: ouBalancedQtrBoot.brierCi95,
+          constant05Brier: 0.25,
+          baseRateBrier: ouBalancedQtrBoot.baseRateBrier,
+          beatsConstant05At95Ci: ouBalancedQtrBoot.beatsConstant05At95Ci,
+          pointPassLt025: ouBalancedQtrBoot.brier !== null && ouBalancedQtrBoot.brier < 0.25,
+          ci95PassLt025: ouBalancedQtrBoot.brierCi95[1] !== null && ouBalancedQtrBoot.brierCi95[1] < 0.25,
+          lineDistribution: ouBalancedQtrLineDist,
+        },
       },
       pinnacleComparison,
     };
@@ -1016,4 +1210,8 @@ if (require.main === module) {
 
 module.exports = {
   runReadOnlyH8BacktestRecompute,
+  buildGrid,
+  evalSingleOuLineOnGrid,
+  evalOuBinaryNoPushLegs,
+  OU_MULTI_LINES,
 };
