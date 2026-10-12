@@ -68,7 +68,7 @@ async function handleCron(request: NextRequest) {
   );
 
   // Run non-billable quota-reset detector (0 billable requests, read-only unless allowDbWrite)
-  const quotaDetection = await OddsPapiQuotaGuard.detectQuotaReset(3, false, undefined, allowDbWrite);
+  const quotaDetection = await OddsPapiQuotaGuard.detectQuotaReset(2, false, undefined, allowDbWrite);
 
   // Fail-closed if quota is still exhausted or unverified (0 billable requests made)
   if (quotaDetection.state !== 'QUOTA_AVAILABLE') {
@@ -114,7 +114,11 @@ async function handleCron(request: NextRequest) {
       allowProductionWrite: allowDbWrite,
     });
     const result = await ProductionPredictionEngine.runPredictionCycle(
-      autoUnlockResult.evaluatedFixtures
+      autoUnlockResult.evaluatedFixtures,
+      {
+        persistToDatabase: allowDbWrite,
+        allowProductionWrite: allowDbWrite,
+      }
     );
     const latencyMs = Date.now() - start;
 

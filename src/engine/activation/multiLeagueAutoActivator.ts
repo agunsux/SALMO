@@ -17,6 +17,7 @@ import {
   getPriorityOrderedLeaguesForOdds,
   getTournamentBatches,
   MAX_TOURNAMENTS_PER_BATCH_REQUEST,
+  ODDSPAPI_TOURNAMENT_LEAGUE_MAP,
 } from '../../config/multiLeagueRegistry';
 import {
   OddsPapiQuotaGuard,
@@ -27,6 +28,7 @@ import {
   MULTI_LEAGUE_BACKTEST_SUMMARY,
   MULTI_LEAGUE_PROFILES,
   CANONICAL_EPL_RATINGS,
+  normalizeTeamKey,
 } from '../features/teamRatings';
 import { CompetitionProfileEngine } from '../features/competitionProfile';
 import { ProductionPredictionEngine, FixtureInput } from '../pipeline/productionPredictionEngine';
@@ -100,6 +102,7 @@ export interface AutoActivationRunResult {
   quotaDetection: QuotaResetDetectionResult;
   billableRequestsMade: number;
   batchesQueried: number[][];
+  ingestionBlockerReason?: string | null;
   leaguesPromoted: string[];
   leaguesProposedForReview: Array<{
     internalLeagueId: string;
@@ -141,6 +144,10 @@ export interface AutoActivationOptions {
   forceAccountSync?: boolean;
   injectedAccountData?: any;
   injectedFixtures?: Array<Partial<LiveFixtureDTO> & { providerFixtureId: string; homeTeam: string; awayTeam: string; league: string; kickoffTime: string }>;
+  canonicalFixturesPath?: string;
+  maxCanonicalFixtureAgeHours?: number;
+  referenceTimeUtc?: string;
+  tournamentMappingOverride?: Record<number, { internal_league_id: string; league_name: string }>;
   injectedOddsByTournamentBatch?: Record<string, LiveOddsDTO[]>;
   injectedBacktestOverride?: Record<string, any>;
   simulateSmokeTestFailureForLeagues?: string[];
@@ -165,6 +172,7 @@ export class MultiLeagueAutoActivator {
   public static readonly MIN_CALIBRATION_SLOPE = 0.5000;
   public static readonly MAX_DISPERSION_RATIO = 1.1500;
   public static readonly MIN_EVAL_SAMPLE = 300;
+  public static readonly DEFAULT_MAX_CANONICAL_FIXTURE_AGE_HOURS = 168; // 7 days
 
   /**
    * H2 Safety Gate: Checks whether manual human approval for league promotion is active.
@@ -181,6 +189,8 @@ export class MultiLeagueAutoActivator {
    * Executes the Phase B -> Phase C -> Phase D Multi-League Evaluation & Proposal flow.
    * H1: Database persistence defaults to FALSE and requires ALLOW_PRODUCTION_DB_WRITE === 'true'.
    * H2: Runs in PROPOSE_ONLY mode by default; quota reset NEVER promotes any league or market to ACTIVE.
+   * H7 P3: Reuses verified canonical fixtures and tournament mappings; makes 0 calls to /v4/fixtures
+   * and only 1-2 batch calls to /v4/odds-by-tournaments.
    */
   public static async runAutoUnlockCycle(
     options: AutoActivationOptions = {}
@@ -197,8 +207,9 @@ export class MultiLeagueAutoActivator {
       : 'PROPOSE_ONLY';
 
     // ─── PHASE B: Non-Billable Quota-Reset Detection (Read-Only by Default) ──
+    // H7 P3: Activation cycle requires at most 2 batch /v4/odds-by-tournaments calls (0 /v4/fixtures calls)
     const quotaDetection = await OddsPapiQuotaGuard.detectQuotaReset(
-      3,
+      2,
       options.forceAccountSync ?? false,
       options.injectedAccountData,
       productionWriteAllowed
@@ -206,6 +217,7 @@ export class MultiLeagueAutoActivator {
 
     let billableRequestsMade = 0;
     const batchesQueried: number[][] = [];
+    let ingestionBlockerReason: string | null = null;
     const discoveredFixturesByLeague = new Map<string, FixtureInput[]>();
     let lockId: string | undefined;
 
@@ -228,6 +240,7 @@ export class MultiLeagueAutoActivator {
         );
         billableRequestsMade = ingestionRes.billableRequestsMade;
         batchesQueried.push(...ingestionRes.batchesQueried);
+        ingestionBlockerReason = ingestionRes.blockerReason;
         for (const [lid, fixList] of ingestionRes.fixturesByLeague.entries()) {
           discoveredFixturesByLeague.set(lid, fixList);
         }
@@ -291,11 +304,15 @@ export class MultiLeagueAutoActivator {
         }
       }
 
-      // H1: Database persistence is strictly blocked unless productionWriteAllowed is true
+      // H1 & H7 P2: Database persistence is strictly blocked unless productionWriteAllowed is true
       let persistenceSummary: AutoActivationRunResult['persistenceSummary'];
       if (productionWriteAllowed && smokeTestedPredictionsForPersistence.length > 0) {
         const persistRes = await ProductionPredictionEngine.persistPredictionCycle(
-          smokeTestedPredictionsForPersistence
+          smokeTestedPredictionsForPersistence,
+          {
+            persistToDatabase: Boolean(options.persistToDatabase),
+            allowProductionWrite: Boolean(options.allowProductionWrite),
+          }
         );
         persistenceSummary = {
           persistedPicksCount: persistRes.persistedPicksCount,
@@ -337,6 +354,7 @@ export class MultiLeagueAutoActivator {
         quotaDetection,
         billableRequestsMade,
         batchesQueried,
+        ingestionBlockerReason,
         leaguesPromoted,
         leaguesProposedForReview,
         leaguesRolledBack,
@@ -361,8 +379,11 @@ export class MultiLeagueAutoActivator {
   }
 
   /**
-   * Phase C: Priority-ordered tournament batch ingestion respecting the 50-request mandatory reserve.
-   * Queries top-priority Pinnacle-supported leagues (EPL + top 7 Tier A/B shadow leagues = 8 tournaments = 2 batches of <=5).
+   * Phase C (H7 P3): Priority-ordered tournament batch ingestion respecting the 50-request mandatory reserve.
+   * Reuses verified canonical fixtures and ODDSPAPI_TOURNAMENT_LEAGUE_MAP — NEVER calls paid /v4/fixtures.
+   * Queries only necessary /v4/odds-by-tournaments batches (1-2 billable requests for up to 8 priority tournaments).
+   * Fails closed with 0 billable requests and an explicit blocker if canonical fixtures are missing/stale
+   * or if tournament mappings are invalid.
    */
   private static async ingestPriorityFixturesAndOdds(
     quotaDetection: QuotaResetDetectionResult,
@@ -371,45 +392,189 @@ export class MultiLeagueAutoActivator {
     billableRequestsMade: number;
     batchesQueried: number[][];
     fixturesByLeague: Map<string, FixtureInput[]>;
+    blockerReason: string | null;
   }> {
     let billableRequestsMade = 0;
     const batchesQueried: number[][] = [];
     const fixturesByLeague = new Map<string, FixtureInput[]>();
 
-    // Select priority cohort (activation_priority <= 8: ENG-PL + 7 primary European leagues = 8 tournaments = 2 batches of <=5)
-    const prioritizedCohort = getPriorityOrderedLeaguesForOdds().filter(
-      l => (l.activation_priority ?? 99) <= 8
-    );
-    const priorityBatches = getTournamentBatches(prioritizedCohort);
+    const refTimeStr = options.referenceTimeUtc || new Date().toISOString();
+    const refMs = Date.parse(refTimeStr);
+    const maxAgeHours =
+      options.maxCanonicalFixtureAgeHours ?? this.DEFAULT_MAX_CANONICAL_FIXTURE_AGE_HOURS;
 
-    // 1. Discover upcoming fixtures (injected for tests or live via OddsPapiProvider)
-    let rawFixtures: Array<Partial<LiveFixtureDTO> & { providerFixtureId: string; homeTeam: string; awayTeam: string; league: string; kickoffTime: string }> = [];
-    if (options.injectedFixtures) {
+    // 1. Load & validate canonical fixtures from injectedFixtures or canonical fixture file (0 billable requests)
+    let rawFixtures: Array<
+      Partial<LiveFixtureDTO> & {
+        providerFixtureId: string;
+        homeTeam: string;
+        awayTeam: string;
+        league: string;
+        kickoffTime: string;
+      }
+    > = [];
+
+    if (options.injectedFixtures !== undefined) {
+      if (!Array.isArray(options.injectedFixtures) || options.injectedFixtures.length === 0) {
+        const blockerReason =
+          'BLOCKED_MISSING_CANONICAL_FIXTURES: Injected canonical fixture list is empty.';
+        Logger.warn('[MultiLeagueAutoActivator] Halting odds ingestion (0 billable requests):', {
+          blockerReason,
+        });
+        return { billableRequestsMade: 0, batchesQueried, fixturesByLeague, blockerReason };
+      }
       rawFixtures = options.injectedFixtures;
     } else {
-      const guard = await OddsPapiQuotaGuard.checkQuota(
-        1,
-        OddsPapiQuotaGuard.MANDATORY_MULTI_LEAGUE_RESERVE,
-        false
-      );
-      if (!guard.allowed) {
-        Logger.warn('[MultiLeagueAutoActivator] Halting fixture discovery due to 50-request reserve guard:', {
-          reason: guard.reason,
+      const fixtureFilePath =
+        options.canonicalFixturesPath ||
+        path.join(process.cwd(), 'data/verification/stage_b1_fixture_evidence.json');
+
+      if (!fs.existsSync(fixtureFilePath)) {
+        const blockerReason = `BLOCKED_MISSING_CANONICAL_FIXTURES: Canonical fixture file not found at ${fixtureFilePath}.`;
+        Logger.warn('[MultiLeagueAutoActivator] Halting odds ingestion (0 billable requests):', {
+          blockerReason,
         });
-        return { billableRequestsMade, batchesQueried, fixturesByLeague };
+        return { billableRequestsMade: 0, batchesQueried, fixturesByLeague, blockerReason };
       }
-      const oddsPapi = new OddsPapiProvider();
-      const fixRes = await oddsPapi.getUpcomingFixtures();
-      if (fixRes.status === 'AVAILABLE' && fixRes.data) {
-        rawFixtures = fixRes.data;
-        billableRequestsMade += 1;
-      } else {
-        return { billableRequestsMade, batchesQueried, fixturesByLeague };
+
+      let parsedDoc: any;
+      try {
+        parsedDoc = JSON.parse(fs.readFileSync(fixtureFilePath, 'utf8'));
+      } catch (err) {
+        const blockerReason = `BLOCKED_MISSING_CANONICAL_FIXTURES: Failed to parse canonical fixture file (${String(err)}).`;
+        Logger.warn('[MultiLeagueAutoActivator] Halting odds ingestion (0 billable requests):', {
+          blockerReason,
+        });
+        return { billableRequestsMade: 0, batchesQueried, fixturesByLeague, blockerReason };
+      }
+
+      if (!parsedDoc || !Array.isArray(parsedDoc.normalizedFixtures) || parsedDoc.normalizedFixtures.length === 0) {
+        const blockerReason =
+          'BLOCKED_MISSING_CANONICAL_FIXTURES: Canonical fixture payload contains 0 normalizedFixtures.';
+        Logger.warn('[MultiLeagueAutoActivator] Halting odds ingestion (0 billable requests):', {
+          blockerReason,
+        });
+        return { billableRequestsMade: 0, batchesQueried, fixturesByLeague, blockerReason };
+      }
+
+      if (parsedDoc.generatedAt) {
+        const generatedMs = Date.parse(parsedDoc.generatedAt);
+        if (Number.isNaN(generatedMs) || refMs - generatedMs > maxAgeHours * 3600 * 1000) {
+          const blockerReason = `BLOCKED_STALE_CANONICAL_FIXTURES: Canonical fixture artifact generatedAt (${parsedDoc.generatedAt}) exceeds max age of ${maxAgeHours}h.`;
+          Logger.warn('[MultiLeagueAutoActivator] Halting odds ingestion (0 billable requests):', {
+            blockerReason,
+          });
+          return { billableRequestsMade: 0, batchesQueried, fixturesByLeague, blockerReason };
+        }
+      }
+
+      rawFixtures = parsedDoc.normalizedFixtures.map((nf: any) => ({
+        providerFixtureId: String(nf.canonicalFixtureId || nf.providerFixtureId || nf.sourceFixtureId),
+        homeTeam: nf.homeTeam,
+        awayTeam: nf.awayTeam,
+        league: nf.leagueName || nf.league || nf.internalLeagueId,
+        kickoffTime: nf.kickoffUtc || nf.kickoffTime,
+        season: String(nf.seasonYear || nf.season || '2026'),
+        venue: nf.venue || undefined,
+        tournamentId: nf.oddspapiTournamentId,
+      }));
+    }
+
+    // 2. Validate kickoff window on canonical fixtures (must have valid future kickoffUtc > refMs)
+    const validUpcomingFixtures = rawFixtures.filter(f => {
+      if (!f || !f.kickoffTime || !f.homeTeam || !f.awayTeam || !f.league) return false;
+      const kMs = Date.parse(f.kickoffTime);
+      if (Number.isNaN(kMs)) return false;
+      return kMs > refMs;
+    });
+
+    if (validUpcomingFixtures.length === 0) {
+      const blockerReason =
+        'BLOCKED_STALE_CANONICAL_FIXTURES: Zero canonical fixtures have valid upcoming kickoff timestamps after reference time.';
+      Logger.warn('[MultiLeagueAutoActivator] Halting odds ingestion (0 billable requests):', {
+        blockerReason,
+      });
+      return { billableRequestsMade: 0, batchesQueried, fixturesByLeague, blockerReason };
+    }
+
+    // 3. Map validated canonical fixtures to registered leagues & validate tournament mappings
+    const tournamentMap = options.tournamentMappingOverride || ODDSPAPI_TOURNAMENT_LEAGUE_MAP;
+    if (!tournamentMap || Object.keys(tournamentMap).length === 0) {
+      const blockerReason =
+        'BLOCKED_INVALID_TOURNAMENT_MAPPING: Canonical tournament mapping table is empty or missing.';
+      Logger.warn('[MultiLeagueAutoActivator] Halting odds ingestion (0 billable requests):', {
+        blockerReason,
+      });
+      return { billableRequestsMade: 0, batchesQueried, fixturesByLeague, blockerReason };
+    }
+
+    const mappedFixtures: Array<{
+      fixture: (typeof validUpcomingFixtures)[number];
+      leagueEntry: MultiLeagueEntry;
+    }> = [];
+    const leagueIdsWithUpcomingFixtures = new Set<string>();
+
+    for (const f of validUpcomingFixtures) {
+      const leagueEntry = CANONICAL_15_LEAGUES.find(
+        l =>
+          l.league_name.toLowerCase() === f.league.toLowerCase() ||
+          l.display_name.toLowerCase() === f.league.toLowerCase() ||
+          l.internal_league_id.toLowerCase() === f.league.toLowerCase() ||
+          (f.league.toLowerCase().includes('belgian') && l.internal_league_id === 'BEL-PRO') ||
+          l.oddspapi_tournament_id === Number((f as any).tournamentId)
+      );
+      if (!leagueEntry) continue;
+
+      mappedFixtures.push({ fixture: f, leagueEntry });
+      leagueIdsWithUpcomingFixtures.add(leagueEntry.internal_league_id);
+    }
+
+    if (mappedFixtures.length === 0) {
+      const blockerReason =
+        'BLOCKED_INVALID_TOURNAMENT_MAPPING: None of the canonical fixtures matched a registered league.';
+      Logger.warn('[MultiLeagueAutoActivator] Halting odds ingestion (0 billable requests):', {
+        blockerReason,
+      });
+      return { billableRequestsMade: 0, batchesQueried, fixturesByLeague, blockerReason };
+    }
+
+    // Select priority cohort (activation_priority <= 8) that actually have upcoming canonical fixtures
+    const prioritizedCohort = getPriorityOrderedLeaguesForOdds().filter(
+      l => (l.activation_priority ?? 99) <= 8 && leagueIdsWithUpcomingFixtures.has(l.internal_league_id)
+    );
+
+    if (prioritizedCohort.length === 0) {
+      const blockerReason =
+        'BLOCKED_MISSING_CANONICAL_FIXTURES: Zero priority leagues (activation_priority <= 8) have upcoming canonical fixtures.';
+      return { billableRequestsMade: 0, batchesQueried, fixturesByLeague, blockerReason };
+    }
+
+    // Verify every league in prioritizedCohort has a valid tournament mapping in tournamentMap
+    for (const league of prioritizedCohort) {
+      const tid = league.oddspapi_tournament_id;
+      const mapped = tournamentMap[tid];
+      if (
+        !Number.isInteger(tid) ||
+        tid <= 0 ||
+        !mapped ||
+        mapped.internal_league_id !== league.internal_league_id
+      ) {
+        const blockerReason = `BLOCKED_INVALID_TOURNAMENT_MAPPING: Invalid or mismatched tournament mapping for ${league.internal_league_id} (tournamentId=${tid}).`;
+        Logger.warn('[MultiLeagueAutoActivator] Halting odds ingestion (0 billable requests):', {
+          blockerReason,
+        });
+        return { billableRequestsMade: 0, batchesQueried, fixturesByLeague, blockerReason };
       }
     }
 
-    // 2. Fetch batch tournament odds for Pinnacle in priority order, checking reserve before each batch
+    const priorityBatches = getTournamentBatches(
+      prioritizedCohort,
+      MAX_TOURNAMENTS_PER_BATCH_REQUEST
+    );
+
+    // 4. Fetch batch tournament odds for Pinnacle in priority order (1-2 billable requests, 0 /v4/fixtures requests)
     const oddsByFixtureId = new Map<string, LiveOddsDTO[]>();
+    const allFetchedOdds: LiveOddsDTO[] = [];
 
     for (const batch of priorityBatches) {
       const batchKey = batch.join(',');
@@ -417,6 +582,7 @@ export class MultiLeagueAutoActivator {
         batchesQueried.push(batch);
         billableRequestsMade += 1;
         for (const o of options.injectedOddsByTournamentBatch[batchKey]) {
+          allFetchedOdds.push(o);
           const list = oddsByFixtureId.get(o.providerFixtureId) || [];
           list.push(o);
           oddsByFixtureId.set(o.providerFixtureId, list);
@@ -456,6 +622,7 @@ export class MultiLeagueAutoActivator {
         batchesQueried.push(batch);
         billableRequestsMade += 1;
         for (const o of oddsRes.data) {
+          allFetchedOdds.push(o);
           const list = oddsByFixtureId.get(o.providerFixtureId) || [];
           list.push(o);
           oddsByFixtureId.set(o.providerFixtureId, list);
@@ -472,19 +639,21 @@ export class MultiLeagueAutoActivator {
       }
     }
 
-    // 3. Map discovered fixtures + Pinnacle odds by internal_league_id
-    for (const f of rawFixtures) {
-      const leagueEntry = CANONICAL_15_LEAGUES.find(
-        l =>
-          l.league_name.toLowerCase() === f.league.toLowerCase() ||
-          l.display_name.toLowerCase() === f.league.toLowerCase() ||
-          l.internal_league_id.toLowerCase() === f.league.toLowerCase() ||
-          (f.league.toLowerCase().includes('belgian') && l.internal_league_id === 'BEL-PRO') ||
-          l.oddspapi_tournament_id === Number((f as any).tournamentId)
-      );
-      if (!leagueEntry) continue;
+    // 5. Map canonical fixtures + Pinnacle odds by internal_league_id
+    for (const { fixture: f, leagueEntry } of mappedFixtures) {
+      let fixtureOdds = oddsByFixtureId.get(f.providerFixtureId) || [];
+      if (fixtureOdds.length === 0 && allFetchedOdds.length > 0) {
+        const normHome = normalizeTeamKey(f.homeTeam);
+        const normAway = normalizeTeamKey(f.awayTeam);
+        fixtureOdds = allFetchedOdds.filter((o: any) => {
+          if (!o.homeTeam || !o.awayTeam) return false;
+          return (
+            normalizeTeamKey(o.homeTeam) === normHome &&
+            normalizeTeamKey(o.awayTeam) === normAway
+          );
+        });
+      }
 
-      const fixtureOdds = oddsByFixtureId.get(f.providerFixtureId) || [];
       let ah: { line: number; homeOdds: number; awayOdds: number; timestampUtc?: string } | undefined;
       let ou: { line: number; overOdds: number; underOdds: number; timestampUtc?: string } | undefined;
 
@@ -537,7 +706,7 @@ export class MultiLeagueAutoActivator {
       fixturesByLeague.set(leagueEntry.internal_league_id, existing);
     }
 
-    return { billableRequestsMade, batchesQueried, fixturesByLeague };
+    return { billableRequestsMade, batchesQueried, fixturesByLeague, blockerReason: null };
   }
 
   /**

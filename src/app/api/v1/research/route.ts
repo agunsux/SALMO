@@ -12,6 +12,10 @@ import { Logger } from '@/lib/logger';
 export const dynamic = 'force-dynamic';
 
 import { SettlementEngine } from '@/engine/settlement/settlementEngine';
+import {
+  evaluateRowTemporalIntegrity,
+  isKnownBatchPlaceholderTimestamp,
+} from '@/engine/archive/temporalIntegrityGuard';
 
 function bootstrapConfidenceInterval(values: number[], iterations = 2000): {
   n: number;
@@ -52,7 +56,8 @@ function normalizeResearchRow(
   raw: any,
   index: number,
   liveSettledMap: Map<string, any>,
-  evidenceFtMap: Map<string, { homeGoals: number; awayGoals: number; matchScore: string }>
+  evidenceFtMap: Map<string, { homeGoals: number; awayGoals: number; matchScore: string }>,
+  evidenceGeneratedAt: string | null = null
 ) {
   const ledgerTier: 'PRODUCTION' | 'SHADOW' | 'NONE' =
     raw.ledgerTier || (raw.league === 'Premier League' || raw.competition === 'Premier League' ? 'PRODUCTION' : 'SHADOW');
@@ -110,31 +115,63 @@ function normalizeResearchRow(
     }
   }
 
-  // Strictly enforce that SHADOW / NONE rows are never marked as production picks
-  const isPick =
-    ledgerTier === 'PRODUCTION' &&
-    Boolean(raw.is_pick || raw.isDailyPick || raw.verdict === 'LAYAK');
-
   const fixtureId = String(raw.fixture_id || raw.fixtureId || `fix_${index}`);
   const id = raw.id || raw.predictionId || `${fixtureId}_${market}_${index}`;
 
-  // Enrich PRODUCTION rows with verified settlement P&L from live_prediction_ledger.jsonl
+  // Enrich PRODUCTION rows with verified pre-match provenance & settlement P&L from live_prediction_ledger.jsonl
   const liveSettled =
     ledgerTier === 'PRODUCTION'
       ? liveSettledMap.get(`${fixtureId}_${market}`) ||
         (raw.canonicalMatchId ? liveSettledMap.get(`${raw.canonicalMatchId}_${market}`) : undefined)
       : undefined;
 
-  // Enrich finished non-EPL fixtures with verified API-Football final score (zero OddsPapi needed)
-  const evidenceFt = evidenceFtMap.get(fixtureId);
+  // Evaluate strict temporal integrity & provenance (Hotfix H7 P1)
+  // Never assume created_at / createdAt is a genuine prediction timestamp unless verified by canonical ledger provenance.
+  const explicitPredTs =
+    liveSettled?.predictionTimestamp ||
+    liveSettled?.publishedAt ||
+    raw.predictionTimestamp ||
+    raw.prediction_timestamp ||
+    raw.publishedAt ||
+    raw.published_at ||
+    (ledgerTier === 'PRODUCTION' && raw.createdAt && !isKnownBatchPlaceholderTimestamp(raw.createdAt)
+      ? raw.createdAt
+      : null);
 
-  const settlement =
-    liveSettled?.settlementStatus ||
-    liveSettled?.settlement ||
-    raw.settlement ||
-    raw.settlementStatus ||
-    raw.status ||
-    'PENDING';
+  const verifiedSourceTs =
+    liveSettled?.marketStateTimestamp ||
+    raw.sourceDataTimestamp ||
+    raw.source_data_timestamp ||
+    evidenceGeneratedAt ||
+    null;
+
+  const hasVerifiedPreMatchProvenance = Boolean(
+    explicitPredTs && !isKnownBatchPlaceholderTimestamp(explicitPredTs) && raw.hasVerifiedPreMatchProvenance !== false
+  );
+
+  const temporalEval = evaluateRowTemporalIntegrity(
+    {
+      ...raw,
+      kickoffUtc,
+    },
+    {
+      verifiedPredictionTimestamp: explicitPredTs,
+      verifiedSourceDataTimestamp: verifiedSourceTs,
+      hasVerifiedPreMatchProvenance,
+      batchCommitTimestampUtc: '2026-10-11T18:56:38Z',
+    }
+  );
+
+  const eligibleForPreMatchMetrics = temporalEval.eligibleForPreMatchMetrics;
+
+  // Strictly enforce that SHADOW / NONE / temporally ineligible rows are never marked as production picks
+  const isPick =
+    eligibleForPreMatchMetrics &&
+    ledgerTier === 'PRODUCTION' &&
+    Boolean(raw.is_pick || raw.isDailyPick || raw.verdict === 'LAYAK');
+
+  // Enrich finished fixtures with verified API-Football final score (zero OddsPapi needed)
+  const evidenceFt = evidenceFtMap.get(fixtureId);
 
   const homeGoals =
     typeof liveSettled?.homeGoals === 'number'
@@ -155,8 +192,17 @@ function normalizeResearchRow(
     evidenceFt?.matchScore ||
     (typeof homeGoals === 'number' && typeof awayGoals === 'number' ? `${homeGoals}-${awayGoals}` : null);
 
-  let scoreOutcome: string | null = liveSettled?.result || raw.result || null;
-  if (!scoreOutcome && typeof homeGoals === 'number' && typeof awayGoals === 'number' && (market === 'AH' || market === 'OU') && line !== null) {
+  const archiveScoreVerified = typeof homeGoals === 'number' && typeof awayGoals === 'number';
+  // Pre-match score verification requires BOTH verified final score AND strict pre-match temporal eligibility
+  const scoreVerified = eligibleForPreMatchMetrics && archiveScoreVerified;
+
+  let rawScoreOutcome: string | null = liveSettled?.result || raw.result || null;
+  if (
+    !rawScoreOutcome &&
+    archiveScoreVerified &&
+    (market === 'AH' || market === 'OU') &&
+    line !== null
+  ) {
     try {
       const settledOutcome = SettlementEngine.settlePosition({
         ledgerPositionId: id,
@@ -164,29 +210,44 @@ function normalizeResearchRow(
         selection,
         line: Number(line),
         oddsTaken: Number(marketOdds || 2.0),
-        homeGoals,
-        awayGoals,
+        homeGoals: homeGoals as number,
+        awayGoals: awayGoals as number,
         matchStatus: 'FINISHED',
         homeTeam,
         awayTeam,
       });
-      scoreOutcome = settledOutcome.result;
+      rawScoreOutcome = settledOutcome.result;
     } catch {}
   }
 
-  const result = liveSettled?.result || raw.result || scoreOutcome || null;
-  const scoreVerified = typeof homeGoals === 'number' && typeof awayGoals === 'number';
+  const rawSettlement =
+    liveSettled?.settlementStatus ||
+    liveSettled?.settlement ||
+    raw.settlement ||
+    raw.settlementStatus ||
+    raw.status ||
+    'PENDING';
 
-  // Financial P&L is strictly computed ONLY when pick-time odds were recorded (PRODUCTION tier)
+  const settlement = eligibleForPreMatchMetrics
+    ? rawSettlement
+    : temporalEval.temporalEligibilityStatus === 'RETROSPECTIVE_EXCLUDED'
+    ? 'EXCLUDED_RETROSPECTIVE'
+    : 'EXCLUDED_UNVERIFIED_TIMESTAMP';
+
+  // Only pre-match eligible predictions may expose settled result/outcome for performance metrics
+  const scoreOutcome = eligibleForPreMatchMetrics ? rawScoreOutcome : null;
+  const result = eligibleForPreMatchMetrics ? (liveSettled?.result || raw.result || rawScoreOutcome || null) : null;
+
+  // Financial P&L is strictly computed ONLY when pick-time odds were recorded AND row is pre-match eligible (PRODUCTION tier)
   const profitLossUnits =
-    ledgerTier === 'PRODUCTION' && settlement === 'SETTLED'
+    eligibleForPreMatchMetrics && ledgerTier === 'PRODUCTION' && settlement === 'SETTLED'
       ? Number(liveSettled?.profitUnits ?? liveSettled?.profitLoss ?? raw.profitLossUnits ?? 0)
       : null;
   const stakeUnits =
-    ledgerTier === 'PRODUCTION' && settlement === 'SETTLED'
+    eligibleForPreMatchMetrics && ledgerTier === 'PRODUCTION' && settlement === 'SETTLED'
       ? Number(liveSettled?.stakeUnits ?? 1)
       : 0;
-  const settledAt = liveSettled?.settledAt || raw.settledAt || null;
+  const settledAt = eligibleForPreMatchMetrics ? (liveSettled?.settledAt || raw.settledAt || null) : null;
 
   return {
     ...raw,
@@ -203,6 +264,20 @@ function normalizeResearchRow(
     league: competition,
     kickoff_utc: kickoffUtc,
     kickoffUtc,
+    // 4 separated timestamps (Hotfix H7 P1)
+    predictionTimestamp: temporalEval.predictionTimestamp,
+    prediction_timestamp: temporalEval.predictionTimestamp,
+    sourceDataTimestamp: temporalEval.sourceDataTimestamp,
+    source_data_timestamp: temporalEval.sourceDataTimestamp,
+    archiveCreatedAt: temporalEval.archiveCreatedAt,
+    archive_created_at: temporalEval.archiveCreatedAt,
+    // Temporal integrity classification
+    temporalEligibilityStatus: temporalEval.temporalEligibilityStatus,
+    eligibleForPreMatchMetrics: temporalEval.eligibleForPreMatchMetrics,
+    temporalExclusionReason: temporalEval.temporalExclusionReason,
+    leadTimeHoursBeforeKickoff: temporalEval.leadTimeHoursBeforeKickoff,
+    isBatchPlaceholderTimestamp: temporalEval.isBatchPlaceholderTimestamp,
+    provenanceVerified: temporalEval.provenanceVerified,
     market,
     line,
     selection,
@@ -227,6 +302,8 @@ function normalizeResearchRow(
     homeGoals,
     awayGoals,
     matchScore,
+    archiveScoreVerified,
+    rawScoreOutcome,
     scoreVerified,
     scoreOutcome,
     result,
@@ -265,10 +342,12 @@ export async function GET(request: NextRequest) {
 
     // Load stage_b1_fixture_evidence.json for verified API-Football FT scores across all 15 leagues
     const evidenceFtMap = new Map<string, { homeGoals: number; awayGoals: number; matchScore: string }>();
+    let evidenceGeneratedAt: string | null = null;
     const evidencePath = path.resolve(process.cwd(), 'data', 'verification', 'stage_b1_fixture_evidence.json');
     if (fs.existsSync(evidencePath)) {
       try {
         const ev = JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
+        evidenceGeneratedAt = ev.generatedAt || null;
         for (const lr of ev.leagueResults || []) {
           for (const f of lr.fixtures || []) {
             if (
@@ -329,6 +408,7 @@ export async function GET(request: NextRequest) {
             verdict: r.recommendation || 'LEWATI',
             confidence: Number(r.confidence || 0),
             model_version: r.model_version,
+            created_at: r.created_at,
             ledgerTier: r.league === 'Premier League' ? 'PRODUCTION' : r.league === 'Liga 1' ? 'NONE' : 'SHADOW',
           }));
         }
@@ -346,14 +426,16 @@ export async function GET(request: NextRequest) {
     }
 
     const predictions = rawPredictions.map((row, idx) =>
-      normalizeResearchRow(row, idx, liveSettledMap, evidenceFtMap)
+      normalizeResearchRow(row, idx, liveSettledMap, evidenceFtMap, evidenceGeneratedAt)
     );
 
-    const searchParams = request.nextUrl?.searchParams;
+    const searchParams =
+      request.nextUrl?.searchParams || (request.url ? new URL(request.url).searchParams : undefined);
     const tierParam = (searchParams?.get('tier') || 'ALL').toUpperCase();
     const leagueParam = searchParams?.get('league') || 'ALL';
     const marketParam = (searchParams?.get('market') || 'ALL').toUpperCase();
     const settlementParam = (searchParams?.get('settlement') || 'ALL').toUpperCase();
+    const temporalStatusParam = (searchParams?.get('temporalStatus') || 'ALL').toUpperCase();
     const searchParam = (searchParams?.get('search') || '').trim().toLowerCase();
     const dateFromParam = searchParams?.get('dateFrom') || '';
     const dateToParam = searchParams?.get('dateTo') || '';
@@ -364,10 +446,29 @@ export async function GET(request: NextRequest) {
     const shadowRows = predictions.filter((p: any) => p.ledgerTier === 'SHADOW');
     const unsupportedRows = predictions.filter((p: any) => p.ledgerTier === 'NONE');
 
-    const settledRows = productionRows.filter((p: any) => p.settlement === 'SETTLED');
+    // Pre-match settlement metrics strictly require eligibleForPreMatchMetrics === true
+    const eligiblePreMatchRows = predictions.filter((p: any) => p.eligibleForPreMatchMetrics === true);
+    const confirmedRetrospectiveRows = predictions.filter(
+      (p: any) => p.temporalEligibilityStatus === 'RETROSPECTIVE_EXCLUDED'
+    );
+    const unverifiedProvenanceRows = predictions.filter(
+      (p: any) => p.temporalEligibilityStatus === 'UNVERIFIED_TIMESTAMP_PROVENANCE'
+    );
+    const missingOrInvalidTimestampRows = predictions.filter(
+      (p: any) =>
+        p.temporalEligibilityStatus === 'MISSING_PREDICTION_TIMESTAMP' ||
+        p.temporalEligibilityStatus === 'INVALID_PREDICTION_TIMESTAMP' ||
+        p.temporalEligibilityStatus === 'INVALID_KICKOFF_TIMESTAMP'
+    );
+
+    const settledRows = eligiblePreMatchRows.filter(
+      (p: any) => p.ledgerTier === 'PRODUCTION' && p.settlement === 'SETTLED'
+    );
     const settledCount = settledRows.length;
-    const pendingCount = productionRows.filter((p: any) => p.settlement !== 'SETTLED').length;
-    const dailyPicksCount = productionRows.filter((p: any) => p.is_pick).length;
+    const pendingCount = eligiblePreMatchRows.filter(
+      (p: any) => p.ledgerTier === 'PRODUCTION' && p.settlement !== 'SETTLED'
+    ).length;
+    const dailyPicksCount = eligiblePreMatchRows.filter((p: any) => p.is_pick).length;
 
     const netProfitUnits = Number(
       settledRows.reduce((acc: number, r: any) => acc + Number(r.profitLossUnits || 0), 0).toFixed(3)
@@ -388,7 +489,19 @@ export async function GET(request: NextRequest) {
       netProfitUnits,
     };
 
-    // Build per-league Metric Computability Matrix (Stage 1 Audit contract)
+    const temporalEligibilitySummary = {
+      totalInspected: predictions.length,
+      validPreMatchCount: eligiblePreMatchRows.length,
+      confirmedRetrospectiveCount: confirmedRetrospectiveRows.length,
+      unverifiedProvenanceCount: unverifiedProvenanceRows.length,
+      missingOrInvalidTimestampCount: missingOrInvalidTimestampRows.length,
+      eligibleWithVerifiedOutcomeCount: eligiblePreMatchRows.filter((p: any) => p.scoreVerified).length,
+      excludedRetrospectiveWithScoreCount: predictions.filter(
+        (p: any) => !p.eligibleForPreMatchMetrics && p.archiveScoreVerified
+      ).length,
+    };
+
+    // Build per-league Metric Computability Matrix (Hotfix H7 P1: strictly over eligibleForPreMatchMetrics rows)
     const outcomeValueMap: Record<string, number> = {
       WIN: 1.0,
       HALF_WIN: 0.75,
@@ -405,6 +518,11 @@ export async function GET(request: NextRequest) {
           tier: p.ledgerTier,
           informative: Boolean(p.informative ?? (p.ledgerTier !== 'NONE')),
           nPredictions: 0,
+          nEligiblePreMatch: 0,
+          nConfirmedRetrospectiveExcluded: 0,
+          nUnverifiedTimestampExcluded: 0,
+          nOtherTemporalExcluded: 0,
+          nArchiveScorePresentExcluded: 0,
           nWithPickOdds: 0,
           nExcludedMissingOdds: 0,
           oddsProvider: null as string | null,
@@ -419,11 +537,27 @@ export async function GET(request: NextRequest) {
       }
       const entry = byLeagueMap.get(lg)!;
       entry.nPredictions++;
+
+      if (!p.eligibleForPreMatchMetrics) {
+        if (p.temporalEligibilityStatus === 'RETROSPECTIVE_EXCLUDED') {
+          entry.nConfirmedRetrospectiveExcluded++;
+        } else if (p.temporalEligibilityStatus === 'UNVERIFIED_TIMESTAMP_PROVENANCE') {
+          entry.nUnverifiedTimestampExcluded++;
+        } else {
+          entry.nOtherTemporalExcluded++;
+        }
+        if (p.archiveScoreVerified) {
+          entry.nArchiveScorePresentExcluded++;
+        }
+        continue;
+      }
+
+      entry.nEligiblePreMatch++;
       const hasPickOdds = typeof p.market_odds === 'number' && p.market_odds > 1.0;
       if (hasPickOdds) {
         entry.nWithPickOdds++;
         entry.oddsProvider = p.bookmaker || 'PINNACLE';
-        entry.oddsTimestampSample = p.createdAt || p.predictionTimestamp || null;
+        entry.oddsTimestampSample = p.predictionTimestamp || null;
       } else {
         entry.nExcludedMissingOdds++;
       }
@@ -453,6 +587,11 @@ export async function GET(request: NextRequest) {
         tier: entry.tier,
         informative: entry.informative,
         nPredictions: entry.nPredictions,
+        nEligiblePreMatch: entry.nEligiblePreMatch,
+        nConfirmedRetrospectiveExcluded: entry.nConfirmedRetrospectiveExcluded,
+        nUnverifiedTimestampExcluded: entry.nUnverifiedTimestampExcluded,
+        nOtherTemporalExcluded: entry.nOtherTemporalExcluded,
+        nArchiveScorePresentExcluded: entry.nArchiveScorePresentExcluded,
         nWithPickOdds: entry.nWithPickOdds,
         nExcludedMissingOdds: entry.nExcludedMissingOdds,
         oddsProvider: entry.oddsProvider,
@@ -480,6 +619,16 @@ export async function GET(request: NextRequest) {
     else if (tierParam === 'SHADOW') filteredPredictions = shadowRows;
     else if (tierParam === 'NONE') filteredPredictions = unsupportedRows;
 
+    if (temporalStatusParam && temporalStatusParam !== 'ALL') {
+      if (temporalStatusParam === 'EXCLUDED_ALL') {
+        filteredPredictions = filteredPredictions.filter((p: any) => !p.eligibleForPreMatchMetrics);
+      } else {
+        filteredPredictions = filteredPredictions.filter(
+          (p: any) => p.temporalEligibilityStatus === temporalStatusParam
+        );
+      }
+    }
+
     if (leagueParam && leagueParam !== 'ALL') {
       const q = leagueParam.toLowerCase();
       filteredPredictions = filteredPredictions.filter(
@@ -494,9 +643,15 @@ export async function GET(request: NextRequest) {
     }
 
     if (settlementParam === 'SETTLED') {
-      filteredPredictions = filteredPredictions.filter((p: any) => p.settlement === 'SETTLED' || p.scoreVerified);
+      filteredPredictions = filteredPredictions.filter(
+        (p: any) => p.eligibleForPreMatchMetrics && (p.settlement === 'SETTLED' || p.scoreVerified)
+      );
     } else if (settlementParam === 'PENDING') {
-      filteredPredictions = filteredPredictions.filter((p: any) => p.settlement !== 'SETTLED' && !p.scoreVerified);
+      filteredPredictions = filteredPredictions.filter(
+        (p: any) => p.eligibleForPreMatchMetrics && p.settlement !== 'SETTLED' && !p.scoreVerified
+      );
+    } else if (settlementParam === 'EXCLUDED') {
+      filteredPredictions = filteredPredictions.filter((p: any) => !p.eligibleForPreMatchMetrics);
     }
 
     if (searchParam) {
@@ -538,17 +693,26 @@ export async function GET(request: NextRequest) {
 
     const counts = {
       totalArchived: predictions.length,
+      validPreMatch: temporalEligibilitySummary.validPreMatchCount,
+      confirmedRetrospectiveExcluded: temporalEligibilitySummary.confirmedRetrospectiveCount,
+      unverifiedTimestampExcluded: temporalEligibilitySummary.unverifiedProvenanceCount,
       productionRows: productionRows.length,
       shadowRows: shadowRows.length,
       unsupportedRows: unsupportedRows.length,
       dailyPicks: dailyPicksCount,
       settled: settledCount,
       pending: pendingCount,
-      verifiedFinalScoresCount: predictions.filter((p: any) => p.scoreVerified).length,
+      verifiedFinalScoresCount: temporalEligibilitySummary.eligibleWithVerifiedOutcomeCount,
+      excludedRetrospectiveWithScoreCount: temporalEligibilitySummary.excludedRetrospectiveWithScoreCount,
       byLedgerTier: {
         PRODUCTION: productionRows.length,
         SHADOW: shadowRows.length,
         NONE: unsupportedRows.length,
+      },
+      byTemporalStatus: {
+        VALID_PRE_MATCH: temporalEligibilitySummary.validPreMatchCount,
+        RETROSPECTIVE_EXCLUDED: temporalEligibilitySummary.confirmedRetrospectiveCount,
+        UNVERIFIED_TIMESTAMP_PROVENANCE: temporalEligibilitySummary.unverifiedProvenanceCount,
       },
     };
     const dataState = predictions.length > 0 ? 'REAL' : (syncRes?.dataState || 'NO_QUALIFIED_PICKS');
@@ -564,6 +728,7 @@ export async function GET(request: NextRequest) {
       tierFilter: tierParam,
       dataState,
       counts,
+      temporalEligibilitySummary,
       settlementSummary,
       metricComputabilityMatrix,
       observability,

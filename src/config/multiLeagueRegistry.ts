@@ -735,6 +735,15 @@ export function isLeagueMarketValidated(leagueKeyOrName: string, market: 'AH' | 
 }
 
 /**
+ * Returns the current production activation state ('ACTIVE' | 'SHADOW' | 'PAUSED' | 'DISABLED') for a league.
+ */
+export function getLeagueActivationState(leagueKeyOrName: string): ProductionStatus {
+  const entry = getLeagueByNameOrSlug(leagueKeyOrName);
+  if (!entry) return 'DISABLED';
+  return entry.production_status;
+}
+
+/**
  * Checks whether a specific market ('AH' | 'OU') is currently enabled for production pick qualification.
  * Requires the league to be ACTIVE, production_pick_enabled = true, and the specific market included in production_enabled_markets.
  */
@@ -898,14 +907,17 @@ export function getShadowResearchLeagues(): MultiLeagueEntry[] {
 /**
  * Returns batches of tournament IDs chunked by MAX_TOURNAMENTS_PER_BATCH_REQUEST (5).
  */
-export function getTournamentBatches(leagues: MultiLeagueEntry[] = CANONICAL_15_LEAGUES): number[][] {
+export function getTournamentBatches(
+  leagues: MultiLeagueEntry[] = CANONICAL_15_LEAGUES,
+  maxBatchSize: number = MAX_TOURNAMENTS_PER_BATCH_REQUEST
+): number[][] {
   const tournamentIds = leagues
     .filter((l) => l.oddspapi_tournament_id > 0)
     .map((l) => l.oddspapi_tournament_id);
 
   const batches: number[][] = [];
-  for (let i = 0; i < tournamentIds.length; i += MAX_TOURNAMENTS_PER_BATCH_REQUEST) {
-    batches.push(tournamentIds.slice(i, i + MAX_TOURNAMENTS_PER_BATCH_REQUEST));
+  for (let i = 0; i < tournamentIds.length; i += maxBatchSize) {
+    batches.push(tournamentIds.slice(i, i + maxBatchSize));
   }
   return batches;
 }

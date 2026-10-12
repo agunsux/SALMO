@@ -53,6 +53,19 @@ interface PredictionRecord {
   profitLossUnits?: number | null;
   stakeUnits?: number | null;
   settledAt?: string | null;
+  predictionTimestamp?: string | null;
+  sourceDataTimestamp?: string | null;
+  archiveCreatedAt?: string | null;
+  temporalEligibilityStatus?:
+    | 'VALID_PRE_MATCH'
+    | 'RETROSPECTIVE_EXCLUDED'
+    | 'UNVERIFIED_TIMESTAMP_PROVENANCE'
+    | 'MISSING_PREDICTION_TIMESTAMP'
+    | 'INVALID_PREDICTION_TIMESTAMP'
+    | 'INVALID_KICKOFF_TIMESTAMP';
+  eligibleForPreMatchMetrics?: boolean;
+  temporalExclusionReason?: string | null;
+  archiveScoreVerified?: boolean;
   odds_snapshot: {
     bookmaker: string;
     line: number;
@@ -70,6 +83,7 @@ export default function ResearchPage() {
   const [dataTimestamp, setDataTimestamp] = useState<string>('');
   const [modelVersion, setModelVersion] = useState<string>('poisson_v1_rescue');
   const [settlementSummary, setSettlementSummary] = useState<any | null>(null);
+  const [temporalSummary, setTemporalSummary] = useState<any | null>(null);
 
   // Filters
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
@@ -77,6 +91,7 @@ export default function ResearchPage() {
   const [selectedMarket, setSelectedMarket] = useState<string>('ALL');
   const [selectedTier, setSelectedTier] = useState<string>('ALL');
   const [selectedLedgerTier, setSelectedLedgerTier] = useState<string>('ALL');
+  const [selectedTemporalStatus, setSelectedTemporalStatus] = useState<string>('ALL');
   const [selectedSettlement, setSelectedSettlement] = useState<string>('ALL');
   const [selectedLeague, setSelectedLeague] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -96,6 +111,7 @@ export default function ResearchPage() {
           if (data.timestampUtc) setDataTimestamp(data.timestampUtc);
           if (data.modelVersion) setModelVersion(data.modelVersion);
           if (data.settlementSummary) setSettlementSummary(data.settlementSummary);
+          if (data.temporalEligibilitySummary) setTemporalSummary(data.temporalEligibilitySummary);
         } else {
           setError('Research is temporarily unavailable. Please try again.');
         }
@@ -136,12 +152,14 @@ export default function ResearchPage() {
   }, [predictions]);
 
   const qualifiedPicksCount = useMemo(() => {
-    return predictions.filter((p) => p.is_pick).length;
+    return predictions.filter((p) => p.is_pick && p.eligibleForPreMatchMetrics !== false).length;
   }, [predictions]);
 
   const highConfidenceCount = useMemo(() => {
     return predictions.filter(
-      (p) => p.confidence_tier === 'HIGH' || p.confidence_tier === 'VALUE_HIGH'
+      (p) =>
+        p.eligibleForPreMatchMetrics !== false &&
+        (p.confidence_tier === 'HIGH' || p.confidence_tier === 'VALUE_HIGH')
     ).length;
   }, [predictions]);
 
@@ -170,12 +188,18 @@ export default function ResearchPage() {
         return false;
       }
 
-      // Settlement status filter (SETTLED / PENDING)
-      if (selectedSettlement === 'SETTLED' && p.settlement !== 'SETTLED' && !p.scoreVerified) {
+      // Temporal Integrity filter (VALID_PRE_MATCH / RETROSPECTIVE_EXCLUDED / UNVERIFIED_TIMESTAMP_PROVENANCE)
+      if (selectedTemporalStatus !== 'ALL' && p.temporalEligibilityStatus !== selectedTemporalStatus) {
         return false;
       }
-      if (selectedSettlement === 'PENDING' && (p.settlement === 'SETTLED' || p.scoreVerified)) {
-        return false;
+
+      // Settlement status filter (SETTLED / PENDING / EXCLUDED)
+      if (selectedSettlement === 'SETTLED') {
+        if (!p.eligibleForPreMatchMetrics || (p.settlement !== 'SETTLED' && !p.scoreVerified)) return false;
+      } else if (selectedSettlement === 'PENDING') {
+        if (!p.eligibleForPreMatchMetrics || p.settlement === 'SETTLED' || p.scoreVerified) return false;
+      } else if (selectedSettlement === 'EXCLUDED') {
+        if (p.eligibleForPreMatchMetrics) return false;
       }
 
       // Tier filter
@@ -210,7 +234,7 @@ export default function ResearchPage() {
 
       return true;
     });
-  }, [predictions, selectedDate, todayStr, selectedMarket, selectedLedgerTier, selectedSettlement, selectedTier, selectedLeague, searchQuery]);
+  }, [predictions, selectedDate, todayStr, selectedMarket, selectedLedgerTier, selectedTemporalStatus, selectedSettlement, selectedTier, selectedLeague, searchQuery]);
 
   // Counts by market
   const countsByMarket = useMemo(() => {
@@ -468,6 +492,26 @@ export default function ResearchPage() {
               </select>
             </div>
 
+            {/* Temporal Provenance Status filter */}
+            <div>
+              <select
+                value={selectedTemporalStatus}
+                onChange={(e) => setSelectedTemporalStatus(e.target.value)}
+                className="w-full rounded-md border border-[#E4DED4] bg-white px-3 py-1.5 text-xs text-[#14110F] font-mono focus:border-[#3B1515] focus:outline-none focus:ring-1 focus:ring-[#3B1515]"
+              >
+                <option value="ALL">All Temporal States ({predictions.length})</option>
+                <option value="VALID_PRE_MATCH">
+                  VALID PRE-MATCH ({temporalSummary?.validPreMatchCount ?? 20})
+                </option>
+                <option value="RETROSPECTIVE_EXCLUDED">
+                  RETROSPECTIVE EXCLUDED ({temporalSummary?.confirmedRetrospectiveCount ?? 144})
+                </option>
+                <option value="UNVERIFIED_TIMESTAMP_PROVENANCE">
+                  UNVERIFIED TIMESTAMP ({temporalSummary?.unverifiedProvenanceCount ?? 172})
+                </option>
+              </select>
+            </div>
+
             {/* Settlement Status filter */}
             <div>
               <select
@@ -476,8 +520,14 @@ export default function ResearchPage() {
                 className="w-full rounded-md border border-[#E4DED4] bg-white px-3 py-1.5 text-xs text-[#14110F] font-mono focus:border-[#3B1515] focus:outline-none focus:ring-1 focus:ring-[#3B1515]"
               >
                 <option value="ALL">All Settlement States</option>
-                <option value="SETTLED">SETTLED ({settlementSummary?.settledCount ?? 12})</option>
-                <option value="PENDING">PENDING ({predictions.length - (settlementSummary?.settledCount ?? 12)})</option>
+                <option value="SETTLED">SETTLED PRE-MATCH ({settlementSummary?.settledCount ?? 12})</option>
+                <option value="PENDING">PENDING PRE-MATCH ({settlementSummary?.pendingCount ?? 8})</option>
+                <option value="EXCLUDED">
+                  EXCLUDED RETROSPECTIVE / UNVERIFIED (
+                  {(temporalSummary?.confirmedRetrospectiveCount ?? 144) +
+                    (temporalSummary?.unverifiedProvenanceCount ?? 172)}
+                  )
+                </option>
               </select>
             </div>
 
@@ -540,6 +590,7 @@ export default function ResearchPage() {
                   setSelectedDate('ALL');
                   setSelectedMarket('ALL');
                   setSelectedLedgerTier('ALL');
+                  setSelectedTemporalStatus('ALL');
                   setSelectedSettlement('ALL');
                   setSelectedTier('ALL');
                   setSelectedLeague('ALL');
@@ -587,18 +638,41 @@ export default function ResearchPage() {
                       const pnl = row.profitLossUnits;
                       const hasPnl = typeof pnl === 'number';
 
+                      const temporalBadge =
+                        row.temporalEligibilityStatus === 'VALID_PRE_MATCH'
+                          ? {
+                              label: 'VALID PRE-MATCH',
+                              cls: 'bg-[#EAF7EE] text-[#137333] border border-[#BFE7CA]',
+                            }
+                          : row.temporalEligibilityStatus === 'RETROSPECTIVE_EXCLUDED'
+                          ? {
+                              label: 'RETROSPECTIVE EXCLUDED',
+                              cls: 'bg-[#FCE8E6] text-[#C5221F] border border-[#FAD2CF]',
+                            }
+                          : {
+                              label: 'UNVERIFIED TIMESTAMP',
+                              cls: 'bg-[#FEF7E0] text-[#B06000] border border-[#FEE5A5]',
+                            };
+
                       return (
                         <tr key={row.id} className="hover:bg-[#F6F3EE]/60 transition-colors">
                           <td className="px-4 py-3 font-sans">
                             <div className="font-semibold text-[#14110F] flex items-center gap-2 flex-wrap">
                               <span>{row.match}</span>
-                              {(row.settlement === 'SETTLED' || row.scoreVerified) && row.matchScore && (
-                                <span className="rounded bg-[#EAF7EE] border border-[#BFE7CA] px-1.5 py-0.5 text-[9px] font-mono font-bold text-[#137333]">
-                                  FT {row.matchScore} · {row.result || 'SETTLED'}
+                              {row.eligibleForPreMatchMetrics &&
+                                (row.settlement === 'SETTLED' || row.scoreVerified) &&
+                                row.matchScore && (
+                                  <span className="rounded bg-[#EAF7EE] border border-[#BFE7CA] px-1.5 py-0.5 text-[9px] font-mono font-bold text-[#137333]">
+                                    FT {row.matchScore} · {row.result || 'SETTLED'}
+                                  </span>
+                                )}
+                              {!row.eligibleForPreMatchMetrics && row.matchScore && (
+                                <span className="rounded bg-[#F6F3EE] border border-[#E4DED4] px-1.5 py-0.5 text-[9px] font-mono text-[#6B645C]">
+                                  FT {row.matchScore} (Excluded from Pre-Match Metrics)
                                 </span>
                               )}
                             </div>
-                            <div className="text-[10px] text-[#9E968D] flex items-center gap-1.5 mt-0.5">
+                            <div className="text-[10px] text-[#9E968D] flex items-center gap-1.5 mt-0.5 flex-wrap">
                               <span>{row.competition}</span>
                               <span
                                 className={`rounded px-1 py-0.2 text-[9px] font-mono font-semibold ${
@@ -614,6 +688,12 @@ export default function ResearchPage() {
                                   : row.ledgerTier === 'NONE'
                                   ? 'PAUSED'
                                   : 'SHADOW'}
+                              </span>
+                              <span
+                                className={`rounded px-1.5 py-0.2 text-[9px] font-mono font-semibold ${temporalBadge.cls}`}
+                                title={row.temporalExclusionReason || 'Verified pre-match prediction timestamp'}
+                              >
+                                {temporalBadge.label}
                               </span>
                             </div>
                           </td>
@@ -691,7 +771,14 @@ export default function ResearchPage() {
                             )}
                           </td>
                           <td className="px-3 py-3 text-center whitespace-nowrap">
-                            {row.settlement === 'SETTLED' || row.scoreVerified ? (
+                            {!row.eligibleForPreMatchMetrics ? (
+                              <span
+                                className={`rounded px-1.5 py-0.5 text-[9px] font-bold ${temporalBadge.cls}`}
+                                title={row.temporalExclusionReason || ''}
+                              >
+                                {temporalBadge.label}
+                              </span>
+                            ) : row.settlement === 'SETTLED' || row.scoreVerified ? (
                               <div className="inline-flex flex-col items-center">
                                 <span
                                   className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
@@ -731,23 +818,49 @@ export default function ResearchPage() {
                   const isResearchOnly =
                     row.market === 'BTTS' || row.confidence_tier === 'RESEARCH_ONLY' || row.ledgerTier !== 'PRODUCTION';
 
+                  const temporalBadge =
+                    row.temporalEligibilityStatus === 'VALID_PRE_MATCH'
+                      ? {
+                          label: 'VALID PRE-MATCH',
+                          cls: 'bg-[#EAF7EE] text-[#137333] border border-[#BFE7CA]',
+                        }
+                      : row.temporalEligibilityStatus === 'RETROSPECTIVE_EXCLUDED'
+                      ? {
+                          label: 'RETROSPECTIVE EXCLUDED',
+                          cls: 'bg-[#FCE8E6] text-[#C5221F] border border-[#FAD2CF]',
+                        }
+                      : {
+                          label: 'UNVERIFIED TIMESTAMP',
+                          cls: 'bg-[#FEF7E0] text-[#B06000] border border-[#FEE5A5]',
+                        };
+
                   return (
                     <div key={row.id} className="p-4 space-y-2.5 bg-white">
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <div className="font-semibold text-sm text-[#14110F] font-sans flex items-center gap-1.5 flex-wrap">
                             <span>{row.match}</span>
-                            {(row.settlement === 'SETTLED' || row.scoreVerified) && row.matchScore && (
-                              <span className="rounded bg-[#EAF7EE] border border-[#BFE7CA] px-1.5 py-0.5 text-[9px] font-mono font-bold text-[#137333]">
-                                FT {row.matchScore} · {row.result || 'SETTLED'}
-                                {typeof row.profitLossUnits === 'number'
-                                  ? ` (${row.profitLossUnits > 0 ? '+' : ''}${row.profitLossUnits.toFixed(2)}u)`
-                                  : ' (No Odds)'}
-                              </span>
-                            )}
+                            {row.eligibleForPreMatchMetrics &&
+                              (row.settlement === 'SETTLED' || row.scoreVerified) &&
+                              row.matchScore && (
+                                <span className="rounded bg-[#EAF7EE] border border-[#BFE7CA] px-1.5 py-0.5 text-[9px] font-mono font-bold text-[#137333]">
+                                  FT {row.matchScore} · {row.result || 'SETTLED'}
+                                  {typeof row.profitLossUnits === 'number'
+                                    ? ` (${row.profitLossUnits > 0 ? '+' : ''}${row.profitLossUnits.toFixed(2)}u)`
+                                    : ' (No Odds)'}
+                                </span>
+                              )}
                           </div>
-                          <div className="text-[10px] text-[#9E968D] font-mono">
-                            {row.competition} [{row.ledgerTier || 'SHADOW'}] • {row.kickoff_utc?.replace('T', ' ').slice(0, 16)} UTC
+                          <div className="text-[10px] text-[#9E968D] font-mono flex items-center gap-1.5 flex-wrap mt-0.5">
+                            <span>
+                              {row.competition} [{row.ledgerTier || 'SHADOW'}] •{' '}
+                              {row.kickoff_utc?.replace('T', ' ').slice(0, 16)} UTC
+                            </span>
+                            <span
+                              className={`rounded px-1.5 py-0.2 text-[9px] font-mono font-semibold ${temporalBadge.cls}`}
+                            >
+                              {temporalBadge.label}
+                            </span>
                           </div>
                         </div>
                         <span

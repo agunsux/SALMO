@@ -78,10 +78,12 @@ function auditLeagueBaselines(evidenceData) {
   return audits;
 }
 
-function runStageCExecution() {
+function runStageCExecution(options = {}) {
   const raw = JSON.parse(fs.readFileSync(EVIDENCE_PATH, 'utf8'));
   const audits = auditLeagueBaselines(raw);
   const generatedRows = [];
+  const runtimeEvaluationTimestamp = options.evaluationTimestamp || new Date().toISOString();
+  const sourceDataTimestamp = raw.generatedAt || null;
 
   raw.leagueResults.forEach((lr, idx) => {
     const audit = audits[idx];
@@ -104,7 +106,9 @@ function runStageCExecution() {
       const result = ProductionPredictionEngine.evaluateFixture(fixtureInput);
       const pred = result.prediction;
       const canonicalMatchId = pred.canonicalMatchId;
-      const timestamp = new Date().toISOString();
+      const evalMs = Date.parse(runtimeEvaluationTimestamp);
+      const kickoffMs = Date.parse(f.fixture.date);
+      const isRetrospective = Number.isNaN(evalMs) || Number.isNaN(kickoffMs) || evalMs >= kickoffMs;
 
       // Generate RESEARCH_ONLY rows for AH and OU
       // 1. Asian Handicap Market
@@ -137,7 +141,13 @@ function runStageCExecution() {
           profitLoss: null,
           profitUnits: 0,
           stakeUnits: 0,
-          createdAt: timestamp,
+          predictionTimestamp: isRetrospective ? null : runtimeEvaluationTimestamp,
+          sourceDataTimestamp,
+          archiveCreatedAt: runtimeEvaluationTimestamp,
+          createdAt: runtimeEvaluationTimestamp,
+          isRetrospective,
+          temporalEligibilityStatus: isRetrospective ? 'RETROSPECTIVE_EXCLUDED' : 'VALID_PRE_MATCH',
+          eligibleForPreMatchMetrics: !isRetrospective,
         };
         generatedRows.push(ahRow);
         audit.researchRowsGenerated++;
@@ -173,7 +183,13 @@ function runStageCExecution() {
           profitLoss: null,
           profitUnits: 0,
           stakeUnits: 0,
-          createdAt: timestamp,
+          predictionTimestamp: isRetrospective ? null : runtimeEvaluationTimestamp,
+          sourceDataTimestamp,
+          archiveCreatedAt: runtimeEvaluationTimestamp,
+          createdAt: runtimeEvaluationTimestamp,
+          isRetrospective,
+          temporalEligibilityStatus: isRetrospective ? 'RETROSPECTIVE_EXCLUDED' : 'VALID_PRE_MATCH',
+          eligibleForPreMatchMetrics: !isRetrospective,
         };
         generatedRows.push(ouRow);
         audit.researchRowsGenerated++;
@@ -181,18 +197,19 @@ function runStageCExecution() {
     });
   });
 
-  // Ensure staging directory exists and write
-  const dir = path.dirname(STAGING_OUTPUT_PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
-  const content = generatedRows.map(r => JSON.stringify(r)).join('\n') + '\n';
-  fs.writeFileSync(STAGING_OUTPUT_PATH, content, 'utf8');
+  if (options.writeToDisk === true) {
+    const dir = path.dirname(STAGING_OUTPUT_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    const content = generatedRows.map(r => JSON.stringify(r)).join('\n') + '\n';
+    fs.writeFileSync(STAGING_OUTPUT_PATH, content, 'utf8');
+  }
 
   return { audits, generatedRows };
 }
 
 if (require.main === module) {
-  const { audits, generatedRows } = runStageCExecution();
+  const writeToDisk = process.argv.includes('--write');
+  const { audits, generatedRows } = runStageCExecution({ writeToDisk });
   console.log('=== STAGE C LEAGUE BASELINE VALIDATION AUDIT ===');
   console.table(audits.map(a => ({
     League: a.leagueName,
@@ -203,7 +220,7 @@ if (require.main === module) {
     'Rows Written': a.researchRowsGenerated,
     'Failure Reason': a.failureReason ? a.failureReason.slice(0, 50) + '...' : 'VALIDATED PASS',
   })));
-  console.log(`\nTotal RESEARCH_ONLY rows written to staging: ${generatedRows.length}`);
+  console.log(`\nTotal RESEARCH_ONLY rows evaluated: ${generatedRows.length} (writeToDisk=${writeToDisk})`);
 }
 
 module.exports = { auditLeagueBaselines, runStageCExecution, STAGING_OUTPUT_PATH };

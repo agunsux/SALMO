@@ -19,7 +19,15 @@ import { resolveTeamRating, TeamRating, normalizeTeamKey } from '../features/tea
 import { ApiFootballProvider } from '../../services/providers/apiFootballProvider';
 import { OddsPapiProvider } from '../../services/providers/oddsPapiProvider';
 import { LiveOddsDTO } from '../../services/providers/types';
-import { CANONICAL_15_LEAGUES, getTournamentBatches, getLeagueByNameOrSlug, isLeagueMarketProductionEnabled, getPriorityOrderedLeaguesForOdds } from '../../config/multiLeagueRegistry';
+import {
+  CANONICAL_15_LEAGUES,
+  getTournamentBatches,
+  getLeagueByNameOrSlug,
+  getLeagueActivationState,
+  isLeagueMarketProductionEnabled,
+  getPriorityOrderedLeaguesForOdds,
+} from '../../config/multiLeagueRegistry';
+import { OddsPapiQuotaGuard } from '../../lib/quota/oddsPapiQuotaGuard';
 import { FixtureIntegrityGuard } from '../../lib/fixtureIntegrity';
 import { env } from '../../config/env';
 import { ActiveMatchPrediction, ActivePredictionMarket } from '../../types/index';
@@ -60,24 +68,43 @@ export interface FixtureInput {
   };
 }
 
+export interface PredictionCycleOptions {
+  /** Must be explicitly true to authorize persistence; defaults to false */
+  persistToDatabase?: boolean;
+  /** Must be explicitly true AND pass OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed; defaults to false */
+  allowProductionWrite?: boolean;
+  /** Optional injected database client for isolated unit/regression testing */
+  dbClient?: any;
+  /** Optional flag to suppress local JSONL file appends during isolated unit tests */
+  skipLocalFileAppend?: boolean;
+}
+
 export interface PersistenceResult {
   persistedPicksCount: number;
+  persistedPredictionsCount?: number;
   persistedLedgerCount: number;
   persistedGreenCount: number;
   duplicateCount: number;
   excludedCount: number;
   newLedgerPositions: any[];
+  persistenceAuthorized?: boolean;
+  persistenceSkipped?: boolean;
+  persistenceSkipReason?: string | null;
 }
 
 export interface PredictionCycleResult {
   timestampUtc: string;
   activePredictions: ActiveMatchPrediction[];
   persistedPicksCount: number;
+  persistedPredictionsCount?: number;
   persistedLedgerCount: number;
   persistedGreenCount: number;
   duplicateCount: number;
   excludedCount: number;
   newLedgerPositions: any[];
+  persistenceAuthorized?: boolean;
+  persistenceSkipped?: boolean;
+  persistenceSkipReason?: string | null;
   stats: {
     totalFixtures: number;
     reconciledWithOdds: number;
@@ -475,11 +502,17 @@ export class ProductionPredictionEngine {
 
   /**
    * Persists a prediction cycle atomically and idempotently to Supabase / PostgreSQL.
+   * Persists a prediction cycle atomically and idempotently to Supabase / PostgreSQL.
    * Persists into:
-   * 1. daily_picks (canonical picks table)
-   * 2. predictions (full point-in-time predictions table)
-   * 3. prediction_ledger (immutable cryptographic provenance audit ledger)
+   * 1. daily_picks (canonical picks table - strictly ACTIVE league-markets AH/OU only)
+   * 2. predictions (full point-in-time predictions table - strictly ACTIVE league-markets AH/OU only)
+   * 3. prediction_ledger (immutable cryptographic provenance audit ledger - strictly LAYAK ACTIVE AH/OU within execution window)
    * 4. local verification JSONL ledger file
+   *
+   * SAFETY INVARIANTS (Hotfix H7 P2):
+   * - Defaults to disabled (`persistToDatabase: false, allowProductionWrite: false`).
+   * - Enforces `OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed` at the actual persistence boundary.
+   * - Never writes SHADOW or PAUSED leagues, or BTTS / unenabled markets, to daily_picks, predictions, or prediction_ledger.
    */
   public static async persistPredictionCycle(
     items: Array<{
@@ -489,56 +522,37 @@ export class ProductionPredictionEngine {
         ou?: ValueEvaluationResult;
         btts?: ValueEvaluationResult;
       };
-    }>
+    }>,
+    options: PredictionCycleOptions = {}
   ): Promise<PersistenceResult> {
     const result: PersistenceResult = {
       persistedPicksCount: 0,
+      persistedPredictionsCount: 0,
       persistedLedgerCount: 0,
       persistedGreenCount: 0,
       duplicateCount: 0,
       excludedCount: 0,
       newLedgerPositions: [],
+      persistenceAuthorized: false,
+      persistenceSkipped: true,
+      persistenceSkipReason: null,
     };
 
     try {
-      const { getDbClient } = await import('../../lib/db');
-      const client = getDbClient();
-
-      const fs = await import('fs');
-      const path = await import('path');
-      const targetDir = path.resolve(process.cwd(), 'data', 'verification');
-      if (!fs.existsSync(targetDir)) {
-        fs.mkdirSync(targetDir, { recursive: true });
-      }
-      const liveLedgerPath = path.join(targetDir, 'live_prediction_ledger.jsonl');
-      const runLedgerPath = path.join(targetDir, 'production_run_ledger.jsonl');
-
-      // Load existing ledger position IDs from live_prediction_ledger.jsonl for file idempotency
-      const existingFilePosIds = new Set<string>();
-      if (fs.existsSync(liveLedgerPath)) {
-        try {
-          const lines = fs.readFileSync(liveLedgerPath, 'utf8').trim().split('\n').filter(Boolean);
-          for (const line of lines) {
-            try {
-              const parsed = JSON.parse(line);
-              if (parsed.ledgerPositionId) existingFilePosIds.add(parsed.ledgerPositionId);
-              else if (parsed.predictionId) existingFilePosIds.add(parsed.predictionId);
-            } catch {}
-          }
-        } catch {}
-      }
-
-      const localLedgerEntriesToAppend: any[] = [];
+      const eligibleMarketsToPersist: Array<{
+        prediction: ActiveMatchPrediction;
+        fixtureUuid: string;
+        marketType: 'ASIAN_HANDICAP' | 'OVER_UNDER';
+        shortMarket: 'AH' | 'OU';
+        evalObj?: ValueEvaluationResult;
+        marketView: ActivePredictionMarket;
+      }> = [];
 
       for (const item of items) {
         const { prediction, evaluations } = item;
 
         // PHASE 3 — FAIL-CLOSED WRITE GUARD
         // Fixture must originate from an authoritative provider-backed discovery result.
-        // Explicitly enforce verified provider provenance:
-        // 1. Must declare sourceType === 'PROVIDER'
-        // 2. Must carry valid providerName and provider fixture identity
-        // 3. Strictly reject synthetic fallback, hardcoded prefixes, or fabricated objects.
         const hasProviderProvenance =
           prediction.sourceType === 'PROVIDER' &&
           (prediction.providerName === 'OddsPapi' || prediction.providerName === 'API-Football' || !prediction.providerName) &&
@@ -565,10 +579,22 @@ export class ProductionPredictionEngine {
           continue;
         }
 
+        // HOTFIX H7 P2 — Strictly reject SHADOW and PAUSED leagues from daily_picks, predictions, and prediction_ledger
+        const leagueActivationState = getLeagueActivationState(prediction.league);
+        if (leagueActivationState !== 'ACTIVE') {
+          Logger.info('[ProductionPredictionEngine] Excluding non-ACTIVE league from production persistence:', {
+            league: prediction.league,
+            leagueActivationState,
+            fixtureId: prediction.fixtureId,
+          });
+          result.excludedCount++;
+          continue;
+        }
+
         const fixtureUuid = this.toUuid(prediction.fixtureId);
 
         // Markets to evaluate for persistence
-        const marketsToPersist: Array<{
+        const candidateMarkets: Array<{
           marketType: 'ASIAN_HANDICAP' | 'OVER_UNDER' | 'BTTS';
           shortMarket: 'AH' | 'OU' | 'BTTS';
           evalObj?: ValueEvaluationResult;
@@ -579,220 +605,296 @@ export class ProductionPredictionEngine {
           { marketType: 'BTTS', shortMarket: 'BTTS', evalObj: evaluations.btts, marketView: prediction.markets.btts },
         ];
 
-        for (const m of marketsToPersist) {
+        for (const m of candidateMarkets) {
           const { marketType, shortMarket, evalObj, marketView } = m;
 
-          // Only persist if odds were available (> 1.0)
+          // Only consider if odds were available (> 1.0)
           if (!marketView || marketView.marketOdds <= 1.0) continue;
 
-          const pickDeterministicId = this.deterministicUuid(`pick:${prediction.fixtureId}:${marketType}:live`);
-          const predDeterministicId = this.deterministicUuid(`pred:${prediction.fixtureId}:${shortMarket}`);
-          const ledgerPositionId = `${prediction.fixtureId}:${shortMarket}:${marketView.line}:${marketView.selection}`;
-          const ledgerDeterministicId = this.deterministicUuid(`pos:${ledgerPositionId}`);
+          // HOTFIX H7 P2 — Only explicitly enabled ACTIVE league-markets (AH, OU) may be written to daily_picks or predictions
+          const isAllowedShortMarket = shortMarket === 'AH' || shortMarket === 'OU';
+          const isMarketEnabledForLeague =
+            isAllowedShortMarket && isLeagueMarketProductionEnabled(prediction.league, shortMarket);
 
-          const provenanceHash = crypto
-            .createHash('sha256')
-            .update(`${prediction.canonicalMatchId}:${marketType}:${marketView.selection}:${marketView.fairOdds}:${marketView.marketOdds}:${this.MODEL_VERSION}:${prediction.predictionTimestamp}`)
-            .digest('hex');
-
-          // 1. Persist to Supabase daily_picks table (all evaluated market views for UI display)
-          const dailyPickRow = {
-            id: pickDeterministicId,
-            fixture_id: fixtureUuid,
-            league: prediction.league,
-            home_team: prediction.homeTeam,
-            away_team: prediction.awayTeam,
-            kickoff_utc: prediction.kickoffUtc,
-            market_type: marketType,
-            prediction: marketView.selection,
-            model_probability: marketView.modelProbabilityPct ? marketView.modelProbabilityPct / 100 : 0.5,
-            fair_odds: marketView.fairOdds,
-            market_odds: marketView.marketOdds,
-            market_bookmaker: marketView.bookmaker || 'Pinnacle',
-            edge_pct: marketView.edgePct,
-            confidence: marketView.confidence || 0,
-            verdict: marketView.verdict || 'LEWATI',
-            reasoning: evalObj
-              ? `Model fair ${evalObj.fairOdds.toFixed(2)} vs Pinnacle ${evalObj.marketOdds.toFixed(2)}. Edge: ${(evalObj.edge * 100).toFixed(1)}%, EV: ${(evalObj.expectedValue * 100).toFixed(1)}%, Confidence: ${evalObj.confidence}/100. Model: ${this.MODEL_VERSION}.`
-              : `Edge: ${marketView.edgePct}%, Odds: ${marketView.marketOdds}`,
-            rejection_reason: marketView.rejectionReason || null,
-            status: 'PENDING',
-            source: 'live',
-            prediction_id: predDeterministicId,
-          };
-
-          const { error: pickErr } = await client
-            .from('daily_picks')
-            .upsert(dailyPickRow, { onConflict: 'fixture_id, market_type, source' });
-
-          if (!pickErr) {
-            result.persistedPicksCount++;
-          } else {
-            Logger.warn('[ProductionPredictionEngine] Upsert error on daily_picks:', { error: pickErr.message });
-          }
-
-          // 2. Persist to Supabase predictions table
-          const predictionRow = {
-            id: predDeterministicId,
-            match_id: fixtureUuid,
-            market_type: shortMarket,
-            home_team: prediction.homeTeam,
-            away_team: prediction.awayTeam,
-            selection: marketView.selection,
-            model_probability: marketView.modelProbabilityPct ? marketView.modelProbabilityPct / 100 : null,
-            fair_odds: marketView.fairOdds,
-            market_odds: marketView.marketOdds,
-            edge_pct: marketView.edgePct,
-            expected_value: marketView.expectedValuePct ? marketView.expectedValuePct / 100 : null,
-            confidence: (marketView.confidence || 0) / 100,
-            model_version: this.MODEL_VERSION,
-            feature_version: this.FEATURE_VERSION,
-            prediction_timestamp: prediction.predictionTimestamp,
-            source_type: 'PROVIDER',
-            data_status: 'ACTIVE',
-          };
-
-          const { error: predErr } = await client
-            .from('predictions')
-            .upsert(predictionRow, { onConflict: 'id' });
-
-          if (predErr) {
-            Logger.warn('[ProductionPredictionEngine] Upsert error on predictions:', { error: predErr.message });
-          }
-
-          // 3. STEP 1 & 1.1: Production Betting Ledger Qualification Rule
-          const isLayak = marketView.verdict === 'LAYAK';
-          const isAllowedMarket = shortMarket === 'AH' || shortMarket === 'OU';
-          const isMarketActiveForLeague =
-            isAllowedMarket && isLeagueMarketProductionEnabled(prediction.league, shortMarket);
-          const hasValidOdds = typeof marketView.marketOdds === 'number' && marketView.marketOdds > 1.0;
-          const isProvider = true;
-          const isActive = isMarketActiveForLeague;
-          const kickoffMs = new Date(prediction.kickoffUtc).getTime();
-          const writeTimeMs = Date.now();
-          const isPreKickoff = Number.isFinite(kickoffMs) ? writeTimeMs < kickoffMs : true;
-          const isWithinWindow = isWithinLedgerExecutionWindow(prediction.kickoffUtc, writeTimeMs);
-
-          const qualifiesForLedger =
-            isLayak &&
-            isAllowedMarket &&
-            isMarketActiveForLeague &&
-            hasValidOdds &&
-            isPreKickoff &&
-            isWithinWindow &&
-            isProvider &&
-            isActive;
-
-          if (!qualifiesForLedger) {
+          if (!isAllowedShortMarket || !isMarketEnabledForLeague) {
             result.excludedCount++;
-            continue; // NEVER write PANTAU, LEWATI, BTTS, Moneyline, invalid odds, unactivated markets, or picks outside execution window to prediction_ledger
+            continue;
           }
 
-          // STEP 2: Canonical Position Identity & Idempotency Check
-          let alreadyExistsInDb = false;
-          try {
-            const { data: existingRow, error: chkErr } = await client
-              .from('prediction_ledger')
-              .select('id')
-              .eq('id', ledgerDeterministicId)
-              .maybeSingle();
+          eligibleMarketsToPersist.push({
+            prediction,
+            fixtureUuid,
+            marketType: marketType as 'ASIAN_HANDICAP' | 'OVER_UNDER',
+            shortMarket: shortMarket as 'AH' | 'OU',
+            evalObj,
+            marketView,
+          });
+        }
+      }
 
-            if (!chkErr && existingRow) {
-              alreadyExistsInDb = true;
-            }
-          } catch (e) {
-            // DB probe error handled safely
+      // HOTFIX H7 P2 — Enforce explicit authorization & OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed at the persistence boundary
+      const explicitlyAuthorized =
+        options?.persistToDatabase === true && options?.allowProductionWrite === true;
+      const writeAllowedByGuard =
+        explicitlyAuthorized && OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed(true);
+
+      if (!explicitlyAuthorized || !writeAllowedByGuard) {
+        result.persistenceAuthorized = false;
+        result.persistenceSkipped = true;
+        result.persistenceSkipReason = !explicitlyAuthorized
+          ? 'PERSISTENCE_DISABLED_BY_DEFAULT: persistToDatabase and allowProductionWrite must both be explicitly true'
+          : 'PRODUCTION_DB_WRITE_GUARD_BLOCKED: OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed returned false';
+        return result;
+      }
+
+      result.persistenceAuthorized = true;
+      result.persistenceSkipped = false;
+      result.persistenceSkipReason = null;
+
+      if (eligibleMarketsToPersist.length === 0) {
+        return result;
+      }
+
+      const client = options.dbClient || (await import('../../lib/db')).getDbClient();
+
+      const fs = await import('fs');
+      const path = await import('path');
+      const targetDir = path.resolve(process.cwd(), 'data', 'verification');
+      if (!options.skipLocalFileAppend && !fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+      const liveLedgerPath = path.join(targetDir, 'live_prediction_ledger.jsonl');
+      const runLedgerPath = path.join(targetDir, 'production_run_ledger.jsonl');
+
+      // Load existing ledger position IDs from live_prediction_ledger.jsonl for file idempotency
+      const existingFilePosIds = new Set<string>();
+      if (!options.skipLocalFileAppend && fs.existsSync(liveLedgerPath)) {
+        try {
+          const lines = fs.readFileSync(liveLedgerPath, 'utf8').trim().split('\n').filter(Boolean);
+          for (const line of lines) {
+            try {
+              const parsed = JSON.parse(line);
+              if (parsed.ledgerPositionId) existingFilePosIds.add(parsed.ledgerPositionId);
+              else if (parsed.predictionId) existingFilePosIds.add(parsed.predictionId);
+            } catch {}
           }
+        } catch {}
+      }
 
-          if (alreadyExistsInDb || existingFilePosIds.has(ledgerPositionId)) {
-            result.duplicateCount++;
-            Logger.info(`[ProductionPredictionEngine] Position ${ledgerPositionId} already exists; preserving immutable first snapshot.`);
-            continue; // First qualifying snapshot wins; do not overwrite or duplicate!
-          }
+      const localLedgerEntriesToAppend: any[] = [];
 
-          // STEP 1.1: Green Cohort Tagging (strictly confidence > 70)
-          const isGreenCohort = (marketView.confidence || 0) > 70;
+      for (const entry of eligibleMarketsToPersist) {
+        const { prediction, fixtureUuid, marketType, shortMarket, evalObj, marketView } = entry;
 
-          // STEP 3: Immutable Prediction Snapshot
-          const pWin = (evalObj as any)?.decomposition?.win ?? ((evalObj as any)?.probabilities?.pOver ?? ((marketView.modelProbabilityPct || 0) / 100));
-          const pPush = (evalObj as any)?.decomposition?.push ?? ((evalObj as any)?.probabilities?.pPush ?? 0);
-          const pLoss = (evalObj as any)?.decomposition?.loss ?? ((evalObj as any)?.probabilities?.pUnder ?? (1 - pWin - pPush));
+        const pickDeterministicId = this.deterministicUuid(`pick:${prediction.fixtureId}:${marketType}:live`);
+        const predDeterministicId = this.deterministicUuid(`pred:${prediction.fixtureId}:${shortMarket}`);
+        const ledgerPositionId = `${prediction.fixtureId}:${shortMarket}:${marketView.line}:${marketView.selection}`;
+        const ledgerDeterministicId = this.deterministicUuid(`pos:${ledgerPositionId}`);
 
-          const snapshotMeta = {
-            cohort: 'GREEN_V2',
-            green_cohort: isGreenCohort,
-            ledger_position_id: ledgerPositionId,
-            fixture_id: prediction.fixtureId,
-            canonical_match_id: prediction.canonicalMatchId,
-            market_type: shortMarket,
-            selection: marketView.selection,
-            line: marketView.line,
-            stake_units: 1.0,
-            market_odds: marketView.marketOdds,
-            fair_odds: marketView.fairOdds,
-            p_win: Number(pWin.toFixed(4)),
-            p_push: Number(pPush.toFixed(4)),
-            p_loss: Number(pLoss.toFixed(4)),
-            confidence: marketView.confidence || 0,
-            edge: marketView.edgePct,
-            expected_value_pct: marketView.expectedValuePct,
-            kickoff_utc: prediction.kickoffUtc,
-            odds_snapshot_ts: marketView.oddsCapturedAt,
-            model_version: this.MODEL_VERSION,
-            feature_artifact_version: this.FEATURE_VERSION,
-            calibration_version: 'calib-v1.0',
-            source_type: 'PROVIDER',
-            data_status: 'ACTIVE',
-            provider: marketView.bookmaker || 'Pinnacle',
-            provenance_hash: provenanceHash,
-            created_at: new Date().toISOString(),
-          };
+        const provenanceHash = crypto
+          .createHash('sha256')
+          .update(`${prediction.canonicalMatchId}:${marketType}:${marketView.selection}:${marketView.fairOdds}:${marketView.marketOdds}:${this.MODEL_VERSION}:${prediction.predictionTimestamp}`)
+          .digest('hex');
 
-          const leagueEntry = getLeagueByNameOrSlug(prediction.league);
-          const competitionId = leagueEntry ? leagueEntry.provider_league_id : 39;
+        // 1. Persist to Supabase daily_picks table (strictly ACTIVE league-markets AH/OU only)
+        const dailyPickRow = {
+          id: pickDeterministicId,
+          fixture_id: fixtureUuid,
+          league: prediction.league,
+          home_team: prediction.homeTeam,
+          away_team: prediction.awayTeam,
+          kickoff_utc: prediction.kickoffUtc,
+          market_type: marketType,
+          prediction: marketView.selection,
+          model_probability: marketView.modelProbabilityPct ? marketView.modelProbabilityPct / 100 : 0.5,
+          fair_odds: marketView.fairOdds,
+          market_odds: marketView.marketOdds,
+          market_bookmaker: marketView.bookmaker || 'Pinnacle',
+          edge_pct: marketView.edgePct,
+          confidence: marketView.confidence || 0,
+          verdict: marketView.verdict || 'LEWATI',
+          reasoning: evalObj
+            ? `Model fair ${evalObj.fairOdds.toFixed(2)} vs Pinnacle ${evalObj.marketOdds.toFixed(2)}. Edge: ${(evalObj.edge * 100).toFixed(1)}%, EV: ${(evalObj.expectedValue * 100).toFixed(1)}%, Confidence: ${evalObj.confidence}/100. Model: ${this.MODEL_VERSION}.`
+            : `Edge: ${marketView.edgePct}%, Odds: ${marketView.marketOdds}`,
+          rejection_reason: marketView.rejectionReason || null,
+          status: 'PENDING',
+          source: 'live',
+          prediction_id: predDeterministicId,
+        };
 
-          const ledgerRow = {
-            id: ledgerDeterministicId,
-            doi_id: ledgerPositionId,
-            match_id: fixtureUuid,
-            competition_id: competitionId,
-            market: shortMarket,
-            selection: marketView.selection,
-            fair_odds: marketView.fairOdds,
-            odds_at_prediction: marketView.marketOdds,
-            confidence: marketView.confidence || 0,
-            model_version: this.MODEL_VERSION,
-            xg_home: prediction.scoreGridSummary?.homeXG || 1.35,
-            xg_away: prediction.scoreGridSummary?.awayXG || 1.20,
-            dixon_coles_rho: prediction.scoreGridSummary?.rho || -0.06,
-            sha256_hash: provenanceHash,
-            decision: 'BET',
-            decision_reason: JSON.stringify(snapshotMeta),
-            published_at: prediction.predictionTimestamp,
-            result_status: 'pending',
-            source_type: 'PROVIDER',
-            data_status: 'ACTIVE',
-            verified: true,
-          };
+        const { error: pickErr } = await client
+          .from('daily_picks')
+          .upsert(dailyPickRow, { onConflict: 'fixture_id, market_type, source' });
 
-          const { error: ledgerErr } = await client
+        if (!pickErr) {
+          result.persistedPicksCount++;
+        } else {
+          Logger.warn('[ProductionPredictionEngine] Upsert error on daily_picks:', { error: pickErr.message });
+        }
+
+        // 2. Persist to Supabase predictions table (strictly ACTIVE league-markets AH/OU only)
+        const predictionRow = {
+          id: predDeterministicId,
+          match_id: fixtureUuid,
+          market_type: shortMarket,
+          home_team: prediction.homeTeam,
+          away_team: prediction.awayTeam,
+          selection: marketView.selection,
+          model_probability: marketView.modelProbabilityPct ? marketView.modelProbabilityPct / 100 : null,
+          fair_odds: marketView.fairOdds,
+          market_odds: marketView.marketOdds,
+          edge_pct: marketView.edgePct,
+          expected_value: marketView.expectedValuePct ? marketView.expectedValuePct / 100 : null,
+          confidence: (marketView.confidence || 0) / 100,
+          model_version: this.MODEL_VERSION,
+          feature_version: this.FEATURE_VERSION,
+          prediction_timestamp: prediction.predictionTimestamp,
+          source_type: 'PROVIDER',
+          data_status: 'ACTIVE',
+        };
+
+        const { error: predErr } = await client
+          .from('predictions')
+          .upsert(predictionRow, { onConflict: 'id' });
+
+        if (!predErr) {
+          result.persistedPredictionsCount = (result.persistedPredictionsCount || 0) + 1;
+        } else {
+          Logger.warn('[ProductionPredictionEngine] Upsert error on predictions:', { error: predErr.message });
+        }
+
+        // 3. STEP 1 & 1.1: Production Betting Ledger Qualification Rule
+        const isLayak = marketView.verdict === 'LAYAK';
+        const isAllowedMarket = shortMarket === 'AH' || shortMarket === 'OU';
+        const isMarketActiveForLeague =
+          isAllowedMarket && isLeagueMarketProductionEnabled(prediction.league, shortMarket);
+        const hasValidOdds = typeof marketView.marketOdds === 'number' && marketView.marketOdds > 1.0;
+        const isProvider = true;
+        const isActive = isMarketActiveForLeague;
+        const kickoffMs = new Date(prediction.kickoffUtc).getTime();
+        const writeTimeMs = Date.now();
+        const isPreKickoff = Number.isFinite(kickoffMs) ? writeTimeMs < kickoffMs : true;
+        const isWithinWindow = isWithinLedgerExecutionWindow(prediction.kickoffUtc, writeTimeMs);
+
+        const qualifiesForLedger =
+          isLayak &&
+          isAllowedMarket &&
+          isMarketActiveForLeague &&
+          hasValidOdds &&
+          isPreKickoff &&
+          isWithinWindow &&
+          isProvider &&
+          isActive;
+
+        if (!qualifiesForLedger) {
+          result.excludedCount++;
+          continue; // NEVER write PANTAU, LEWATI, BTTS, Moneyline, invalid odds, unactivated markets, or picks outside execution window to prediction_ledger
+        }
+
+        // STEP 2: Canonical Position Identity & Idempotency Check
+        let alreadyExistsInDb = false;
+        try {
+          const { data: existingRow, error: chkErr } = await client
             .from('prediction_ledger')
-            .insert(ledgerRow);
+            .select('id')
+            .eq('id', ledgerDeterministicId)
+            .maybeSingle();
 
-          if (!ledgerErr) {
-            result.persistedLedgerCount++;
-            if (isGreenCohort) result.persistedGreenCount++;
-            result.newLedgerPositions.push(snapshotMeta);
-            existingFilePosIds.add(ledgerPositionId);
-            localLedgerEntriesToAppend.push(snapshotMeta);
-          } else {
-            Logger.warn('[ProductionPredictionEngine] Insert error on prediction_ledger:', { error: ledgerErr.message });
+          if (!chkErr && existingRow) {
+            alreadyExistsInDb = true;
           }
+        } catch (e) {
+          // DB probe error handled safely
+        }
+
+        if (alreadyExistsInDb || existingFilePosIds.has(ledgerPositionId)) {
+          result.duplicateCount++;
+          Logger.info(`[ProductionPredictionEngine] Position ${ledgerPositionId} already exists; preserving immutable first snapshot.`);
+          continue; // First qualifying snapshot wins; do not overwrite or duplicate!
+        }
+
+        // STEP 1.1: Green Cohort Tagging (strictly confidence > 70)
+        const isGreenCohort = (marketView.confidence || 0) > 70;
+
+        // STEP 3: Immutable Prediction Snapshot
+        const pWin = (evalObj as any)?.decomposition?.win ?? ((evalObj as any)?.probabilities?.pOver ?? ((marketView.modelProbabilityPct || 0) / 100));
+        const pPush = (evalObj as any)?.decomposition?.push ?? ((evalObj as any)?.probabilities?.pPush ?? 0);
+        const pLoss = (evalObj as any)?.decomposition?.loss ?? ((evalObj as any)?.probabilities?.pUnder ?? (1 - pWin - pPush));
+
+        const snapshotMeta = {
+          cohort: 'GREEN_V2',
+          green_cohort: isGreenCohort,
+          ledger_position_id: ledgerPositionId,
+          fixture_id: prediction.fixtureId,
+          canonical_match_id: prediction.canonicalMatchId,
+          market_type: shortMarket,
+          selection: marketView.selection,
+          line: marketView.line,
+          stake_units: 1.0,
+          market_odds: marketView.marketOdds,
+          fair_odds: marketView.fairOdds,
+          p_win: Number(pWin.toFixed(4)),
+          p_push: Number(pPush.toFixed(4)),
+          p_loss: Number(pLoss.toFixed(4)),
+          confidence: marketView.confidence || 0,
+          edge: marketView.edgePct,
+          expected_value_pct: marketView.expectedValuePct,
+          kickoff_utc: prediction.kickoffUtc,
+          odds_snapshot_ts: marketView.oddsCapturedAt,
+          model_version: this.MODEL_VERSION,
+          feature_artifact_version: this.FEATURE_VERSION,
+          calibration_version: 'calib-v1.0',
+          source_type: 'PROVIDER',
+          data_status: 'ACTIVE',
+          provider: marketView.bookmaker || 'Pinnacle',
+          provenance_hash: provenanceHash,
+          created_at: new Date().toISOString(),
+        };
+
+        const leagueEntry = getLeagueByNameOrSlug(prediction.league);
+        const competitionId = leagueEntry ? leagueEntry.provider_league_id : 39;
+
+        const ledgerRow = {
+          id: ledgerDeterministicId,
+          doi_id: ledgerPositionId,
+          match_id: fixtureUuid,
+          competition_id: competitionId,
+          market: shortMarket,
+          selection: marketView.selection,
+          fair_odds: marketView.fairOdds,
+          odds_at_prediction: marketView.marketOdds,
+          confidence: marketView.confidence || 0,
+          model_version: this.MODEL_VERSION,
+          xg_home: prediction.scoreGridSummary?.homeXG || 1.35,
+          xg_away: prediction.scoreGridSummary?.awayXG || 1.20,
+          dixon_coles_rho: prediction.scoreGridSummary?.rho || -0.06,
+          sha256_hash: provenanceHash,
+          decision: 'BET',
+          decision_reason: JSON.stringify(snapshotMeta),
+          published_at: prediction.predictionTimestamp,
+          result_status: 'pending',
+          source_type: 'PROVIDER',
+          data_status: 'ACTIVE',
+          verified: true,
+        };
+
+        const { error: ledgerErr } = await client
+          .from('prediction_ledger')
+          .insert(ledgerRow);
+
+        if (!ledgerErr) {
+          result.persistedLedgerCount++;
+          if (isGreenCohort) result.persistedGreenCount++;
+          result.newLedgerPositions.push(snapshotMeta);
+          existingFilePosIds.add(ledgerPositionId);
+          localLedgerEntriesToAppend.push(snapshotMeta);
+        } else {
+          Logger.warn('[ProductionPredictionEngine] Insert error on prediction_ledger:', { error: ledgerErr.message });
         }
       }
 
       // Append new qualifying immutable ledger entries to local ledger files
-      if (localLedgerEntriesToAppend.length > 0) {
+      if (!options.skipLocalFileAppend && localLedgerEntriesToAppend.length > 0) {
         try {
           const lines = localLedgerEntriesToAppend.map(e => JSON.stringify(e)).join('\n') + '\n';
           fs.appendFileSync(liveLedgerPath, lines, 'utf8');
@@ -812,9 +914,11 @@ export class ProductionPredictionEngine {
   /**
    * Main production cycle runner.
    * Can accept explicit fixtures or ingest from API-Football & OddsPapi.
+   * Persistence is DISABLED by default (`persistToDatabase: false, allowProductionWrite: false`).
    */
   public static async runPredictionCycle(
-    explicitFixtures?: FixtureInput[]
+    explicitFixtures?: FixtureInput[],
+    options: PredictionCycleOptions = {}
   ): Promise<PredictionCycleResult> {
     const timestampUtc = new Date().toISOString();
     let fixtures = explicitFixtures;
@@ -848,18 +952,27 @@ export class ProductionPredictionEngine {
       }
     }
 
-    // Persist idempotently to database if configured
-    const persistence = await this.persistPredictionCycle(evaluatedItems);
+    // Persist idempotently to database ONLY if explicitly authorized and allowed by guard
+    const persistence = await this.persistPredictionCycle(evaluatedItems, {
+      persistToDatabase: Boolean(options?.persistToDatabase === true),
+      allowProductionWrite: Boolean(options?.allowProductionWrite === true),
+      dbClient: options?.dbClient,
+      skipLocalFileAppend: options?.skipLocalFileAppend,
+    });
 
     return {
       timestampUtc,
       activePredictions: evaluatedItems.map(item => item.prediction),
       persistedPicksCount: persistence.persistedPicksCount,
+      persistedPredictionsCount: persistence.persistedPredictionsCount,
       persistedLedgerCount: persistence.persistedLedgerCount,
       persistedGreenCount: persistence.persistedGreenCount,
       duplicateCount: persistence.duplicateCount,
       excludedCount: persistence.excludedCount,
       newLedgerPositions: persistence.newLedgerPositions,
+      persistenceAuthorized: persistence.persistenceAuthorized,
+      persistenceSkipped: persistence.persistenceSkipped,
+      persistenceSkipReason: persistence.persistenceSkipReason,
       stats: {
         totalFixtures: fixtures.length,
         reconciledWithOdds: evaluatedItems.filter(i => i.prediction.markets.asianHandicap.marketOdds > 1.0).length,

@@ -182,14 +182,14 @@ export class CanonicalMatchArchiveService {
   ): ImmutablePredictionCheckResult & { immutable: boolean; violations: string[] } {
     const violations: string[] = [];
 
-    // 1. Temporal check: predictionTimestamp / createdAt must not be after kickoffUtc
+    // 1. Temporal check: predictionTimestamp / createdAt must be strictly before kickoffUtc (<)
     const predTs = candidate.predictionTimestamp || candidate.createdAt || candidate.created_at;
     const kickTs = candidate.kickoffUtc || candidate.kickoff_utc || candidate.kickoff;
     if (predTs && kickTs && candidate.ledgerTier !== 'NONE') {
       const pMs = new Date(predTs).getTime();
       const kMs = new Date(kickTs).getTime();
-      if (!isNaN(pMs) && !isNaN(kMs) && pMs > kMs) {
-        const msg = `Temporal leakage violation: predictionTimestamp (${predTs}) > kickoffUtc (${kickTs}). Backdated predictions are prohibited.`;
+      if (!isNaN(pMs) && !isNaN(kMs) && pMs >= kMs) {
+        const msg = `Temporal leakage violation: predictionTimestamp (${predTs}) >= kickoffUtc (${kickTs}). Backdated or at-kickoff predictions are prohibited.`;
         violations.push(msg);
         return {
           valid: false,

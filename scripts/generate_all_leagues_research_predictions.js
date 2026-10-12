@@ -59,7 +59,7 @@ function loadLiveEplLookup() {
   return map;
 }
 
-function generateAllLeaguesResearchPredictions() {
+function generateAllLeaguesResearchPredictions(options = {}) {
   if (!fs.existsSync(EVIDENCE_PATH)) {
     throw new Error(`Evidence file not found at ${EVIDENCE_PATH}`);
   }
@@ -73,7 +73,8 @@ function generateAllLeaguesResearchPredictions() {
     leagueCounts[l.league_name] = { fixtures: 0, predictions: 0 };
   });
 
-  const timestamp = '2026-10-11T05:00:00.000Z';
+  const runtimeEvaluationTimestamp = options.evaluationTimestamp || new Date().toISOString();
+  const sourceDataTimestamp = raw.generatedAt || null;
 
   raw.leagueResults.forEach(lr => {
     const leagueName = lr.fixtures[0]?.league?.name || lr.leagueKey;
@@ -137,10 +138,15 @@ function generateAllLeaguesResearchPredictions() {
         ? 'NO_MARKET_ODDS'
         : 'ODDS_UNAVAILABLE';
 
+      const kickoffMs = Date.parse(f.fixture.date);
+
       // 1. Asian Handicap Market
       if (pred.markets.asianHandicap) {
         const ah = pred.markets.asianHandicap;
         const ahId = `pred_${canonicalMatchId}_AH_${ah.line}`;
+        const ahPredTs = (isEpl && ahLive?.predictionTimestamp) || runtimeEvaluationTimestamp;
+        const ahPredMs = Date.parse(ahPredTs);
+        const ahIsRetrospective = Number.isNaN(ahPredMs) || Number.isNaN(kickoffMs) || ahPredMs >= kickoffMs;
 
         const ahRow = {
           predictionId: ahId,
@@ -185,7 +191,13 @@ function generateAllLeaguesResearchPredictions() {
           profitLoss: null,
           profitUnits: 0,
           stakeUnits: 0,
-          createdAt: (isEpl && ahLive?.predictionTimestamp) || timestamp,
+          predictionTimestamp: ahIsRetrospective ? null : ahPredTs,
+          sourceDataTimestamp,
+          archiveCreatedAt: runtimeEvaluationTimestamp,
+          createdAt: ahPredTs,
+          isRetrospective: ahIsRetrospective,
+          temporalEligibilityStatus: ahIsRetrospective ? 'RETROSPECTIVE_EXCLUDED' : 'VALID_PRE_MATCH',
+          eligibleForPreMatchMetrics: !ahIsRetrospective,
           ...(isEpl && ahLive?.matchScore ? {
             matchScore: ahLive.matchScore,
             homeGoals: ahLive.homeGoals,
@@ -203,6 +215,9 @@ function generateAllLeaguesResearchPredictions() {
       if (pred.markets.overUnder) {
         const ou = pred.markets.overUnder;
         const ouId = `pred_${canonicalMatchId}_OU_${ou.line}`;
+        const ouPredTs = (isEpl && ouLive?.predictionTimestamp) || runtimeEvaluationTimestamp;
+        const ouPredMs = Date.parse(ouPredTs);
+        const ouIsRetrospective = Number.isNaN(ouPredMs) || Number.isNaN(kickoffMs) || ouPredMs >= kickoffMs;
 
         const ouRow = {
           predictionId: ouId,
@@ -247,7 +262,13 @@ function generateAllLeaguesResearchPredictions() {
           profitLoss: null,
           profitUnits: 0,
           stakeUnits: 0,
-          createdAt: (isEpl && ouLive?.predictionTimestamp) || timestamp,
+          predictionTimestamp: ouIsRetrospective ? null : ouPredTs,
+          sourceDataTimestamp,
+          archiveCreatedAt: runtimeEvaluationTimestamp,
+          createdAt: ouPredTs,
+          isRetrospective: ouIsRetrospective,
+          temporalEligibilityStatus: ouIsRetrospective ? 'RETROSPECTIVE_EXCLUDED' : 'VALID_PRE_MATCH',
+          eligibleForPreMatchMetrics: !ouIsRetrospective,
           ...(isEpl && ouLive?.matchScore ? {
             matchScore: ouLive.matchScore,
             homeGoals: ouLive.homeGoals,
@@ -270,12 +291,16 @@ function generateAllLeaguesResearchPredictions() {
     return a.predictionId.localeCompare(b.predictionId);
   });
 
-  const dir = path.dirname(ALL_LEAGUES_OUTPUT_PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(ALL_LEAGUES_OUTPUT_PATH, generatedRows.map(r => JSON.stringify(r)).join('\n') + '\n', 'utf8');
+  // Never rewrite historical timestamps in all_leagues_research_ledger.jsonl unless writeToDisk is explicitly requested
+  if (options.writeToDisk === true) {
+    const targetPath = options.outputPath || ALL_LEAGUES_OUTPUT_PATH;
+    const dir = path.dirname(targetPath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(targetPath, generatedRows.map(r => JSON.stringify(r)).join('\n') + '\n', 'utf8');
+  }
 
   return {
-    outputPath: ALL_LEAGUES_OUTPUT_PATH,
+    outputPath: options.outputPath || ALL_LEAGUES_OUTPUT_PATH,
     totalPredictions: generatedRows.length,
     leagueCounts,
     generatedRows,
@@ -283,8 +308,9 @@ function generateAllLeaguesResearchPredictions() {
 }
 
 if (require.main === module) {
-  const res = generateAllLeaguesResearchPredictions();
-  console.log(`Generated ${res.totalPredictions} predictions across ${Object.keys(res.leagueCounts).length} leagues -> ${res.outputPath}`);
+  const writeToDisk = process.argv.includes('--write');
+  const res = generateAllLeaguesResearchPredictions({ writeToDisk });
+  console.log(`Generated ${res.totalPredictions} predictions across ${Object.keys(res.leagueCounts).length} leagues (writeToDisk=${writeToDisk}) -> ${res.outputPath}`);
 }
 
 module.exports = {
