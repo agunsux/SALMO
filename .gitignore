@@ -36,6 +36,7 @@ next-env.d.ts
 scratch/
 /data/backup/
 /research/raw_dribble/
+/research/
 /data/external/football-data/
 
 .vercel
