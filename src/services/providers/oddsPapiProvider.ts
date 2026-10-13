@@ -436,8 +436,16 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
       };
     }
 
+    const allowProdWrite = OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed(
+      process.env.ALLOW_PRODUCTION_DB_WRITE === 'true'
+    );
+
     // Pre-flight Persistent Quota & 90% Hard-Stop Guard: Reserve total request count upfront
-    const batchReservation = await OddsPapiQuotaGuard.reserveQuota(requestUrls.length);
+    const batchReservation = await OddsPapiQuotaGuard.reserveQuota(requestUrls.length, {
+      endpoint: '/fixtures',
+      metadata: { tournamentIds: targetTournamentIds },
+      allowProductionWrite: allowProdWrite,
+    });
     if (!batchReservation.allowed) {
       Logger.warn(`[OddsPapiProvider] Fixture discovery halted by quota guard: ${batchReservation.reason}`);
       return {
@@ -455,9 +463,6 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
     const allFixtures: LiveFixtureDTO[] = [];
     const seenFixtureIds = new Set<string>();
     const reservationId = batchReservation.reservationId!;
-    const allowProdWrite = OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed(
-      process.env.ALLOW_PRODUCTION_DB_WRITE === 'true'
-    );
     let billableRequestsConsumed = 0;
 
     for (let i = 0; i < requestUrls.length; i++) {
@@ -473,12 +478,42 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
           next: { revalidate: 300 },
         });
       } catch (err) {
-        // Pre-response transport error: release remaining unexecuted reservation units
-        OddsPapiQuotaGuard.releaseQuota(reservationId, {
-          endpoint: '/fixtures',
-          params: { tournamentId },
+        const remainingInBatch = requestUrls.length - i;
+        const isAmbiguousPostDispatch = OddsPapiQuotaGuard.isAmbiguousPostDispatchFailure({
           error: String(err),
         });
+
+        if (isAmbiguousPostDispatch) {
+          // Worst-case billing safety: request i was dispatched and timed out/dropped ambiguously (charge 1 unit),
+          // while remaining loop iterations (i+1 .. N-1) were never dispatched before abort (release remainingInBatch - 1).
+          billableRequestsConsumed += 1;
+          await OddsPapiQuotaGuard.confirmQuota(
+            reservationId,
+            {
+              endpoint: '/fixtures',
+              params: { tournamentId },
+              outcome: 'BILLABLE_ERROR',
+              billingOutcome: 'AMBIGUOUS_TRANSPORT_CHARGED',
+              consumedCost: 1,
+              releasedCost: Math.max(0, remainingInBatch - 1),
+              error: String(err),
+            },
+            allowProdWrite
+          );
+        } else {
+          // Confirmed pre-response transport error: release remaining unexecuted reservation units
+          await OddsPapiQuotaGuard.releaseQuotaAsync(
+            reservationId,
+            {
+              endpoint: '/fixtures',
+              params: { tournamentId },
+              consumedCost: remainingInBatch,
+              preRequestAbort: true,
+              error: String(err),
+            },
+            allowProdWrite
+          );
+        }
         const latencyMs = Date.now() - start;
         Logger.error('[OddsPapiProvider] Fixture discovery network failure:', { error: String(err), latencyMs });
         return {
@@ -495,12 +530,18 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
 
       // Non-billable pre-endpoint rejection (429 / 401): release remaining unconfirmed units and trip circuit breaker
       if (res.status === 429 || res.status === 401) {
-        OddsPapiQuotaGuard.releaseQuota(reservationId, {
-          endpoint: '/fixtures',
-          params: { tournamentId },
-          statusCode: res.status,
-          error: `HTTP ${res.status}`,
-        });
+        const remainingInBatch = requestUrls.length - i;
+        await OddsPapiQuotaGuard.releaseQuotaAsync(
+          reservationId,
+          {
+            endpoint: '/fixtures',
+            params: { tournamentId },
+            statusCode: res.status,
+            consumedCost: remainingInBatch,
+            error: `HTTP ${res.status}`,
+          },
+          allowProdWrite
+        );
         Logger.warn(`[OddsPapiProvider] HTTP ${res.status} encountered during fixture discovery`);
         return {
           status: res.status === 429 ? 'RATE_LIMITED' : 'UNCONFIGURED',
@@ -702,7 +743,16 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
       };
     }
 
-    const reservation = await OddsPapiQuotaGuard.reserveQuota(1);
+    const allowProdWrite = OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed(
+      process.env.ALLOW_PRODUCTION_DB_WRITE === 'true'
+    );
+    const auditParams = { tournamentIds, bookmakers: normalizedBookmakers.join(',') };
+
+    const reservation = await OddsPapiQuotaGuard.reserveQuota(1, {
+      endpoint: options.endpointLabel,
+      metadata: auditParams,
+      allowProductionWrite: allowProdWrite,
+    });
     if (!reservation.allowed) {
       Logger.warn(`[OddsPapiProvider] Tournament odds halted by quota guard: ${reservation.reason}`);
       return {
@@ -718,10 +768,6 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
     }
 
     const reservationId = reservation.reservationId!;
-    const auditParams = { tournamentIds, bookmakers: normalizedBookmakers.join(',') };
-    const allowProdWrite = OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed(
-      process.env.ALLOW_PRODUCTION_DB_WRITE === 'true'
-    );
     let quotaSettled = false;
     let billableRequestConsumed = 0;
 
@@ -738,12 +784,16 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
       if (res.status === 429 || res.status === 401) {
         quotaSettled = true;
         const errBody = await res.text().catch(() => '');
-        OddsPapiQuotaGuard.releaseQuota(reservationId, {
-          endpoint: options.endpointLabel,
-          params: auditParams,
-          statusCode: res.status,
-          error: `HTTP ${res.status}`,
-        });
+        await OddsPapiQuotaGuard.releaseQuotaAsync(
+          reservationId,
+          {
+            endpoint: options.endpointLabel,
+            params: auditParams,
+            statusCode: res.status,
+            error: `HTTP ${res.status}`,
+          },
+          allowProdWrite
+        );
         OddsPapiQuotaGuard.tripCircuitBreaker(
           res.status,
           `OddsPapi ${options.endpointLabel} returned ${res.status}: ${errBody.slice(0, 120)}`
@@ -818,11 +868,18 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
       };
     } catch (err) {
       if (!quotaSettled) {
-        OddsPapiQuotaGuard.releaseQuota(reservationId, {
-          endpoint: options.endpointLabel,
-          params: auditParams,
-          error: String(err),
-        });
+        const releaseOutcome = await OddsPapiQuotaGuard.releaseQuotaAsync(
+          reservationId,
+          {
+            endpoint: options.endpointLabel,
+            params: auditParams,
+            error: String(err),
+          },
+          allowProdWrite
+        );
+        if (releaseOutcome.convertedToBillableConfirm) {
+          billableRequestConsumed = 1;
+        }
       }
       return {
         status: 'DATA_UNAVAILABLE',
