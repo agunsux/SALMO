@@ -3,7 +3,9 @@
 **Audit Date:** 2026-10-15  
 **Governing Standard:** docs/governance/promotion_gates.md & SALMO EPIC 76 Specification  
 **Baseline Release Commit:** `0a1e94784e1b8b8f2d5939226cb0bf06a6b1076b`  
-**Baseline Production Deployment ID:** `dpl_hRyq1Wcs6VAi1Vy4H1e8eqGP9VY7`  
+**Production Release Commit:** `726080e727932625ce5a5937107779f40882e3c0`  
+**Preview Deployment ID:** `dpl_FLbUa9mxePjdmkn3ED9XUHJrejBN`  
+**Production Deployment ID:** `dpl_4YNQsfRHpNApuKc1EBn7ZJdHqAQe`  
 **Auditor / Engineering Lead:** Principal Systems Engineer & Data-Integrity Lead  
 **Final Status / Verdict:** `INTEGRITY_VERIFIED_PRODUCTION_DEPLOYED`
 
