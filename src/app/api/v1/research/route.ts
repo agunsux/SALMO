@@ -459,6 +459,16 @@ export async function GET(request: NextRequest) {
     }
 
     if (rawPredictions.length === 0) {
+      const mirrorResearchPath = path.resolve(process.cwd(), 'data', 'research', 'multi_league_research_predictions.jsonl');
+      if (fs.existsSync(mirrorResearchPath)) {
+        try {
+          const lines = fs.readFileSync(mirrorResearchPath, 'utf8').trim().split('\n').filter(Boolean);
+          rawPredictions = lines.map((l: string) => JSON.parse(l));
+        } catch {}
+      }
+    }
+
+    if (rawPredictions.length === 0) {
       const stagingLedgerPath = path.resolve(process.cwd(), 'data', 'verification', 'staging_research_only_ledger.jsonl');
       if (fs.existsSync(stagingLedgerPath)) {
         try {

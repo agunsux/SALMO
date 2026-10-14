@@ -81,6 +81,14 @@ export async function GET() {
     uptimeSeconds: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
     latencyMs,
+    dataFreshness: {
+      historicalResearchAvailable: true,
+      currentFixturesAvailable: false,
+      currentOddsVerified: false,
+      predictionsQualified: false,
+      settlementUpToDate: true,
+      liveDataState: 'HISTORICAL_PRESERVED_LIVE_UNAVAILABLE',
+    },
     pipelineObservability,
     multiLeagueActivation: {
       activeLeaguesCount: activeLeagues.length,
