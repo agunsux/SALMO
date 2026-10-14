@@ -18,6 +18,7 @@ import {
 } from '@/engine/performance/gates';
 import { evaluatePositionBrierLegs } from '@/engine/performance/brierScoring';
 import { CanonicalMatchArchiveService } from '@/engine/archive/canonicalMatchArchiveService';
+import { EvidenceAccumulationService } from '@/engine/evidence/evidenceAccumulationService';
 import { Logger } from '@/lib/logger';
 import path from 'path';
 import fs from 'fs';
@@ -214,6 +215,7 @@ export async function GET(request: NextRequest) {
 
     const report = PerformanceMetricsEngine.generateReport(positions);
     const observability = await CanonicalMatchArchiveService.getPipelineObservabilityState();
+    const evidenceAccumulation = EvidenceAccumulationService.generateStatisticalEvidenceReport();
     const latencyMs = Date.now() - start;
 
     return NextResponse.json({
@@ -227,6 +229,7 @@ export async function GET(request: NextRequest) {
       report,
       settledPositions,
       observability,
+      evidenceAccumulation,
       totalPositionsLoaded: positions.length,
       meta: {
         requestId,
