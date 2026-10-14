@@ -990,7 +990,7 @@ test('P0 Atomic Quota - Scenario 19: Real PostgreSQL 16.4 engine executes forwar
 // -----------------------------------------------------------------------------
 // SCENARIO 20: Multi-Process External/Staging PostgreSQL TCP Harness Check
 // -----------------------------------------------------------------------------
-test('P0 Atomic Quota - Scenario 20: Multi-process PostgreSQL TCP staging harness check (refuses production hosts; reports explicit status when external staging Postgres URL is unset)', async t => {
+test('P0 Atomic Quota - Scenario 20: Multi-process PostgreSQL TCP staging harness check (refuses production hosts; verifies row locking across 20 independent TCP sockets)', async t => {
   const localPgUrl = process.env.LOCAL_POSTGRES_URL || process.env.STAGING_POSTGRES_URL || '';
   if (!localPgUrl) {
     t.skip(
@@ -999,10 +999,167 @@ test('P0 Atomic Quota - Scenario 20: Multi-process PostgreSQL TCP staging harnes
     return;
   }
 
-  // Safety gate: strictly forbid non-localhost URLs
+  // Safety gate: strictly forbid non-localhost URLs and non-test databases
   const parsed = new URL(localPgUrl);
   assert.ok(
     parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1',
     `Refusing to run SQL migration harness against non-local host: ${parsed.hostname}`
   );
+  assert.ok(
+    parsed.pathname === '/salmo_test',
+    `Refusing to run SQL migration harness against non-test database: ${parsed.pathname}`
+  );
+
+  const { Client } = require('pg');
+  const adminClient = new Client({ connectionString: localPgUrl });
+  await adminClient.connect();
+
+  const verRes = await adminClient.query('SELECT version() AS v, current_database() AS db');
+  assert.match(verRes.rows[0].v, /PostgreSQL 16\./, 'Must execute on real PostgreSQL 16 engine');
+  assert.strictEqual(verRes.rows[0].db, 'salmo_test', 'Must execute against salmo_test');
+
+  try {
+    // 1. Provision standard Supabase roles and execute forward migration
+    await adminClient.query(`
+      DO $$ BEGIN
+        IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'anon') THEN CREATE ROLE anon; END IF;
+        IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'authenticated') THEN CREATE ROLE authenticated; END IF;
+        IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'service_role') THEN CREATE ROLE service_role; END IF;
+      END $$;
+    `);
+
+    const forwardSql = fs.readFileSync(FORWARD_MIGRATION_PATH, 'utf8');
+    await adminClient.query(forwardSql);
+    await adminClient.query('TRUNCATE public.quota_reservations, public.quota_state;');
+
+    // 2. Initialize cycle at 197/250 (operational ceiling = 200, 3 units remaining)
+    const cycleKey = `tcp-cycle-${Date.now()}`;
+    const syncRes = await adminClient.query(
+      "SELECT public.salmo_sync_oddspapi_quota_cycle($1, 197, 250, 50) AS res",
+      [cycleKey]
+    );
+    const cycleState = syncRes.rows[0].res;
+    assert.strictEqual(cycleState.ok, true);
+    assert.strictEqual(cycleState.state.consumed, 197);
+    assert.strictEqual(cycleState.state.operational_ceiling, 200);
+    assert.strictEqual(cycleState.state.operational_remaining, 3);
+
+    // 3. Establish 20 independent TCP client sockets
+    const WORKER_COUNT = 20;
+    const workers = [];
+    for (let i = 0; i < WORKER_COUNT; i++) {
+      const c = new Client({ connectionString: localPgUrl });
+      await c.connect();
+      workers.push(c);
+    }
+
+    try {
+      // 4. Fire 20 concurrent reservation requests across independent TCP connections
+      const burstResults = await Promise.all(
+        workers.map((client, idx) =>
+          client.query(
+            "SELECT public.salmo_reserve_oddspapi_quota(1, '/v4/odds-by-tournaments', $1, $2, 50, 0.90, 600) AS res",
+            [`tcp-worker-${idx}`, cycleKey]
+          ).then(r => r.rows[0].res)
+        )
+      );
+
+      const allowed = burstResults.filter(r => r.ok);
+      const denied = burstResults.filter(r => !r.ok);
+
+      assert.strictEqual(allowed.length, 3, 'Exactly 3 reservations must succeed when only 3 units are available');
+      assert.strictEqual(denied.length, 17, 'All 17 excess reservations must be rejected');
+
+      for (const d of denied) {
+        assert.strictEqual(d.error_code, 'QUOTA_EXHAUSTED', 'Denied requests must receive QUOTA_EXHAUSTED');
+      }
+
+      // Verify DB state immediately after burst: ceiling enforced, 50-request reserve preserved
+      const stateAfterBurst = await adminClient.query(
+        "SELECT consumed, reserved, operational_ceiling FROM public.quota_state WHERE provider = 'oddspapi'"
+      );
+      assert.strictEqual(stateAfterBurst.rows[0].consumed, 197);
+      assert.strictEqual(stateAfterBurst.rows[0].reserved, 3);
+      assert.strictEqual(stateAfterBurst.rows[0].operational_ceiling, 200);
+
+      // 5. Idempotent replay on duplicate idempotency_key over TCP
+      const winningWorkerIndex = burstResults.findIndex(r => r.ok);
+      const dupRes = await workers[winningWorkerIndex].query(
+        "SELECT public.salmo_reserve_oddspapi_quota(1, '/v4/odds-by-tournaments', $1, $2, 50, 0.90, 600) AS res",
+        [`tcp-worker-${winningWorkerIndex}`, cycleKey]
+      );
+      const dupData = dupRes.rows[0].res;
+      assert.strictEqual(dupData.ok, true);
+      assert.strictEqual(dupData.idempotent_replay, true);
+      assert.strictEqual(dupData.reservation_id, burstResults[winningWorkerIndex].reservation_id);
+
+      // 6. Confirm and release transitions over TCP
+      // Confirm reservation #0 (HTTP 200 OK) -> consumed=198, reserved=2
+      const c0 = await adminClient.query(
+        "SELECT public.salmo_confirm_oddspapi_quota($1::uuid, 1, 0, 200, 'SUCCESS_2XX', 'tcp-step-c0') AS res",
+        [allowed[0].reservation_id]
+      );
+      assert.strictEqual(c0.rows[0].res.ok, true);
+      assert.strictEqual(c0.rows[0].res.consumed, 198);
+      assert.strictEqual(c0.rows[0].res.reserved, 2);
+
+      // Free release reservation #1 with HTTP 429 -> consumed=198, reserved=1
+      const rel429 = await adminClient.query(
+        "SELECT public.salmo_release_oddspapi_quota($1::uuid, 1, 429, false, 'FREE_429_RATE_LIMITED', 'HTTP_429', 'tcp-step-r1') AS res",
+        [allowed[1].reservation_id]
+      );
+      assert.strictEqual(rel429.rows[0].res.ok, true);
+      assert.strictEqual(rel429.rows[0].res.converted_to_billable_confirm, false);
+      assert.strictEqual(rel429.rows[0].res.consumed, 198);
+      assert.strictEqual(rel429.rows[0].res.reserved, 1);
+
+      // Billable release reservation #2 with HTTP 400 -> converted to billable confirm, consumed=199, reserved=0
+      const rel400 = await adminClient.query(
+        "SELECT public.salmo_release_oddspapi_quota($1::uuid, 1, 400, false, 'PRE_REQUEST_ABORT', 'HTTP_400', 'tcp-step-r2') AS res",
+        [allowed[2].reservation_id]
+      );
+      assert.strictEqual(rel400.rows[0].res.ok, true);
+      assert.strictEqual(rel400.rows[0].res.converted_to_billable_confirm, true);
+      assert.strictEqual(rel400.rows[0].res.consumed, 199);
+      assert.strictEqual(rel400.rows[0].res.reserved, 0);
+
+      // Trigger test: block illegal CONFIRMED -> RELEASED transition
+      await assert.rejects(
+        () => adminClient.query("UPDATE public.quota_reservations SET status = 'RELEASED' WHERE id = $1::uuid", [allowed[0].reservation_id]),
+        /INVALID_STATE_TRANSITION/
+      );
+
+      // 7. Rollback script verification over TCP
+      const inflight = await adminClient.query(
+        "SELECT public.salmo_reserve_oddspapi_quota(1, '/v4/fixtures', 'tcp-inflight-rb', $1, 50, 0.90, 600) AS res",
+        [cycleKey]
+      );
+      assert.strictEqual(inflight.rows[0].res.ok, true);
+      assert.strictEqual(inflight.rows[0].res.reserved, 1);
+
+      const rollbackSql = fs.readFileSync(ROLLBACK_MIGRATION_PATH, 'utf8');
+      await adminClient.query(rollbackSql);
+
+      const postRb = await adminClient.query(
+        "SELECT consumed, reserved, limit_value, safe_limit, schema_version FROM public.quota_state WHERE provider = 'oddspapi'"
+      );
+      assert.strictEqual(postRb.rows[0].consumed, 199, 'Confirmed consumption preserved on rollback');
+      assert.strictEqual(postRb.rows[0].reserved, 0, 'In-flight reservation drained on rollback');
+      assert.strictEqual(postRb.rows[0].safe_limit, 200, '50 reserve ceiling preserved');
+      assert.strictEqual(postRb.rows[0].schema_version, 'rolled_back_to_v4_compat');
+
+      // Re-apply forward migration
+      await adminClient.query(forwardSql);
+      const postRemigrate = await adminClient.query(
+        "SELECT consumed, reserved, operational_ceiling, schema_version FROM public.quota_state WHERE provider = 'oddspapi'"
+      );
+      assert.strictEqual(postRemigrate.rows[0].consumed, 199);
+      assert.strictEqual(postRemigrate.rows[0].operational_ceiling, 200);
+      assert.strictEqual(postRemigrate.rows[0].schema_version, 'salmo_p0_atomic_v1');
+    } finally {
+      await Promise.all(workers.map(w => w.end()));
+    }
+  } finally {
+    await adminClient.end();
+  }
 });

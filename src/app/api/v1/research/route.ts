@@ -850,7 +850,7 @@ export async function GET(request: NextRequest) {
         UNVERIFIED_TIMESTAMP_PROVENANCE: temporalEligibilitySummary.unverifiedProvenanceCount,
       },
     };
-    const dataState = predictions.length > 0 ? 'REAL' : (syncRes?.dataState || 'NO_QUALIFIED_PICKS');
+    const dataState = predictions.length > 0 ? 'REAL' : (syncRes?.dataState || 'DATA_UNAVAILABLE');
     const observability = await CanonicalMatchArchiveService.getPipelineObservabilityState();
 
     const latencyMs = Date.now() - start;
