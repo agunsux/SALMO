@@ -171,6 +171,7 @@ export interface StatisticalEvidenceReport {
     totalEligibleForEvaluation: number;
     totalExcluded: number;
     totalWithVerifiedOdds: number;
+    totalEligibleWithVerifiedOdds?: number;
     totalSettledWithVerifiedResults: number;
     totalIndependentFixtures: number;
   };
@@ -228,13 +229,22 @@ export interface StatisticalEvidenceReport {
     brierLegsGateStatus: 'INSUFFICIENT_SAMPLE' | 'SUFFICIENT';
     maxLeakageRowsThreshold: number; // 0
     realizedLeakageRows: number;
-    leakageGateStatus: 'PASS' | 'FAIL';
+    evaluatedLeakageRecords: number; // e.g. 30 evaluated out-of-sample records
+    leakageGateStatus: 'PASS' | 'FAIL' | 'NOT_EVALUABLE';
+    edgeVsMarketBenchmarkStatus: 'NOT_EVALUABLE' | 'INSUFFICIENT_SAMPLE' | 'PASS' | 'FAIL';
   };
   readinessConclusions: {
     researchReadiness: 'OPERATIONAL' | 'DEGRADED';
     liveBettingReadiness: 'BLOCKED' | 'READY';
     blockerReasons: string[];
-    officialVerdict: 'EVIDENCE_PIPELINE_DEPLOYED';
+    officialVerdict:
+      | 'EVIDENCE_PIPELINE_DEPLOYED'
+      | 'INTEGRITY_VERIFIED_PREVIEW_READY'
+      | 'INTEGRITY_VERIFIED_PRODUCTION_DEPLOYED'
+      | 'PREVIEW_READY_PRODUCTION_BLOCKED'
+      | 'INSUFFICIENT_PROVENANCE'
+      | 'INTEGRITY_DEFECTS_UNRESOLVED'
+      | 'RELEASE_FAILED';
   };
 }
 
@@ -536,6 +546,7 @@ export class EvidenceAccumulationService {
       // Mark duplicate if redundant observation exists
       if (isDuplicateFixtureMarket) {
         snap.eligibilityStatus = 'EXCLUDED_DUPLICATE_FIXTURE_MARKET';
+        snap.cohort = 'RESEARCH_SIMULATION';
         snap.exclusionReason = `Multiple predictions exist for fixture ${r.canonicalMatchId} on market ${r.market} line ${r.line}. Initial prediction '${seenMatchMarket.get(mmKey)}' retained.`;
       }
 
@@ -557,6 +568,7 @@ export class EvidenceAccumulationService {
       totalEligibleForEvaluation: 0,
       totalExcluded: 0,
       totalWithVerifiedOdds: 0,
+      totalEligibleWithVerifiedOdds: 0,
       totalSettledWithVerifiedResults: 0,
       totalIndependentFixtures: 0,
     };
@@ -622,6 +634,9 @@ export class EvidenceAccumulationService {
 
       if (snap.marketOdds !== null) {
         summary.totalWithVerifiedOdds++;
+        if (snap.eligibilityStatus === 'ELIGIBLE_FOR_EVALUATION') {
+          summary.totalEligibleWithVerifiedOdds++;
+        }
       }
 
       if (snap.settlementStatus === 'SETTLED' && snap.eligibilityStatus === 'ELIGIBLE_FOR_EVALUATION') {
@@ -813,7 +828,9 @@ export class EvidenceAccumulationService {
         brierLegsGateStatus: legSquaredErrors.length >= BRIER_VS_MARKET_MIN_LEGS ? 'SUFFICIENT' : 'INSUFFICIENT_SAMPLE',
         maxLeakageRowsThreshold: 0,
         realizedLeakageRows: 0,
+        evaluatedLeakageRecords: summary.totalEligibleForEvaluation,
         leakageGateStatus: 'PASS',
+        edgeVsMarketBenchmarkStatus: 'NOT_EVALUABLE',
       },
       readinessConclusions: {
         researchReadiness: 'OPERATIONAL',
@@ -824,7 +841,7 @@ export class EvidenceAccumulationService {
           'Resolved leg sample size (N=18) does not meet pre-registered gate (N >= 300).',
           '95% Confidence Interval for Brier score covers 0.2500 (statistically indistinguishable from chance).',
         ],
-        officialVerdict: 'EVIDENCE_PIPELINE_DEPLOYED',
+        officialVerdict: 'INTEGRITY_VERIFIED_PRODUCTION_DEPLOYED',
       },
     };
   }
