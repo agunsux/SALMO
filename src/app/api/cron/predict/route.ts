@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { ProductionPredictionEngine } from '@/engine/pipeline/productionPredictionEngine';
+import { DailyPredictionRefreshService } from '@/engine/pipeline/dailyPredictionRefreshService';
 import { MultiLeagueAutoActivator } from '@/engine/activation/multiLeagueAutoActivator';
 import { OddsPapiQuotaGuard } from '@/lib/quota/oddsPapiQuotaGuard';
 import { Logger } from '@/lib/logger';
@@ -45,6 +46,24 @@ async function handleCron(request: NextRequest) {
   if (!verifyAuth(request)) {
     Logger.warn('[Cron:predict] Unauthorized attempt', { requestId });
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const requestedMode = searchParams.get('mode')?.toUpperCase();
+
+  // Allow explicit administrative simulation (AUDIT_ONLY or RESEARCH dry-run) without requiring ENABLE_PRODUCTION_CRON
+  if (requestedMode === 'AUDIT_ONLY' || requestedMode === 'RESEARCH_DRY_RUN') {
+    const refreshResult = await DailyPredictionRefreshService.runDailyRefresh({
+      mode: 'AUDIT_ONLY',
+      dryRun: true,
+    });
+    return NextResponse.json({
+      success: refreshResult.success,
+      status: refreshResult.status,
+      mode: 'AUDIT_ONLY',
+      report: refreshResult.report,
+      qualifiedPredictionsCount: refreshResult.qualifiedPredictions.length,
+    }, { status: 200 });
   }
 
   // H3 Safety Gate: Strict opt-in behavior (ENABLE_PRODUCTION_CRON === 'true' required; default OFF when absent/false or in preview)
