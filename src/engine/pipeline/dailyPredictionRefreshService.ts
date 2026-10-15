@@ -38,6 +38,7 @@ import { OddsPapiQuotaGuard } from '../../lib/quota/oddsPapiQuotaGuard';
 import { Logger } from '../../lib/logger';
 import { FixtureInput } from './productionPredictionEngine';
 import { OpenFootballProvider } from '../../services/providers/openFootballProvider';
+import { DurablePredictionStorageAdapter } from './durablePredictionStorageAdapter';
 
 export type OperatingMode = 'AUDIT_ONLY' | 'RESEARCH' | 'SHADOW' | 'PRODUCTION';
 
@@ -72,6 +73,12 @@ export interface DailyRefreshOptions {
   dryRun?: boolean;
   /** Require explicit authorization to publish picks in PRODUCTION mode */
   allowProductionPublish?: boolean;
+  /** Explicit flag authorizing database persistence */
+  persistToDatabase?: boolean;
+  /** Production write guard flag (must pass OddsPapiQuotaGuard.isProductionDatabaseWriteAllowed) */
+  allowProductionWrite?: boolean;
+  /** Injected database client for unit/integration testing */
+  dbClient?: any;
 }
 
 export interface RejectionDetail {
@@ -161,6 +168,9 @@ export interface DailyPipelineReport {
   nextScheduledRun: string | null;
   persistedRecordsCount: number;
   outputLedgerPath: string | null;
+  storageTarget?: 'SUPABASE_POSTGRES' | 'IN_MEMORY_TEST' | 'LOCAL_FALLBACK_FILE' | 'DRY_RUN';
+  isDurableAcrossRestarts?: boolean;
+  storageWarning?: string;
 }
 
 export interface DailyRefreshCycleResult {
@@ -322,8 +332,23 @@ export class DailyPredictionRefreshService {
       // STAGE 9 & 10: Reconcile Ledger & Persist Snapshots
       // ──────────────────────────────────────────────────────────────────────────
       let persistedRecordsCount = 0;
+      let storageTarget: 'SUPABASE_POSTGRES' | 'IN_MEMORY_TEST' | 'LOCAL_FALLBACK_FILE' | 'DRY_RUN' =
+        isDryRun ? 'DRY_RUN' : 'LOCAL_FALLBACK_FILE';
+      let isDurableAcrossRestarts = false;
+      let storageWarning: string | undefined = undefined;
+
       if (!isDryRun && allEvaluations.length > 0) {
-        persistedRecordsCount = this.persistPredictionsSafely(allEvaluations, destinationPath);
+        const storageResult = await DurablePredictionStorageAdapter.persistDailyPredictions(allEvaluations, {
+          persistToDatabase: options.persistToDatabase,
+          allowProductionWrite: options.allowProductionWrite,
+          dbClient: options.dbClient,
+          localFallbackPath: destinationPath,
+          dryRun: false,
+        });
+        persistedRecordsCount = storageResult.persistedCount;
+        storageTarget = storageResult.storageTarget;
+        isDurableAcrossRestarts = storageResult.isDurableAcrossRestarts;
+        storageWarning = storageResult.warning;
       }
 
       // ──────────────────────────────────────────────────────────────────────────
@@ -371,6 +396,9 @@ export class DailyPredictionRefreshService {
         nextScheduledRun: null, // Production scheduling remains disabled
         persistedRecordsCount,
         outputLedgerPath: isDryRun ? null : destinationPath,
+        storageTarget,
+        isDurableAcrossRestarts,
+        storageWarning,
       };
 
       return {
