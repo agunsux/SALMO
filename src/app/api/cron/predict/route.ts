@@ -10,26 +10,10 @@ import { MultiLeagueAutoActivator } from '@/engine/activation/multiLeagueAutoAct
 import { OddsPapiQuotaGuard } from '@/lib/quota/oddsPapiQuotaGuard';
 import { Logger } from '@/lib/logger';
 
+import { verifyCronRequest } from '@/lib/auth/cronAuth';
+
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60; // Allow sufficient runtime for provider roundtrips
-
-function verifyAuth(request: NextRequest): boolean {
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) {
-    // If CRON_SECRET is not configured, deny access in production
-    if (process.env.NODE_ENV === 'production') return false;
-    return true;
-  }
-
-  const authHeader = request.headers.get('authorization');
-  if (authHeader === `Bearer ${cronSecret}`) return true;
-
-  // Also check query param fallback for secure manual administrative triggering
-  const { searchParams } = new URL(request.url);
-  if (searchParams.get('key') === cronSecret) return true;
-
-  return false;
-}
 
 export async function GET(request: NextRequest) {
   return handleCron(request);
@@ -43,9 +27,10 @@ async function handleCron(request: NextRequest) {
   const start = Date.now();
   const requestId = request.headers.get('x-request-id') || `cron_${Date.now()}`;
 
-  if (!verifyAuth(request)) {
-    Logger.warn('[Cron:predict] Unauthorized attempt', { requestId });
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const authResult = await verifyCronRequest(request);
+  if (!authResult.authorized) {
+    Logger.warn('[Cron:predict] Unauthorized attempt', { requestId, reason: authResult.reason });
+    return NextResponse.json({ error: 'Unauthorized', reason: authResult.reason }, { status: 401 });
   }
 
   const { searchParams } = new URL(request.url);

@@ -90,11 +90,18 @@ export class HandicapLabSyncService {
    * Resolves HandicapLab candidate ledger paths on the filesystem.
    */
   public static resolveSourceFiles(type: 'canonical' | 'rescue' | 'all' | 'auto' = 'auto'): string[] {
-    const candidateDirs = [
-      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'ledger'),
-      path.resolve(process.cwd(), 'data', 'ledger'),
-      path.resolve(__dirname, '..', '..', '..', '..', 'HandicapLab', 'data', 'ledger'),
-    ];
+    const candidateDirs: string[] = [];
+
+    // Optional explicit override for isolated staging/testing
+    if (process.env.HANDICAPLAB_LEDGER_PATH && fs.existsSync(process.env.HANDICAPLAB_LEDGER_PATH)) {
+      candidateDirs.push(process.env.HANDICAPLAB_LEDGER_PATH);
+    }
+
+    // Isolated SALMO paths only — zero sibling repository traversal
+    candidateDirs.push(
+      path.resolve(process.cwd(), 'data', 'sync'),
+      path.resolve(process.cwd(), 'data', 'ledger')
+    );
 
     const sources: string[] = [];
 

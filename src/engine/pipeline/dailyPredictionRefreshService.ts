@@ -337,8 +337,9 @@ export class DailyPredictionRefreshService {
       let isDurableAcrossRestarts = false;
       let storageWarning: string | undefined = undefined;
 
+      let storageResult: any = null;
       if (!isDryRun && allEvaluations.length > 0) {
-        const storageResult = await DurablePredictionStorageAdapter.persistDailyPredictions(allEvaluations, {
+        storageResult = await DurablePredictionStorageAdapter.persistDailyPredictions(allEvaluations, {
           persistToDatabase: options.persistToDatabase,
           allowProductionWrite: options.allowProductionWrite,
           dbClient: options.dbClient,
@@ -356,10 +357,20 @@ export class DailyPredictionRefreshService {
       // ──────────────────────────────────────────────────────────────────────────
       const ledgerIntegrity = this.verifyProtectedLedgersIntegrity() ? 'PASS' : 'FAIL';
       const hasErrors = rejectionsByReason.MISSING_ODDS > 0 && fixturesDiscovered.total > 0 && qualifiedCounts.total === 0;
+
+      // F-02 Fix: Propagate database storage degradation to pipelineHealth
+      const isStorageDegraded = Boolean(
+        options.persistToDatabase &&
+        storageResult &&
+        (!storageResult.success ||
+          storageResult.status === 'DEGRADED_LOCAL_FALLBACK' ||
+          !storageResult.isDurableAcrossRestarts)
+      );
+
       const pipelineHealth: 'SUCCESS' | 'PARTIAL' | 'FAILED' =
         ledgerIntegrity === 'FAIL'
           ? 'FAILED'
-          : hasErrors
+          : (hasErrors || isStorageDegraded)
             ? 'PARTIAL'
             : 'SUCCESS';
 

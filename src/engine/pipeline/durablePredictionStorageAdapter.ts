@@ -93,12 +93,21 @@ export interface DurableStorageOptions {
 
 export interface DurableStorageResult {
   success: boolean;
+  status: 'SUCCESS' | 'DEGRADED_LOCAL_FALLBACK' | 'FAILED';
   storageTarget: 'SUPABASE_POSTGRES' | 'IN_MEMORY_TEST' | 'LOCAL_FALLBACK_FILE' | 'DRY_RUN';
   persistedCount: number;
   skippedDuplicatesCount: number;
   errors: string[];
   isDurableAcrossRestarts: boolean;
   warning?: string;
+}
+
+export interface QueryPredictionsStatusResult {
+  success: boolean;
+  source: 'SUPABASE_POSTGRES' | 'IN_MEMORY_TEST' | 'LOCAL_FALLBACK_FILE' | 'NONE';
+  data: DurableStorageRecord[];
+  isDurable: boolean;
+  error?: string;
 }
 
 export class DurablePredictionStorageAdapter {
@@ -202,6 +211,7 @@ export class DurablePredictionStorageAdapter {
     if (isDryRun) {
       return {
         success: true,
+        status: 'SUCCESS',
         storageTarget: 'DRY_RUN',
         persistedCount: 0,
         skippedDuplicatesCount: 0,
@@ -214,6 +224,7 @@ export class DurablePredictionStorageAdapter {
     if (candidates.length === 0) {
       return {
         success: true,
+        status: 'SUCCESS',
         storageTarget: 'LOCAL_FALLBACK_FILE',
         persistedCount: 0,
         skippedDuplicatesCount: 0,
@@ -295,6 +306,7 @@ export class DurablePredictionStorageAdapter {
     if (validationErrors.length > 0 && formattedRecords.length === 0) {
       return {
         success: false,
+        status: 'FAILED',
         storageTarget: 'LOCAL_FALLBACK_FILE',
         persistedCount: 0,
         skippedDuplicatesCount: 0,
@@ -321,13 +333,16 @@ export class DurablePredictionStorageAdapter {
 
           if (error) {
             Logger.warn('[DurablePredictionStorageAdapter] Injected DB upsert returned error:', { error: error.message });
+            const localFallback = this.persistToLocalFile(formattedRecords, localPath);
             return {
               success: false,
-              storageTarget: 'IN_MEMORY_TEST',
-              persistedCount: 0,
-              skippedDuplicatesCount: 0,
+              status: 'DEGRADED_LOCAL_FALLBACK',
+              storageTarget: 'LOCAL_FALLBACK_FILE',
+              persistedCount: localFallback.added,
+              skippedDuplicatesCount: localFallback.skipped,
               errors: [error.message],
-              isDurableAcrossRestarts: true,
+              isDurableAcrossRestarts: false,
+              warning: `Injected DB upsert returned error: ${error.message}. Fell back to local file sink. Durability across serverless restarts is NOT guaranteed.`,
             };
           }
 
@@ -338,6 +353,7 @@ export class DurablePredictionStorageAdapter {
 
         return {
           success: true,
+          status: 'SUCCESS',
           storageTarget: 'IN_MEMORY_TEST',
           persistedCount: insertedCount,
           skippedDuplicatesCount: duplicateCount,
@@ -345,13 +361,17 @@ export class DurablePredictionStorageAdapter {
           isDurableAcrossRestarts: true,
         };
       } catch (e) {
+        Logger.warn('[DurablePredictionStorageAdapter] Injected DB client threw error:', { error: String(e) });
+        const localFallback = this.persistToLocalFile(formattedRecords, localPath);
         return {
           success: false,
-          storageTarget: 'IN_MEMORY_TEST',
-          persistedCount: 0,
-          skippedDuplicatesCount: 0,
+          status: 'DEGRADED_LOCAL_FALLBACK',
+          storageTarget: 'LOCAL_FALLBACK_FILE',
+          persistedCount: localFallback.added,
+          skippedDuplicatesCount: localFallback.skipped,
           errors: [String(e)],
-          isDurableAcrossRestarts: true,
+          isDurableAcrossRestarts: false,
+          warning: `Injected DB write threw exception: ${String(e)}. Fell back to local file sink. Durability across serverless restarts is NOT guaranteed.`,
         };
       }
     }
@@ -372,10 +392,11 @@ export class DurablePredictionStorageAdapter {
 
         if (upsertErr) {
           Logger.warn('[DurablePredictionStorageAdapter] Supabase upsert error:', { error: upsertErr.message });
-          // Fall back safely to local file
+          // Fall back safely to local file but return explicit degraded failure (F-02 fix)
           const localFallbackCount = this.persistToLocalFile(formattedRecords, localPath);
           return {
-            success: true,
+            success: false,
+            status: 'DEGRADED_LOCAL_FALLBACK',
             storageTarget: 'LOCAL_FALLBACK_FILE',
             persistedCount: localFallbackCount.added,
             skippedDuplicatesCount: localFallbackCount.skipped,
@@ -425,6 +446,7 @@ export class DurablePredictionStorageAdapter {
 
         return {
           success: true,
+          status: 'SUCCESS',
           storageTarget: 'SUPABASE_POSTGRES',
           persistedCount: formattedRecords.length,
           skippedDuplicatesCount: 0,
@@ -437,7 +459,8 @@ export class DurablePredictionStorageAdapter {
         });
         const fallbackRes = this.persistToLocalFile(formattedRecords, localPath);
         return {
-          success: true,
+          success: false,
+          status: 'DEGRADED_LOCAL_FALLBACK',
           storageTarget: 'LOCAL_FALLBACK_FILE',
           persistedCount: fallbackRes.added,
           skippedDuplicatesCount: fallbackRes.skipped,
@@ -457,6 +480,7 @@ export class DurablePredictionStorageAdapter {
 
     return {
       success: true,
+      status: requestedDb && !isWriteAllowed ? 'DEGRADED_LOCAL_FALLBACK' : 'SUCCESS',
       storageTarget: 'LOCAL_FALLBACK_FILE',
       persistedCount: localResult.added,
       skippedDuplicatesCount: localResult.skipped,
@@ -528,6 +552,9 @@ export class DurablePredictionStorageAdapter {
   /**
    * Queries predictions across durable storage with graceful fallback to local files.
    * Enables container restart hydration.
+   * Remediates F-01:
+   * 1. When options.dbClient is omitted, resolves getDbClient() if database is configured in environment.
+   * 2. Distinguishes legitimate empty results ([] with 0 rows) from query/connection errors.
    */
   public static async queryLatestPredictions(options: {
     league?: string;
@@ -536,26 +563,93 @@ export class DurablePredictionStorageAdapter {
     limit?: number;
     dbClient?: any;
     sourcePath?: string;
+    throwOnError?: boolean;
   } = {}): Promise<DurableStorageRecord[]> {
-    const limit = options.limit || 100;
+    const detailed = await this.queryLatestPredictionsWithStatus(options);
+    if (!detailed.success && options.throwOnError) {
+      throw new Error(`Database query failed: ${detailed.error || 'Unknown error'}`);
+    }
+    return detailed.data;
+  }
 
-    // 1. If test/mock dbClient provided, query it
-    if (options.dbClient && typeof options.dbClient.from === 'function') {
+  /**
+   * Detailed query method returning execution status, storage source, durability, and error details.
+   */
+  public static async queryLatestPredictionsWithStatus(options: {
+    league?: string;
+    market?: 'AH' | 'OU' | 'BTTS';
+    isPublicPick?: boolean;
+    limit?: number;
+    dbClient?: any;
+    sourcePath?: string;
+  } = {}): Promise<QueryPredictionsStatusResult> {
+    const limit = options.limit || 100;
+    let client = options.dbClient;
+    let isTestClient = Boolean(options.dbClient);
+
+    // F-01: When options.dbClient is omitted, resolve configured client via getDbClient()
+    if (!client) {
+      const isConfigured = Boolean(
+        process.env.SUPABASE_URL ||
+        process.env.NEXT_PUBLIC_SUPABASE_URL
+      );
+      if (isConfigured) {
+        try {
+          client = getDbClient();
+          isTestClient = false;
+        } catch (clientErr) {
+          Logger.warn('[DurablePredictionStorageAdapter] getDbClient() failed to initialize:', {
+            error: String(clientErr),
+          });
+        }
+      }
+    }
+
+    let dbError: string | null = null;
+
+    // 1. If database client is available, execute query
+    if (client && typeof client.from === 'function') {
       try {
-        let query = options.dbClient.from('daily_prediction_refresh_ledger').select('*');
+        let query = client.from('daily_prediction_refresh_ledger').select('*');
         if (options.league) query = query.eq('league', options.league);
         if (options.market) query = query.eq('market', options.market);
         if (typeof options.isPublicPick === 'boolean') query = query.eq('is_public_pick', options.isPublicPick);
+
         const { data, error } = await query.limit(limit);
-        if (!error && Array.isArray(data)) {
-          return data as DurableStorageRecord[];
+
+        if (error) {
+          dbError = error.message;
+          Logger.warn('[DurablePredictionStorageAdapter] Database query returned error:', {
+            error: error.message,
+          });
+        } else if (Array.isArray(data)) {
+          // Legitimate query success (even if empty array with 0 rows)
+          return {
+            success: true,
+            source: isTestClient ? 'IN_MEMORY_TEST' : 'SUPABASE_POSTGRES',
+            data: data as DurableStorageRecord[],
+            isDurable: true,
+          };
         }
-      } catch {}
+      } catch (err) {
+        dbError = String(err);
+        Logger.warn('[DurablePredictionStorageAdapter] Database query threw exception:', {
+          error: String(err),
+        });
+      }
     }
 
     // 2. Fall back to local file sink
     const filePath = options.sourcePath || this.DEFAULT_LOCAL_PATH;
-    if (!fs.existsSync(filePath)) return [];
+    if (!fs.existsSync(filePath)) {
+      return {
+        success: dbError === null,
+        source: 'NONE',
+        data: [],
+        isDurable: false,
+        error: dbError || undefined,
+      };
+    }
 
     try {
       const content = fs.readFileSync(filePath, 'utf8');
@@ -604,9 +698,21 @@ export class DurablePredictionStorageAdapter {
         } catch {}
       }
 
-      return results;
-    } catch {
-      return [];
+      return {
+        success: dbError === null,
+        source: 'LOCAL_FALLBACK_FILE',
+        data: results,
+        isDurable: false,
+        error: dbError || undefined,
+      };
+    } catch (readErr) {
+      return {
+        success: false,
+        source: 'NONE',
+        data: [],
+        isDurable: false,
+        error: dbError || String(readErr),
+      };
     }
   }
 }

@@ -263,14 +263,9 @@ export class LocalHandicapLabAdapter implements IHandicapLabAdapter {
       return envPath;
     }
 
-    const siblingPath = path.resolve('..', 'HandicapLab', 'data', 'bronze', 'football_data');
-    if (fs.existsSync(siblingPath)) {
-      return siblingPath;
-    }
-
-    const cwdFallback = path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'bronze', 'football_data');
-    if (fs.existsSync(cwdFallback)) {
-      return cwdFallback;
+    const internalDataPath = path.resolve(process.cwd(), 'data', 'football_data');
+    if (fs.existsSync(internalDataPath)) {
+      return internalDataPath;
     }
 
     return null;
@@ -468,7 +463,6 @@ export class LocalHandicapLabAdapter implements IHandicapLabAdapter {
     // 1. Candidate paths for pre-generated active_7day_predictions.json
     const candidatePaths = [
       path.resolve(process.cwd(), 'data', 'verification', 'active_7day_predictions.json'),
-      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'verification', 'active_7day_predictions.json'),
       path.resolve(__dirname, '..', '..', 'data', 'verification', 'active_7day_predictions.json'),
     ];
 
@@ -494,12 +488,11 @@ export class LocalHandicapLabAdapter implements IHandicapLabAdapter {
       }
     }
 
-    // 2. Direct read from canonical ledgers (sync ledger, canonical_prediction_ledger, rescue_prediction_ledger)
+    // 2. Direct read from canonical ledgers (sync ledger, internal prediction archive, live prediction ledger)
     const ledgerCandidates = [
       path.resolve(process.cwd(), 'data', 'sync', 'handicaplab_sync_ledger.jsonl'),
-      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'ledger', 'canonical_prediction_ledger.jsonl'),
-      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'ledger', 'canonical_prediction_ledger.json'),
-      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'ledger', 'rescue_prediction_ledger.jsonl'),
+      path.resolve(process.cwd(), 'data', 'verification', 'live_prediction_ledger.jsonl'),
+      path.resolve(process.cwd(), 'data', 'verification', 'production_run_ledger.jsonl'),
       path.resolve(process.cwd(), 'data', 'ledger', 'prediction_archive.json'),
     ];
 
@@ -531,7 +524,6 @@ export class LocalHandicapLabAdapter implements IHandicapLabAdapter {
   public async getLiveValidationSummary(): Promise<LiveValidationSummary | null> {
     const candidatePaths = [
       path.resolve(process.cwd(), 'data', 'verification', 'live_prediction_validation.json'),
-      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'verification', 'live_prediction_validation.json'),
       path.resolve(__dirname, '..', '..', 'data', 'verification', 'live_prediction_validation.json'),
     ];
 
@@ -551,9 +543,8 @@ export class LocalHandicapLabAdapter implements IHandicapLabAdapter {
   public async getSalmoSync(query?: SalmoSyncQueryParams): Promise<SalmoSyncResponse | null> {
     const candidatePaths = [
       path.resolve(process.cwd(), 'data', 'sync', 'handicaplab_sync_ledger.jsonl'),
-      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'ledger', 'canonical_prediction_ledger.jsonl'),
-      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'ledger', 'canonical_prediction_ledger.json'),
-      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'ledger', 'rescue_prediction_ledger.jsonl'),
+      path.resolve(process.cwd(), 'data', 'verification', 'live_prediction_ledger.jsonl'),
+      path.resolve(process.cwd(), 'data', 'verification', 'production_run_ledger.jsonl'),
       path.resolve(process.cwd(), 'data', 'ledger', 'prediction_archive.json'),
     ];
 

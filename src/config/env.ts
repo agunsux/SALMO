@@ -67,7 +67,7 @@ class EnvironmentValidator {
       }
     }
 
-    const handicapLabDataPath = process.env.HANDICAPLAB_DATA_PATH || '../HandicapLab/data/bronze/football_data';
+    const handicapLabDataPath = process.env.HANDICAPLAB_DATA_PATH || '';
     const handicapLabApiUrl = process.env.HANDICAPLAB_API_URL;
     const handicapLabApiKey = process.env.HANDICAPLAB_API_KEY;
 
