@@ -39,5 +39,6 @@ scratch/
 /research/
 /data/external/football-data/
 /data/sync/
+/data/quota/
 
 .vercel

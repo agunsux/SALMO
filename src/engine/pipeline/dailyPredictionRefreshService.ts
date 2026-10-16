@@ -38,6 +38,8 @@ import { OddsPapiQuotaGuard } from '../../lib/quota/oddsPapiQuotaGuard';
 import { Logger } from '../../lib/logger';
 import { FixtureInput } from './productionPredictionEngine';
 import { OpenFootballProvider } from '../../services/providers/openFootballProvider';
+import { TheOddsApiProvider } from '../../services/providers/theOddsApiProvider';
+import { TheOddsApiNormalizer, CanonicalOddsRecord } from '../../services/providers/theOddsApiNormalizer';
 import { DurablePredictionStorageAdapter } from './durablePredictionStorageAdapter';
 
 export type OperatingMode = 'AUDIT_ONLY' | 'RESEARCH' | 'SHADOW' | 'PRODUCTION';
@@ -159,6 +161,7 @@ export interface DailyPipelineReport {
     apiFootball: number;
     oddsPapi: number;
     openFootball: number;
+    theOddsApi?: number;
     totalBillable: number;
   };
   duplicatesPrevented: number;
@@ -243,7 +246,7 @@ export class DailyPredictionRefreshService {
     };
     const rejectionDetails: RejectionDetail[] = [];
     let duplicatesPrevented = 0;
-    let providerCalls = { apiFootball: 0, oddsPapi: 0, openFootball: 0, totalBillable: 0 };
+    let providerCalls = { apiFootball: 0, oddsPapi: 0, openFootball: 0, theOddsApi: 0, totalBillable: 0 };
 
     try {
       // ──────────────────────────────────────────────────────────────────────────
@@ -633,7 +636,7 @@ export class DailyPredictionRefreshService {
   private static async enrichAndValidateOdds(
     fixtures: FixtureInput[],
     nowMs: number,
-    providerCalls: { apiFootball: number; oddsPapi: number; openFootball: number; totalBillable: number },
+    providerCalls: { apiFootball: number; oddsPapi: number; openFootball: number; theOddsApi?: number; totalBillable: number },
     rejectionsByReason: Record<MachineReadableRejectionReason, number>,
     rejectionDetails: RejectionDetail[]
   ): Promise<FixtureInput[]> {
@@ -641,6 +644,9 @@ export class DailyPredictionRefreshService {
 
     // Check OddsPapi quota state safely without burning requests
     const quotaState = await OddsPapiQuotaGuard.detectQuotaReset(2, false, undefined, false);
+    const toa = new TheOddsApiProvider();
+    const isToaConfigured = toa.isConfigured();
+    const leagueOddsCache = new Map<string, CanonicalOddsRecord[]>();
 
     for (const f of fixtures) {
       // If fixture already carries pinnacle odds (e.g. from input or test fixture), validate freshness
@@ -649,26 +655,96 @@ export class DailyPredictionRefreshService {
         continue;
       }
 
-      // If quota is exhausted or unverified, do NOT make billable calls
-      if (quotaState.state !== 'QUOTA_AVAILABLE') {
-        rejectionsByReason.MISSING_ODDS++;
-        rejectionDetails.push({
-          fixtureId: f.fixtureId,
-          canonicalMatchId: `${f.homeTeam}_vs_${f.awayTeam}`,
-          league: f.league,
-          market: 'AH',
-          line: null,
-          selection: '—',
-          rejectionCode: 'MISSING_ODDS',
-          detail: `Odds unavailable: OddsPapi quota exhausted (${quotaState.state}) — zero billable calls permitted`,
-          modelProbability: null,
-          marketOdds: null,
-          expectedValue: null,
-        });
+      // 1. Primary: If OddsPapi quota is verified available, use it
+      if (quotaState.state === 'QUOTA_AVAILABLE') {
+        enriched.push(f);
         continue;
       }
 
-      enriched.push(f);
+      // 2. Fallback: The Odds API (if configured and quota available)
+      if (isToaConfigured) {
+        const sportKey = toa.resolveSportKey(f.league);
+        if (sportKey) {
+          if (!leagueOddsCache.has(sportKey)) {
+            const leagueRes = await toa.getLeagueOdds(f.league);
+            if (leagueRes.status === 'AVAILABLE' && leagueRes.data) {
+              leagueOddsCache.set(sportKey, leagueRes.data);
+              providerCalls.theOddsApi = (providerCalls.theOddsApi || 0) + 1;
+              providerCalls.totalBillable += 1;
+            } else {
+              leagueOddsCache.set(sportKey, []);
+            }
+          }
+
+          const records = leagueOddsCache.get(sportKey) || [];
+          const cleanHome = TheOddsApiNormalizer.normalizeTeamName(f.homeTeam);
+          const cleanAway = TheOddsApiNormalizer.normalizeTeamName(f.awayTeam);
+
+          const matchedRecords = records.filter(r => {
+            const rHome = TheOddsApiNormalizer.normalizeTeamName(r.homeTeam);
+            const rAway = TheOddsApiNormalizer.normalizeTeamName(r.awayTeam);
+            return (
+              (rHome === cleanHome || rHome.includes(cleanHome) || cleanHome.includes(rHome)) &&
+              (rAway === cleanAway || rAway.includes(cleanAway) || cleanAway.includes(rAway))
+            );
+          });
+
+          if (matchedRecords.length > 0) {
+            const ahRecord =
+              matchedRecords.find(r => r.market === 'AH' && r.bookmaker.toLowerCase().includes('pinnacle')) ||
+              matchedRecords.find(r => r.market === 'AH');
+
+            const ouRecord =
+              matchedRecords.find(r => r.market === 'OU' && r.bookmaker.toLowerCase().includes('pinnacle')) ||
+              matchedRecords.find(r => r.market === 'OU');
+
+            const bttsRecord = matchedRecords.find(r => r.market === 'BTTS');
+
+            if (ahRecord || ouRecord || bttsRecord) {
+              enriched.push({
+                ...f,
+                providerName: 'TheOddsApi',
+                pinnacleOdds: {
+                  ah: ahRecord && ahRecord.homeOdds && ahRecord.awayOdds ? {
+                    line: ahRecord.line ?? 0,
+                    homeOdds: ahRecord.homeOdds,
+                    awayOdds: ahRecord.awayOdds,
+                    timestampUtc: ahRecord.capturedAt,
+                  } : undefined,
+                  ou: ouRecord && ouRecord.overOdds && ouRecord.underOdds ? {
+                    line: ouRecord.line ?? 2.5,
+                    overOdds: ouRecord.overOdds,
+                    underOdds: ouRecord.underOdds,
+                    timestampUtc: ouRecord.capturedAt,
+                  } : undefined,
+                  btts: bttsRecord && bttsRecord.yesOdds && bttsRecord.noOdds ? {
+                    yesOdds: bttsRecord.yesOdds,
+                    noOdds: bttsRecord.noOdds,
+                    timestampUtc: bttsRecord.capturedAt,
+                  } : undefined,
+                },
+              });
+              continue;
+            }
+          }
+        }
+      }
+
+      // If both OddsPapi and TheOddsApi are exhausted, unconfigured, or have no odds:
+      rejectionsByReason.MISSING_ODDS++;
+      rejectionDetails.push({
+        fixtureId: f.fixtureId,
+        canonicalMatchId: `${f.homeTeam}_vs_${f.awayTeam}`,
+        league: f.league,
+        market: 'AH',
+        line: null,
+        selection: '—',
+        rejectionCode: 'MISSING_ODDS',
+        detail: `Odds unavailable: OddsPapi quota exhausted (${quotaState.state}); The Odds API ${isToaConfigured ? 'no matched lines found' : 'unconfigured'}`,
+        modelProbability: null,
+        marketOdds: null,
+        expectedValue: null,
+      });
     }
 
     return enriched;

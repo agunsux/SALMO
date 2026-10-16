@@ -97,11 +97,19 @@ export class HandicapLabSyncService {
       candidateDirs.push(process.env.HANDICAPLAB_LEDGER_PATH);
     }
 
-    // Isolated SALMO paths only — zero sibling repository traversal
+    // Isolated SALMO paths only
     candidateDirs.push(
       path.resolve(process.cwd(), 'data', 'sync'),
       path.resolve(process.cwd(), 'data', 'ledger')
     );
+
+    // Dev/test offline fallback only (never in production)
+    if (process.env.NODE_ENV !== 'production') {
+      const devSibling = path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'ledger');
+      if (fs.existsSync(devSibling)) {
+        candidateDirs.push(devSibling);
+      }
+    }
 
     const sources: string[] = [];
 
