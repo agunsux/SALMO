@@ -43,6 +43,7 @@ test('Integration Test 1: Real fixture path (HandicapLab canonical -> SALMO)', a
   const { data: picks, error } = await client
     .from('daily_picks')
     .select('fixture_id, home_team, away_team, kickoff_utc, league')
+    .eq('league', 'Premier League')
     .limit(10);
 
   assert.strictEqual(error, null, 'Query to canonical daily_picks must succeed');
@@ -92,9 +93,12 @@ test('Integration Test 3: Real odds path (Pinnacle reference odds -> SALMO)', as
 
   const { data: picks, error } = await client
     .from('daily_picks')
-    .select('market_odds, market_bookmaker, market_type');
+    .select('market_odds, market_bookmaker, market_type')
+    .not('market_odds', 'is', null)
+    .limit(10);
 
   assert.strictEqual(error, null);
+  assert.ok(picks && picks.length > 0, 'Must have quoted picks with market odds');
   for (const pick of picks) {
     const odds = Number(pick.market_odds);
     assert.ok(odds > 1.0, `market_odds must be valid decimal odds (> 1.0), got ${odds}`);

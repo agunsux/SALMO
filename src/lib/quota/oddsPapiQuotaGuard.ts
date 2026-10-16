@@ -34,7 +34,8 @@ export type AtomicQuotaErrorCode =
   | 'RESERVATION_NOT_FOUND'
   | 'ALREADY_CONFIRMED'
   | 'ALREADY_RELEASED'
-  | 'CIRCUIT_BREAKER_OPEN';
+  | 'CIRCUIT_BREAKER_OPEN'
+  | 'ODDSPAPI_PAUSED';
 
 export type ReservationStatus = 'RESERVED' | 'CONFIRMED' | 'RELEASED' | 'ROLLED_BACK';
 
@@ -1423,6 +1424,15 @@ export class OddsPapiQuotaGuard {
     return this.completedActivationCycles.has(cycleKey);
   }
 
+  public static isPaused(): boolean {
+    return (
+      process.env.ODDSPAPI_PAUSED === 'true' ||
+      process.env.PAUSE_ODDSPAPI === 'true' ||
+      process.env.ODDS_PAPI_PAUSED === 'true' ||
+      Boolean(env.providers.oddsPapi.paused)
+    );
+  }
+
   /**
    * Injects mock account payload for deterministic offline unit tests.
    * Preserves in-memory confirmed floor when the injected payload belongs to the exact same
@@ -1902,6 +1912,20 @@ export class OddsPapiQuotaGuard {
   ): Promise<QuotaGuardStatus> {
     const reserve = customReserve ?? Number(process.env.ODDSPAPI_QUOTA_RESERVE || this.DEFAULT_RESERVE);
 
+    if (this.isPaused()) {
+      return {
+        allowed: false,
+        errorCode: 'ODDSPAPI_PAUSED',
+        reason: 'ODDSPAPI_PAUSED: OddsPapi provider is PAUSED pending quota reset verification.',
+        consumed: Math.max(this.localConsumedFloor, this.cachedAccountData?.subscriptions?.[0]?.request_count || 0),
+        limit: this.DEFAULT_MONTHLY_LIMIT,
+        hardStopThreshold: Math.max(0, this.DEFAULT_MONTHLY_LIMIT - reserve),
+        remaining: 0,
+        reserve,
+        source: 'FALLBACK',
+      };
+    }
+
     if (this.circuitTripped) {
       return {
         allowed: false,
@@ -2104,6 +2128,14 @@ export class OddsPapiQuotaGuard {
     reason?: string;
     state?: any;
   }> {
+    if (this.isPaused()) {
+      return {
+        allowed: false,
+        errorCode: 'ODDSPAPI_PAUSED',
+        reason: 'ODDSPAPI_PAUSED: OddsPapi provider is PAUSED pending quota reset verification.',
+      };
+    }
+
     if (this.circuitTripped) {
       return {
         allowed: false,

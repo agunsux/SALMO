@@ -28,8 +28,14 @@ export interface EnvironmentConfig {
       apiKey?: string;
       baseUrl: string;
       activeBookmakers: string[];
+      paused: boolean;
     };
     footyStats: {
+      configured: boolean;
+      apiKey?: string;
+      baseUrl: string;
+    };
+    theOddsApi: {
       configured: boolean;
       apiKey?: string;
       baseUrl: string;
@@ -86,9 +92,16 @@ class EnvironmentValidator {
 
     const oddsPapiKey = process.env.ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY;
     const oddsPapiBaseUrl = process.env.ODDS_PAPI_BASE_URL || 'https://api.oddspapi.io/v4';
+    const oddsPapiPaused =
+      process.env.ODDSPAPI_PAUSED === 'true' ||
+      process.env.PAUSE_ODDSPAPI === 'true' ||
+      process.env.ODDS_PAPI_PAUSED === 'true';
 
     const footyStatsKey = process.env.FOOTYSTATS_API_KEY || process.env.FOOTYSTATS_KEY;
     const footyStatsBaseUrl = process.env.FOOTYSTATS_BASE_URL || 'https://api.football-data-api.com';
+
+    const theOddsApiKey = process.env.ODDS_API_KEY || process.env.THE_ODDS_API_KEY;
+    const theOddsApiBaseUrl = process.env.ODDS_API_BASE_URL || process.env.THE_ODDS_API_BASE_URL || 'https://api.the-odds-api.com/v4';
 
     const authSecret = process.env.AUTH_SECRET;
     const cronSecret = process.env.CRON_SECRET;
@@ -127,11 +140,17 @@ class EnvironmentValidator {
             .split(',')
             .map(b => b.trim().toLowerCase())
             .filter(Boolean),
+          paused: oddsPapiPaused,
         },
         footyStats: {
           configured: Boolean(footyStatsKey && footyStatsKey.trim().length > 0),
           apiKey: footyStatsKey,
           baseUrl: footyStatsBaseUrl,
+        },
+        theOddsApi: {
+          configured: Boolean(theOddsApiKey && theOddsApiKey.trim().length > 0),
+          apiKey: theOddsApiKey,
+          baseUrl: theOddsApiBaseUrl,
         },
       },
       security: {
