@@ -6,6 +6,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as crypto from 'crypto';
 import { RawMatchRecord, DatasetSummary } from './handicapLabClient';
 import { MatchObservation, SettlementOutcome, ActiveMatchPrediction, ActivePredictionMarket, LiveValidationSummary } from '../types/index';
 import { QuarterLineSettler } from '../engine/ah/quarterLineSettler';
@@ -262,14 +263,9 @@ export class LocalHandicapLabAdapter implements IHandicapLabAdapter {
       return envPath;
     }
 
-    const siblingPath = path.resolve('..', 'HandicapLab', 'data', 'bronze', 'football_data');
-    if (fs.existsSync(siblingPath)) {
-      return siblingPath;
-    }
-
-    const cwdFallback = path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'bronze', 'football_data');
-    if (fs.existsSync(cwdFallback)) {
-      return cwdFallback;
+    const internalDataPath = path.resolve(process.cwd(), 'data', 'football_data');
+    if (fs.existsSync(internalDataPath)) {
+      return internalDataPath;
     }
 
     return null;
@@ -467,7 +463,6 @@ export class LocalHandicapLabAdapter implements IHandicapLabAdapter {
     // 1. Candidate paths for pre-generated active_7day_predictions.json
     const candidatePaths = [
       path.resolve(process.cwd(), 'data', 'verification', 'active_7day_predictions.json'),
-      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'verification', 'active_7day_predictions.json'),
       path.resolve(__dirname, '..', '..', 'data', 'verification', 'active_7day_predictions.json'),
     ];
 
@@ -493,25 +488,32 @@ export class LocalHandicapLabAdapter implements IHandicapLabAdapter {
       }
     }
 
-    // 2. Direct read from canonical Prediction Archive ledger
-    const archivePaths = [
+    // 2. Direct read from canonical ledgers (sync ledger, internal prediction archive, live prediction ledger)
+    const ledgerCandidates = [
+      path.resolve(process.cwd(), 'data', 'sync', 'handicaplab_sync_ledger.jsonl'),
+      path.resolve(process.cwd(), 'data', 'verification', 'live_prediction_ledger.jsonl'),
+      path.resolve(process.cwd(), 'data', 'verification', 'production_run_ledger.jsonl'),
       path.resolve(process.cwd(), 'data', 'ledger', 'prediction_archive.json'),
-      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'ledger', 'prediction_archive.json'),
-      path.resolve(__dirname, '..', '..', '..', 'HandicapLab', 'data', 'ledger', 'prediction_archive.json'),
     ];
 
-    for (const p of archivePaths) {
+    for (const p of ledgerCandidates) {
       if (fs.existsSync(p)) {
         try {
           const content = fs.readFileSync(p, 'utf8');
-          const archive = JSON.parse(content);
-          const records = Object.values(archive) as any[];
-          const upcoming = records.filter(r => r.status === 'ACTIVE' || r.status === 'GENERATED' || !r.status);
+          let records: any[] = [];
+          if (p.endsWith('.jsonl')) {
+            records = content.split(/\r?\n/).filter(Boolean).map(l => JSON.parse(l));
+          } else {
+            const parsed = JSON.parse(content);
+            records = Array.isArray(parsed) ? parsed : Object.values(parsed);
+          }
+          const upcoming = records.filter(r => r.status === 'ACTIVE' || r.status === 'GENERATED' || r.status === 'PENDING' || !r.status);
           if (upcoming.length > 0) {
-            return mapRawPicksToActivePredictions(upcoming);
+            const mapped = mapRawPicksToActivePredictions(upcoming);
+            if (mapped.length > 0) return mapped;
           }
         } catch (err) {
-          Logger.warn(`[LocalHandicapLabAdapter] Failed to parse archive from ${p}:`, { error: String(err) });
+          Logger.warn(`[LocalHandicapLabAdapter] Failed to parse ledger from ${p}:`, { error: String(err) });
         }
       }
     }
@@ -522,7 +524,6 @@ export class LocalHandicapLabAdapter implements IHandicapLabAdapter {
   public async getLiveValidationSummary(): Promise<LiveValidationSummary | null> {
     const candidatePaths = [
       path.resolve(process.cwd(), 'data', 'verification', 'live_prediction_validation.json'),
-      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'verification', 'live_prediction_validation.json'),
       path.resolve(__dirname, '..', '..', 'data', 'verification', 'live_prediction_validation.json'),
     ];
 
@@ -540,60 +541,110 @@ export class LocalHandicapLabAdapter implements IHandicapLabAdapter {
   }
 
   public async getSalmoSync(query?: SalmoSyncQueryParams): Promise<SalmoSyncResponse | null> {
-    const archivePaths = [
+    const candidatePaths = [
+      path.resolve(process.cwd(), 'data', 'sync', 'handicaplab_sync_ledger.jsonl'),
+      path.resolve(process.cwd(), 'data', 'verification', 'live_prediction_ledger.jsonl'),
+      path.resolve(process.cwd(), 'data', 'verification', 'production_run_ledger.jsonl'),
       path.resolve(process.cwd(), 'data', 'ledger', 'prediction_archive.json'),
-      path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'ledger', 'prediction_archive.json'),
-      path.resolve(__dirname, '..', '..', '..', 'HandicapLab', 'data', 'ledger', 'prediction_archive.json'),
     ];
 
-    for (const p of archivePaths) {
+    for (const p of candidatePaths) {
       if (fs.existsSync(p)) {
         try {
           const content = fs.readFileSync(p, 'utf8');
-          const archive = JSON.parse(content);
-          const records = Object.values(archive) as any[];
-          const settled = records.filter(r => r.status === 'SETTLED' || r.status === 'VOID');
-          const pending = records.filter(r => r.status === 'ACTIVE' || r.status === 'GENERATED');
+          let records: any[] = [];
+          if (p.endsWith('.jsonl')) {
+            records = content.split(/\r?\n/).filter(Boolean).map(l => JSON.parse(l));
+          } else {
+            const parsed = JSON.parse(content);
+            records = Array.isArray(parsed) ? parsed : Object.values(parsed);
+          }
+
+          if (records.length === 0) continue;
+
+          // Apply query filters
+          if (query?.modelVersion) {
+            records = records.filter(r => (r.modelVersion || r.model_version) === query.modelVersion);
+          }
+          if (query?.market) {
+            records = records.filter(r => (r.market || r.marketType || r.market_type) === query.market);
+          }
+          if (query?.since) {
+            records = records.filter(r => (r.kickoffTimestamp || r.kickoff_utc || r.kickoffUtc || r.created_at || '') >= query.since!);
+          }
+
+          const nowMs = Date.now();
+          const settled = records.filter(r => r.status === 'SETTLED' || r.settlementStatus === 'SETTLED' || (r.settlement && r.settlement.status === 'SETTLED') || r.status === 'VOID');
+          const pending = records.filter(r => r.status === 'ACTIVE' || r.status === 'GENERATED' || r.status === 'PENDING' || (!r.status && !r.settlementStatus));
+
+          const activeDailyPicks = pending
+            .filter(r => {
+              const k = r.kickoffTimestamp || r.kickoff_utc || r.kickoffUtc || '';
+              const ms = new Date(k).getTime();
+              // Kickoff kill switch
+              if (isNaN(ms) || ms <= nowMs) return false;
+              // Only actionable picks with verdict LAYAK or explicit pick
+              const isPick = r.is_pick === true || r.isPick === true || r.isPublicPick === true;
+              const isLayak = r.verdict === 'LAYAK' || r.decision === 'VALUE_CANDIDATE' || r.valueStatus === 'VALUE' || r.confidence_tier === 'VALUE_HIGH';
+              return isPick && isLayak;
+            })
+            .map(r => {
+              const k = r.kickoffTimestamp || r.kickoff_utc || r.kickoffUtc || '';
+              const ms = new Date(k).getTime();
+              const diffHours = (ms - nowMs) / (1000 * 3600);
+              let targetWindow: 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS' = 'NEXT_7_DAYS';
+              if (diffHours <= 24) targetWindow = 'TODAY';
+              else if (diffHours <= 48) targetWindow = 'TOMORROW';
+
+              const mkt = r.market === 'AH' ? 'ASIAN_HANDICAP' : r.market === 'OU' ? 'OVER_UNDER' : 'BTTS';
+              const id = r.predictionId || r.id || '';
+              const home = r.homeTeam || r.home_team || 'Home';
+              const away = r.awayTeam || r.away_team || 'Away';
+
+              return {
+                projectionId: `proj_${id}`,
+                predictionId: id,
+                targetWindow,
+                fixtureId: String(r.fixtureId || r.canonicalFixtureId || r.fixture_id || ''),
+                matchId: r.canonicalMatchId || r.matchId || `${home}_${away}_${k}`,
+                leagueId: r.leagueId || r.competition_id || 39,
+                leagueName: r.competitionName || r.competition || r.league || 'Premier League',
+                homeTeam: home,
+                awayTeam: away,
+                kickoffUtc: k,
+                horizon: targetWindow,
+                marketType: mkt as 'ASIAN_HANDICAP' | 'OVER_UNDER' | 'BTTS',
+                recommendedLine: Number(r.line ?? r.recommendedLine ?? 0),
+                recommendedSelection: r.selection || r.recommendedSelection || r.prediction || '',
+                modelProbability: Number(r.modelProbability ?? r.calibrated_probability ?? r.model_probability ?? 0),
+                fairOdds: Number(r.fairOdds ?? r.fair_odds ?? 0),
+                marketOdds: Number(r.marketOdds ?? r.originalOdds ?? r.market_odds ?? 0),
+                edgePct: Number(((r.edgePct ?? r.edge_pct ?? (r.edge ? r.edge * 100 : 0)) || 0)),
+                confidenceScore: Number(r.confidenceScore ?? r.confidence_score ?? r.confidence ?? 0),
+                verdict: 'LAYAK' as const,
+                modelQualityGrade: 'GRADE_A',
+                modelVersion: r.modelVersion || r.model_version || 'dixon-coles-v1.0',
+                sourceBookmaker: r.bookmaker || r.sourceBookmaker || 'Pinnacle',
+                oddsCapturedAt: r.oddsCapturedAt || r.oddsTimestamp || r.created_at || new Date().toISOString(),
+                provenanceHash: r.provenanceHash || '',
+                status: r.status || 'ACTIVE',
+              };
+            });
+
+          const dataState = activeDailyPicks.length > 0 ? 'REAL' : (records.length > 0 ? 'NO_QUALIFIED_PICKS' : 'DATA_UNAVAILABLE');
 
           return {
             success: true,
             timestampUtc: new Date().toISOString(),
-            syncChecksum: 'local-archive-sync',
-            dataState: records.length > 0 ? 'REAL' : 'NO_FIXTURES',
+            syncChecksum: crypto.createHash('sha256').update(JSON.stringify({ path: p, count: records.length })).digest('hex'),
+            dataState,
             counts: {
               totalArchived: records.length,
-              dailyPicks: pending.length,
+              dailyPicks: activeDailyPicks.length,
               settled: settled.length,
               pending: pending.length,
             },
-            dailyPicks: pending.map(r => ({
-              projectionId: `proj_${r.predictionId}`,
-              predictionId: r.predictionId,
-              targetWindow: 'NEXT_7_DAYS' as const,
-              fixtureId: r.fixtureId,
-              matchId: r.canonicalMatchId,
-              leagueId: 39,
-              leagueName: r.competition || 'Premier League',
-              homeTeam: r.homeTeam,
-              awayTeam: r.awayTeam,
-              kickoffUtc: r.kickoffTimestamp,
-              horizon: 'T-6h',
-              marketType: r.market === 'AH' ? 'ASIAN_HANDICAP' : r.market === 'OU' ? 'OVER_UNDER' : 'BTTS',
-              recommendedLine: r.line,
-              recommendedSelection: r.selection,
-              modelProbability: r.modelProbability,
-              fairOdds: r.fairOdds,
-              marketOdds: r.marketOdds,
-              edgePct: Number(((r.edge ?? 0) * 100).toFixed(2)),
-              confidenceScore: r.confidence || 0,
-              verdict: r.decision === 'VALUE_CANDIDATE' ? 'LAYAK' : r.decision === 'WATCH' ? 'PANTAU' : 'LEWATI',
-              modelQualityGrade: 'GRADE_A',
-              modelVersion: r.modelVersion || 'dixon-coles-v1.0',
-              sourceBookmaker: r.bookmaker || 'Pinnacle',
-              oddsCapturedAt: r.oddsTimestamp || new Date().toISOString(),
-              provenanceHash: r.provenanceHash || '',
-              status: r.status || 'ACTIVE',
-            })),
+            dailyPicks: activeDailyPicks,
             predictions: records,
             performance: {},
           };

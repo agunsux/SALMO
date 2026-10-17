@@ -40,20 +40,38 @@ test('Integration Test 1: Real fixture path (HandicapLab canonical -> SALMO)', a
   assert.ok(envConfig.SUPABASE_ANON_KEY, 'SUPABASE_ANON_KEY must be defined');
 
   const client = createClient(envConfig.SUPABASE_URL, envConfig.SUPABASE_ANON_KEY);
-  const { data: picks, error } = await client
+
+  // 1. Canonical Premier League cohort verification
+  const { data: eplPicks, error: eplErr } = await client
     .from('daily_picks')
     .select('fixture_id, home_team, away_team, kickoff_utc, league')
+    .eq('league', 'Premier League')
     .limit(10);
 
-  assert.strictEqual(error, null, 'Query to canonical daily_picks must succeed');
-  assert.ok(picks && picks.length > 0, 'Canonical daily_picks must contain real rows');
+  assert.strictEqual(eplErr, null, 'Query to canonical daily_picks must succeed');
+  assert.ok(eplPicks && eplPicks.length > 0, 'Canonical daily_picks must contain real EPL rows');
 
-  for (const pick of picks) {
+  for (const pick of eplPicks) {
     assert.ok(pick.fixture_id, 'Must have canonical fixture_id');
     assert.ok(pick.home_team, 'Must have canonical home_team');
     assert.ok(pick.away_team, 'Must have canonical away_team');
     assert.ok(pick.kickoff_utc, 'Must have canonical kickoff_utc');
     assert.strictEqual(pick.league, 'Premier League', 'Must be Premier League canonical fixture');
+  }
+
+  // 2. Global fixture integrity verification across all stored records (including expansion leagues)
+  const { data: allPicks, error: allErr } = await client
+    .from('daily_picks')
+    .select('fixture_id, home_team, away_team, kickoff_utc, league')
+    .limit(50);
+
+  assert.strictEqual(allErr, null);
+  for (const pick of allPicks) {
+    assert.ok(pick.fixture_id, 'Every stored row must have a valid fixture_id');
+    assert.ok(pick.home_team && pick.home_team.trim().length > 0, 'Every stored row must have home_team');
+    assert.ok(pick.away_team && pick.away_team.trim().length > 0, 'Every stored row must have away_team');
+    assert.ok(pick.kickoff_utc && !isNaN(Date.parse(pick.kickoff_utc)), 'Every stored row must have valid kickoff_utc');
+    assert.ok(pick.league && pick.league.trim().length > 0, 'Every stored row must have a league');
   }
 });
 
@@ -90,12 +108,16 @@ test('Integration Test 3: Real odds path (Pinnacle reference odds -> SALMO)', as
   const { createClient } = require('@supabase/supabase-js');
   const client = createClient(envConfig.SUPABASE_URL, envConfig.SUPABASE_ANON_KEY);
 
-  const { data: picks, error } = await client
+  // 1. Quoted market picks verification: odds > 1.0, Pinnacle sharp bookmaker, valid market type
+  const { data: quotedPicks, error: quotedErr } = await client
     .from('daily_picks')
-    .select('market_odds, market_bookmaker, market_type');
+    .select('market_odds, market_bookmaker, market_type, verdict')
+    .not('market_odds', 'is', null)
+    .limit(20);
 
-  assert.strictEqual(error, null);
-  for (const pick of picks) {
+  assert.strictEqual(quotedErr, null);
+  assert.ok(quotedPicks && quotedPicks.length > 0, 'Must have quoted picks with market odds');
+  for (const pick of quotedPicks) {
     const odds = Number(pick.market_odds);
     assert.ok(odds > 1.0, `market_odds must be valid decimal odds (> 1.0), got ${odds}`);
     assert.strictEqual(
@@ -103,6 +125,28 @@ test('Integration Test 3: Real odds path (Pinnacle reference odds -> SALMO)', as
       'PINNACLE',
       'Canonical reference bookmaker must be Pinnacle sharp'
     );
+    assert.ok(
+      ['ASIAN_HANDICAP', 'OVER_UNDER', 'BTTS', 'AH', 'OU'].includes(pick.market_type),
+      `market_type must be a valid canonical market, got ${pick.market_type}`
+    );
+  }
+
+  // 2. Unquoted picks integrity verification: unquoted records fail closed (verdict = LEWATI)
+  const { data: unquotedPicks, error: unquotedErr } = await client
+    .from('daily_picks')
+    .select('market_odds, market_bookmaker, verdict')
+    .is('market_odds', null)
+    .limit(20);
+
+  assert.strictEqual(unquotedErr, null);
+  if (unquotedPicks && unquotedPicks.length > 0) {
+    for (const pick of unquotedPicks) {
+      assert.strictEqual(
+        pick.verdict,
+        'LEWATI',
+        'Unquoted picks must fail-closed with verdict LEWATI, never published as actionable'
+      );
+    }
   }
 });
 

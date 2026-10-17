@@ -334,6 +334,19 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
     return key && key.trim().length > 0 ? key.trim() : undefined;
   }
 
+  public static isPaused(): boolean {
+    return (
+      process.env.ODDSPAPI_PAUSED === 'true' ||
+      process.env.PAUSE_ODDSPAPI === 'true' ||
+      process.env.ODDS_PAPI_PAUSED === 'true' ||
+      Boolean(env.providers.oddsPapi.paused)
+    );
+  }
+
+  public isPaused(): boolean {
+    return OddsPapiProvider.isPaused();
+  }
+
   public isConfigured(): boolean {
     return Boolean(this.getApiKey());
   }
@@ -349,6 +362,19 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
   ): Promise<ProviderResult<LiveFixtureDTO[]>> {
     const start = Date.now();
     const timestamp = new Date().toISOString();
+
+    if (this.isPaused()) {
+      return {
+        status: 'PAUSED',
+        provider: this.providerName,
+        data: null,
+        error: 'OddsPAPI provider is PAUSED pending quota reset verification.',
+        latencyMs: 0,
+        cached: false,
+        timestamp,
+        requestsConsumed: 0,
+      };
+    }
 
     if (!this.isConfigured()) {
       return {
@@ -631,6 +657,18 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
 
   public async getFixtureById(id: string): Promise<ProviderResult<LiveFixtureDTO | null>> {
     const timestamp = new Date().toISOString();
+    if (this.isPaused()) {
+      return {
+        status: 'PAUSED',
+        provider: this.providerName,
+        data: null,
+        error: 'OddsPAPI provider is PAUSED pending quota reset verification.',
+        latencyMs: 0,
+        cached: false,
+        timestamp,
+        requestsConsumed: 0,
+      };
+    }
     return {
       status: 'DATA_UNAVAILABLE',
       provider: this.providerName,
@@ -688,6 +726,19 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
   ): Promise<ProviderResult<LiveOddsDTO[]>> {
     const start = Date.now();
     const timestamp = new Date().toISOString();
+
+    if (this.isPaused()) {
+      return {
+        status: 'PAUSED',
+        provider: this.providerName,
+        data: null,
+        error: 'OddsPAPI provider is PAUSED pending quota reset verification.',
+        latencyMs: 0,
+        cached: false,
+        timestamp,
+        requestsConsumed: 0,
+      };
+    }
 
     if (!this.isConfigured()) {
       return {
@@ -903,6 +954,18 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
     bookmakers: string[] = ['pinnacle', 'bet365']
   ): Promise<ProviderResult<LiveOddsDTO[]>> {
     const timestamp = new Date().toISOString();
+    if (this.isPaused()) {
+      return {
+        status: 'PAUSED',
+        provider: this.providerName,
+        data: null,
+        error: 'OddsPAPI provider is PAUSED pending quota reset verification.',
+        latencyMs: 0,
+        cached: false,
+        timestamp,
+        requestsConsumed: 0,
+      };
+    }
     return {
       status: 'DATA_UNAVAILABLE',
       provider: this.providerName,
@@ -911,6 +974,7 @@ export class OddsPapiProvider implements IFixtureProvider, IOddsProvider {
       latencyMs: 0,
       cached: false,
       timestamp,
+      requestsConsumed: 0,
     };
   }
 

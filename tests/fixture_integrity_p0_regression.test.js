@@ -231,6 +231,8 @@ test('Test 7: Synthetic provenance rejection guard', async () => {
 });
 
 test('Test 8: MatchIntelligenceService fails closed on empty/429 provider and NEVER reconstructs schedule from daily_picks', async () => {
+  const refTime = new Date('2026-10-10T08:00:00Z').getTime();
+
   // 1. Static codebase verification: MatchIntelligenceService must NOT query daily_picks for fixture discovery
   const serviceCode = fs.readFileSync(path.resolve('src/engine/matchIntelligenceService.ts'), 'utf8');
   assert.ok(
@@ -253,7 +255,7 @@ test('Test 8: MatchIntelligenceService fails closed on empty/429 provider and NE
       data: [],
     });
 
-    const matchesUnder429 = await MatchIntelligenceService.getForward7DayMatches();
+    const matchesUnder429 = await MatchIntelligenceService.getForward7DayMatches({ nowMs: refTime });
     assert.strictEqual(
       matchesUnder429.length,
       0,
@@ -266,7 +268,7 @@ test('Test 8: MatchIntelligenceService fails closed on empty/429 provider and NE
       data: [],
     });
 
-    const matchesUnderEmpty = await MatchIntelligenceService.getForward7DayMatches();
+    const matchesUnderEmpty = await MatchIntelligenceService.getForward7DayMatches({ nowMs: refTime });
     assert.strictEqual(
       matchesUnderEmpty.length,
       0,
@@ -278,7 +280,7 @@ test('Test 8: MatchIntelligenceService fails closed on empty/429 provider and NE
   }
 
   // 3. Normal provider behavior: Returns legitimate fixtures unchanged
-  const normalMatches = await MatchIntelligenceService.getForward7DayMatches();
+  const normalMatches = await MatchIntelligenceService.getForward7DayMatches({ nowMs: refTime });
   assert.ok(
     normalMatches.length >= 10,
     `Under normal provider discovery, expected at least 10 EPL fixtures, got ${normalMatches.length}`

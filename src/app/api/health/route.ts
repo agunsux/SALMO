@@ -30,22 +30,30 @@ export async function GET() {
 
   // 3. Providers operational checks
   const apiFootballStatus = env.providers.apiFootball.configured ? 'configured' : 'unconfigured';
-  const oddsPapiStatus = env.providers.oddsPapi.configured ? 'configured' : 'unconfigured';
+  const oddsPapiStatus = env.providers.oddsPapi.paused
+    ? 'paused'
+    : env.providers.oddsPapi.configured
+    ? 'configured'
+    : 'unconfigured';
+  const theOddsApiStatus = env.providers.theOddsApi.configured ? 'configured' : 'unconfigured';
 
   // System status determination:
-  // HEALTHY: Data storage connected, native prediction engine ready, OddsPapi configured
-  // DEGRADED: OddsPapi unconfigured or upstream R&D unavailable, but SALMO production product is operational
+  // HEALTHY: Data storage connected, native prediction engine ready, OddsPapi or TheOddsApi configured
+  // DEGRADED: Odds providers unconfigured or upstream R&D unavailable, but SALMO production product is operational
   // UNAVAILABLE: No operational data store available (both DB and local storage unreachable)
   let overallStatus: 'healthy' | 'degraded' | 'unavailable' = 'healthy';
 
   const hasDataStore = dbHealth.connected || hlHealth.status === 'HEALTHY';
+  const hasOddsProvider =
+    (env.providers.oddsPapi.configured && !env.providers.oddsPapi.paused) ||
+    env.providers.theOddsApi.configured;
 
   if (!hasDataStore) {
     overallStatus = 'unavailable';
   } else if (
     hlHealth.status !== 'HEALTHY' ||
     !dbHealth.connected ||
-    !env.providers.oddsPapi.configured
+    !hasOddsProvider
   ) {
     overallStatus = 'degraded';
   }
@@ -124,6 +132,12 @@ export async function GET() {
         role: 'authoritative_live_market',
         bookmakers: ['pinnacle', 'bet365'],
         supportedMarkets: ['ASIAN_HANDICAP', 'OVER_UNDER', 'BTTS'],
+      },
+      theOddsApi: {
+        status: theOddsApiStatus,
+        provider: 'The Odds API',
+        role: 'live_market_fallback',
+        activeKeyConfigured: env.providers.theOddsApi.configured,
       },
       apiFootball: {
         status: apiFootballStatus,

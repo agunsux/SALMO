@@ -14,6 +14,8 @@
  */
 
 export interface CandidatePick {
+  id?: string | null;
+  predictionId?: string | null;
   kickoffUtc?: string | null;
   kickoff_utc?: string | null;
   verdict?: string | null;
@@ -22,7 +24,72 @@ export interface CandidatePick {
   reasoning?: string | null;
   marketOdds?: number | null;
   market_odds?: number | null;
+  modelProbability?: number | null;
+  model_probability?: number | null;
+  prediction?: string | null;
+  line?: number | null;
+  homeTeam?: string | null;
+  home_team?: string | null;
+  awayTeam?: string | null;
+  away_team?: string | null;
+  league?: string | null;
+  competition?: string | null;
+  status?: string | null;
+  data_status?: string | null;
+  quarantined?: boolean | null;
   [key: string]: any;
+}
+
+/**
+ * Known quarantined candidate IDs from uncalibrated upstream runs
+ * (e.g. 70.64% default-fallback parameter artifact from run daily-2026-10-16T20:00Z)
+ */
+export const QUARANTINED_SIGNAL_IDS = new Set<string>([
+  'cbd13e02-6be4-4b22-95d9-59c26eb603bc', // Nottingham Forest vs Arsenal (uncalibrated 70.64% default fallback)
+  'abe7d4da-0659-4869-b560-635a017710f5', // Aston Villa vs Manchester City (uncalibrated 70.64% default fallback)
+  '224dd97b-bee6-4875-b97a-f14d9607995a', // Hull City vs Brentford (competition mismatch & uncalibrated fallback)
+]);
+
+/**
+ * Evaluates whether a signal is quarantined due to:
+ * - Explicit quarantine ID or flag
+ * - Default uncalibrated probability artifact (70.64% fallback marker from static default xG 1.45/1.15)
+ * - Competition mismatch (e.g. Hull City in Premier League)
+ */
+export function isQuarantinedSignal(pick: CandidatePick): { quarantined: boolean; reason?: string } {
+  if (!pick) return { quarantined: false };
+
+  // 1. Explicit ID quarantine
+  const id = pick.id || pick.predictionId;
+  if (id && QUARANTINED_SIGNAL_IDS.has(String(id))) {
+    return { quarantined: true, reason: 'QUARANTINED_SIGNAL_ID: Known uncalibrated model fallback artifact' };
+  }
+
+  // 2. Explicit status or data_status
+  if (pick.status === 'QUARANTINED' || pick.data_status === 'QUARANTINED' || pick.quarantined === true) {
+    return { quarantined: true, reason: 'EXPLICIT_QUARANTINE_FLAG' };
+  }
+
+  // 3. Detect uncalibrated fallback probability artifact:
+  // In HandicapLab dailyOrchestrator, missing team ratings fall back to homeXg=1.45, awayXg=1.15, rho=-0.05,
+  // which produces exactly 0.7064 (70.64%) on AH +0.75 lines.
+  const prob = pick.modelProbability ?? pick.model_probability;
+  const line = pick.line ?? (typeof pick.prediction === 'string' && pick.prediction.includes('+0.75') ? 0.75 : null);
+  if (typeof prob === 'number' && Math.abs(prob - 0.7064) < 0.0001 && line === 0.75) {
+    return { quarantined: true, reason: 'UNCALIBRATED_FALLBACK_ARTIFACT: Identical 70.64% probability from default parameters' };
+  }
+
+  // 4. Competition mismatch: Hull City is not in Premier League
+  const home = String(pick.home_team || pick.homeTeam || '');
+  const away = String(pick.away_team || pick.awayTeam || '');
+  const league = String(pick.league || pick.competition || '');
+  if (league.toLowerCase().includes('premier league')) {
+    if (home.toLowerCase().includes('hull') || away.toLowerCase().includes('hull')) {
+      return { quarantined: true, reason: 'COMPETITION_MISMATCH: Hull City is not a Premier League club' };
+    }
+  }
+
+  return { quarantined: false };
 }
 
 export function isPublicPickEligible(
@@ -30,6 +97,11 @@ export function isPublicPickEligible(
   referenceTimeMs: number
 ): boolean {
   if (!pick || typeof referenceTimeMs !== 'number' || isNaN(referenceTimeMs)) {
+    return false;
+  }
+
+  // 0. Quarantine Guard: exclude uncalibrated, mismatched, or quarantined signals
+  if (isQuarantinedSignal(pick).quarantined) {
     return false;
   }
 
@@ -74,6 +146,11 @@ export function isCandidateQualifiedWithoutOdds(
   referenceTimeMs: number
 ): boolean {
   if (!pick || typeof referenceTimeMs !== 'number' || isNaN(referenceTimeMs)) {
+    return false;
+  }
+
+  // 0. Quarantine Guard: exclude uncalibrated, mismatched, or quarantined signals
+  if (isQuarantinedSignal(pick).quarantined) {
     return false;
   }
 
@@ -133,7 +210,7 @@ export function classifyDailyPicksState(
     return !isNaN(kMs) && kMs > referenceTimeMs;
   };
 
-  const currentPicks = picks.filter(isUpcoming);
+  const currentPicks = picks.filter(isUpcoming).filter(p => !isQuarantinedSignal(p).quarantined);
   const eligiblePicks = currentPicks.filter(p => isPublicPickEligible(p, referenceTimeMs));
 
   if (eligiblePicks.length > 0) {

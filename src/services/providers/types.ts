@@ -7,7 +7,8 @@ export type ProviderDataStatus =
   | 'DATA_UNAVAILABLE'
   | 'UNCONFIGURED'
   | 'RATE_LIMITED'
-  | 'ERROR';
+  | 'ERROR'
+  | 'PAUSED';
 
 export interface ProviderResult<T> {
   status: ProviderDataStatus;

@@ -5,30 +5,15 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { ProductionPredictionEngine } from '@/engine/pipeline/productionPredictionEngine';
+import { DailyPredictionRefreshService } from '@/engine/pipeline/dailyPredictionRefreshService';
 import { MultiLeagueAutoActivator } from '@/engine/activation/multiLeagueAutoActivator';
 import { OddsPapiQuotaGuard } from '@/lib/quota/oddsPapiQuotaGuard';
 import { Logger } from '@/lib/logger';
 
+import { verifyCronRequest } from '@/lib/auth/cronAuth';
+
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60; // Allow sufficient runtime for provider roundtrips
-
-function verifyAuth(request: NextRequest): boolean {
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) {
-    // If CRON_SECRET is not configured, deny access in production
-    if (process.env.NODE_ENV === 'production') return false;
-    return true;
-  }
-
-  const authHeader = request.headers.get('authorization');
-  if (authHeader === `Bearer ${cronSecret}`) return true;
-
-  // Also check query param fallback for secure manual administrative triggering
-  const { searchParams } = new URL(request.url);
-  if (searchParams.get('key') === cronSecret) return true;
-
-  return false;
-}
 
 export async function GET(request: NextRequest) {
   return handleCron(request);
@@ -42,9 +27,28 @@ async function handleCron(request: NextRequest) {
   const start = Date.now();
   const requestId = request.headers.get('x-request-id') || `cron_${Date.now()}`;
 
-  if (!verifyAuth(request)) {
-    Logger.warn('[Cron:predict] Unauthorized attempt', { requestId });
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const authResult = await verifyCronRequest(request);
+  if (!authResult.authorized) {
+    Logger.warn('[Cron:predict] Unauthorized attempt', { requestId, reason: authResult.reason });
+    return NextResponse.json({ error: 'Unauthorized', reason: authResult.reason }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const requestedMode = searchParams.get('mode')?.toUpperCase();
+
+  // Allow explicit administrative simulation (AUDIT_ONLY or RESEARCH dry-run) without requiring ENABLE_PRODUCTION_CRON
+  if (requestedMode === 'AUDIT_ONLY' || requestedMode === 'RESEARCH_DRY_RUN') {
+    const refreshResult = await DailyPredictionRefreshService.runDailyRefresh({
+      mode: 'AUDIT_ONLY',
+      dryRun: true,
+    });
+    return NextResponse.json({
+      success: refreshResult.success,
+      status: refreshResult.status,
+      mode: 'AUDIT_ONLY',
+      report: refreshResult.report,
+      qualifiedPredictionsCount: refreshResult.qualifiedPredictions.length,
+    }, { status: 200 });
   }
 
   // H3 Safety Gate: Strict opt-in behavior (ENABLE_PRODUCTION_CRON === 'true' required; default OFF when absent/false or in preview)

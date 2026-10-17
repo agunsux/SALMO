@@ -34,7 +34,8 @@ export type AtomicQuotaErrorCode =
   | 'RESERVATION_NOT_FOUND'
   | 'ALREADY_CONFIRMED'
   | 'ALREADY_RELEASED'
-  | 'CIRCUIT_BREAKER_OPEN';
+  | 'CIRCUIT_BREAKER_OPEN'
+  | 'ODDSPAPI_PAUSED';
 
 export type ReservationStatus = 'RESERVED' | 'CONFIRMED' | 'RELEASED' | 'ROLLED_BACK';
 
@@ -1423,6 +1424,15 @@ export class OddsPapiQuotaGuard {
     return this.completedActivationCycles.has(cycleKey);
   }
 
+  public static isPaused(): boolean {
+    return (
+      process.env.ODDSPAPI_PAUSED === 'true' ||
+      process.env.PAUSE_ODDSPAPI === 'true' ||
+      process.env.ODDS_PAPI_PAUSED === 'true' ||
+      Boolean(env.providers.oddsPapi.paused)
+    );
+  }
+
   /**
    * Injects mock account payload for deterministic offline unit tests.
    * Preserves in-memory confirmed floor when the injected payload belongs to the exact same
@@ -1627,6 +1637,28 @@ export class OddsPapiQuotaGuard {
       process.env.ODDSPAPI_MULTI_LEAGUE_RESERVE || this.MANDATORY_MULTI_LEAGUE_RESERVE
     );
 
+    if (this.isPaused()) {
+      return {
+        state: 'RESET_UNVERIFIED',
+        checkedAtUtc,
+        providerStatus: 'UNVERIFIED_OFFLINE',
+        isActive: false,
+        plan: 'unknown',
+        requestCount: 0,
+        requestLimit: this.DEFAULT_MONTHLY_LIMIT,
+        mandatoryReserve,
+        operationalCeiling: Math.max(0, this.DEFAULT_MONTHLY_LIMIT - mandatoryReserve),
+        remainingTotal: 0,
+        remainingOperationalBudget: 0,
+        hasPinnacle: false,
+        pinnacleLiveOdds: false,
+        supportsFootball: false,
+        validFrom: null,
+        idempotencyCycleKey: `paused_${checkedAtUtc.slice(0, 10)}`,
+        reason: 'OddsPAPI provider is PAUSED pending quota reset verification.',
+      };
+    }
+
     if (this.isActivationInProgress()) {
       const sub = this.cachedAccountData?.subscriptions?.[0];
       const limit = Number(sub?.request_limit ?? this.DEFAULT_MONTHLY_LIMIT);
@@ -1829,6 +1861,10 @@ export class OddsPapiQuotaGuard {
    * Preserves in-memory confirmed floor within the same subscription cycle.
    */
   public static async syncAccount(force = false): Promise<any | null> {
+    if (this.isPaused()) {
+      return this.cachedAccountData;
+    }
+
     const apiKey = env.providers.oddsPapi.apiKey || process.env.ODDS_PAPI_KEY || '';
     if (!apiKey) {
       if (this.cachedAccountData?.subscriptions?.[0] && this.inMemoryConfirmedCost > 0) {
@@ -1901,6 +1937,20 @@ export class OddsPapiQuotaGuard {
     allowProductionWrite = false
   ): Promise<QuotaGuardStatus> {
     const reserve = customReserve ?? Number(process.env.ODDSPAPI_QUOTA_RESERVE || this.DEFAULT_RESERVE);
+
+    if (this.isPaused()) {
+      return {
+        allowed: false,
+        errorCode: 'ODDSPAPI_PAUSED',
+        reason: 'ODDSPAPI_PAUSED: OddsPapi provider is PAUSED pending quota reset verification.',
+        consumed: Math.max(this.localConsumedFloor, this.cachedAccountData?.subscriptions?.[0]?.request_count || 0),
+        limit: this.DEFAULT_MONTHLY_LIMIT,
+        hardStopThreshold: Math.max(0, this.DEFAULT_MONTHLY_LIMIT - reserve),
+        remaining: 0,
+        reserve,
+        source: 'FALLBACK',
+      };
+    }
 
     if (this.circuitTripped) {
       return {
@@ -2104,6 +2154,14 @@ export class OddsPapiQuotaGuard {
     reason?: string;
     state?: any;
   }> {
+    if (this.isPaused()) {
+      return {
+        allowed: false,
+        errorCode: 'ODDSPAPI_PAUSED',
+        reason: 'ODDSPAPI_PAUSED: OddsPapi provider is PAUSED pending quota reset verification.',
+      };
+    }
+
     if (this.circuitTripped) {
       return {
         allowed: false,

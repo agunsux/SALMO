@@ -327,18 +327,46 @@ export class CanonicalPredictionLedgerService {
    * Ensures data/research/multi_league_research_predictions.jsonl exists and is cleanly synchronized
    * from the canonical 336 research records without destructive changes.
    */
-  public static reconcileAndExportResearchLedger(): { count: number; synchronized: boolean } {
-    const researchRecords = this.getResearchLedger();
+  public static reconcileAndExportResearchLedger(
+    customTargetPath?: string,
+    customRecords?: CanonicalPredictionRecord[]
+  ): { count: number; synchronized: boolean } {
+    const researchRecords = customRecords || this.getResearchLedger();
     if (researchRecords.length === 0) return { count: 0, synchronized: false };
 
-    const dir = path.dirname(this.researchPredictionsPath);
+    const targetPath = customTargetPath || this.researchPredictionsPath;
+    const dir = path.dirname(targetPath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
 
-    // Write JSONL cleanly
-    const content = researchRecords.map(r => JSON.stringify(r)).join('\n') + '\n';
-    fs.writeFileSync(this.researchPredictionsPath, content, 'utf8');
+    // Preserve existing mirror file and line endings if already present and complete
+    if (fs.existsSync(targetPath)) {
+      try {
+        const existingRaw = fs.readFileSync(targetPath, 'utf8');
+        const existingLines = existingRaw.trim().split(/\r?\n/).filter(Boolean);
+        if (existingLines.length === researchRecords.length) {
+          let identical = true;
+          for (let i = 0; i < researchRecords.length; i++) {
+            if (JSON.stringify(JSON.parse(existingLines[i])) !== JSON.stringify(researchRecords[i])) {
+              identical = false;
+              break;
+            }
+          }
+          if (identical) {
+            return {
+              count: researchRecords.length,
+              synchronized: true,
+            };
+          }
+        }
+      } catch {}
+    }
+
+    // Write JSONL cleanly, preserving CRLF if existing target file used CRLF
+    const eol = fs.existsSync(targetPath) && fs.readFileSync(targetPath, 'utf8').includes('\r\n') ? '\r\n' : '\n';
+    const content = researchRecords.map(r => JSON.stringify(r)).join(eol) + eol;
+    fs.writeFileSync(targetPath, content, 'utf8');
 
     return {
       count: researchRecords.length,

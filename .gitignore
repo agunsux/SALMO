@@ -38,5 +38,8 @@ scratch/
 /research/raw_dribble/
 /research/
 /data/external/football-data/
+/data/sync/
+/data/quota/
 
 .vercel
+.env*

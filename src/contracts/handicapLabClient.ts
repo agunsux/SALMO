@@ -48,24 +48,23 @@ export class HandicapLabClient {
   /**
    * Resolves the HandicapLab data directory cleanly across local environments.
    */
-  public static getDataDirectory(): string {
+  public static getDataDirectory(): string | null {
     const override = process.env.HANDICAPLAB_DATA_PATH;
     if (override && fs.existsSync(override)) {
       return override;
     }
 
-    // Default sibling path in Antigravity workspace
-    const siblingPath = path.resolve('..', 'HandicapLab', 'data', 'bronze', 'football_data');
-    if (fs.existsSync(siblingPath)) {
-      return siblingPath;
+    // Isolated path within SALMO repository if local mirrored bronze dataset exists
+    const localMirrored = path.resolve(process.cwd(), 'data', 'bronze', 'football_data');
+    if (fs.existsSync(localMirrored)) {
+      return localMirrored;
     }
 
-    const fallbackPath = path.resolve(process.cwd(), '..', 'HandicapLab', 'data', 'bronze', 'football_data');
-    return fallbackPath;
+    return null;
   }
 
   /**
-   * Loads all real verified match records from HandicapLab bronze datasets.
+   * Loads all real verified match records from bronze datasets.
    * Total: 2,659 matches with real closing AH lines and odds (2019-2020 through 2025-2026).
    */
   public static getAllRecords(): RawMatchRecord[] {
@@ -74,8 +73,7 @@ export class HandicapLabClient {
     }
 
     const dataDir = this.getDataDirectory();
-    if (!fs.existsSync(dataDir)) {
-      console.warn(`[HandicapLabClient] Data directory not found at: ${dataDir}`);
+    if (!dataDir || !fs.existsSync(dataDir)) {
       return [];
     }
 
