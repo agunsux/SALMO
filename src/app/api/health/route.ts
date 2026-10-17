@@ -30,7 +30,11 @@ export async function GET() {
 
   // 3. Providers operational checks
   const apiFootballStatus = env.providers.apiFootball.configured ? 'configured' : 'unconfigured';
-  const oddsPapiStatus = env.providers.oddsPapi.configured ? 'configured' : 'unconfigured';
+  const oddsPapiStatus = env.providers.oddsPapi.paused
+    ? 'paused'
+    : env.providers.oddsPapi.configured
+    ? 'configured'
+    : 'unconfigured';
   const theOddsApiStatus = env.providers.theOddsApi.configured ? 'configured' : 'unconfigured';
 
   // System status determination:
@@ -40,7 +44,9 @@ export async function GET() {
   let overallStatus: 'healthy' | 'degraded' | 'unavailable' = 'healthy';
 
   const hasDataStore = dbHealth.connected || hlHealth.status === 'HEALTHY';
-  const hasOddsProvider = env.providers.oddsPapi.configured || env.providers.theOddsApi.configured;
+  const hasOddsProvider =
+    (env.providers.oddsPapi.configured && !env.providers.oddsPapi.paused) ||
+    env.providers.theOddsApi.configured;
 
   if (!hasDataStore) {
     overallStatus = 'unavailable';

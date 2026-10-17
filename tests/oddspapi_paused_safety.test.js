@@ -128,4 +128,19 @@ test('OddsPAPI Pause Safety: Provider & Quota Guard Containment', async (t) => {
     assert.strictEqual(OddsPapiProvider.isPaused(), true);
     assert.strictEqual(OddsPapiQuotaGuard.isPaused(), true);
   });
+
+  await t.test('8. syncAccount(true) makes ZERO network calls when paused', async () => {
+    process.env.ODDSPAPI_PAUSED = 'true';
+    const account = await OddsPapiQuotaGuard.syncAccount(true);
+    assert.strictEqual(oddspapiFetchCount, 0, 'syncAccount must make zero network calls while paused');
+  });
+
+  await t.test('9. detectQuotaReset() makes ZERO network calls and returns RESET_UNVERIFIED', async () => {
+    process.env.ODDSPAPI_PAUSED = 'true';
+    const resetResult = await OddsPapiQuotaGuard.detectQuotaReset(3, true, undefined, false);
+    assert.strictEqual(resetResult.state, 'RESET_UNVERIFIED');
+    assert.strictEqual(resetResult.providerStatus, 'UNVERIFIED_OFFLINE');
+    assert.ok(resetResult.reason.includes('PAUSED'));
+    assert.strictEqual(oddspapiFetchCount, 0, 'detectQuotaReset must make zero network calls while paused');
+  });
 });
