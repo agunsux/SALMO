@@ -36,6 +36,10 @@ export default function DailyPicksPage() {
   const [loading, setLoading] = useState(true);
   const [apiStatus, setApiStatus] = useState<'LOADING' | 'AVAILABLE' | 'DATA_UNAVAILABLE' | 'NO_QUALIFIED_PICKS'>('LOADING');
   const [referenceTimeMs, setReferenceTimeMs] = useState<number | null>(null);
+  const [missingDataReasons, setMissingDataReasons] = useState<string[]>([]);
+  const [providerStatus, setProviderStatus] = useState<Record<string, any> | null>(null);
+  const [freshness, setFreshness] = useState<any | null>(null);
+  const [upcomingFixturesCount, setUpcomingFixturesCount] = useState<number>(0);
 
   const [verdictFilter, setVerdictFilter] = useState<'ALL' | 'LAYAK' | 'PANTAU' | 'LEWATI'>('ALL');
   const [marketFilter, setMarketFilter] = useState<'ALL' | 'ASIAN_HANDICAP' | 'OVER_UNDER' | 'BTTS'>('ALL');
@@ -51,6 +55,11 @@ export default function DailyPicksPage() {
       .then(({ json, headerTimeMs }) => {
         if (json.success && json.data) {
           setPicks(json.data);
+          if (Array.isArray(json.missingDataReasons)) setMissingDataReasons(json.missingDataReasons);
+          if (json.providerStatus) setProviderStatus(json.providerStatus);
+          if (json.freshness) setFreshness(json.freshness);
+          if (typeof json.upcomingFixturesCount === 'number') setUpcomingFixturesCount(json.upcomingFixturesCount);
+
           const payloadTime = json.timestampUtc || json.timestamp;
           const refMs = payloadTime
             ? new Date(payloadTime).getTime()
@@ -183,7 +192,72 @@ export default function DailyPicksPage() {
             </p>
           </div>
         ) : apiStatus === 'NO_QUALIFIED_PICKS' || classification.state !== 'AVAILABLE' || filteredPicks.length === 0 ? (
-          classification.state === 'ODDS_NOT_YET_AVAILABLE' ? (
+          missingDataReasons.length > 0 || (providerStatus && Object.values(providerStatus).some((p: any) => p?.liveIngestion === 'BLOCKED')) ? (
+            <div className="rounded-xl border border-amber-500/30 bg-[#161410] p-8 text-center max-w-2xl mx-auto">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10 text-amber-400 mb-3">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <h3 className="text-sm font-bold text-amber-400 uppercase tracking-wider">
+                Upstream Data Providers Paused — Actionable Picks Locked
+              </h3>
+              <p className="mt-2 text-xs text-[#8A93A0] max-w-lg mx-auto">
+                SALMO operates strictly fail-closed: zero synthetic or unvetted picks. Actionable daily recommendations remain locked until live sharp market feeds are restored and fresh pre-match odds are verified against the 24-hour SLA.
+              </p>
+
+              {/* Provider Telemetry Breakdown */}
+              <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-2 text-left">
+                <div className="rounded border border-[#232830] bg-[#111418] p-2.5">
+                  <div className="text-[10px] uppercase font-bold text-zinc-500">API-Football Pro</div>
+                  <div className="text-xs font-semibold text-rose-400 mt-0.5">
+                    {providerStatus?.apiFootball?.status || 'AUTH_FAILED'}
+                  </div>
+                  <div className="text-[10px] text-zinc-400 mt-0.5 truncate" title={providerStatus?.apiFootball?.reason}>
+                    {providerStatus?.apiFootball?.reason || 'Account suspended upstream'}
+                  </div>
+                </div>
+                <div className="rounded border border-[#232830] bg-[#111418] p-2.5">
+                  <div className="text-[10px] uppercase font-bold text-zinc-500">OddsPapi Sharp Odds</div>
+                  <div className="text-xs font-semibold text-amber-400 mt-0.5">
+                    {providerStatus?.oddsPapi?.status || 'QUOTA_BLOCKED'}
+                  </div>
+                  <div className="text-[10px] text-zinc-400 mt-0.5 truncate" title={providerStatus?.oddsPapi?.reason}>
+                    {providerStatus?.oddsPapi?.reason || 'Monthly quota exhausted (260/250)'}
+                  </div>
+                </div>
+                <div className="rounded border border-[#232830] bg-[#111418] p-2.5">
+                  <div className="text-[10px] uppercase font-bold text-zinc-500">FootyStats Free</div>
+                  <div className="text-xs font-semibold text-zinc-400 mt-0.5">
+                    {providerStatus?.footyStats?.status || 'AUTH_FAILED'}
+                  </div>
+                  <div className="text-[10px] text-zinc-400 mt-0.5 truncate" title={providerStatus?.footyStats?.reason}>
+                    {providerStatus?.footyStats?.reason || 'Demo key quarantined'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Audit Log Reasons */}
+              {missingDataReasons.length > 0 && (
+                <div className="mt-4 rounded border border-[#232830] bg-[#0E1013] p-3 text-left">
+                  <div className="text-[11px] font-semibold text-zinc-400 mb-1">Audit Log Reasons:</div>
+                  <ul className="list-disc list-inside text-[11px] text-zinc-400 space-y-0.5">
+                    {missingDataReasons.map((r, i) => (
+                      <li key={i}>{r}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="mt-4 flex items-center justify-center gap-2 text-xs">
+                <Link
+                  href="/research"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-400 hover:text-emerald-300 underline underline-offset-4"
+                >
+                  <span>Explore historical walk-forward models in Research</span>
+                  <ArrowUpRight className="h-3 w-3" />
+                </Link>
+              </div>
+            </div>
+          ) : classification.state === 'ODDS_NOT_YET_AVAILABLE' ? (
             <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-12 text-center">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10 text-amber-400 mb-3">
                 <ShieldCheck className="h-5 w-5" />

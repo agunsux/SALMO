@@ -52,6 +52,10 @@ export async function GET(request: NextRequest) {
             totalCanonicalPicks: syncRes.counts?.totalArchived || 0,
             timestampUtc: new Date(nowMs).toISOString(),
             data: [],
+            missingDataReasons: syncRes.missingDataReasons || [],
+            providerStatus: syncRes.providerStatus,
+            freshness: syncRes.freshness,
+            upcomingFixturesCount: syncRes.counts?.upcomingFixtures || 0,
           });
         }
 
