@@ -10,6 +10,8 @@ import {
 import { getLeagueByNameOrSlug } from '../../config/multiLeagueRegistry';
 import { Logger } from '../../lib/logger';
 
+import { HandicapLabAdapterFactory } from '../../contracts/handicapLabAdapter';
+
 interface ApiFootballFixtureItem {
   fixture: {
     id: number;
@@ -42,8 +44,6 @@ export interface SettlementRunnerOptions {
 
 export async function runProductionSettlement(options: SettlementRunnerOptions = {}) {
   const dryRun = options.dryRun ?? false;
-  const apiKey = process.env.API_FOOTBALL_KEY || process.env.APIFOOTBALL_KEY;
-  const baseUrl = process.env.API_FOOTBALL_BASE_URL || 'https://v3.football.api-sports.io';
   const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
@@ -87,51 +87,31 @@ export async function runProductionSettlement(options: SettlementRunnerOptions =
     }
   }
 
-  // 2b. Level (b) Fallback: Query API-Football across active unsettled leagues only if needed and not dryRun
-  const from = options.fromDate || '2026-10-10';
-  const to = options.toDate || '2026-10-18';
-  let apiFixtures: ApiFootballFixtureItem[] = [];
-
-  if (apiKey && !dryRun && dbScoreMap.size === 0) {
-    const neededLeagueIds = new Set<number>();
-    for (const line of rawLines) {
-      try {
-        const parsed = JSON.parse(line);
-        if (parsed.settlementStatus === 'SETTLED') continue;
-        const entry = getLeagueByNameOrSlug(parsed.league || 'Premier League');
-        neededLeagueIds.add(entry ? entry.provider_league_id : 39);
-      } catch {}
-    }
-    if (neededLeagueIds.size === 0) neededLeagueIds.add(39);
-
-    for (const providerLeagueId of neededLeagueIds) {
-      try {
-        const apiUrl = `${baseUrl}/fixtures?league=${providerLeagueId}&from=${from}&to=${to}&season=2026`;
-        const apiRes = await fetch(apiUrl, {
-          headers: {
-            'x-apisports-key': apiKey,
-            'Accept': 'application/json',
-          },
-        });
-
-        if (apiRes.ok) {
-          const apiJson = await apiRes.json();
-          const leagueFixtures: ApiFootballFixtureItem[] = apiJson.response || [];
-          apiFixtures.push(...leagueFixtures);
-          Logger.info(`[SettlementRunner] Fetched ${leagueFixtures.length} authentic fixtures from API-Football for league=${providerLeagueId} (${from} to ${to}).`);
-        } else {
-          Logger.warn(`[SettlementRunner] API-Football returned HTTP ${apiRes.status} for league=${providerLeagueId}`);
+  // 2b. Level (b) HandicapLab Verified Results Resolution (Decoupled: zero direct API-Football calls from SALMO)
+  const contractScoreMap = new Map<string, { homeGoals: number; awayGoals: number; homeTeam: string; awayTeam: string }>();
+  if (!dryRun) {
+    try {
+      const adapter = HandicapLabAdapterFactory.getAdapter();
+      const syncRes = await adapter.getSalmoSync({ view: 'results' });
+      if (syncRes && syncRes.verifiedResults && syncRes.verifiedResults.length > 0) {
+        for (const vr of syncRes.verifiedResults) {
+          if (typeof vr.homeGoals === 'number' && typeof vr.awayGoals === 'number') {
+            const entry = {
+              homeGoals: vr.homeGoals,
+              awayGoals: vr.awayGoals,
+              homeTeam: vr.homeTeam,
+              awayTeam: vr.awayTeam,
+            };
+            if (vr.canonicalFixtureId) contractScoreMap.set(vr.canonicalFixtureId, entry);
+            if (vr.providerMatchId) contractScoreMap.set(vr.providerMatchId, entry);
+          }
         }
-      } catch (fetchErr) {
-        Logger.warn('[SettlementRunner] Could not reach API-Football provider:', { error: String(fetchErr) });
+        Logger.info(`[SettlementRunner] Level (b) resolved ${contractScoreMap.size} verified matches from HandicapLab contract.`);
       }
+    } catch (contractErr) {
+      Logger.warn('[SettlementRunner] Could not query HandicapLab contract verified results:', { error: String(contractErr) });
     }
   }
-
-  const finishedFixtures = apiFixtures.filter(f =>
-    f.fixture.status.short === 'FT' || f.fixture.status.short === 'AET' || f.fixture.status.short === 'PEN'
-  );
-  Logger.info(`[SettlementRunner] Finished fixtures available (DB: ${dbScoreMap.size}, API: ${finishedFixtures.length})`);
 
   let settledCount = 0;
   let pendingCount = 0;
@@ -143,12 +123,17 @@ export async function runProductionSettlement(options: SettlementRunnerOptions =
     const apiId = row.providerProvenance?.apiFootballFixtureId;
     const matchId = row.matchId || row.fixtureId;
 
-    // Resolve score from Level (a) public.matches first, then Level (b) API-Football
+    // Resolve score from Level (a) public.matches first, then Level (b) HandicapLab contract
     const dbMatch = matchId ? dbScoreMap.get(String(matchId)) : undefined;
-    const finishedMatch = finishedFixtures.find(f => f.fixture.id === apiId);
+    const contractMatch =
+      (row.canonicalMatchId && contractScoreMap.get(row.canonicalMatchId)) ||
+      (matchId && contractScoreMap.get(String(matchId))) ||
+      (apiId && contractScoreMap.get(String(apiId)));
 
-    const hGoals = dbMatch ? dbMatch.homeGoals : (finishedMatch?.goals.home ?? null);
-    const aGoals = dbMatch ? dbMatch.awayGoals : (finishedMatch?.goals.away ?? null);
+    const hGoals = dbMatch ? dbMatch.homeGoals : (contractMatch ? contractMatch.homeGoals : null);
+    const aGoals = dbMatch ? dbMatch.awayGoals : (contractMatch ? contractMatch.awayGoals : null);
+    const homeTeam = dbMatch?.homeTeam || contractMatch?.homeTeam || row.homeTeam;
+    const awayTeam = dbMatch?.awayTeam || contractMatch?.awayTeam || row.awayTeam;
 
     if (hGoals !== null && aGoals !== null) {
       const mType = (row.market || row.marketType)?.toUpperCase();
@@ -162,8 +147,8 @@ export async function runProductionSettlement(options: SettlementRunnerOptions =
         homeGoals: hGoals,
         awayGoals: aGoals,
         matchStatus: 'FINISHED',
-        homeTeam: dbMatch?.homeTeam || finishedMatch?.teams.home.name || row.homeTeam,
-        awayTeam: dbMatch?.awayTeam || finishedMatch?.teams.away.name || row.awayTeam,
+        homeTeam,
+        awayTeam,
       });
 
       const updatedRow = {
@@ -327,7 +312,7 @@ export async function runProductionSettlement(options: SettlementRunnerOptions =
     success: true,
     settledCount,
     pendingCount,
-    finishedFixturesCount: finishedFixtures.length,
+    finishedFixturesCount: contractScoreMap.size + dbScoreMap.size,
     report,
     timestampUtc: new Date().toISOString(),
   };

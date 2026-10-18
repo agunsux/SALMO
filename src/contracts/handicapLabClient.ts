@@ -41,6 +41,159 @@ export interface DatasetSummary {
   checksum: string;
 }
 
+export type SalmoDataState =
+  | 'REAL'
+  | 'NO_QUALIFIED_PICKS'
+  | 'DATA_TEMPORARILY_UNAVAILABLE'
+  | 'DATA_UNAVAILABLE'
+  | 'INSUFFICIENT_DATA'
+  | 'NO_MARKET_AVAILABLE'
+  | 'PROVIDER_UNAVAILABLE'
+  | 'QUOTA_BLOCKED';
+
+export interface SalmoUpcomingFixtureDTO {
+  canonicalFixtureId: string;
+  providerMatchId: string;
+  competition: string;
+  season: string;
+  homeTeam: string;
+  awayTeam: string;
+  kickoffUtc: string;
+  status: string;
+  targetWindow: 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS';
+  marketsAvailable: ('AH' | 'OU' | 'BTTS')[];
+  venue?: string;
+  sourceProvider: string;
+  sourceVersion: string;
+}
+
+export interface SalmoVerifiedResultDTO {
+  canonicalFixtureId: string;
+  providerMatchId: string;
+  competition: string;
+  season: string;
+  homeTeam: string;
+  awayTeam: string;
+  kickoffUtc: string;
+  status: string;
+  homeGoals: number;
+  awayGoals: number;
+  totalGoals: number;
+  sourceProvider: string;
+  verifiedAt: string;
+}
+
+export interface SalmoProviderStatusReport {
+  apiFootball: {
+    name: string;
+    status: 'AVAILABLE' | 'PARTIAL' | 'UNAVAILABLE' | 'AUTH_FAILED' | 'QUOTA_BLOCKED' | 'NOT_VERIFIED';
+    plan: string;
+    reason: string;
+    authenticated: boolean;
+    liveIngestion: 'BLOCKED' | 'ALLOWED';
+  };
+  footyStats: {
+    name: string;
+    status: 'AVAILABLE' | 'PARTIAL' | 'UNAVAILABLE' | 'AUTH_FAILED' | 'QUOTA_BLOCKED' | 'NOT_VERIFIED';
+    plan: string;
+    reason: string;
+    authenticated: boolean;
+    liveIngestion: 'BLOCKED' | 'ALLOWED';
+  };
+  oddsPapi: {
+    name: string;
+    status: 'AVAILABLE' | 'PARTIAL' | 'UNAVAILABLE' | 'AUTH_FAILED' | 'QUOTA_BLOCKED' | 'NOT_VERIFIED';
+    plan: string;
+    reason: string;
+    authenticated: boolean;
+    quotaLimit: number;
+    quotaUsed: number;
+    quotaRemaining: number;
+    reserveFloor: number;
+    liveIngestion: 'BLOCKED' | 'ALLOWED';
+  };
+}
+
+export interface SalmoFreshnessReport {
+  fixtureFreshnessSlaSeconds: number;
+  oddsFreshnessSlaSeconds: number;
+  lastSyncTimestampUtc: string;
+  upcomingFixturesCount: number;
+  activeDailyPicksCount: number;
+  status: 'FRESH' | 'STALE';
+}
+
+export interface SalmoDailyPickDTO {
+  projectionId: string;
+  predictionId: string;
+  targetWindow: 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS';
+  fixtureId: string;
+  matchId: string;
+  leagueId: number;
+  leagueName: string;
+  homeTeam: string;
+  awayTeam: string;
+  kickoffUtc: string;
+  horizon: string;
+  marketType: 'ASIAN_HANDICAP' | 'OVER_UNDER' | 'BTTS';
+  recommendedLine: number;
+  recommendedSelection: string;
+  modelProbability: number;
+  fairOdds: number;
+  marketOdds: number;
+  edgePct: number;
+  confidenceScore: number;
+  verdict: 'LAYAK' | 'PANTAU' | 'LEWATI';
+  modelQualityGrade: string;
+  modelVersion: string;
+  sourceBookmaker: string;
+  oddsCapturedAt: string;
+  provenanceHash: string;
+  status: string;
+  rejectionReason?: string | null;
+}
+
+export interface SalmoProductionSyncOptions {
+  nowMs?: number;
+  since?: string;
+  view?: 'all' | 'daily_picks' | 'history' | 'performance' | 'fixtures' | 'results';
+  horizon?: 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS' | 'ALL';
+  market?: 'AH' | 'OU' | 'BTTS';
+  modelVersion?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface SalmoProductionSyncPayload {
+  success: boolean;
+  timestampUtc: string;
+  syncChecksum: string;
+  dataState: SalmoDataState;
+  counts: {
+    totalArchived: number;
+    dailyPicks: number;
+    settled: number;
+    pending: number;
+    upcomingFixtures?: number;
+    verifiedResults?: number;
+  };
+  dailyPicks: SalmoDailyPickDTO[];
+  predictions?: any[];
+  upcomingFixtures?: SalmoUpcomingFixtureDTO[];
+  verifiedResults?: SalmoVerifiedResultDTO[];
+  settledHistory: any[];
+  performance: any;
+  providerStatus?: SalmoProviderStatusReport;
+  missingDataReasons?: string[];
+  freshness?: SalmoFreshnessReport;
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 export class HandicapLabClient {
   private static cachedRecords: RawMatchRecord[] | null = null;
   private static datasetSummary: DatasetSummary | null = null;

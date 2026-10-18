@@ -509,6 +509,40 @@ export class HandicapLabSyncService {
       }
     }
 
+    // 3b. Ingest from HandicapLab HTTP API contract if httpUrl is provided or adapter is http
+    if (options.httpUrl || process.env.HANDICAPLAB_ADAPTER === 'http') {
+      try {
+        const { HttpHandicapLabAdapter } = await import('../../contracts/handicapLabAdapter');
+        const adapter = new HttpHandicapLabAdapter(options.httpUrl);
+        const syncRes = await adapter.getSalmoSync({
+          since: options.since,
+          market: options.market,
+          modelVersion: options.modelVersion,
+          view: 'all',
+        });
+        if (syncRes && syncRes.dailyPicks && syncRes.dailyPicks.length > 0) {
+          totalSourceRead += syncRes.dailyPicks.length;
+          for (const raw of syncRes.dailyPicks) {
+            const { record, error } = this.mapRawToCanonical(raw, 'HandicapLab_HttpSync');
+            if (!record || error) {
+              invalidSkipped++;
+              continue;
+            }
+            validParsed++;
+            const dedupKey = this.getDeduplicationKey(record);
+            if (seenBatchKeys.has(dedupKey) || existingKeyMap.has(dedupKey)) {
+              duplicatesSkipped++;
+              continue;
+            }
+            seenBatchKeys.add(dedupKey);
+            candidateRecords.push(record);
+          }
+        }
+      } catch (httpErr) {
+        Logger.warn('[HandicapLabSyncService] HTTP sync ingestion failed:', { error: String(httpErr) });
+      }
+    }
+
     // 4. Merge candidates with existing records
     const finalRecords = [...Array.from(existingKeyMap.values()), ...candidateRecords];
 

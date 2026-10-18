@@ -511,7 +511,7 @@ export async function GET(request: NextRequest) {
       try {
         const adapter = HandicapLabAdapterFactory.getAdapter();
         syncRes = await adapter.getSalmoSync?.({ modelVersion: 'poisson_v1_rescue', view: 'all' });
-        rawPredictions = syncRes?.predictions || [];
+        rawPredictions = syncRes?.predictions?.length ? syncRes.predictions : (syncRes?.dailyPicks || []);
       } catch (adapterErr) {
         Logger.warn('Upstream adapter getSalmoSync failed:', { error: String(adapterErr) });
       }

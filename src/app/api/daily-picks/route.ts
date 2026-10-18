@@ -6,12 +6,94 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    const { getDbClient } = await import('@/lib/db');
-    const client = getDbClient();
-
     const { searchParams } = new URL(request.url);
     const verdictParam = searchParams.get('verdict')?.toUpperCase() || 'ALL';
     const marketParam = searchParams.get('market')?.toUpperCase() || 'ALL';
+
+    const { env } = await import('@/config/env');
+    if (env.handicapLab.adapter === 'http') {
+      const { HandicapLabAdapterFactory } = await import('@/contracts/handicapLabAdapter');
+      const adapter = HandicapLabAdapterFactory.getAdapter();
+      const syncRes = await adapter.getSalmoSync({ view: 'daily_picks' });
+      if (syncRes) {
+        if (
+          syncRes.dataState === 'DATA_TEMPORARILY_UNAVAILABLE' ||
+          syncRes.dataState === 'DATA_UNAVAILABLE' ||
+          syncRes.dataState === 'PROVIDER_UNAVAILABLE' ||
+          syncRes.dataState === 'QUOTA_BLOCKED'
+        ) {
+          return NextResponse.json(
+            {
+              success: false,
+              status: syncRes.dataState,
+              count: 0,
+              totalCanonicalPicks: syncRes.counts?.totalArchived || 0,
+              data: [],
+              missingDataReasons: syncRes.missingDataReasons,
+            },
+            { status: 503 }
+          );
+        }
+
+        const nowMs = Date.now();
+        const activePicks = (syncRes.dailyPicks || []).filter(p => {
+          const kMs = new Date(p.kickoffUtc).getTime();
+          if (isNaN(kMs) || kMs <= nowMs) return false;
+          if (verdictParam !== 'ALL' && p.verdict !== verdictParam) return false;
+          if (marketParam !== 'ALL' && p.marketType !== marketParam) return false;
+          return true;
+        });
+
+        if (activePicks.length === 0) {
+          return NextResponse.json({
+            success: true,
+            status: syncRes.dataState === 'REAL' ? 'NO_QUALIFIED_PICKS' : syncRes.dataState,
+            count: 0,
+            totalCanonicalPicks: syncRes.counts?.totalArchived || 0,
+            timestampUtc: new Date(nowMs).toISOString(),
+            data: [],
+          });
+        }
+
+        const formatted = activePicks.map(p => ({
+          id: p.predictionId,
+          fixtureId: p.fixtureId,
+          match: `${p.homeTeam} vs ${p.awayTeam}`,
+          homeTeam: p.homeTeam,
+          awayTeam: p.awayTeam,
+          league: p.leagueName,
+          kickoffUtc: p.kickoffUtc,
+          marketType: p.marketType,
+          selection: p.recommendedSelection,
+          modelProbability: p.modelProbability,
+          modelProbabilityPct: p.modelProbability ? Number((p.modelProbability * 100).toFixed(1)) : null,
+          fairOdds: p.fairOdds,
+          marketOdds: p.marketOdds,
+          marketBookmaker: p.sourceBookmaker || 'Pinnacle',
+          edgePct: p.edgePct,
+          expectedValuePct: p.marketOdds > 1 && p.modelProbability > 0 ? Number(((p.modelProbability * p.marketOdds - 1) * 100).toFixed(1)) : null,
+          confidence: p.confidenceScore,
+          verdict: p.verdict,
+          modelVersion: p.modelVersion,
+          reasoning: `Model fair ${p.fairOdds} vs ${p.sourceBookmaker} ${p.marketOdds}. Edge: ${p.edgePct}%. Model: ${p.modelVersion}.`,
+          rejectionReason: p.rejectionReason || null,
+          status: p.status,
+          createdAt: p.oddsCapturedAt,
+        }));
+
+        return NextResponse.json({
+          success: true,
+          status: 'AVAILABLE',
+          count: formatted.length,
+          totalCanonicalPicks: syncRes.counts?.totalArchived || formatted.length,
+          timestampUtc: new Date(nowMs).toISOString(),
+          data: formatted,
+        });
+      }
+    }
+
+    const { getDbClient } = await import('@/lib/db');
+    const client = getDbClient();
 
     const { data: picks, error } = await client
       .from('daily_picks')

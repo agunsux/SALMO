@@ -111,56 +111,30 @@ export class MatchIntelligenceService {
         Logger.warn('[MatchIntelligenceService] Database fixture lookup failed, falling back to providers:', { error: String(dbErr) });
       }
 
-      // 2. Provider fallback if database has zero upcoming fixtures
+      // 2. HandicapLab canonical contract fallback if database has zero upcoming fixtures
+      // Strictly decoupled: SALMO does not call OddsPapi or API-Football directly when data is owned by HandicapLab.
       if (scheduledFixtures.length === 0) {
         try {
-          if (this.oddsPapi.isConfigured()) {
-            const res = await this.oddsPapi.getUpcomingFixtures();
-            if (res.status === 'AVAILABLE' && res.data && res.data.length > 0) {
-              for (const f of res.data) {
-                const kMs = new Date(f.kickoffTime).getTime();
-                if (!isNaN(kMs) && kMs > nowMs) {
-                  scheduledFixtures.push({
-                    providerFixtureId: f.providerFixtureId,
-                    homeTeam: f.homeTeam,
-                    awayTeam: f.awayTeam,
-                    league: f.league,
-                    season: f.season,
-                    kickoffUtc: f.kickoffTime,
-                    venue: f.venue,
-                  });
-                }
+          const adapter = HandicapLabAdapterFactory.getAdapter();
+          const syncRes = await adapter.getSalmoSync?.({ horizon: 'NEXT_7_DAYS', view: 'fixtures' });
+          if (syncRes && syncRes.upcomingFixtures && syncRes.upcomingFixtures.length > 0) {
+            for (const f of syncRes.upcomingFixtures) {
+              const kMs = new Date(f.kickoffUtc).getTime();
+              if (!isNaN(kMs) && kMs > nowMs) {
+                scheduledFixtures.push({
+                  providerFixtureId: f.providerMatchId || f.canonicalFixtureId,
+                  homeTeam: f.homeTeam,
+                  awayTeam: f.awayTeam,
+                  league: f.competition,
+                  season: f.season,
+                  kickoffUtc: f.kickoffUtc,
+                  venue: f.venue,
+                });
               }
             }
           }
         } catch (err) {
-          Logger.warn('[MatchIntelligenceService] OddsPapi fixture lookup failed:', { error: String(err) });
-        }
-
-        if (scheduledFixtures.length === 0) {
-          try {
-            if (this.apiFootball.isConfigured()) {
-              const res = await this.apiFootball.getUpcomingFixtures();
-              if (res.status === 'AVAILABLE' && res.data && res.data.length > 0) {
-                for (const f of res.data) {
-                  const kMs = new Date(f.kickoffTime).getTime();
-                  if (!isNaN(kMs) && kMs > nowMs) {
-                    scheduledFixtures.push({
-                      providerFixtureId: f.providerFixtureId,
-                      homeTeam: f.homeTeam,
-                      awayTeam: f.awayTeam,
-                      league: f.league,
-                      season: f.season,
-                      kickoffUtc: f.kickoffTime,
-                      venue: f.venue,
-                    });
-                  }
-                }
-              }
-            }
-          } catch (err) {
-            Logger.warn('[MatchIntelligenceService] ApiFootball fixture lookup failed:', { error: String(err) });
-          }
+          Logger.warn('[MatchIntelligenceService] HandicapLab contract fixture lookup failed:', { error: String(err) });
         }
       }
     }

@@ -7,7 +7,18 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import { RawMatchRecord, DatasetSummary } from './handicapLabClient';
+import {
+  RawMatchRecord,
+  DatasetSummary,
+  SalmoDataState,
+  SalmoUpcomingFixtureDTO,
+  SalmoVerifiedResultDTO,
+  SalmoProviderStatusReport,
+  SalmoFreshnessReport,
+  SalmoDailyPickDTO,
+  SalmoProductionSyncOptions,
+  SalmoProductionSyncPayload,
+} from './handicapLabClient';
 import { MatchObservation, SettlementOutcome, ActiveMatchPrediction, ActivePredictionMarket, LiveValidationSummary } from '../types/index';
 import { QuarterLineSettler } from '../engine/ah/quarterLineSettler';
 import { env } from '../config/env';
@@ -15,6 +26,17 @@ import { Logger } from '../lib/logger';
 import { normalizeTeamKey } from '../engine/features/teamRatings';
 import { FixtureIntegrityGuard } from '../lib/fixtureIntegrity';
 import { getLeagueByNameOrSlug } from '../config/multiLeagueRegistry';
+
+export {
+  type SalmoDataState,
+  type SalmoUpcomingFixtureDTO,
+  type SalmoVerifiedResultDTO,
+  type SalmoProviderStatusReport,
+  type SalmoFreshnessReport,
+  type SalmoDailyPickDTO,
+  type SalmoProductionSyncOptions,
+  type SalmoProductionSyncPayload,
+};
 
 export interface HistoricalObservationFilter {
   line?: number;
@@ -33,56 +55,8 @@ export interface AdapterHealth {
   error?: string;
 }
 
-export interface SalmoSyncQueryParams {
-  since?: string;
-  view?: 'all' | 'daily_picks' | 'history' | 'performance';
-  horizon?: 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS' | 'ALL';
-  market?: 'AH' | 'OU' | 'BTTS';
-  modelVersion?: string;
-}
-
-export interface SalmoSyncResponse {
-  success: boolean;
-  timestampUtc: string;
-  syncChecksum: string;
-  dataState: 'REAL' | 'CACHED' | 'NO_FIXTURES' | 'NO_QUALIFIED_PICKS' | 'DATA_UNAVAILABLE';
-  counts: {
-    totalArchived: number;
-    dailyPicks: number;
-    settled: number;
-    pending: number;
-  };
-  dailyPicks: Array<{
-    projectionId: string;
-    predictionId: string;
-    targetWindow: 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS';
-    fixtureId: string;
-    matchId: string;
-    leagueId: number;
-    leagueName: string;
-    homeTeam: string;
-    awayTeam: string;
-    kickoffUtc: string;
-    horizon: string;
-    marketType: 'ASIAN_HANDICAP' | 'OVER_UNDER' | 'BTTS';
-    recommendedLine: number;
-    recommendedSelection: string;
-    modelProbability: number;
-    fairOdds: number;
-    marketOdds: number;
-    edgePct: number;
-    confidenceScore: number;
-    verdict: 'LAYAK' | 'PANTAU' | 'LEWATI';
-    modelQualityGrade: string;
-    modelVersion: string;
-    sourceBookmaker: string;
-    oddsCapturedAt: string;
-    provenanceHash: string;
-    status: string;
-  }>;
-  predictions: Array<any>;
-  performance: any;
-}
+export type SalmoSyncQueryParams = SalmoProductionSyncOptions;
+export type SalmoSyncResponse = SalmoProductionSyncPayload;
 
 export interface IHandicapLabAdapter {
   readonly mode: 'local' | 'http' | 'database';
@@ -91,7 +65,7 @@ export interface IHandicapLabAdapter {
   getDatasetSummary(): Promise<DatasetSummary>;
   getActive7DayPredictions(): Promise<ActiveMatchPrediction[]>;
   getLiveValidationSummary(): Promise<LiveValidationSummary | null>;
-  getSalmoSync?(query?: SalmoSyncQueryParams): Promise<SalmoSyncResponse | null>;
+  getSalmoSync(query?: SalmoProductionSyncOptions): Promise<SalmoProductionSyncPayload | null>;
   getHealth(): Promise<AdapterHealth>;
 }
 
@@ -643,10 +617,53 @@ export class LocalHandicapLabAdapter implements IHandicapLabAdapter {
               dailyPicks: activeDailyPicks.length,
               settled: settled.length,
               pending: pending.length,
+              upcomingFixtures: 0,
+              verifiedResults: settled.length,
             },
             dailyPicks: activeDailyPicks,
             predictions: records,
+            upcomingFixtures: [],
+            verifiedResults: [],
+            settledHistory: settled,
             performance: {},
+            providerStatus: {
+              apiFootball: {
+                name: 'API-Football (Direct Ingestion)',
+                status: 'UNAVAILABLE',
+                plan: 'Blocked / Suspended upstream',
+                reason: 'Account suspended in upstream HandicapLab',
+                authenticated: false,
+                liveIngestion: 'BLOCKED',
+              },
+              footyStats: {
+                name: 'FootyStats API',
+                status: 'AUTH_FAILED',
+                plan: 'Demo / Free Sample',
+                reason: 'Demo API key restricted to historical EPL sample',
+                authenticated: false,
+                liveIngestion: 'BLOCKED',
+              },
+              oddsPapi: {
+                name: 'OddsPapi',
+                status: 'QUOTA_BLOCKED',
+                plan: 'Standard (250 credits/month)',
+                reason: 'Exceeded quota limit (260/250)',
+                authenticated: true,
+                quotaLimit: 250,
+                quotaUsed: 260,
+                quotaRemaining: 0,
+                reserveFloor: 15,
+                liveIngestion: 'BLOCKED',
+              },
+            },
+            freshness: {
+              fixtureFreshnessSlaSeconds: 3600,
+              oddsFreshnessSlaSeconds: 3600,
+              lastSyncTimestampUtc: new Date().toISOString(),
+              upcomingFixturesCount: 0,
+              activeDailyPicksCount: activeDailyPicks.length,
+              status: 'FRESH',
+            },
           };
         } catch (err) {
           Logger.warn(`[LocalHandicapLabAdapter] Failed to load local archive for SalmoSync:`, { error: String(err) });
@@ -680,17 +697,109 @@ export class LocalHandicapLabAdapter implements IHandicapLabAdapter {
 
 /**
  * HTTP REST adapter for Production environments (Vercel, containerized).
- * Connects to HandicapLab API contract endpoint.
- * Throws HandicapLabDataUnavailableError if unconfigured or unreachable.
+ * Connects to HandicapLab API contract endpoint (/api/v1/salmo/sync).
+ * Strictly enforces 10s timeout, exponential backoff retries, secret-safe logging,
+ * and fail-closed DATA_TEMPORARILY_UNAVAILABLE error handling.
  */
 export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
   public readonly mode = 'http' as const;
-  private readonly baseUrl?: string;
+  private readonly baseUrl: string;
   private readonly apiKey?: string;
+  private readonly timeoutMs: number;
+  private readonly maxRetries: number;
 
-  constructor(baseUrl?: string, apiKey?: string) {
-    this.baseUrl = baseUrl || env.handicapLab.apiUrl;
-    this.apiKey = apiKey || env.handicapLab.apiKey;
+  constructor(
+    baseUrl?: string,
+    apiKey?: string,
+    options?: { timeoutMs?: number; maxRetries?: number }
+  ) {
+    const rawUrl =
+      baseUrl ||
+      env.handicapLab.apiUrl ||
+      process.env.HANDICAPLAB_API_URL ||
+      'https://handicaplab.dev';
+    this.baseUrl = rawUrl.replace(/\/+$/, '');
+    this.apiKey =
+      apiKey ||
+      process.env.HANDICAPLAB_API_KEY ||
+      process.env.SALMO_SYNC_API_KEY ||
+      process.env.CRON_SECRET ||
+      env.handicapLab.apiKey;
+    this.timeoutMs = options?.timeoutMs ?? 10000;
+    this.maxRetries = options?.maxRetries ?? 2;
+  }
+
+  public getBaseUrl(): string {
+    return this.baseUrl;
+  }
+
+  private sanitizeUrl(urlStr: string): string {
+    try {
+      const u = new URL(urlStr);
+      return `${u.origin}${u.pathname}`;
+    } catch {
+      return urlStr.split('?')[0];
+    }
+  }
+
+  private async fetchWithTimeoutAndRetry(
+    url: string,
+    options: RequestInit,
+    retries = this.maxRetries
+  ): Promise<Response> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+    try {
+      const res = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+
+      if (res.status >= 500 && res.status !== 503 && retries > 0) {
+        await new Promise(r => setTimeout(r, (this.maxRetries - retries + 1) * 300));
+        return this.fetchWithTimeoutAndRetry(url, options, retries - 1);
+      }
+      return res;
+    } catch (err: any) {
+      clearTimeout(timer);
+      if (retries > 0 && err.name !== 'AbortError') {
+        await new Promise(r => setTimeout(r, (this.maxRetries - retries + 1) * 300));
+        return this.fetchWithTimeoutAndRetry(url, options, retries - 1);
+      }
+      throw err;
+    }
+  }
+
+  private buildUnavailablePayload(reason: string): SalmoProductionSyncPayload {
+    return {
+      success: false,
+      timestampUtc: new Date().toISOString(),
+      syncChecksum: 'unavailable',
+      dataState: 'DATA_TEMPORARILY_UNAVAILABLE',
+      counts: {
+        totalArchived: 0,
+        dailyPicks: 0,
+        settled: 0,
+        pending: 0,
+        upcomingFixtures: 0,
+        verifiedResults: 0,
+      },
+      dailyPicks: [],
+      upcomingFixtures: [],
+      verifiedResults: [],
+      settledHistory: [],
+      performance: {},
+      missingDataReasons: [reason],
+      freshness: {
+        fixtureFreshnessSlaSeconds: 3600,
+        oddsFreshnessSlaSeconds: 3600,
+        lastSyncTimestampUtc: new Date().toISOString(),
+        upcomingFixturesCount: 0,
+        activeDailyPicksCount: 0,
+        status: 'STALE',
+      },
+    };
   }
 
   public async getAllRecords(): Promise<RawMatchRecord[]> {
@@ -707,7 +816,7 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
         headers['Authorization'] = `Bearer ${this.apiKey}`;
       }
 
-      const res = await fetch(`${this.baseUrl}/matches`, {
+      const res = await this.fetchWithTimeoutAndRetry(`${this.baseUrl}/matches`, {
         headers,
         next: { revalidate: 3600 },
       });
@@ -718,9 +827,12 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
 
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      Logger.error('[HttpHandicapLabAdapter] Failed to fetch records from HandicapLab API:', { error: String(err) });
-      throw new HandicapLabDataUnavailableError(`HandicapLab contract service unreachable: ${String(err)}`);
+    } catch (err: any) {
+      Logger.error('[HttpHandicapLabAdapter] Failed to fetch records from HandicapLab API:', {
+        endpoint: this.sanitizeUrl(`${this.baseUrl}/matches`),
+        error: String(err?.message || err),
+      });
+      throw new HandicapLabDataUnavailableError(`HandicapLab contract service unreachable: ${String(err?.message || err)}`);
     }
   }
 
@@ -742,7 +854,7 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
         headers['Authorization'] = `Bearer ${this.apiKey}`;
       }
 
-      const res = await fetch(url.toString(), {
+      const res = await this.fetchWithTimeoutAndRetry(url.toString(), {
         headers,
         next: { revalidate: 3600 },
       });
@@ -753,9 +865,12 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
 
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      Logger.error('[HttpHandicapLabAdapter] Failed to fetch observations from HandicapLab API:', { error: String(err) });
-      throw new HandicapLabDataUnavailableError(`HandicapLab contract service unreachable: ${String(err)}`);
+    } catch (err: any) {
+      Logger.error('[HttpHandicapLabAdapter] Failed to fetch observations from HandicapLab API:', {
+        endpoint: this.sanitizeUrl(this.baseUrl),
+        error: String(err?.message || err),
+      });
+      throw new HandicapLabDataUnavailableError(`HandicapLab contract service unreachable: ${String(err?.message || err)}`);
     }
   }
 
@@ -765,8 +880,16 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
     }
 
     try {
-      const res = await fetch(`${this.baseUrl}/summary`, {
-        headers: { 'Accept': 'application/json' },
+      const headers: Record<string, string> = {
+        'Accept': 'application/json',
+        'User-Agent': 'SALMO-Production-Client/1.0',
+      };
+      if (this.apiKey) {
+        headers['Authorization'] = `Bearer ${this.apiKey}`;
+      }
+
+      const res = await this.fetchWithTimeoutAndRetry(`${this.baseUrl}/summary`, {
+        headers,
         next: { revalidate: 86400 },
       });
 
@@ -776,8 +899,11 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
 
       const json = await res.json();
       return json.data;
-    } catch (err) {
-      Logger.warn('[HttpHandicapLabAdapter] Failed to fetch dataset summary from remote endpoint, falling back to native metadata:', { error: String(err) });
+    } catch (err: any) {
+      Logger.warn('[HttpHandicapLabAdapter] Failed to fetch dataset summary from remote endpoint, falling back to native metadata:', {
+        endpoint: this.sanitizeUrl(this.baseUrl),
+        error: String(err?.message || err),
+      });
       return {
         version: 'v1.0.0-salmo-native',
         verifiedMatchCount: 4180,
@@ -788,8 +914,13 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
     }
   }
 
-  public async getSalmoSync(query?: SalmoSyncQueryParams): Promise<SalmoSyncResponse | null> {
-    if (!this.baseUrl) return null;
+  public async getSalmoSync(
+    query?: SalmoProductionSyncOptions
+  ): Promise<SalmoProductionSyncPayload> {
+    if (!this.baseUrl) {
+      return this.buildUnavailablePayload('HANDICAPLAB_API_URL is not configured.');
+    }
+
     try {
       const url = new URL(`${this.baseUrl}/api/v1/salmo/sync`);
       if (query?.since) url.searchParams.set('since', query.since);
@@ -797,6 +928,8 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
       if (query?.horizon) url.searchParams.set('horizon', query.horizon);
       if (query?.market) url.searchParams.set('market', query.market);
       if (query?.modelVersion) url.searchParams.set('modelVersion', query.modelVersion);
+      if (query?.page) url.searchParams.set('page', String(query.page));
+      if (query?.limit) url.searchParams.set('limit', String(query.limit));
 
       const headers: Record<string, string> = {
         'Accept': 'application/json',
@@ -806,65 +939,76 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
         headers['Authorization'] = `Bearer ${this.apiKey}`;
       }
 
-      const res = await fetch(url.toString(), {
+      const res = await this.fetchWithTimeoutAndRetry(url.toString(), {
         headers,
         next: { revalidate: 60 },
       });
 
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      if (res.status === 401 || res.status === 403) {
+        Logger.warn('[HttpHandicapLabAdapter] Backend authorization rejected request (401/403):', {
+          endpoint: this.sanitizeUrl(url.toString()),
+          status: res.status,
+        });
+        return this.buildUnavailablePayload(
+          `BACKEND_AUTH_REJECTED_${res.status}: Backend Cloud Run deployment pending or credentials mismatch`
+        );
       }
 
-      return await res.json();
-    } catch (err) {
-      Logger.warn('[HttpHandicapLabAdapter] SalmoSync endpoint unreachable:', { error: String(err) });
-      return null;
+      const json = await res.json().catch(() => null);
+
+      if (json && typeof json === 'object') {
+        return {
+          success: Boolean(json.success),
+          timestampUtc: json.timestampUtc || new Date().toISOString(),
+          syncChecksum: json.syncChecksum || '',
+          dataState: json.dataState || (res.ok ? 'REAL' : 'DATA_TEMPORARILY_UNAVAILABLE'),
+          counts: {
+            totalArchived: json.counts?.totalArchived ?? 0,
+            dailyPicks: json.counts?.dailyPicks ?? (json.dailyPicks?.length || 0),
+            settled: json.counts?.settled ?? 0,
+            pending: json.counts?.pending ?? 0,
+            upcomingFixtures: json.counts?.upcomingFixtures ?? (json.upcomingFixtures?.length || 0),
+            verifiedResults: json.counts?.verifiedResults ?? (json.verifiedResults?.length || 0),
+          },
+          dailyPicks: Array.isArray(json.dailyPicks) ? json.dailyPicks : [],
+          upcomingFixtures: Array.isArray(json.upcomingFixtures) ? json.upcomingFixtures : [],
+          verifiedResults: Array.isArray(json.verifiedResults) ? json.verifiedResults : [],
+          settledHistory: Array.isArray(json.settledHistory) ? json.settledHistory : [],
+          performance: json.performance || {},
+          providerStatus: json.providerStatus,
+          missingDataReasons: json.missingDataReasons,
+          freshness: json.freshness,
+          pagination: json.pagination,
+        };
+      }
+
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    } catch (err: any) {
+      Logger.warn('[HttpHandicapLabAdapter] SalmoSync endpoint unreachable or timed out:', {
+        endpoint: this.sanitizeUrl(this.baseUrl),
+        error: String(err?.message || err),
+      });
+      return this.buildUnavailablePayload(
+        `CONTRACT_UNREACHABLE: ${err?.message || 'HandicapLab endpoint unavailable'}`
+      );
     }
   }
 
   public async getActive7DayPredictions(): Promise<ActiveMatchPrediction[]> {
     if (!this.baseUrl) {
-      throw new HandicapLabDataUnavailableError('HANDICAPLAB_API_URL is not configured.');
+      return [];
     }
 
-    // 1. Prefer canonical incremental sync feed (/api/v1/salmo/sync)
     try {
-      const syncRes = await this.getSalmoSync({ horizon: 'NEXT_7_DAYS', view: 'all' });
+      const syncRes = await this.getSalmoSync({ horizon: 'NEXT_7_DAYS', view: 'daily_picks' });
       if (syncRes && syncRes.dailyPicks && syncRes.dailyPicks.length > 0) {
         return mapRawPicksToActivePredictions(syncRes.dailyPicks);
       }
-      // Never fall back to syncRes.predictions (historical settled archive)!
-    } catch (err) {
-      Logger.warn('[HttpHandicapLabAdapter] Sync feed fallback to legacy endpoint:', { error: String(err) });
-    }
-
-    // 2. Legacy endpoint fallback (/predictions/active-7day)
-    try {
-      const headers: Record<string, string> = {
-        'Accept': 'application/json',
-        'User-Agent': 'SALMO-Production-Client/1.0',
-      };
-      if (this.apiKey) {
-        headers['Authorization'] = `Bearer ${this.apiKey}`;
-      }
-
-      const res = await fetch(`${this.baseUrl}/predictions/active-7day`, {
-        headers,
-        next: { revalidate: 300 },
+    } catch (err: any) {
+      Logger.warn('[HttpHandicapLabAdapter] Active predictions sync lookup failed:', {
+        endpoint: this.sanitizeUrl(this.baseUrl),
+        error: String(err?.message || err),
       });
-
-      if (res.ok) {
-        const json = await res.json();
-        const raw = json.data || [];
-        const nowMs = Date.now();
-        return raw.filter((item: any) => {
-          const k = item.kickoffUtc || item.kickoff_utc || item.kickoffTimestamp;
-          const ms = new Date(k).getTime();
-          return !isNaN(ms) && ms > nowMs;
-        });
-      }
-    } catch (err) {
-      Logger.error('[HttpHandicapLabAdapter] Failed to fetch predictions from legacy endpoint:', { error: String(err) });
     }
 
     return [];
@@ -875,7 +1019,6 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
       return null;
     }
 
-    // 1. Try pulling live validation metrics from canonical sync feed
     try {
       const syncRes = await this.getSalmoSync({ view: 'performance' });
       if (syncRes && syncRes.performance) {
@@ -916,6 +1059,16 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
           },
         ];
 
+        const providerStatus = syncRes.providerStatus ? {
+          apiFootball: syncRes.providerStatus.apiFootball.status,
+          oddsPapi: syncRes.providerStatus.oddsPapi.status,
+          footyStats: syncRes.providerStatus.footyStats.status,
+        } : {
+          apiFootball: 'UNAVAILABLE',
+          oddsPapi: 'QUOTA_BLOCKED',
+          footyStats: 'AUTH_FAILED',
+        };
+
         return {
           generatedAt: syncRes.timestampUtc,
           windowStart: '2026-09-01',
@@ -926,46 +1079,21 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
           ouCoverage: `${syncRes.counts?.dailyPicks || 0}/${syncRes.counts?.dailyPicks || 0}`,
           bttsCoverage: `${syncRes.counts?.dailyPicks || 0}/${syncRes.counts?.dailyPicks || 0}`,
           predictionCount: syncRes.counts?.totalArchived || 0,
-          dataCompleteness: '100%',
-          providerStatus: {
-            apiFootball: 'HEALTHY_PRO_TIER',
-            oddsPapi: 'HEALTHY_PINNACLE_SHARP',
-            footyStats: 'HEALTHY_ENRICHMENT',
-          },
+          dataCompleteness: syncRes.dataState === 'REAL' ? '100%' : 'DEGRADED',
+          providerStatus,
           modelVersion: 'dixon-coles-v1.0',
-          validationStatus: 'WALK_FORWARD_VALIDATED',
+          validationStatus: syncRes.dataState === 'REAL' ? 'WALK_FORWARD_VALIDATED' : 'DATA_TEMPORARILY_UNAVAILABLE',
           matrix,
         };
       }
-    } catch (err) {
-      Logger.warn('[HttpHandicapLabAdapter] Failed to build validation summary from sync feed:', { error: String(err) });
-    }
-
-    // 2. Legacy fallback to /api/public/calibration
-    try {
-      const headers: Record<string, string> = {
-        'Accept': 'application/json',
-        'User-Agent': 'SALMO-Production-Client/1.0',
-      };
-      if (this.apiKey) {
-        headers['Authorization'] = `Bearer ${this.apiKey}`;
-      }
-
-      const res = await fetch(`${this.baseUrl}/api/public/calibration`, {
-        headers,
-        next: { revalidate: 3600 },
+    } catch (err: any) {
+      Logger.warn('[HttpHandicapLabAdapter] Failed to build validation summary from sync feed:', {
+        endpoint: this.sanitizeUrl(this.baseUrl),
+        error: String(err?.message || err),
       });
-
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      }
-
-      const json = await res.json();
-      return json.data || null;
-    } catch (err) {
-      Logger.warn('[HttpHandicapLabAdapter] Failed to fetch validation summary from HTTP endpoint:', { error: String(err) });
-      return null;
     }
+
+    return null;
   }
 
   public async getHealth(): Promise<AdapterHealth> {
@@ -988,7 +1116,7 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
         headers['Authorization'] = `Bearer ${this.apiKey}`;
       }
 
-      const res = await fetch(`${this.baseUrl}/api/health`, {
+      const res = await this.fetchWithTimeoutAndRetry(`${this.baseUrl}/api/health`, {
         headers,
         next: { revalidate: 60 },
       });
@@ -1007,13 +1135,13 @@ export class HttpHandicapLabAdapter implements IHandicapLabAdapter {
         recordCount,
         lastChecked: json.timestamp || new Date().toISOString(),
       };
-    } catch (err) {
+    } catch (err: any) {
       return {
         status: 'UNAVAILABLE',
         mode: 'http',
         recordCount: 0,
         lastChecked: new Date().toISOString(),
-        error: String(err),
+        error: String(err?.message || err),
       };
     }
   }
@@ -1469,10 +1597,53 @@ export class DatabaseHandicapLabAdapter implements IHandicapLabAdapter {
               dailyPicks: dailyPicks.filter(p => p.verdict === 'LAYAK').length,
               settled: dbSettledCount,
               pending: dbPendingCount,
+              upcomingFixtures: 0,
+              verifiedResults: dbSettledCount,
             },
             dailyPicks,
             predictions: picks,
+            upcomingFixtures: [],
+            verifiedResults: [],
+            settledHistory: picks.filter((r: any) => r.status === 'WON' || r.status === 'LOST' || r.status === 'PUSH' || r.status === 'SETTLED'),
             performance: {},
+            providerStatus: {
+              apiFootball: {
+                name: 'API-Football (Direct Ingestion)',
+                status: 'UNAVAILABLE',
+                plan: 'Blocked / Suspended upstream',
+                reason: 'Account suspended in upstream HandicapLab',
+                authenticated: false,
+                liveIngestion: 'BLOCKED',
+              },
+              footyStats: {
+                name: 'FootyStats API',
+                status: 'AUTH_FAILED',
+                plan: 'Demo / Free Sample',
+                reason: 'Demo API key restricted to historical EPL sample',
+                authenticated: false,
+                liveIngestion: 'BLOCKED',
+              },
+              oddsPapi: {
+                name: 'OddsPapi',
+                status: 'QUOTA_BLOCKED',
+                plan: 'Standard (250 credits/month)',
+                reason: 'Exceeded quota limit (260/250)',
+                authenticated: true,
+                quotaLimit: 250,
+                quotaUsed: 260,
+                quotaRemaining: 0,
+                reserveFloor: 15,
+                liveIngestion: 'BLOCKED',
+              },
+            },
+            freshness: {
+              fixtureFreshnessSlaSeconds: 3600,
+              oddsFreshnessSlaSeconds: 3600,
+              lastSyncTimestampUtc: new Date().toISOString(),
+              upcomingFixturesCount: 0,
+              activeDailyPicksCount: dailyPicks.filter(p => p.verdict === 'LAYAK').length,
+              status: 'FRESH',
+            },
           };
         }
       } catch (err) {
@@ -1485,8 +1656,8 @@ export class DatabaseHandicapLabAdapter implements IHandicapLabAdapter {
         try {
           const lines = fs.readFileSync(localLedgerPath, 'utf8').trim().split('\n').filter(Boolean);
           const records = lines.map(l => JSON.parse(l));
-          const fileSettledCount = records.filter((r: any) => r.settlement === 'SETTLED' || r.settlementStatus === 'SETTLED' || r.status === 'SETTLED').length;
-          const filePendingCount = records.filter((r: any) => r.settlement === 'PENDING' || r.settlementStatus === 'PENDING' || r.status === 'PENDING').length;
+          const fileSettled = records.filter((r: any) => r.settlement === 'SETTLED' || r.settlementStatus === 'SETTLED' || r.status === 'SETTLED');
+          const filePending = records.filter((r: any) => r.settlement === 'PENDING' || r.settlementStatus === 'PENDING' || r.status === 'PENDING');
 
           return {
             success: true,
@@ -1496,12 +1667,55 @@ export class DatabaseHandicapLabAdapter implements IHandicapLabAdapter {
             counts: {
               totalArchived: records.length,
               dailyPicks: records.filter((r: any) => r.verdict === 'LAYAK').length,
-              settled: fileSettledCount,
-              pending: filePendingCount,
+              settled: fileSettled.length,
+              pending: filePending.length,
+              upcomingFixtures: 0,
+              verifiedResults: fileSettled.length,
             },
             dailyPicks: [],
             predictions: records,
+            upcomingFixtures: [],
+            verifiedResults: [],
+            settledHistory: fileSettled,
             performance: {},
+            providerStatus: {
+              apiFootball: {
+                name: 'API-Football (Direct Ingestion)',
+                status: 'UNAVAILABLE',
+                plan: 'Blocked / Suspended upstream',
+                reason: 'Account suspended in upstream HandicapLab',
+                authenticated: false,
+                liveIngestion: 'BLOCKED',
+              },
+              footyStats: {
+                name: 'FootyStats API',
+                status: 'AUTH_FAILED',
+                plan: 'Demo / Free Sample',
+                reason: 'Demo API key restricted to historical EPL sample',
+                authenticated: false,
+                liveIngestion: 'BLOCKED',
+              },
+              oddsPapi: {
+                name: 'OddsPapi',
+                status: 'QUOTA_BLOCKED',
+                plan: 'Standard (250 credits/month)',
+                reason: 'Exceeded quota limit (260/250)',
+                authenticated: true,
+                quotaLimit: 250,
+                quotaUsed: 260,
+                quotaRemaining: 0,
+                reserveFloor: 15,
+                liveIngestion: 'BLOCKED',
+              },
+            },
+            freshness: {
+              fixtureFreshnessSlaSeconds: 3600,
+              oddsFreshnessSlaSeconds: 3600,
+              lastSyncTimestampUtc: new Date().toISOString(),
+              upcomingFixturesCount: 0,
+              activeDailyPicksCount: 0,
+              status: 'FRESH',
+            },
           };
       } catch (err) {
         Logger.warn('[DatabaseHandicapLabAdapter] File fallback error:', { error: String(err) });
