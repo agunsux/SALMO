@@ -93,7 +93,7 @@ export class MatchIntelligenceService {
           for (const m of dbMatches) {
             const kTime = m.kickoff || m.kickoff_time;
             const kMs = new Date(kTime).getTime();
-            if (!isNaN(kMs) && kMs > nowMs && (m.status === 'upcoming' || m.status === 'scheduled' || m.status === 'SCHEDULED')) {
+            if (!isNaN(kMs) && kMs > nowMs && (m.status === 'upcoming' || m.status === 'scheduled' || m.status === 'SCHEDULED' || filter?.nowMs !== undefined)) {
               const apiId = m.pipeline_metadata?.apiFootballFixtureId || m.id;
               scheduledFixtures.push({
                 providerFixtureId: String(apiId),
