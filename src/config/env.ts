@@ -17,6 +17,13 @@ export interface EnvironmentConfig {
     supabaseUrl?: string;
     supabaseAnonKey?: string;
   };
+  staging: {
+    configured: boolean;
+    databaseUrl?: string;
+    supabaseUrl?: string;
+    supabaseAnonKey?: string;
+    supabaseServiceRoleKey?: string;
+  };
   providers: {
     apiFootball: {
       configured: boolean;
@@ -125,6 +132,13 @@ class EnvironmentValidator {
         databaseUrl,
         supabaseUrl,
         supabaseAnonKey,
+      },
+      staging: {
+        configured: Boolean(process.env.STAGING_SUPABASE_URL || process.env.STAGING_DATABASE_URL),
+        databaseUrl: process.env.STAGING_DATABASE_URL,
+        supabaseUrl: process.env.STAGING_SUPABASE_URL,
+        supabaseAnonKey: process.env.STAGING_SUPABASE_ANON_KEY,
+        supabaseServiceRoleKey: process.env.STAGING_SUPABASE_SERVICE_ROLE_KEY,
       },
       providers: {
         apiFootball: {

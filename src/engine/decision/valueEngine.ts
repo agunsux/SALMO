@@ -65,6 +65,7 @@ export interface ValueEngineSelectionInput {
   league: string;
   modelStatus: 'FIXTURE_SPECIFIC' | 'INSUFFICIENT_MODEL';
   oddsLeakedToModel?: boolean;
+  skipLeagueRegistryCheck?: boolean;
 }
 
 export interface ValueEvaluationResult {
@@ -319,7 +320,7 @@ export class ValueEngine {
     const evThreshold = modelValid && expectedValue >= this.MIN_EV_THRESHOLD;
 
     // GATE 7: DATA_COMPLETENESS (Per-League & Per-Market Eligibility)
-    const isRegistryMarketEnabled = isLeagueMarketProductionEnabled(input.league, input.market);
+    const isRegistryMarketEnabled = input.skipLeagueRegistryCheck || isLeagueMarketProductionEnabled(input.league, input.market);
     const isWhitelistedLeague = isRegistryMarketEnabled;
 
     const hasTeamIdentity =

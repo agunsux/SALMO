@@ -5,6 +5,7 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { env } from '../config/env';
 import { Logger } from './logger';
+import { EnvironmentGuard } from './security/environmentGuard';
 
 export interface DbConnectionHealth {
   configured: boolean;
@@ -14,6 +15,7 @@ export interface DbConnectionHealth {
 }
 
 let supabaseInstance: SupabaseClient | null = null;
+let stagingSupabaseInstance: SupabaseClient | null = null;
 
 /**
  * Returns the singleton Supabase client if configured.
@@ -43,6 +45,42 @@ export function getDbClient(): SupabaseClient {
   });
 
   return supabaseInstance;
+}
+
+/**
+ * Returns dedicated staging Supabase client after strict fail-closed validation.
+ */
+export function getStagingDbClient(approvedStagingProjectRef?: string): SupabaseClient {
+  if (stagingSupabaseInstance) {
+    return stagingSupabaseInstance;
+  }
+
+  const stagingUrl = process.env.STAGING_SUPABASE_URL;
+  const stagingKey = process.env.STAGING_SUPABASE_SERVICE_ROLE_KEY || process.env.STAGING_SUPABASE_ANON_KEY;
+
+  const validation = EnvironmentGuard.validateStagingConfig({
+    stagingSupabaseUrl: stagingUrl,
+    stagingSupabaseServiceRoleKey: process.env.STAGING_SUPABASE_SERVICE_ROLE_KEY,
+    stagingSupabaseAnonKey: process.env.STAGING_SUPABASE_ANON_KEY,
+    stagingDatabaseUrl: process.env.STAGING_DATABASE_URL,
+    approvedStagingProjectRef: approvedStagingProjectRef || process.env.APPROVED_STAGING_PROJECT_REF,
+    prodSupabaseUrl: process.env.SUPABASE_URL,
+    prodServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    prodAnonKey: process.env.SUPABASE_ANON_KEY,
+  });
+
+  if (!validation.allowed) {
+    throw new Error(`[StagingDb] Staging environment validation failed: ${validation.errorMessage} (code: ${validation.errorCode})`);
+  }
+
+  stagingSupabaseInstance = createClient(stagingUrl!, stagingKey!, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
+
+  return stagingSupabaseInstance;
 }
 
 /**
