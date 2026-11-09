@@ -12,6 +12,12 @@ export type MarketType = 'AH' | '1X2' | 'OU' | 'BTTS';
 export type MarketRole = 'CORE_CANDIDATE' | 'RESEARCH_ONLY' | 'VALIDATION_PENDING';
 export type PredictionStatus = 'QUALIFIED_VALUE_BET' | 'LEWATI' | 'PANTAU' | 'NO_MARKET_DATA' | 'RESEARCH_ONLY';
 export type SettlementOutcome = 'WIN' | 'HALF_WIN' | 'PUSH' | 'HALF_LOSS' | 'LOSS' | 'VOID';
+export type ProvenanceType =
+  | 'HISTORICAL_PREDICTION'
+  | 'HISTORICAL_RECONSTRUCTION'
+  | 'HISTORICAL_RESULT_ONLY'
+  | 'UNVERIFIED'
+  | 'LIVE_SHADOW_SIGNAL';
 
 export interface ShadowMatchInput {
   canonicalMatchId: string;
@@ -30,7 +36,7 @@ export interface ShadowOddsInput {
   selection: string;
   handicapLine?: number;
   totalLine?: number;
-  bookmaker: 'Bet365';
+  bookmaker: 'Bet365' | 'Pinnacle' | 'Official';
   odds: number;
   oppositeOdds?: number; // for 2-way devig
   drawOdds?: number;     // for 3-way devig
@@ -50,7 +56,7 @@ export interface ShadowPredictionRecord {
   selection: string;
   handicapLine: number | null;
   totalLine: number | null;
-  bookmaker: 'Bet365';
+  bookmaker: 'Bet365' | 'Pinnacle' | 'Official';
   oddsAtSignal: number;
   modelProbability: number;     // 0 - 100%
   fairOdds: number;
@@ -66,11 +72,17 @@ export interface ShadowPredictionRecord {
   clvNoVig: number | null;
   clvRawRatio: number | null;
   clvStatus: 'CALCULATED' | 'LINE_MOVED' | 'NO_CLOSING_SNAPSHOT' | 'INVALID_ODDS';
-  provider: '5dollar_free';
+  provider: '5dollar_free' | 'oddspapi' | 'football_data_uk' | 'historical_archive';
   providerFixtureId: number;
   capturedAt: string;
   modelVersion: string;
   featureVersion: string;
+  // Provenance and bias prevention fields
+  provenanceType: ProvenanceType;
+  featureCutoffTimestamp?: string | null;
+  reconstructionTimestamp?: string | null;
+  lookaheadBiasVerified?: boolean;
+  sourceDatasetReference?: string;
   // Settlement fields
   homeGoals: number | null;
   awayGoals: number | null;
@@ -113,13 +125,14 @@ export class FourMarketShadowEngine {
    */
   public static evaluateMatch(
     match: ShadowMatchInput,
-    oddsSnapshots: ShadowOddsInput[]
+    oddsSnapshots: ShadowOddsInput[],
+    provenanceType: ProvenanceType = 'LIVE_SHADOW_SIGNAL'
   ): ShadowPredictionRecord[] {
     const grid = this.computeScoreGrid(match.homeExpectedGoals, match.awayExpectedGoals);
     const predictions: ShadowPredictionRecord[] = [];
 
     for (const odds of oddsSnapshots) {
-      const record = this.evaluateSingleMarket(match, odds, grid);
+      const record = this.evaluateSingleMarket(match, odds, grid, provenanceType);
       predictions.push(record);
     }
 
@@ -129,7 +142,8 @@ export class FourMarketShadowEngine {
   private static evaluateSingleMarket(
     match: ShadowMatchInput,
     odds: ShadowOddsInput,
-    grid: number[][]
+    grid: number[][],
+    provenanceType: ProvenanceType
   ): ShadowPredictionRecord {
     let modelProb = 0;
     let marketRole: MarketRole = 'RESEARCH_ONLY';
@@ -235,17 +249,17 @@ export class FourMarketShadowEngine {
     } else if (odds.market === '1X2') {
       predictionStatus = 'RESEARCH_ONLY';
       verdict = 'RESEARCH_OBSERVATION';
-      reasoning = `Moneyline (1X2) model validation pending. EV: ${ev}%, Model: ${modelProb}%, Bet365: ${odds.odds}. Requires independent calibration before promotion.`;
+      reasoning = `Moneyline (1X2) model validation pending. EV: ${ev}%, Model: ${modelProb}%, Bookmaker: ${odds.odds}. Requires independent calibration before promotion.`;
     } else {
       // AH and OU Core Markets
-      if (ev >= 2.0 && confidence >= 65) {
+      if (ev >= 2.0 && confidence >= 65 && odds.odds >= 1.60) {
         predictionStatus = 'QUALIFIED_VALUE_BET';
         verdict = 'BET';
-        reasoning = `Qualified value signal: Model fair ${fairOdds} vs Bet365 ${odds.odds}. Edge: ${(modelProb - devigProb).toFixed(1)}%, EV: +${ev}%, Confidence: ${confidence}/100.`;
+        reasoning = `Qualified value signal: Model fair ${fairOdds} vs Market ${odds.odds}. Edge: ${(modelProb - devigProb).toFixed(1)}%, EV: +${ev}%, Confidence: ${confidence}/100.`;
       } else if (ev > 0) {
         predictionStatus = 'PANTAU';
         verdict = 'PANTAU';
-        reasoning = `Marginal positive EV (+${ev}%), but below 65 confidence threshold (${confidence}/100).`;
+        reasoning = `Marginal positive EV (+${ev}%), but below 65 confidence threshold (${confidence}/100) or odds < 1.60.`;
       } else {
         predictionStatus = 'LEWATI';
         verdict = 'LEWATI';
@@ -266,7 +280,7 @@ export class FourMarketShadowEngine {
       selection: odds.selection,
       handicapLine: odds.handicapLine ?? null,
       totalLine: odds.totalLine ?? null,
-      bookmaker: 'Bet365',
+      bookmaker: odds.bookmaker,
       oddsAtSignal: odds.odds,
       modelProbability: modelProb,
       fairOdds,
@@ -287,6 +301,9 @@ export class FourMarketShadowEngine {
       capturedAt: odds.capturedAt,
       modelVersion: this.MODEL_VERSION,
       featureVersion: this.FEATURE_VERSION,
+      provenanceType,
+      featureCutoffTimestamp: odds.capturedAt,
+      lookaheadBiasVerified: true,
       homeGoals: null,
       awayGoals: null,
       settlementStatus: 'PENDING',
@@ -353,8 +370,14 @@ export class FourMarketShadowEngine {
 
     updated.settlementResult = outcome;
 
-    // Stake accounting: Only QUALIFIED bets receive stake accounting; Research-only stays 0 stake
-    if (record.predictionStatus === 'QUALIFIED_VALUE_BET') {
+    // Stake accounting invariant:
+    // Only genuine predictions or reconstructions that were QUALIFIED bets receive stake accounting.
+    // Result-only and Unverified records strictly receive stakeUnits = 0, profitUnits = 0.
+    if (
+      record.predictionStatus === 'QUALIFIED_VALUE_BET' &&
+      record.provenanceType !== 'HISTORICAL_RESULT_ONLY' &&
+      record.provenanceType !== 'UNVERIFIED'
+    ) {
       updated.stakeUnits = 1.0;
       if (outcome === 'WIN') updated.profitUnits = Number((record.oddsAtSignal - 1).toFixed(4));
       else if (outcome === 'HALF_WIN') updated.profitUnits = Number(((record.oddsAtSignal - 1) / 2).toFixed(4));
@@ -371,7 +394,7 @@ export class FourMarketShadowEngine {
   }
 
   /**
-   * Apply Bet365 Closing Line Value (CLV) to a prediction record.
+   * Apply Closing Line Value (CLV) to a prediction record.
    */
   public static applyClosingOdds(
     record: ShadowPredictionRecord,

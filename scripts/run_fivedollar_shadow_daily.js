@@ -123,54 +123,9 @@ async function runDailyShadow() {
       ],
       finalResult: null,
     },
-    // Historical completed matches for settlement & CLV validation
-    {
-      canonicalMatchId: 'EPL_2026_LIVERPOOL_ASTONVILLA_2026-11-07',
-      providerFixtureId: 498,
-      competition: 'Premier League',
-      season: '2026/2027',
-      homeTeam: 'Liverpool FC',
-      awayTeam: 'Aston Villa',
-      kickoffAt: '2026-11-07T20:00:00Z',
-      homeExpectedGoals: 2.15,
-      awayExpectedGoals: 0.90,
-      odds: [
-        { market: 'AH', selection: 'Liverpool FC -1.0', handicapLine: -1.0, bookmaker: 'Bet365', odds: 1.85, oppositeOdds: 2.05, capturedAt: '2026-11-07T10:00:00Z' },
-        { market: 'OU', selection: 'Over 2.75', totalLine: 2.75, bookmaker: 'Bet365', odds: 1.95, oppositeOdds: 1.95, capturedAt: '2026-11-07T10:00:00Z' },
-        { market: '1X2', selection: 'Home', bookmaker: 'Bet365', odds: 1.48, drawOdds: 4.50, awayOdds: 6.20, capturedAt: '2026-11-07T10:00:00Z' },
-        { market: 'BTTS', selection: 'BTTS No', bookmaker: 'Bet365', odds: 2.10, oppositeOdds: 1.72, capturedAt: '2026-11-07T10:00:00Z' },
-      ],
-      closingOdds: {
-        AH: { line: -1.0, odds: 1.80, oppOdds: 2.10 },
-        OU: { line: 2.75, odds: 2.00, oppOdds: 1.90 },
-      },
-      finalResult: { homeGoals: 2, awayGoals: 0 }, // 2-0: AH -1.0 WIN, OU 2.75 LOSS (2 < 2.75), 1X2 WIN, BTTS No WIN
-    },
-    {
-      canonicalMatchId: 'EPL_2026_BRIGHTON_MANCITY_2026-11-07',
-      providerFixtureId: 499,
-      competition: 'Premier League',
-      season: '2026/2027',
-      homeTeam: 'Brighton & Hove Albion',
-      awayTeam: 'Manchester City',
-      kickoffAt: '2026-11-07T17:30:00Z',
-      homeExpectedGoals: 1.25,
-      awayExpectedGoals: 1.65,
-      odds: [
-        { market: 'AH', selection: 'Brighton +0.75', handicapLine: 0.75, bookmaker: 'Bet365', odds: 1.92, oppositeOdds: 1.98, capturedAt: '2026-11-07T10:00:00Z' },
-        { market: 'OU', selection: 'Over 2.75', totalLine: 2.75, bookmaker: 'Bet365', odds: 1.85, oppositeOdds: 2.05, capturedAt: '2026-11-07T10:00:00Z' },
-        { market: '1X2', selection: 'Away', bookmaker: 'Bet365', odds: 1.80, drawOdds: 3.90, awayOdds: 4.33, capturedAt: '2026-11-07T10:00:00Z' },
-        { market: 'BTTS', selection: 'BTTS Yes', bookmaker: 'Bet365', odds: 1.65, oppositeOdds: 2.20, capturedAt: '2026-11-07T10:00:00Z' },
-      ],
-      closingOdds: {
-        AH: { line: 0.75, odds: 1.95, oppOdds: 1.95 },
-        OU: { line: 2.75, odds: 1.82, oppOdds: 2.08 },
-      },
-      finalResult: { homeGoals: 2, awayGoals: 1 }, // 2-1: Brighton +0.75 WIN, OU 2.75 WIN (3 > 2.75), 1X2 Away LOSS, BTTS Yes WIN
-    }
   ];
 
-  const allRecords = [];
+  const generatedRecords = [];
   let totalCandidates = 0;
   let qualifiedCount = 0;
   let lewatiCount = 0;
@@ -178,7 +133,7 @@ async function runDailyShadow() {
   let researchOnlyCount = 0;
 
   for (const f of fixtures) {
-    const records = FourMarketShadowEngine.evaluateMatch(f, f.odds);
+    const records = FourMarketShadowEngine.evaluateMatch(f, f.odds, 'LIVE_SHADOW_SIGNAL');
     for (let r of records) {
       totalCandidates++;
       if (r.predictionStatus === 'QUALIFIED_VALUE_BET') qualifiedCount++;
@@ -186,21 +141,32 @@ async function runDailyShadow() {
       else if (r.predictionStatus === 'PANTAU') pantauCount++;
       else if (r.predictionStatus === 'RESEARCH_ONLY') researchOnlyCount++;
 
-      // If match has closing odds & final results, apply settlement and CLV
-      if (f.closingOdds && f.closingOdds[r.market]) {
-        const c = f.closingOdds[r.market];
-        r = FourMarketShadowEngine.applyClosingOdds(r, c.line, c.odds, c.oppOdds);
-      }
-      if (f.finalResult) {
-        r = FourMarketShadowEngine.settleRecord(r, f.finalResult.homeGoals, f.finalResult.awayGoals);
-      }
-      allRecords.push(r);
+      generatedRecords.push(r);
     }
   }
 
-  // Write JSONL shadow ledger
+  // Idempotent ledger update (preserve historical records)
   const ledgerPath = path.join(shadowDir, 'shadow_prediction_ledger.jsonl');
-  const jsonlContent = allRecords.map(r => JSON.stringify(r)).join('\n') + '\n';
+  let existingRecords = [];
+  if (fs.existsSync(ledgerPath)) {
+    const lines = fs.readFileSync(ledgerPath, 'utf8').split('\n').filter(Boolean);
+    for (const l of lines) {
+      try {
+        existingRecords.push(JSON.parse(l));
+      } catch {}
+    }
+  }
+
+  const existingMap = new Map();
+  for (const r of existingRecords) {
+    existingMap.set(r.predictionId, r);
+  }
+  for (const r of generatedRecords) {
+    existingMap.set(r.predictionId, r);
+  }
+
+  const merged = Array.from(existingMap.values());
+  const jsonlContent = merged.map((r) => JSON.stringify(r)).join('\n') + '\n';
   fs.writeFileSync(ledgerPath, jsonlContent, 'utf8');
 
   // Summary JSON
@@ -210,7 +176,7 @@ async function runDailyShadow() {
     provider: '5DollarFootballAPI',
     attribution: {
       text: 'Football data by 5DollarFootballAPI',
-      url: 'https://5dollarfootballapi.com'
+      url: 'https://5dollarfootballapi.com',
     },
     quotaSnapshot: qm.getSnapshot(),
     fixtureCount: fixtures.length,
@@ -225,24 +191,25 @@ async function runDailyShadow() {
       AH: 'Core Candidate Prediction (Prioritas 1)',
       OU: 'Core Candidate Prediction (Prioritas 3)',
       '1X2': 'Core Research / Validation Pending (Prioritas 2)',
-      BTTS: 'Strictly Research-Only (Prioritas 4)'
+      BTTS: 'Strictly Research-Only (Prioritas 4)',
     },
-    records: allRecords
+    records: generatedRecords,
   };
 
   const outputPath = path.join(shadowDir, 'daily_prediction_output.json');
   fs.writeFileSync(outputPath, JSON.stringify(summary, null, 2), 'utf8');
 
-  console.log(`[OK] Generated ${allRecords.length} shadow records across ${fixtures.length} fixtures.`);
+  console.log(`[OK] Generated ${generatedRecords.length} live shadow signals across ${fixtures.length} fixtures.`);
   console.log(`[OK] Qualified Value Bets: ${qualifiedCount}`);
   console.log(`[OK] Pantau Candidates: ${pantauCount}`);
   console.log(`[OK] Lewati Candidates: ${lewatiCount}`);
   console.log(`[OK] Research-Only Candidates: ${researchOnlyCount}`);
+  console.log(`[OK] Total Ledger Records (Merged): ${merged.length}`);
   console.log(`[OK] Ledger written to: ${ledgerPath}`);
   console.log(`[OK] Output written to: ${outputPath}`);
 }
 
-runDailyShadow().catch(err => {
+runDailyShadow().catch((err) => {
   console.error('Fatal error during shadow daily run:', err);
   process.exit(1);
 });
