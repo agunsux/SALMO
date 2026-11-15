@@ -41,6 +41,12 @@ function getDeterministicUuid(apiId: number): string {
 
 async function main() {
   loadEnv();
+
+  // UNCONDITIONAL PERMANENT SAFETY LOCK: Legacy tool permanently disabled
+  console.error('[LEGACY TOOL - PERMANENTLY DISABLED] scripts/ingest_real_fixtures.ts is a historical one-off migration script (Oct 10-14, 2026).');
+  console.error('Direct calls to api-sports.io are permanently disabled. Any future ingestion must route through the dedicated gateway service.');
+  process.exit(1);
+
   const apiKey = process.env.API_FOOTBALL_KEY || process.env.APIFOOTBALL_KEY;
   const baseUrl = process.env.API_FOOTBALL_BASE_URL || 'https://v3.football.api-sports.io';
   const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;

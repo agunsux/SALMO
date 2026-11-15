@@ -23,8 +23,11 @@ const SESSION_MAX_REQUESTS = 2500;
 const RAW_DIR = path.resolve('research/api-football/raw');
 const LEDGER_PATH = path.resolve('docs/research/api-football/API_FOOTBALL_REQUEST_LEDGER.jsonl');
 
-// Helper: load API key safely
+// Helper: load API key safely with permanent suspension lock
 function getApiKey() {
+  throw new Error(
+    '[LEGACY TOOL - PERMANENTLY DISABLED] apifootball_harvester.js is a historical research harvester (Oct 13, 2026). Direct calls to api-sports.io are permanently disabled.'
+  );
   const envPath = path.resolve('.env.local');
   if (!fs.existsSync(envPath)) {
     throw new Error('.env.local not found');

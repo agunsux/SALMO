@@ -39,6 +39,7 @@ export interface DecisionTransactionInput {
   xgAway?: number;
   rho?: number;
   isPublicPick?: boolean;
+  skipLeagueRegistryCheck?: boolean;
 }
 
 export interface DecisionTransactionResult {

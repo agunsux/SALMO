@@ -57,6 +57,9 @@ async function checkStatus(apiKey) {
 }
 
 async function runTopUp() {
+  console.error('[LEGACY TOOL - PERMANENTLY DISABLED] run_final_topup.js is a historical pre-expiry harvester (Oct 13, 2026). Direct calls to api-sports.io are permanently disabled.');
+  process.exit(1);
+
   console.log('============================================================');
   console.log('>>> SALMO — API-FOOTBALL FINAL TOP-UP (ONE STAGE, THEN STOP)');
   console.log('============================================================');

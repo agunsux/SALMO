@@ -2,7 +2,7 @@
 // SALMO.DEV — Unified PostgreSQL Client & Transaction Manager
 // Provides direct PostgreSQL connection pooling, transactional execution, and fail-closed safety.
 
-import { Pool, PoolClient, QueryResult } from 'pg';
+import { Pool, PoolClient, QueryResult, QueryResultRow } from 'pg';
 import { Logger } from '../lib/logger';
 import { EnvironmentGuard } from '../lib/security/environmentGuard';
 
@@ -16,7 +16,7 @@ export function getPostgresPool(): Pool {
   let connectionString: string;
 
   // Staging Isolation Guard: In staging mode, explicit STAGING_DATABASE_URL is mandatory
-  if (process.env.APP_ENV === 'staging' || process.env.NODE_ENV === 'staging') {
+  if (process.env.APP_ENV === 'staging' || (process.env.NODE_ENV as string) === 'staging') {
     if (!process.env.STAGING_DATABASE_URL) {
       throw new Error(
         '[PostgresPool] FATAL: Staging environment requires explicit STAGING_DATABASE_URL. Silent fallback to production or local database is prohibited.'
@@ -45,7 +45,7 @@ export function getPostgresPool(): Pool {
   return poolInstance;
 }
 
-export async function executeQuery<T = any>(
+export async function executeQuery<T extends QueryResultRow = any>(
   text: string,
   params?: any[],
   client?: PoolClient

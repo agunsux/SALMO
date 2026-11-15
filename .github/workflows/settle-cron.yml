@@ -39,7 +39,6 @@ jobs:
           CI: 'true'
           ALLOW_PRODUCTION_DB_WRITE: 'false'
           ENABLE_THESPORTSDB: 'false'
-          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
@@ -53,7 +52,6 @@ jobs:
           ALLOW_MANUAL_LEAGUE_PROMOTION: 'false'
           ENABLE_THESPORTSDB: 'false'
           ODDS_PAPI_KEY: ${{ secrets.ODDS_PAPI_KEY }}
-          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
