@@ -45,7 +45,26 @@ const { PerformanceRepository } = require('../src/repositories/performanceReposi
 const LOCAL_PG_URL = process.env.LOCAL_POSTGRES_URL || 'postgresql://postgres@127.0.0.1:5432/salmo_test';
 const pool = new Pool({ connectionString: LOCAL_PG_URL });
 
-test('EPIC 100E — Complete End-to-End UEFA Champions League (UCL) Simulation', async () => {
+let dbAvailable = false;
+test.before(async () => {
+  try {
+    const client = await pool.connect();
+    dbAvailable = true;
+    client.release();
+  } catch (err) {
+    if (err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND') {
+      console.log('Skipping epic100e UCL test: local PostgreSQL not available');
+      return;
+    }
+    throw err;
+  }
+});
+
+test('EPIC 100E — Complete End-to-End UEFA Champions League (UCL) Simulation', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   try {
     const timestamp = Date.now();
     const canonicalUclId = `UCL_2026_RMD_MCI_${timestamp}`;
@@ -252,8 +271,10 @@ test('EPIC 100E — Complete End-to-End UEFA Champions League (UCL) Simulation',
       'Settlement results must be strictly immutable and cannot be deleted'
     );
   } finally {
-    await pool.end();
-    const { closePostgresPool } = require('../src/repositories/dbClient');
-    await closePostgresPool();
+    if (dbAvailable) {
+      await pool.end();
+      const { closePostgresPool } = require('../src/repositories/dbClient');
+      await closePostgresPool();
+    }
   }
 });

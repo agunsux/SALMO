@@ -22,6 +22,23 @@ const ROLLBACK_SQL = fs.readFileSync(
   'utf-8'
 );
 
+let dbAvailable = false;
+
+test.before(async () => {
+  const rootClient = new Client({ connectionString: ROOT_URL });
+  try {
+    await rootClient.connect();
+    dbAvailable = true;
+    await rootClient.end();
+  } catch (err) {
+    if (err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND') {
+      console.log('Skipping epic100g3 adversarial DB tests: local PostgreSQL not available');
+      return;
+    }
+    throw err;
+  }
+});
+
 // Helper to create and drop isolated test databases
 async function createIsolatedDb(dbName) {
   const rootClient = new Client({ connectionString: ROOT_URL });
@@ -51,7 +68,11 @@ async function dropIsolatedDb(dbName) {
 // -----------------------------------------------------------------------------
 // T1: Completely Empty Database -> Bootstrap Succeeds
 // -----------------------------------------------------------------------------
-test('T1: Completely empty database -> Bootstrap succeeds', async () => {
+test('T1: Completely empty database -> Bootstrap succeeds', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const dbName = 'salmo_t1_empty';
   const { client } = await createIsolatedDb(dbName);
   try {
@@ -92,7 +113,11 @@ test('T1: Completely empty database -> Bootstrap succeeds', async () => {
 // -----------------------------------------------------------------------------
 // T2: Baseline Already Applied -> Delta Completes Safely
 // -----------------------------------------------------------------------------
-test('T2: Baseline already applied -> Delta completes safely', async () => {
+test('T2: Baseline already applied -> Delta completes safely', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const dbName = 'salmo_t2_baseline';
   const { client } = await createIsolatedDb(dbName);
   try {
@@ -145,7 +170,11 @@ test('T2: Baseline already applied -> Delta completes safely', async () => {
 // -----------------------------------------------------------------------------
 // T3: Full Bootstrap Already Applied -> Repeat Run is Safe (Idempotency)
 // -----------------------------------------------------------------------------
-test('T3: Full bootstrap already applied -> Repeat run is safe', async () => {
+test('T3: Full bootstrap already applied -> Repeat run is safe', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const dbName = 'salmo_t3_repeat';
   const { client } = await createIsolatedDb(dbName);
   try {
@@ -170,7 +199,11 @@ test('T3: Full bootstrap already applied -> Repeat run is safe', async () => {
 // -----------------------------------------------------------------------------
 // T4: Partial Baseline -> Compatible Objects Preserved; Missing Handled
 // -----------------------------------------------------------------------------
-test('T4: Partial baseline -> Compatible objects preserved; missing objects handled', async () => {
+test('T4: Partial baseline -> Compatible objects preserved; missing objects handled', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const dbName = 'salmo_t4_partial';
   const { client } = await createIsolatedDb(dbName);
   try {
@@ -205,7 +238,11 @@ test('T4: Partial baseline -> Compatible objects preserved; missing objects hand
 // -----------------------------------------------------------------------------
 // T5: Incompatible Existing Column -> Hard Failure (Fail-Closed)
 // -----------------------------------------------------------------------------
-test('T5: Incompatible existing column -> Hard failure', async () => {
+test('T5: Incompatible existing column -> Hard failure', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const dbName = 'salmo_t5_incompatible_col';
   const { client } = await createIsolatedDb(dbName);
   try {
@@ -234,7 +271,11 @@ test('T5: Incompatible existing column -> Hard failure', async () => {
 // -----------------------------------------------------------------------------
 // T6: Duplicate or Incompatible Constraint -> Handled & Hardened
 // -----------------------------------------------------------------------------
-test('T6: Duplicate or incompatible constraint -> Reconciles to canonical constraint', async () => {
+test('T6: Duplicate or incompatible constraint -> Reconciles to canonical constraint', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const dbName = 'salmo_t6_constraint';
   const { client } = await createIsolatedDb(dbName);
   try {
@@ -275,7 +316,11 @@ test('T6: Duplicate or incompatible constraint -> Reconciles to canonical constr
 // -----------------------------------------------------------------------------
 // T7: Duplicate or Incompatible Trigger -> Hard Failure on Tampering
 // -----------------------------------------------------------------------------
-test('T7: Duplicate or incompatible trigger -> Immutability trigger enforces freeze', async () => {
+test('T7: Duplicate or incompatible trigger -> Immutability trigger enforces freeze', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const dbName = 'salmo_t7_trigger';
   const { client } = await createIsolatedDb(dbName);
   try {
@@ -320,7 +365,11 @@ test('T7: Duplicate or incompatible trigger -> Immutability trigger enforces fre
 // -----------------------------------------------------------------------------
 // T8: Missing Required Extension -> Clear Prerequisite Failure
 // -----------------------------------------------------------------------------
-test('T8: Missing required extension / engine version -> Clear prerequisite failure', async () => {
+test('T8: Missing required extension / engine version -> Clear prerequisite failure', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const dbName = 'salmo_t8_prereq';
   const { client } = await createIsolatedDb(dbName);
   try {
@@ -348,7 +397,11 @@ test('T8: Missing required extension / engine version -> Clear prerequisite fail
 // -----------------------------------------------------------------------------
 // T9: Failure Midway Through Migration -> Transaction Rollback Verified
 // -----------------------------------------------------------------------------
-test('T9: Failure midway through migration -> Transaction rollback verified', async () => {
+test('T9: Failure midway through migration -> Transaction rollback verified', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const dbName = 'salmo_t9_rollback';
   const { client } = await createIsolatedDb(dbName);
   try {
@@ -385,7 +438,11 @@ test('T9: Failure midway through migration -> Transaction rollback verified', as
 // -----------------------------------------------------------------------------
 // T10: Rollback of Delta -> Baseline Survives
 // -----------------------------------------------------------------------------
-test('T10: Rollback of delta -> Baseline survives', async () => {
+test('T10: Rollback of delta -> Baseline survives', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const dbName = 'salmo_t10_rollback_delta';
   const { client } = await createIsolatedDb(dbName);
   try {
@@ -418,7 +475,11 @@ test('T10: Rollback of delta -> Baseline survives', async () => {
 // -----------------------------------------------------------------------------
 // T11: Reapply Delta After Rollback -> Bootstrap Succeeds
 // -----------------------------------------------------------------------------
-test('T11: Reapply delta after rollback -> Bootstrap succeeds', async () => {
+test('T11: Reapply delta after rollback -> Bootstrap succeeds', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const dbName = 'salmo_t11_reapply';
   const { client } = await createIsolatedDb(dbName);
   try {

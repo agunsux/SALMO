@@ -44,12 +44,33 @@ const { SettlementRepository } = require('../src/repositories/settlementReposito
 const { PerformanceRepository } = require('../src/repositories/performanceRepository.ts');
 
 const pool = getPostgresPool();
+let dbAvailable = false;
 
-test.after(async () => {
-  await pool.end();
+test.before(async () => {
+  try {
+    const client = await pool.connect();
+    dbAvailable = true;
+    client.release();
+  } catch (err) {
+    if (err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND') {
+      console.log('Skipping epic100e concurrency tests: local PostgreSQL not available');
+      return;
+    }
+    throw err;
+  }
 });
 
-test('Concurrency Scenario 1: Two concurrent workers creating the exact same decision simultaneously', async () => {
+test.after(async () => {
+  if (dbAvailable) {
+    await pool.end();
+  }
+});
+
+test('Concurrency Scenario 1: Two concurrent workers creating the exact same decision simultaneously', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const matchCanonicalId = `EPL_2026_CONCUR_D1_${Date.now()}`;
   const kickoffIso = new Date(Date.now() + 6 * 3600 * 1000).toISOString();
 
@@ -108,7 +129,11 @@ test('Concurrency Scenario 1: Two concurrent workers creating the exact same dec
   assert.strictEqual(parseInt(checkRes.rows[0].count, 10), 1, 'Exactly one record must exist in prediction_ledger');
 });
 
-test('Concurrency Scenario 2: Worker crash and transaction rollback leaves zero orphan records', async () => {
+test('Concurrency Scenario 2: Worker crash and transaction rollback leaves zero orphan records', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const matchCanonicalId = `EPL_2026_CONCUR_CRASH_${Date.now()}`;
   const kickoffIso = new Date(Date.now() + 6 * 3600 * 1000).toISOString();
 
@@ -157,7 +182,11 @@ test('Concurrency Scenario 2: Worker crash and transaction rollback leaves zero 
   assert.strictEqual(parseInt(ledRes.rows[0].count, 10), 0, 'No orphan ledger positions permitted on rollback');
 });
 
-test('Concurrency Scenario 3: Two workers settling the exact same fixture simultaneously', async () => {
+test('Concurrency Scenario 3: Two workers settling the exact same fixture simultaneously', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const matchCanonicalId = `EPL_2026_CONCUR_SETTLE_${Date.now()}`;
   const kickoffIso = new Date(Date.now() - 4 * 3600 * 1000).toISOString(); // 4 hours in past
 
@@ -216,7 +245,11 @@ test('Concurrency Scenario 3: Two workers settling the exact same fixture simult
   assert.strictEqual(plRes.rows[0].status, 'SETTLED');
 });
 
-test('Concurrency Scenario 4: Concurrent odds refreshes do not overwrite or tamper original snapshots', async () => {
+test('Concurrency Scenario 4: Concurrent odds refreshes do not overwrite or tamper original snapshots', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const matchCanonicalId = `EPL_2026_CONCUR_ODDS_${Date.now()}`;
   const kickoffIso = new Date(Date.now() + 12 * 3600 * 1000).toISOString();
 

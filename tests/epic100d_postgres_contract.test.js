@@ -23,6 +23,22 @@ const path = require('path');
 const { Client } = require('pg');
 
 const LOCAL_PG_URL = process.env.LOCAL_POSTGRES_URL || 'postgresql://postgres@127.0.0.1:5432/salmo_test';
+let dbAvailable = false;
+
+test.before(async () => {
+  const client = new Client({ connectionString: LOCAL_PG_URL });
+  try {
+    await client.connect();
+    dbAvailable = true;
+    await client.end();
+  } catch (err) {
+    if (err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND') {
+      console.log('Skipping epic100d postgres contract tests: local PostgreSQL not available');
+      return;
+    }
+    throw err;
+  }
+});
 
 async function getClient() {
   const client = new Client({ connectionString: LOCAL_PG_URL });
@@ -30,7 +46,11 @@ async function getClient() {
   return client;
 }
 
-test('EPIC 100D — 1. Foreign Key Constraint: Reject decision with orphan match_id', async () => {
+test('EPIC 100D — 1. Foreign Key Constraint: Reject decision with orphan match_id', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await getClient();
   try {
     const orphanMatchId = '00000000-0000-0000-0000-000000000099';
@@ -54,7 +74,11 @@ test('EPIC 100D — 1. Foreign Key Constraint: Reject decision with orphan match
   }
 });
 
-test('EPIC 100D — 2. Foreign Key Constraint: Restrict deletion of match with active snapshots', async () => {
+test('EPIC 100D — 2. Foreign Key Constraint: Restrict deletion of match with active snapshots', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -87,7 +111,11 @@ test('EPIC 100D — 2. Foreign Key Constraint: Restrict deletion of match with a
   }
 });
 
-test('EPIC 100D — 3. Check Constraint: Reject invalid model probability (< 0 or > 100)', async () => {
+test('EPIC 100D — 3. Check Constraint: Reject invalid model probability (< 0 or > 100)', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -121,7 +149,11 @@ test('EPIC 100D — 3. Check Constraint: Reject invalid model probability (< 0 o
   }
 });
 
-test('EPIC 100D — 4. Check Constraint: Reject non-positive market odds on snapshots (odds <= 1.0)', async () => {
+test('EPIC 100D — 4. Check Constraint: Reject non-positive market odds on snapshots (odds <= 1.0)', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -152,7 +184,11 @@ test('EPIC 100D — 4. Check Constraint: Reject non-positive market odds on snap
   }
 });
 
-test('EPIC 100D — 5. Check Constraint: Reject invalid model probability on prediction_ledger', async () => {
+test('EPIC 100D — 5. Check Constraint: Reject invalid model probability on prediction_ledger', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -185,7 +221,11 @@ test('EPIC 100D — 5. Check Constraint: Reject invalid model probability on pre
   }
 });
 
-test('EPIC 100D — 6. Check Constraint: Reject non-positive odds_at_prediction on prediction_ledger', async () => {
+test('EPIC 100D — 6. Check Constraint: Reject non-positive odds_at_prediction on prediction_ledger', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -218,7 +258,11 @@ test('EPIC 100D — 6. Check Constraint: Reject non-positive odds_at_prediction 
   }
 });
 
-test('EPIC 100D — 7. Check Constraint: Reject invalid result_status on prediction_ledger', async () => {
+test('EPIC 100D — 7. Check Constraint: Reject invalid result_status on prediction_ledger', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -251,7 +295,11 @@ test('EPIC 100D — 7. Check Constraint: Reject invalid result_status on predict
   }
 });
 
-test('EPIC 100D — 8. Snapshot Immutability: UPDATE on market_snapshots is blocked by trigger', async () => {
+test('EPIC 100D — 8. Snapshot Immutability: UPDATE on market_snapshots is blocked by trigger', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -286,7 +334,11 @@ test('EPIC 100D — 8. Snapshot Immutability: UPDATE on market_snapshots is bloc
   }
 });
 
-test('EPIC 100D — 9. Snapshot Immutability: DELETE on market_snapshots is blocked by trigger', async () => {
+test('EPIC 100D — 9. Snapshot Immutability: DELETE on market_snapshots is blocked by trigger', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -321,7 +373,11 @@ test('EPIC 100D — 9. Snapshot Immutability: DELETE on market_snapshots is bloc
   }
 });
 
-test('EPIC 100D — 10. Decision Immutability: UPDATE on decisions is blocked by trigger', async () => {
+test('EPIC 100D — 10. Decision Immutability: UPDATE on decisions is blocked by trigger', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -359,7 +415,11 @@ test('EPIC 100D — 10. Decision Immutability: UPDATE on decisions is blocked by
   }
 });
 
-test('EPIC 100D — 11. Prediction Ledger Immutability: Modifying odds/probability is blocked by trigger', async () => {
+test('EPIC 100D — 11. Prediction Ledger Immutability: Modifying odds/probability is blocked by trigger', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -409,7 +469,11 @@ test('EPIC 100D — 11. Prediction Ledger Immutability: Modifying odds/probabili
   }
 });
 
-test('EPIC 100D — 12. Prediction Ledger Immutability: DELETE is blocked by trigger', async () => {
+test('EPIC 100D — 12. Prediction Ledger Immutability: DELETE is blocked by trigger', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -446,7 +510,11 @@ test('EPIC 100D — 12. Prediction Ledger Immutability: DELETE is blocked by tri
   }
 });
 
-test('EPIC 100D — 13. Settlement Integration: Quarter-line calculations and settlement_results immutability', async () => {
+test('EPIC 100D — 13. Settlement Integration: Quarter-line calculations and settlement_results immutability', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await getClient();
   try {
     await client.query('BEGIN');
@@ -492,7 +560,11 @@ test('EPIC 100D — 13. Settlement Integration: Quarter-line calculations and se
   }
 });
 
-test('EPIC 100D — 14. Migration Idempotency: Rollback and Re-apply succeed without errors', async () => {
+test('EPIC 100D — 14. Migration Idempotency: Rollback and Re-apply succeed without errors', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await getClient();
   try {
     const rollbackSql = fs.readFileSync(path.resolve('data/schema_canonical_rollback.sql'), 'utf8');

@@ -11,7 +11,7 @@ export type PricingPlanId =
   | 'pro_monthly'
   | 'pro_annual';
 
-export type PaymentRail = 'stablecoin' | 'fiat';
+export type PaymentRail = 'stablecoin' | 'fiat' | 'sea_ewallet';
 
 export type CryptoNetwork = 'base' | 'polygon' | 'arbitrum' | 'tron';
 export type CryptoCurrency = 'USDC' | 'USDT';

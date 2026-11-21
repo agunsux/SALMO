@@ -48,12 +48,33 @@ const { SettlementRepository } = require('../src/repositories/settlementReposito
 const { PerformanceRepository } = require('../src/repositories/performanceRepository.ts');
 
 const pool = getPostgresPool();
+let dbAvailable = false;
 
-test.after(async () => {
-  await pool.end();
+test.before(async () => {
+  try {
+    const client = await pool.connect();
+    dbAvailable = true;
+    client.release();
+  } catch (err) {
+    if (err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND') {
+      console.log('Skipping epic100f tests: local PostgreSQL not available');
+      return;
+    }
+    throw err;
+  }
 });
 
-test('EPIC 100F — Scenario 1: Multi-Decision Coexistence on the Same Fixture (AH -0.25 and AH -0.5)', async () => {
+test.after(async () => {
+  if (dbAvailable) {
+    await pool.end();
+  }
+});
+
+test('EPIC 100F — Scenario 1: Multi-Decision Coexistence on the Same Fixture (AH -0.25 and AH -0.5)', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const matchCanonicalId = `EPL_2026_MULTIDEC_${Date.now()}`;
   const kickoffIso = new Date(Date.now() + 6 * 3600 * 1000).toISOString();
 
@@ -160,7 +181,11 @@ test('EPIC 100F — Scenario 1: Multi-Decision Coexistence on the Same Fixture (
   assert.strictEqual(Number(settledDailyPicks.rows[1].profit_loss), 1.10);
 });
 
-test('EPIC 100F — Scenario 2: Idempotency Key Model Versioning', async () => {
+test('EPIC 100F — Scenario 2: Idempotency Key Model Versioning', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const matchCanonicalId = `EPL_2026_IDEMP_VER_${Date.now()}`;
   const kickoffIso = new Date(Date.now() + 6 * 3600 * 1000).toISOString();
 
@@ -219,7 +244,11 @@ test('EPIC 100F — Scenario 2: Idempotency Key Model Versioning', async () => {
   assert.notStrictEqual(run1.doiId, run3.doiId, 'doi_id must incorporate model version');
 });
 
-test('EPIC 100F — Scenario 3: Performance Accounting Population Separation (SIMULATION vs PROVIDER)', async () => {
+test('EPIC 100F — Scenario 3: Performance Accounting Population Separation (SIMULATION vs PROVIDER)', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const matchCanonicalId = `EPL_2026_PERF_SEP_${Date.now()}`;
   const kickoffIso = new Date(Date.now() + 5 * 3600 * 1000).toISOString();
 
@@ -305,7 +334,11 @@ test('EPIC 100F — Scenario 3: Performance Accounting Population Separation (SI
   assert.ok(simFoundInAll, 'SIMULATION records are accessible only when explicitly included');
 });
 
-test('EPIC 100F — Scenario 4: Performance Accounting for VOID and PUSH Invariants', async () => {
+test('EPIC 100F — Scenario 4: Performance Accounting for VOID and PUSH Invariants', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const matchCanonicalId = `EPL_2026_VOID_PUSH_${Date.now()}`;
   const kickoffIso = new Date(Date.now() + 4 * 3600 * 1000).toISOString();
 
@@ -397,7 +430,11 @@ test('EPIC 100F — Scenario 4: Performance Accounting for VOID and PUSH Invaria
   assert.strictEqual(voidEntry.profitUnits, 0.0, 'Void must have 0.0 profit units');
 });
 
-test('EPIC 100F — Scenario 5: Multi-Worker Concurrency across 4 Parallel Workers (Simultaneous Ingestion & Settlement)', async () => {
+test('EPIC 100F — Scenario 5: Multi-Worker Concurrency across 4 Parallel Workers (Simultaneous Ingestion & Settlement)', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const matchCanonicalId = `EPL_2026_PARALLEL_4W_${Date.now()}`;
   const kickoffIso = new Date(Date.now() + 8 * 3600 * 1000).toISOString();
 

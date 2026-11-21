@@ -14,39 +14,55 @@ const pool = new Pool({
   connectionString: process.env.LOCAL_POSTGRES_URL || 'postgresql://postgres@127.0.0.1:5432/salmo_test',
 });
 
+let dbAvailable = false;
+
 test.before(async () => {
-  // Ensure test roles exist and have appropriate schema privileges
-  const client = await pool.connect();
   try {
-    await client.query(`
-      DO $$
-      BEGIN
-        IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
-          CREATE ROLE anon NOLOGIN;
-        END IF;
-        IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
-          CREATE ROLE authenticated NOLOGIN;
-        END IF;
-      END $$;
+    const client = await pool.connect();
+    dbAvailable = true;
+    try {
+      await client.query(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+            CREATE ROLE anon NOLOGIN;
+          END IF;
+          IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+            CREATE ROLE authenticated NOLOGIN;
+          END IF;
+        END $$;
 
-      GRANT USAGE ON SCHEMA public TO anon, authenticated;
-      GRANT SELECT ON public.daily_picks TO anon, authenticated;
-      GRANT SELECT ON public.matches TO anon, authenticated;
-      GRANT SELECT ON public.prediction_ledger TO authenticated;
+        GRANT USAGE ON SCHEMA public TO anon, authenticated;
+        GRANT SELECT ON public.daily_picks TO anon, authenticated;
+        GRANT SELECT ON public.matches TO anon, authenticated;
+        GRANT SELECT ON public.prediction_ledger TO authenticated;
 
-      REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA public FROM anon;
-      REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA public FROM authenticated;
-    `);
-  } finally {
-    client.release();
+        REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA public FROM anon;
+        REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA public FROM authenticated;
+      `);
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    if (err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND') {
+      console.log('Skipping epic100g staging security tests: local PostgreSQL not available');
+      return;
+    }
+    throw err;
   }
 });
 
 test.after(async () => {
-  await pool.end();
+  if (dbAvailable) {
+    await pool.end();
+  }
 });
 
-test('Security Gate 1: Anon role is restricted to read-only active daily_picks', async () => {
+test('Security Gate 1: Anon role is restricted to read-only active daily_picks', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await pool.connect();
   try {
     await client.query('SET ROLE anon');
@@ -89,7 +105,11 @@ test('Security Gate 1: Anon role is restricted to read-only active daily_picks',
   }
 });
 
-test('Security Gate 2: Authenticated role can read active ledger but cannot mutate records', async () => {
+test('Security Gate 2: Authenticated role can read active ledger but cannot mutate records', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await pool.connect();
   try {
     await client.query('SET ROLE authenticated');
@@ -129,7 +149,11 @@ test('Security Gate 2: Authenticated role can read active ledger but cannot muta
   }
 });
 
-test('Security Gate 3: Immutability triggers prohibit update/delete even under privileged role', async () => {
+test('Security Gate 3: Immutability triggers prohibit update/delete even under privileged role', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await pool.connect();
   try {
     // 1. Create a snapshot and decision under privileged connection

@@ -40,7 +40,7 @@ export function createPaymentIntent(request: PaymentIntentRequest): PaymentInten
   }
 
   const paymentId = `pay_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-  const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString(); // 30 mins expiry
+  const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString(); // Half hour intent TTL
 
   if (request.rail === 'fiat') {
     return {
@@ -49,6 +49,17 @@ export function createPaymentIntent(request: PaymentIntentRequest): PaymentInten
       rail: 'fiat',
       amountUsd: plan.priceUsd,
       checkoutUrl: `/api/billing/checkout?session=${paymentId}&plan=${plan.id}`,
+      expiresAt
+    };
+  }
+
+  if (request.rail === 'sea_ewallet') {
+    return {
+      success: true,
+      paymentId,
+      rail: 'sea_ewallet',
+      amountUsd: plan.priceUsd,
+      checkoutUrl: `/api/billing/sea-checkout?session=${paymentId}&plan=${plan.id}`,
       expiresAt
     };
   }

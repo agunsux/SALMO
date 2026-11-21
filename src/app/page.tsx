@@ -163,6 +163,20 @@ export default function HomePage() {
               {t.table.loading}
             </p>
           </div>
+        ) : filteredMatches.length === 0 ? (
+          <div className="rounded-xl border border-terminal-border bg-terminal-card p-12 text-center space-y-2">
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-terminal-panel text-terminal-textMuted mb-2">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <h3 className="text-sm font-semibold text-terminal-textPrimary">
+              {matches.length === 0 ? 'ODDS NOT YET AVAILABLE' : 'NO QUALIFIED PICKS'}
+            </h3>
+            <p className="text-xs text-terminal-textSecondary max-w-md mx-auto">
+              {matches.length === 0
+                ? 'Pre-match live order books are being synchronized. Please check back shortly.'
+                : 'No matches in the current selection meet the active edge threshold.'}
+            </p>
+          </div>
         ) : (
           <MatchMatrixTable
             matches={filteredMatches}

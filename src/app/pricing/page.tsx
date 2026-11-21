@@ -5,6 +5,7 @@ import { TerminalLayout } from '@/components/terminal/TerminalLayout';
 import { useI18n } from '@/i18n/context';
 import { useEntitlements } from '@/hooks/useEntitlements';
 import { PRICING_PLANS, MONETIZATION_ENABLED } from '@/config/entitlements';
+import { notFound, redirect } from 'next/navigation';
 import { PricingPlan, PricingPlanId, PaymentRail, CryptoNetwork, CryptoCurrency } from '@/lib/billing/types';
 import { createPaymentIntent, SUPPORTED_NETWORKS, CRYPTO_DEPOSIT_WALLETS } from '@/lib/billing/paymentRails';
 import {
@@ -63,7 +64,7 @@ export default function PricingPage() {
   return (
     <TerminalLayout showFilters={false}>
       <div className="space-y-6 max-w-6xl mx-auto">
-        {/* Early Access Banner when MONETIZATION_ENABLED = false */}
+        {/* Early Access Banner when MONETIZATION_ENABLED = false (or redirect('/')) */}
         {!MONETIZATION_ENABLED && (
           <div className="rounded-xl border border-terminal-accentEmerald/30 bg-terminal-accentEmerald/10 p-4 text-xs">
             <div className="flex items-start gap-3">
@@ -84,13 +85,13 @@ export default function PricingPage() {
         <div className="text-center max-w-2xl mx-auto border-b border-terminal-border pb-6">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-terminal-accentEmerald/30 bg-terminal-accentEmerald/10 px-3 py-1 text-[11px] font-mono font-semibold text-terminal-accentEmerald">
             <Zap className="h-3.5 w-3.5" />
-            <span>AFFORDABLE BETTOR ACCESS • FIAT & STABLECOINS</span>
+            <span>AFFORDABLE BETTOR ACCESS • FIAT, STABLECOINS & SEA E-WALLETS</span>
           </div>
           <h1 className="mt-3 text-2xl sm:text-3xl font-extrabold tracking-tight text-terminal-textPrimary">
             Worldwide Low-Friction Pricing
           </h1>
           <p className="mt-2 text-xs sm:text-sm text-terminal-textSecondary leading-relaxed">
-            Non-expiring credit packs, 48-hour weekend passes, and institutional monthly passes. Pay with Card, PayPal, or Stablecoins (USDC / USDT) with zero banking friction.
+            Non-expiring credit packs, 48-hour weekend passes, and institutional monthly passes. Pay with Card, PayPal, Stablecoins (USDC / USDT), or Southeast Asia E-Wallets (QRIS, GoPay, OVO, DANA, TrueMoney) with zero banking friction.
           </p>
         </div>
 
@@ -330,33 +331,44 @@ export default function PricingPage() {
               ) : (
                 <>
                   {/* Payment Rail Toggle */}
-                  <div className="grid grid-cols-2 gap-2 p-1 rounded-lg border border-terminal-border bg-terminal-panel">
+                  <div className="grid grid-cols-3 gap-1.5 p-1 rounded-lg border border-terminal-border bg-terminal-panel">
                     <button
                       onClick={() => setPaymentRail('stablecoin')}
-                      className={`py-2 text-xs font-semibold rounded transition-colors flex items-center justify-center gap-1.5 ${
+                      className={`py-2 text-[11px] sm:text-xs font-semibold rounded transition-colors flex items-center justify-center gap-1 ${
                         paymentRail === 'stablecoin'
                           ? 'bg-terminal-card text-terminal-accentEmerald font-bold shadow-xs'
                           : 'text-terminal-textMuted hover:text-terminal-textPrimary'
                       }`}
                     >
-                      <Coins className="h-3.5 w-3.5" />
-                      <span>Stablecoins (USDC/USDT)</span>
+                      <Coins className="h-3.5 w-3.5 shrink-0" />
+                      <span>Stablecoins</span>
                     </button>
                     <button
                       onClick={() => setPaymentRail('fiat')}
-                      className={`py-2 text-xs font-semibold rounded transition-colors flex items-center justify-center gap-1.5 ${
+                      className={`py-2 text-[11px] sm:text-xs font-semibold rounded transition-colors flex items-center justify-center gap-1 ${
                         paymentRail === 'fiat'
                           ? 'bg-terminal-card text-terminal-accentEmerald font-bold shadow-xs'
                           : 'text-terminal-textMuted hover:text-terminal-textPrimary'
                       }`}
                     >
-                      <CreditCard className="h-3.5 w-3.5" />
+                      <CreditCard className="h-3.5 w-3.5 shrink-0" />
                       <span>Card / PayPal</span>
+                    </button>
+                    <button
+                      onClick={() => setPaymentRail('sea_ewallet')}
+                      className={`py-2 text-[11px] sm:text-xs font-semibold rounded transition-colors flex items-center justify-center gap-1 ${
+                        paymentRail === 'sea_ewallet'
+                          ? 'bg-terminal-card text-terminal-accentEmerald font-bold shadow-xs'
+                          : 'text-terminal-textMuted hover:text-terminal-textPrimary'
+                      }`}
+                    >
+                      <QrCode className="h-3.5 w-3.5 shrink-0" />
+                      <span>QRIS / SEA</span>
                     </button>
                   </div>
 
                   {/* STABLECOIN RAIL */}
-                  {paymentRail === 'stablecoin' ? (
+                  {paymentRail === 'stablecoin' && (
                     <div className="space-y-3 pt-1">
                       {/* Network & Currency Switcher */}
                       <div className="grid grid-cols-2 gap-2 text-xs">
@@ -427,15 +439,17 @@ export default function PricingPage() {
                         Verify & Activate Access (Instant)
                       </button>
                     </div>
-                  ) : (
-                    /* FIAT RAIL */
+                  )}
+
+                  {/* FIAT RAIL */}
+                  {paymentRail === 'fiat' && (
                     <div className="space-y-3 pt-1">
                       <div className="rounded-lg border border-terminal-border bg-terminal-panel p-4 text-xs space-y-2">
                         <div className="font-semibold text-terminal-textPrimary">
                           Secure Card & PayPal Processing
                         </div>
                         <p className="text-terminal-textSecondary text-[11px] leading-relaxed">
-                          Worldwide debit/credit cards accepted (Visa, Mastercard, Amex) with bank-grade 256-bit SSL encryption.
+                          Worldwide debit/credit cards accepted (Visa, Mastercard, Amex, Apple Pay, Google Pay) with bank-grade 256-bit SSL encryption.
                         </p>
                       </div>
 
@@ -445,6 +459,39 @@ export default function PricingPage() {
                       >
                         <CreditCard className="h-4 w-4" />
                         <span>Pay ${selectedPlan.priceUsd.toFixed(2)} with Card / PayPal</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* SEA E-WALLETS RAIL */}
+                  {paymentRail === 'sea_ewallet' && (
+                    <div className="space-y-3 pt-1">
+                      <div className="rounded-lg border border-terminal-border bg-terminal-panel p-4 text-xs space-y-2">
+                        <div className="font-semibold text-terminal-textPrimary flex items-center gap-1.5">
+                          <QrCode className="h-4 w-4 text-terminal-accentEmerald" />
+                          <span>QRIS & Southeast Asia E-Wallets</span>
+                        </div>
+                        <p className="text-terminal-textSecondary text-[11px] leading-relaxed">
+                          Instant local checkout for Indonesia (QRIS, GoPay, OVO, DANA), Thailand (PromptPay, TrueMoney), and Vietnam (MoMo, ZaloPay).
+                        </p>
+                        <div className="rounded border border-terminal-border bg-terminal-card p-2 text-xs font-mono space-y-1">
+                          <div className="flex justify-between text-terminal-textPrimary">
+                            <span>IDR (Indonesia):</span>
+                            <span className="font-bold text-terminal-accentEmerald">Rp {(selectedPlan.priceUsd * 16200).toLocaleString('id-ID')}</span>
+                          </div>
+                          <div className="flex justify-between text-terminal-textSecondary text-[11px]">
+                            <span>THB (Thailand):</span>
+                            <span>฿ {Math.round(selectedPlan.priceUsd * 36.5).toLocaleString()}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={handleSimulatePayment}
+                        className="w-full rounded-md bg-terminal-accentEmerald py-2.5 text-xs font-bold text-black hover:bg-terminal-accentEmerald/90 transition-colors shadow-sm flex items-center justify-center gap-1.5"
+                      >
+                        <QrCode className="h-4 w-4" />
+                        <span>Generate QRIS / Pay with E-Wallet</span>
                       </button>
                     </div>
                   )}

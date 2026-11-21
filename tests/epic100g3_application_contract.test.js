@@ -26,30 +26,41 @@ const BOOTSTRAP_SQL = fs.readFileSync(
 );
 
 let pool;
+let dbAvailable = false;
 
 test.before(async () => {
   const rootClient = new Client({ connectionString: ROOT_URL });
-  await rootClient.connect();
   try {
-    await rootClient.query(`DROP DATABASE IF EXISTS ${TEST_DB} WITH (FORCE);`);
-    await rootClient.query(`CREATE DATABASE ${TEST_DB};`);
-  } finally {
-    await rootClient.end();
-  }
+    await rootClient.connect();
+    dbAvailable = true;
+    try {
+      await rootClient.query(`DROP DATABASE IF EXISTS ${TEST_DB} WITH (FORCE);`);
+      await rootClient.query(`CREATE DATABASE ${TEST_DB};`);
+    } finally {
+      await rootClient.end();
+    }
 
-  // Apply unified bootstrap to TEST_DB
-  const client = new Client({ connectionString: TEST_DB_URL });
-  await client.connect();
-  try {
-    await client.query(BOOTSTRAP_SQL);
-  } finally {
-    await client.end();
-  }
+    // Apply unified bootstrap to TEST_DB
+    const client = new Client({ connectionString: TEST_DB_URL });
+    await client.connect();
+    try {
+      await client.query(BOOTSTRAP_SQL);
+    } finally {
+      await client.end();
+    }
 
-  pool = new Pool({ connectionString: TEST_DB_URL });
+    pool = new Pool({ connectionString: TEST_DB_URL });
+  } catch (err) {
+    if (err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND') {
+      console.log('Skipping epic100g3 application contract tests: local PostgreSQL not available');
+      return;
+    }
+    throw err;
+  }
 });
 
 test.after(async () => {
+  if (!dbAvailable) return;
   if (pool) {
     await pool.end();
   }
@@ -65,7 +76,11 @@ test.after(async () => {
 // -----------------------------------------------------------------------------
 // 1. FixtureRepository Validation
 // -----------------------------------------------------------------------------
-test('Repo Contract 1: FixtureRepository idempotency, status lifecycle, kickoff sync', async () => {
+test('Repo Contract 1: FixtureRepository idempotency, status lifecycle, kickoff sync', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await pool.connect();
   try {
     const fixtureData = {
@@ -137,7 +152,11 @@ test('Repo Contract 1: FixtureRepository idempotency, status lifecycle, kickoff 
 // -----------------------------------------------------------------------------
 // 2. OddsSnapshotRepository Validation
 // -----------------------------------------------------------------------------
-test('Repo Contract 2: OddsSnapshotRepository capture, odds check (>1.0), and immutability', async () => {
+test('Repo Contract 2: OddsSnapshotRepository capture, odds check (>1.0), and immutability', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await pool.connect();
   try {
     // Get existing match
@@ -191,7 +210,11 @@ test('Repo Contract 2: OddsSnapshotRepository capture, odds check (>1.0), and im
 // -----------------------------------------------------------------------------
 // 3. DecisionLedgerRepository Validation: Multiple AH Positions & Idempotency
 // -----------------------------------------------------------------------------
-test('Repo Contract 3: DecisionLedgerRepository multiple AH positions, versioned DOI, and idempotency', async () => {
+test('Repo Contract 3: DecisionLedgerRepository multiple AH positions, versioned DOI, and idempotency', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await pool.connect();
   try {
     const m = await client.query("SELECT id FROM public.matches WHERE canonical_match_id = 'EPL_2026_TEST_MCI_ARS';");
@@ -292,7 +315,11 @@ test('Repo Contract 3: DecisionLedgerRepository multiple AH positions, versioned
 // -----------------------------------------------------------------------------
 // 4. SettlementRepository Validation: Independent Quarter-Line Settlement
 // -----------------------------------------------------------------------------
-test('Repo Contract 4: SettlementRepository independent position settlement & immutability', async () => {
+test('Repo Contract 4: SettlementRepository independent position settlement & immutability', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await pool.connect();
   try {
     // Scoreline is MCI 2 - 1 ARS
@@ -358,7 +385,11 @@ test('Repo Contract 4: SettlementRepository independent position settlement & im
 // -----------------------------------------------------------------------------
 // 5. PerformanceRepository Validation: Metrics & Exclusion of Synthetic Data
 // -----------------------------------------------------------------------------
-test('Repo Contract 5: PerformanceRepository analytics & synthetic data segregation', async () => {
+test('Repo Contract 5: PerformanceRepository analytics & synthetic data segregation', async (t) => {
+  if (!dbAvailable) {
+    t.skip('Local PostgreSQL offline');
+    return;
+  }
   const client = await pool.connect();
   try {
     // Insert a SYNTHETIC decision that should be excluded from production calculations
