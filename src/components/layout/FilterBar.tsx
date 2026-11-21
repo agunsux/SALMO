@@ -68,7 +68,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 : 'bg-[#171B20] dark:bg-[#171B20] light:bg-[#FFFFFF] text-[#8A93A0] hover:text-white dark:hover:text-white light:hover:text-[#14171C] border border-[#232830] dark:border-[#232830] light:border-[#DCE0E7]'
             }`}
           >
-            {t.filters.allMarkets}
+            {(t.filters as any).allMarkets || t.filters.allMatches || 'ALL'}
           </button>
 
         <button
@@ -79,7 +79,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               : 'bg-[#171B20] dark:bg-[#171B20] light:bg-[#FFFFFF] text-[#8A93A0] hover:text-white dark:hover:text-white light:hover:text-[#14171C] border border-[#232830] dark:border-[#232830] light:border-[#DCE0E7]'
           }`}
         >
-          {t.filters.ah}
+          {(t.filters as any).ah || t.markets.ahShort || 'AH'}
         </button>
 
         <button
@@ -90,7 +90,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               : 'bg-[#171B20] dark:bg-[#171B20] light:bg-[#FFFFFF] text-[#8A93A0] hover:text-white dark:hover:text-white light:hover:text-[#14171C] border border-[#232830] dark:border-[#232830] light:border-[#DCE0E7]'
           }`}
         >
-          {t.filters.btts}
+          {(t.filters as any).btts || 'BTTS'}
         </button>
 
         <button
@@ -101,7 +101,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               : 'bg-[#171B20] dark:bg-[#171B20] light:bg-[#FFFFFF] text-[#8A93A0] hover:text-white dark:hover:text-white light:hover:text-[#14171C] border border-[#232830] dark:border-[#232830] light:border-[#DCE0E7]'
           }`}
         >
-          {t.filters.ou}
+          {(t.filters as any).ou || t.markets.ouShort || 'O/U'}
         </button>
       </div>
 
@@ -127,7 +127,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 : 'border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] bg-[#171B20] dark:bg-[#171B20] light:bg-[#FFFFFF] text-[#8A93A0] hover:text-white'
             }`}
           >
-            {t.filters.highConfidence}
+            {(t.filters as any).highConfidence || 'High Confidence'}
           </button>
         </div>
 

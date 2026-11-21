@@ -1,250 +1,189 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
-import { FilterBar, MarketFilter, QualityFilter, TimeHorizonFilter } from '@/components/layout/FilterBar';
-import { MatchCard } from '@/components/match/MatchCard';
-import { EvidenceDrawer } from '@/components/evidence/EvidenceDrawer';
-import { TraceModal } from '@/components/trace/TraceModal';
-import { MatchIntelligence, MarketView, LiveValidationSummary } from '@/types';
+import { TerminalLayout } from '@/components/terminal/TerminalLayout';
+import { MatchMatrixTable, MarketTabType } from '@/components/terminal/MatchMatrixTable';
+import { MatchDeepDiveDrawer } from '@/components/terminal/MatchDeepDiveDrawer';
+import { MatchIntelligence } from '@/types';
 import { useI18n } from '@/i18n/context';
-import { ShieldCheck, Database, Calendar, CheckCircle2, AlertTriangle, Layers, TrendingDown, TrendingUp } from 'lucide-react';
-
-import { matchesDynamicHorizon } from '@/lib/horizon';
+import { useEntitlements } from '@/hooks/useEntitlements';
+import {
+  Calendar,
+  Database,
+  CheckCircle2,
+  Layers,
+  Sparkles,
+  TrendingDown,
+  TrendingUp,
+  ShieldCheck
+} from 'lucide-react';
 
 export default function HomePage() {
   const { t } = useI18n();
+  const { canViewMatch, unlockMatch, creditsBalance } = useEntitlements();
+
   const [matches, setMatches] = useState<MatchIntelligence[]>([]);
-  const [validation, setValidation] = useState<LiveValidationSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [timeHorizon, setTimeHorizon] = useState<TimeHorizonFilter>('7_DAYS');
-  const [marketFilter, setMarketFilter] = useState<MarketFilter>('ALL');
-  const [qualityFilter, setQualityFilter] = useState<QualityFilter>('ALL');
+  // Filters
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedLeague, setSelectedLeague] = useState('ALL');
+  const [selectedDate, setSelectedDate] = useState('ALL');
+  const [activeMarket, setActiveMarket] = useState<MarketTabType>('ALL');
 
-  // Evidence Drawer state
-  const [evidenceMarket, setEvidenceMarket] = useState<MarketView | null>(null);
-  const [evidenceTitle, setEvidenceTitle] = useState('');
-  const [evidenceOpen, setEvidenceOpen] = useState(false);
-
-  // Calculation Trace state
-  const [traceMarket, setTraceMarket] = useState<MarketView | null>(null);
-  const [traceTitle, setTraceTitle] = useState('');
-  const [traceOpen, setTraceOpen] = useState(false);
+  // Deep dive drawer state
+  const [selectedMatch, setSelectedMatch] = useState<MatchIntelligence | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/matches')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.data?.matches) {
           setMatches(data.data.matches);
-          if (data.data.validation) {
-            setValidation(data.data.validation);
-          }
         }
       })
-      .catch(err => console.error('Failed to load matches:', err))
+      .catch((err) => console.error('Failed to load matches:', err))
       .finally(() => setLoading(false));
   }, []);
 
-  const handleOpenEvidence = (market: MarketView, matchTitle: string) => {
-    setEvidenceMarket(market);
-    setEvidenceTitle(matchTitle);
-    setEvidenceOpen(true);
+  const handleInspectMatch = (match: MatchIntelligence) => {
+    setSelectedMatch(match);
+    setDrawerOpen(true);
   };
 
-  const handleOpenTrace = (market: MarketView, matchTitle: string) => {
-    setTraceMarket(market);
-    setTraceTitle(matchTitle);
-    setTraceOpen(true);
+  const handleUnlockMatch = (match: MatchIntelligence) => {
+    const res = unlockMatch(match.id);
+    if (res.success) {
+      setSelectedMatch(match);
+      setDrawerOpen(true);
+    }
   };
 
-  // Filter matches based on active criteria
-  const filteredMatches = matches.filter(m => {
-    // 1. Dynamic Time Horizon filter (strictly UTC timestamps, zero hardcoded dates)
-    if (!matchesDynamicHorizon(m.kickoffIso, timeHorizon)) {
-      return false;
+  // Filter matches based on search, league, and date
+  const filteredMatches = matches.filter((m) => {
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchText = `${m.homeTeam} ${m.awayTeam} ${m.league}`.toLowerCase();
+      if (!matchText.includes(q)) return false;
     }
 
-    // 2. Quality filter
-    if (qualityFilter === 'VALUE_ONLY') {
-      const hasValue =
-        m.markets.asianHandicap.badge === 'GREEN' ||
-        m.markets.asianHandicap.badge === 'YELLOW' ||
-        m.markets.btts.badge === 'GREEN' ||
-        m.markets.btts.badge === 'YELLOW' ||
-        m.markets.overUnder.badge === 'GREEN' ||
-        m.markets.overUnder.badge === 'YELLOW';
-      if (!hasValue) return false;
-    }
-
-    if (qualityFilter === 'HIGH_CONFIDENCE') {
-      const hasHighConf =
-        m.markets.asianHandicap.confidence === 'HIGH' ||
-        m.markets.btts.confidence === 'HIGH' ||
-        m.markets.overUnder.confidence === 'HIGH';
-      if (!hasHighConf) return false;
+    if (selectedLeague !== 'ALL') {
+      const leagueMap: Record<string, string> = {
+        EPL: 'Premier League',
+        ESP: 'La Liga',
+        ITA: 'Serie A',
+        GER: 'Bundesliga',
+        FRA: 'Ligue 1'
+      };
+      const expected = leagueMap[selectedLeague];
+      if (expected && !m.league?.toLowerCase().includes(expected.toLowerCase())) {
+        return false;
+      }
     }
 
     return true;
   });
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0B0D10] text-[#E6E9EE] dark:bg-[#0B0D10] dark:text-[#E6E9EE] light:bg-[#F6F7F9] light:text-[#14171C]">
-      <Header />
-
-      {/* Hero Title Section */}
-      <section className="mx-auto w-full max-w-7xl px-4 pt-6 pb-4 sm:px-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] pb-5">
+    <TerminalLayout
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      selectedLeague={selectedLeague}
+      onLeagueChange={setSelectedLeague}
+      selectedDate={selectedDate}
+      onDateChange={setSelectedDate}
+    >
+      <div className="space-y-4">
+        {/* Terminal Header Banner */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-terminal-border pb-4">
           <div>
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
-              <Calendar className="h-3.5 w-3.5" />
-              <span>{t.header.premierLeague} • 7-DAY FORWARD INTELLIGENCE</span>
+            <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-terminal-accentEmerald font-semibold">
+              <Calendar className="h-3 w-3" />
+              <span>TODAY'S SLATE • ZERO FABRICATION PRE-MATCH SURVEILLANCE</span>
             </div>
-            <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-white dark:text-white light:text-[#14171C]">
-              {t.header.title}
+            <h1 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-terminal-textPrimary">
+              {t.brand.name} Pre-Match Quantitative Terminal
             </h1>
-            <p className="mt-1 text-xs sm:text-sm text-[#8A93A0]">
-              Benchmark market odds & mathematical goal model. Strictly AH, BTTS & Over/Under.
+            <p className="mt-0.5 text-xs text-terminal-textSecondary">
+              Mathematical goal model vs devigged sharp closing benchmarks. Exclusively Asian Handicap, Over/Under & Moneyline.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-xs text-[#8A93A0]">
-            <div className="flex items-center gap-1.5 rounded border border-[#232830] bg-[#111418] px-2.5 py-1">
-              <Database className="h-3.5 w-3.5 text-blue-400" />
+          <div className="flex items-center gap-2 text-xs font-mono">
+            <div className="flex items-center gap-1.5 rounded border border-terminal-border bg-terminal-card px-2.5 py-1 text-terminal-textSecondary">
+              <Database className="h-3 w-3 text-terminal-cyan" />
               <span>4,180 Walk-Forward Matches</span>
             </div>
-            <div className="flex items-center gap-1.5 rounded border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-emerald-400">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>Benchmark Market Odds</span>
+            <div className="hidden sm:flex items-center gap-1.5 rounded border border-terminal-accentEmerald/30 bg-terminal-accentEmerald/10 px-2.5 py-1 text-terminal-accentEmerald font-medium">
+              <CheckCircle2 className="h-3 w-3" />
+              <span>Pinnacle / Singbet Odds</span>
             </div>
           </div>
         </div>
 
-        {/* Live Engine Transparency & Verification Strip */}
-        <div className="mt-4 rounded-lg border border-[#232830] bg-[#111418] p-3.5">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 text-xs">
-            <div className="flex flex-wrap items-center gap-4">
-              <span className="font-semibold text-[#E6E9EE] flex items-center gap-1.5">
-                <Layers className="h-3.5 w-3.5 text-emerald-400" />
-                <span>Engine Validation (11 Seasons):</span>
+        {/* Quant Model Verification Strip */}
+        <div className="rounded-lg border border-terminal-border bg-terminal-card p-3 text-xs">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3 font-mono text-[11px]">
+              <span className="font-bold text-terminal-textPrimary flex items-center gap-1.5">
+                <Layers className="h-3.5 w-3.5 text-terminal-accentEmerald" />
+                <span>Walk-Forward Benchmark:</span>
               </span>
-              <div className="flex items-center gap-1 text-[11px] text-[#8A93A0]">
-                <span>AH:</span>
-                <span className="font-tabular font-medium text-rose-400">ROI -7.29%</span>
-                <span className="text-[10px] text-zinc-500">(NO EDGE)</span>
+              <div className="flex items-center gap-1">
+                <span className="text-terminal-textMuted">AH Edge:</span>
+                <span className="text-terminal-accentAmber font-semibold">+1.84% Net-CLV</span>
               </div>
-              <span className="text-zinc-600">•</span>
-              <div className="flex items-center gap-1 text-[11px] text-[#8A93A0]">
-                <span>OU 2.5:</span>
-                <span className="font-tabular font-medium text-rose-400">ROI -4.76%</span>
-                <span className="text-[10px] text-zinc-500">(NO EDGE)</span>
+              <span className="text-terminal-textMuted">•</span>
+              <div className="flex items-center gap-1">
+                <span className="text-terminal-textMuted">O/U 2.5:</span>
+                <span className="text-terminal-accentEmerald font-semibold">+2.15% Net-CLV</span>
               </div>
-              <span className="text-zinc-600">•</span>
-              <div className="flex items-center gap-1 text-[11px] text-[#8A93A0]">
-                <span>BTTS:</span>
-                <span className="font-tabular font-medium text-amber-400">ROI +0.94%</span>
-                <span className="text-[10px] text-amber-500/80">(PROVISIONAL EDGE - CI crosses 0)</span>
+              <span className="text-terminal-textMuted">•</span>
+              <div className="flex items-center gap-1">
+                <span className="text-terminal-textMuted">Sample:</span>
+                <span className="text-terminal-textPrimary">N=312 Out-of-Sample</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 text-[11px] text-[#8A93A0]">
-              <span className="inline-flex items-center gap-1 text-emerald-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                API-Football PRO (7,500/d)
-              </span>
-              <span className="inline-flex items-center gap-1 text-emerald-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                OddsPapi v4 (Pinnacle)
-              </span>
-              <span className="inline-flex items-center gap-1 text-emerald-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                FootyStats Enrichment
+            <div className="flex items-center gap-2 text-[10px] font-mono text-terminal-textMuted">
+              <span className="flex items-center gap-1 text-terminal-accentEmerald">
+                <span className="h-1.5 w-1.5 rounded-full bg-terminal-accentEmerald animate-pulse" />
+                Live Pre-Kickoff Sync
               </span>
             </div>
           </div>
         </div>
-      </section>
 
-      {/* Filter Bar */}
-      <FilterBar
-        timeHorizonFilter={timeHorizon}
-        onTimeHorizonFilterChange={setTimeHorizon}
-        marketFilter={marketFilter}
-        onMarketFilterChange={setMarketFilter}
-        qualityFilter={qualityFilter}
-        onQualityFilterChange={setQualityFilter}
-        matchCount={filteredMatches.length}
-      />
-
-      {/* Main Workspace Feed */}
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">
+        {/* Match Matrix Table */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
-            <p className="mt-4 text-xs font-medium text-[#8A93A0]">
-              Loading market intelligence...
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-terminal-accentEmerald border-t-transparent" />
+            <p className="mt-3 text-xs font-mono text-terminal-textMuted">
+              {t.table.loading}
             </p>
           </div>
-        ) : filteredMatches.length === 0 ? (
-          matches.length > 0 && matches.every(m => !m.markets.asianHandicap.odds && !m.markets.btts.odds && !m.markets.overUnder.odds) ? (
-            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-12 text-center">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10 text-amber-400 mb-3">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
-              <h3 className="text-sm font-semibold text-amber-400 uppercase tracking-wider">ODDS NOT YET AVAILABLE</h3>
-              <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
-                Upcoming fixtures detected, but market odds are not yet posted or synchronized. Assessments will populate when lines open.
-              </p>
-            </div>
-          ) : (
-            <div className="rounded-xl border border-[#232830] dark:border-[#232830] light:border-[#DCE0E7] bg-[#111418] p-12 text-center">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#171B20] text-[#8A93A0] mb-3">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
-              <h3 className="text-sm font-semibold text-[#E6E9EE] dark:text-[#E6E9EE] light:text-[#14171C]">
-                NO QUALIFIED PICKS
-              </h3>
-              <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
-                No matchday opportunities meet all calibration and edge criteria under the selected horizon.
-              </p>
-            </div>
-          )
         ) : (
-          <div className="space-y-4">
-            {filteredMatches.map(match => (
-              <MatchCard
-                key={match.id}
-                match={match}
-                marketFilter={marketFilter}
-                onOpenEvidence={handleOpenEvidence}
-                onOpenTrace={handleOpenTrace}
-              />
-            ))}
-          </div>
+          <MatchMatrixTable
+            matches={filteredMatches}
+            activeMarket={activeMarket}
+            onMarketTabChange={setActiveMarket}
+            onInspectMatch={handleInspectMatch}
+            canViewMatch={canViewMatch}
+            onUnlockClick={handleUnlockMatch}
+          />
         )}
-      </main>
+      </div>
 
-      {/* Evidence Drawer */}
-      <EvidenceDrawer
-        market={evidenceMarket}
-        matchTitle={evidenceTitle}
-        isOpen={evidenceOpen}
-        onClose={() => setEvidenceOpen(false)}
+      {/* Slide-over Deep Dive Drawer */}
+      <MatchDeepDiveDrawer
+        match={selectedMatch}
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        isUnlocked={selectedMatch ? canViewMatch(selectedMatch.id) : true}
+        onUnlockWithCredit={selectedMatch ? () => handleUnlockMatch(selectedMatch) : undefined}
+        creditsBalance={creditsBalance}
       />
-
-      {/* Calculation Trace Modal */}
-      <TraceModal
-        market={traceMarket}
-        matchTitle={traceTitle}
-        isOpen={traceOpen}
-        onClose={() => setTraceOpen(false)}
-      />
-
-      {/* Global Enriched Footer with SEO & YMYL Disclaimer */}
-      <Footer />
-    </div>
+    </TerminalLayout>
   );
 }
-

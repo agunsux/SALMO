@@ -94,7 +94,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({
 
   const allMarkets: Array<{ type: MarketType; title: string; view: MarketView }> = [
     { type: 'ASIAN_HANDICAP', title: t.markets.asianHandicap, view: match.markets.asianHandicap },
-    { type: 'BTTS', title: t.markets.btts, view: match.markets.btts },
+    { type: 'BTTS', title: (t.markets as any).btts || 'Both Teams To Score', view: match.markets.btts },
     { type: 'OVER_UNDER', title: t.markets.overUnder, view: match.markets.overUnder },
   ];
 

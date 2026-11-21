@@ -3,45 +3,77 @@
 @tailwind utilities;
 
 :root {
-  --bg-base: #0B0D10;
-  --surface-1: #111418;
-  --surface-2: #171B20;
-  --border-default: #232830;
-  --border-subtle: #1C2026;
-  --text-primary: #E6E9EE;
-  --text-secondary: #8A93A0;
-  --text-tertiary: #5B6370;
+  /* Dark Default Palette (Institutional Deep Slate/Navy) */
+  --terminal-canvas: #070B14;
+  --terminal-card: #0F1624;
+  --terminal-panel: #121A2A;
+  --terminal-elevated: #161F30;
+  --terminal-border: #1E293B;
+  --terminal-border-subtle: #141D2C;
+  --terminal-text-primary: #F8FAFC;
+  --terminal-text-secondary: #94A3B8;
+  --terminal-text-muted: #64748B;
+  --terminal-emerald: #10B981;
+  --terminal-amber: #F59E0B;
+  --terminal-red: #EF4444;
+  --terminal-cyan: #06B6D4;
+
+  --bg-base: #070B14;
+  --surface-1: #0F1624;
+  --surface-2: #161F30;
+  --border-default: #1E293B;
+  --border-subtle: #141D2C;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-tertiary: #64748B;
 }
 
+html.light,
 .light {
-  --bg-base: #F6F7F9;
+  /* Bright / Light Mode Palette (High Contrast Institutional Daylight) */
+  --terminal-canvas: #F8FAFC;
+  --terminal-card: #FFFFFF;
+  --terminal-panel: #F1F5F9;
+  --terminal-elevated: #E2E8F0;
+  --terminal-border: #CBD5E1;
+  --terminal-border-subtle: #E2E8F0;
+  --terminal-text-primary: #0F172A;
+  --terminal-text-secondary: #475569;
+  --terminal-text-muted: #94A3B8;
+  --terminal-emerald: #059669;
+  --terminal-amber: #D97706;
+  --terminal-red: #DC2626;
+  --terminal-cyan: #0891B2;
+
+  --bg-base: #F8FAFC;
   --surface-1: #FFFFFF;
-  --surface-2: #EFF1F5;
-  --border-default: #DCE0E7;
-  --border-subtle: #E6E9EE;
-  --text-primary: #14171C;
-  --text-secondary: #5A6270;
-  --text-tertiary: #8A93A0;
+  --surface-2: #F1F5F9;
+  --border-default: #CBD5E1;
+  --border-subtle: #E2E8F0;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-tertiary: #94A3B8;
 }
 
 body {
-  background-color: var(--bg-base);
-  color: var(--text-primary);
+  background-color: var(--terminal-canvas);
+  color: var(--terminal-text-primary);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
 }
 
+.tabular-nums,
 .font-tabular {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
 
-/* Restrained scrollbars */
+/* Institutional trading scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -49,17 +81,21 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #232830;
-  border-radius: 9999px;
+  background: #1E293B;
+  border-radius: 4px;
 }
 
 .light ::-webkit-scrollbar-thumb {
-  background: #DCE0E7;
+  background: #CBD5E1;
 }
 
-/* Subtle focus indicators */
-*:focus-visible {
-  outline: 2px solid #3B82F6;
-  outline-offset: 2px;
+/* Selection highlight */
+::selection {
+  background: rgba(16, 185, 129, 0.25);
+  color: #F8FAFC;
 }
 
+.light ::selection {
+  background: rgba(5, 150, 105, 0.25);
+  color: #0F172A;
+}

@@ -2,23 +2,23 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'dark' | 'light';
+export type ThemeMode = 'dark' | 'light';
 
 interface ThemeContextType {
-  theme: Theme;
+  theme: ThemeMode;
   toggleTheme: () => void;
-  setTheme: (theme: Theme) => void;
+  setTheme: (theme: ThemeMode) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>('dark');
+  const [theme, setThemeState] = useState<ThemeMode>('dark');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('salmo_theme') as Theme;
+      const saved = localStorage.getItem('salmo_theme') as ThemeMode;
       if (saved === 'light' || saved === 'dark') {
         setThemeState(saved);
         applyTheme(saved);
@@ -31,7 +31,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setMounted(true);
   }, []);
 
-  const applyTheme = (t: Theme) => {
+  const applyTheme = (t: ThemeMode) => {
     const root = document.documentElement;
     if (t === 'dark') {
       root.classList.add('dark');
@@ -42,13 +42,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const setTheme = (t: Theme) => {
+  const setTheme = (t: ThemeMode) => {
     setThemeState(t);
     applyTheme(t);
     try {
       localStorage.setItem('salmo_theme', t);
     } catch {
-      // Ignore
+      // Ignore in private browsing
     }
   };
 
@@ -57,21 +57,17 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setTheme(next);
   };
 
-  // Prevent flash by rendering with consistent dark default
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
-      <div className={theme === 'dark' ? 'dark text-salmo-dark-textPrimary' : 'light text-salmo-light-textPrimary'}>
-        {children}
-      </div>
+      {children}
     </ThemeContext.Provider>
   );
 };
 
 export const useTheme = () => {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) {
+  const context = useContext(ThemeContext);
+  if (!context) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
-  return ctx;
+  return context;
 };
-

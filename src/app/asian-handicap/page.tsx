@@ -1,153 +1,122 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
-import { MatchCard } from '@/components/match/MatchCard';
-import { EvidenceDrawer } from '@/components/evidence/EvidenceDrawer';
-import { TraceModal } from '@/components/trace/TraceModal';
-import { MatchIntelligence, MarketView } from '@/types';
-import { ShieldCheck, Layers } from 'lucide-react';
-import { matchesDynamicHorizon, TimeHorizonFilter } from '@/lib/horizon';
+import { TerminalLayout } from '@/components/terminal/TerminalLayout';
+import { MatchMatrixTable } from '@/components/terminal/MatchMatrixTable';
+import { MatchDeepDiveDrawer } from '@/components/terminal/MatchDeepDiveDrawer';
+import { MatchIntelligence } from '@/types';
+import { useI18n } from '@/i18n/context';
+import { useEntitlements } from '@/hooks/useEntitlements';
+import { Target, Layers, ShieldCheck, Info } from 'lucide-react';
 
 export default function AsianHandicapPage() {
+  const { t } = useI18n();
+  const { canViewMatch, unlockMatch, creditsBalance } = useEntitlements();
+
   const [matches, setMatches] = useState<MatchIntelligence[]>([]);
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState<'LOADING' | 'AVAILABLE' | 'DATA_UNAVAILABLE'>('LOADING');
-  const [timeHorizon, setTimeHorizon] = useState<TimeHorizonFilter>('7_DAYS');
 
-  const [evidenceMarket, setEvidenceMarket] = useState<MarketView | null>(null);
-  const [evidenceTitle, setEvidenceTitle] = useState('');
-  const [evidenceOpen, setEvidenceOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedLeague, setSelectedLeague] = useState('ALL');
+  const [selectedDate, setSelectedDate] = useState('ALL');
 
-  const [traceMarket, setTraceMarket] = useState<MarketView | null>(null);
-  const [traceTitle, setTraceTitle] = useState('');
-  const [traceOpen, setTraceOpen] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState<MatchIntelligence | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/matches?market=AH')
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data.success && data.data?.matches) {
           setMatches(data.data.matches);
-          setStatus(data.data.matches.length > 0 ? 'AVAILABLE' : 'DATA_UNAVAILABLE');
-        } else {
-          setStatus('DATA_UNAVAILABLE');
         }
       })
-      .catch(err => {
-        console.error('Failed to load AH matches:', err);
-        setStatus('DATA_UNAVAILABLE');
-      })
+      .catch((err) => console.error('Failed to load AH fixtures:', err))
       .finally(() => setLoading(false));
   }, []);
 
-  const handleOpenEvidence = (market: MarketView, matchTitle: string) => {
-    setEvidenceMarket(market);
-    setEvidenceTitle(matchTitle);
-    setEvidenceOpen(true);
+  const handleInspectMatch = (match: MatchIntelligence) => {
+    setSelectedMatch(match);
+    setDrawerOpen(true);
   };
 
-  const handleOpenTrace = (market: MarketView, matchTitle: string) => {
-    setTraceMarket(market);
-    setTraceTitle(matchTitle);
-    setTraceOpen(true);
+  const handleUnlockMatch = (match: MatchIntelligence) => {
+    const res = unlockMatch(match.id);
+    if (res.success) {
+      setSelectedMatch(match);
+      setDrawerOpen(true);
+    }
   };
 
-  const filteredMatches = matches.filter(m => matchesDynamicHorizon(m.kickoffIso, timeHorizon));
+  const filteredMatches = matches.filter((m) => {
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchText = `${m.homeTeam} ${m.awayTeam} ${m.league}`.toLowerCase();
+      if (!matchText.includes(q)) return false;
+    }
+    return true;
+  });
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0B0D10] text-[#E6E9EE]">
-      <Header />
-
-      <section className="mx-auto w-full max-w-7xl px-4 pt-6 pb-4 sm:px-6">
-        <div className="border-b border-[#232830] pb-5">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
-            <Layers className="h-3.5 w-3.5" />
-            <span>MARKET SPECIFIC INTELLIGENCE</span>
+    <TerminalLayout
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      selectedLeague={selectedLeague}
+      onLeagueChange={setSelectedLeague}
+      selectedDate={selectedDate}
+      onDateChange={setSelectedDate}
+    >
+      <div className="space-y-4">
+        {/* Banner */}
+        <div className="border-b border-terminal-border pb-4">
+          <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-terminal-accentEmerald font-semibold">
+            <Target className="h-3.5 w-3.5" />
+            <span>MARKET SPECIALIZATION • ASIAN HANDICAP (AH)</span>
           </div>
-          <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Asian Handicap (AH)
+          <h1 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-terminal-textPrimary">
+            Asian Handicap Terminal
           </h1>
-          <p className="mt-1 text-xs sm:text-sm text-[#8A93A0]">
-            Quarter-line split settlement methodology. Sharp benchmark quotes vs calibrated goal expectation.
+          <p className="mt-0.5 text-xs text-terminal-textSecondary max-w-2xl">
+            Continuous & quarter-line settlement models (-1.25 to +1.25). Devigged sharp benchmark odds vs calibrated Dixon-Coles goal expectation.
           </p>
+        </div>
 
-          <div className="mt-3 flex items-center gap-2 text-xs">
-            {(
-              [
-                { id: 'TODAY', label: 'Today' },
-                { id: 'TOMORROW', label: 'Tomorrow' },
-                { id: 'PLUS_3_DAYS', label: '+3 Days' },
-                { id: '7_DAYS', label: '7 Days' },
-              ] as const
-            ).map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setTimeHorizon(tab.id)}
-                className={`rounded px-2.5 py-1 font-medium transition-colors ${
-                  timeHorizon === tab.id
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold'
-                    : 'bg-[#171B20] text-[#8A93A0] hover:text-white border border-[#232830]'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+        {/* Methodology Callout */}
+        <div className="rounded-lg border border-terminal-border bg-terminal-card p-3 text-xs flex items-start gap-2.5">
+          <Info className="h-4 w-4 text-terminal-accentCyan shrink-0 mt-0.5" />
+          <div className="text-[11px] text-terminal-textSecondary leading-relaxed">
+            <span className="font-bold text-terminal-textPrimary mr-1">Quarter-Line Mathematics:</span>
+            Quarter lines (±0.25, ±0.75) are split exactly into two half-stakes over adjacent half-lines. Win/loss payoffs are evaluated without midpoint probability inversion.
           </div>
         </div>
-      </section>
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">
+        {/* Matrix Table */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
-            <p className="mt-4 text-xs font-medium text-[#8A93A0]">Loading Asian Handicap canonical intelligence...</p>
-          </div>
-        ) : status === 'DATA_UNAVAILABLE' || filteredMatches.length === 0 ? (
-          <div className="rounded-xl border border-[#232830] bg-[#111418] p-12 text-center">
-            <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#171B20] text-[#8A93A0] mb-3">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-            <h3 className="text-sm font-semibold text-[#E6E9EE]">
-              {status === 'DATA_UNAVAILABLE' ? 'DATA_UNAVAILABLE' : 'NO_QUALIFIED_PICKS'}
-            </h3>
-            <p className="mt-1 text-xs text-[#8A93A0] max-w-md mx-auto">
-              {status === 'DATA_UNAVAILABLE'
-                ? 'SALMO Asian Handicap feed is currently unavailable.'
-                : 'No Asian Handicap fixtures match the selected horizon.'}
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-terminal-accentEmerald border-t-transparent" />
+            <p className="mt-3 text-xs font-mono text-terminal-textMuted">
+              Loading Asian Handicap live order books...
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {filteredMatches.map(match => (
-              <MatchCard
-                key={match.id}
-                match={match}
-                marketFilter="AH"
-                onOpenEvidence={handleOpenEvidence}
-                onOpenTrace={handleOpenTrace}
-              />
-            ))}
-          </div>
+          <MatchMatrixTable
+            matches={filteredMatches}
+            activeMarket="AH"
+            onInspectMatch={handleInspectMatch}
+            canViewMatch={canViewMatch}
+            onUnlockClick={handleUnlockMatch}
+          />
         )}
-      </main>
+      </div>
 
-      <EvidenceDrawer
-        isOpen={evidenceOpen}
-        onClose={() => setEvidenceOpen(false)}
-        market={evidenceMarket}
-        matchTitle={evidenceTitle}
+      <MatchDeepDiveDrawer
+        match={selectedMatch}
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        isUnlocked={selectedMatch ? canViewMatch(selectedMatch.id) : true}
+        onUnlockWithCredit={selectedMatch ? () => handleUnlockMatch(selectedMatch) : undefined}
+        creditsBalance={creditsBalance}
       />
-
-      <TraceModal
-        isOpen={traceOpen}
-        onClose={() => setTraceOpen(false)}
-        market={traceMarket}
-        matchTitle={traceTitle}
-      />
-
-      <Footer />
-    </div>
+    </TerminalLayout>
   );
 }

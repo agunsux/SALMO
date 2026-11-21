@@ -1,14 +1,31 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { LocaleCode, DEFAULT_LOCALE, SUPPORTED_LOCALES, TranslationDictionary } from './types';
-import { translations } from './translations';
+import { LocaleCode, DEFAULT_LOCALE, SUPPORTED_LOCALES, TranslationSchema } from './types';
+
+import en from './locales/en.json';
+import es from './locales/es.json';
+import pt from './locales/pt.json';
+import zh from './locales/zh.json';
+import id from './locales/id.json';
+import th from './locales/th.json';
+import vi from './locales/vi.json';
+
+const translations: Record<LocaleCode, TranslationSchema> = {
+  en: en as TranslationSchema,
+  es: es as TranslationSchema,
+  pt: pt as TranslationSchema,
+  zh: zh as TranslationSchema,
+  id: id as TranslationSchema,
+  th: th as TranslationSchema,
+  vi: vi as TranslationSchema,
+};
 
 interface I18nContextType {
   locale: LocaleCode;
   setLocale: (code: LocaleCode) => void;
-  t: TranslationDictionary;
-  formatOdds: (odds: number | null | undefined) => string;
+  t: TranslationSchema;
+  formatOdds: (val: number | null | undefined) => string;
   formatPercent: (val: number | null | undefined, digits?: number) => string;
   formatEdge: (edge: number | null | undefined) => string;
   formatDate: (dateIso: string) => string;
@@ -26,15 +43,17 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (saved && SUPPORTED_LOCALES.some(l => l.code === saved)) {
         setLocaleState(saved);
       } else {
-        // Check browser language
-        const navLang = navigator.language;
-        const match = SUPPORTED_LOCALES.find(l => 
-          navLang.startsWith(l.code) || l.code.startsWith(navLang.split('-')[0])
-        );
-        if (match) setLocaleState(match.code);
+        const navLang = navigator.language.toLowerCase();
+        if (navLang.startsWith('es')) setLocaleState('es');
+        else if (navLang.startsWith('pt')) setLocaleState('pt');
+        else if (navLang.startsWith('zh')) setLocaleState('zh');
+        else if (navLang.startsWith('id')) setLocaleState('id');
+        else if (navLang.startsWith('th')) setLocaleState('th');
+        else if (navLang.startsWith('vi')) setLocaleState('vi');
+        else setLocaleState('en');
       }
     } catch {
-      // Ignore localStorage errors (e.g. incognito)
+      // Ignore
     }
   }, []);
 
@@ -49,14 +68,11 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const t = translations[locale] || translations[DEFAULT_LOCALE];
 
-  const formatOdds = (odds: number | null | undefined): string => {
-    if (odds === null || odds === undefined || !Number.isFinite(odds)) {
+  const formatOdds = (val: number | null | undefined): string => {
+    if (val === null || val === undefined || !Number.isFinite(val) || val <= 1.0) {
       return '—';
     }
-    return new Intl.NumberFormat(locale === 'pt-BR' ? 'pt-BR' : 'en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(odds);
+    return val.toFixed(2);
   };
 
   const formatPercent = (val: number | null | undefined, digits = 1): string => {
@@ -71,13 +87,13 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return '—';
     }
     const prefix = edge > 0 ? '+' : '';
-    return `${prefix}${edge.toFixed(1)} pp`;
+    return `${prefix}${edge.toFixed(1)}%`;
   };
 
   const formatDate = (dateIso: string): string => {
     try {
       const d = new Date(dateIso);
-      return new Intl.DateTimeFormat(locale, {
+      return new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : (locale === 'id' ? 'id-ID' : locale), {
         weekday: 'short',
         day: 'numeric',
         month: 'short',
@@ -90,7 +106,7 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const formatTime = (dateIso: string): string => {
     try {
       const d = new Date(dateIso);
-      return new Intl.DateTimeFormat(locale, {
+      return new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : (locale === 'id' ? 'id-ID' : locale), {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
@@ -119,10 +135,9 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 export const useI18n = () => {
-  const ctx = useContext(I18nContext);
-  if (!ctx) {
+  const context = useContext(I18nContext);
+  if (!context) {
     throw new Error('useI18n must be used within an I18nProvider');
   }
-  return ctx;
+  return context;
 };
-
